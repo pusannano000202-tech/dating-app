@@ -65,6 +65,13 @@
 - 업로드 완료 후 `POST /api/score-photos` 호출 (외모 AI 서버, URL: `process.env.APPEARANCE_API_URL`)
 - 업로드 전 미리보기, 순서 변경 UI 있으면 좋음
 
+**추가 결정사항 (2026-05-15):**
+- 이상형 월드컵은 이모지 카드 → **AI 생성 사진** 기반으로 변경 완료
+- 사진 위치: `public/appearance-types/{type}.jpg` (cute/pure/chic/warm/stylish/healthy)
+- 사진이 없어도 gradient 폴백으로 동작함 (개발 중 테스트 가능)
+- 사진 생성 가이드: `public/appearance-types/README.md` 참고
+- **Codex가 AI 사진 6장 생성해서 폴더에 넣어주면 바로 반영됨**
+
 **주의:**
 - `lib/types.ts` 수정 필요하면 절대 혼자 하지 말고 Claude에게 알릴 것 (PR 필요)
 - 성준 영역(`python/matching/`, `app/group/`, `app/match/`) 건드리지 말 것

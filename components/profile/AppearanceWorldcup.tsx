@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import Image from 'next/image'
 import type { AppearanceType } from '@/lib/types'
 import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
 
-// 8강: 6타입 + 부전승 2개 → [cute,pure], [chic,warm], [stylish,BYE], [healthy,BYE]
-// 부전승(BYE)은 자동으로 탈락 처리
+// 8강: 6타입 + 부전승 2개
+// [cute,pure], [chic,warm] → 유저가 선택
+// [stylish,BYE], [healthy,BYE] → 자동 통과
 const INITIAL_BRACKET: (AppearanceType | 'BYE')[][] = [
   ['cute', 'pure'],
   ['chic', 'warm'],
@@ -15,19 +17,6 @@ const INITIAL_BRACKET: (AppearanceType | 'BYE')[][] = [
 
 type BracketEntry = AppearanceType | 'BYE'
 
-function runByes(pool: BracketEntry[]): AppearanceType[] {
-  // BYE가 있는 매치는 상대방이 자동 통과
-  const winners: AppearanceType[] = []
-  for (let i = 0; i < pool.length; i += 2) {
-    const a = pool[i]
-    const b = pool[i + 1]
-    if (a === 'BYE') winners.push(b as AppearanceType)
-    else if (b === 'BYE') winners.push(a as AppearanceType)
-    // 실제 대결은 caller가 처리
-  }
-  return winners
-}
-
 interface Props {
   onComplete: (type: AppearanceType) => void
 }
@@ -35,7 +24,6 @@ interface Props {
 export default function AppearanceWorldcup({ onComplete }: Props) {
   const [roundLabel, setRoundLabel] = useState('8강')
   const [matchQueue, setMatchQueue] = useState<[AppearanceType, AppearanceType][]>(() => {
-    // 8강에서 BYE 없는 실제 대결만 추출
     const real: [AppearanceType, AppearanceType][] = []
     for (const pair of INITIAL_BRACKET) {
       if (pair[0] !== 'BYE' && pair[1] !== 'BYE') {
@@ -44,25 +32,25 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
     }
     return real
   })
-  // 8강 부전승자 (stylish, healthy)를 미리 다음 라운드 풀에 추가
   const [nextRoundPool, setNextRoundPool] = useState<AppearanceType[]>(['stylish', 'healthy'])
   const [currentMatch, setCurrentMatch] = useState(0)
-  const [totalMatches, setTotalMatches] = useState(0)
+  const [selectedType, setSelectedType] = useState<AppearanceType | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const totalUserChoices = 2 + 2 + 1 // 8강2 + 4강2 + 결승1 = 5회
+  const totalUserChoices = 5 // 8강2 + 4강2 + 결승1
 
   const pick = useCallback(
     (chosen: AppearanceType) => {
       if (isAnimating) return
       setIsAnimating(true)
+      setSelectedType(chosen)
 
       setTimeout(() => {
+        setSelectedType(null)
         const remaining = matchQueue.slice(1)
         const newPool = [...nextRoundPool, chosen]
 
         if (remaining.length > 0) {
-          // 같은 라운드에 남은 경기 있음
           setMatchQueue(remaining)
           setNextRoundPool(newPool)
           setCurrentMatch((m) => m + 1)
@@ -70,33 +58,29 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
           return
         }
 
-        // 이 라운드 끝 → 다음 라운드 구성
         if (newPool.length === 1) {
-          // 우승자 결정
           onComplete(newPool[0])
           return
         }
 
-        // 다음 라운드 매치 생성 (풀을 순서대로 2개씩 페어링)
         const nextMatches: [AppearanceType, AppearanceType][] = []
         const nextPool: AppearanceType[] = []
         for (let i = 0; i < newPool.length; i += 2) {
           if (i + 1 < newPool.length) {
             nextMatches.push([newPool[i], newPool[i + 1]])
           } else {
-            nextPool.push(newPool[i]) // 홀수면 부전승
+            nextPool.push(newPool[i])
           }
         }
 
-        const total = newPool.length
-        if (total <= 4) setRoundLabel('4강')
-        if (total <= 2) setRoundLabel('결승')
+        if (newPool.length <= 4) setRoundLabel('4강')
+        if (newPool.length <= 2) setRoundLabel('결승')
 
         setMatchQueue(nextMatches)
         setNextRoundPool(nextPool)
         setCurrentMatch((m) => m + 1)
         setIsAnimating(false)
-      }, 300)
+      }, 400)
     },
     [isAnimating, matchQueue, nextRoundPool, onComplete]
   )
@@ -106,8 +90,6 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
   }
 
   const [left, right] = matchQueue[0]
-  const leftInfo = APPEARANCE_TYPE_INFO[left]
-  const rightInfo = APPEARANCE_TYPE_INFO[right]
   const progress = Math.round((currentMatch / totalUserChoices) * 100)
 
   return (
@@ -126,50 +108,81 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="mt-4 text-center text-lg font-bold">
-          나는 어떤 스타일이 더 좋아?
+        <p className="mt-5 text-center text-xl font-bold tracking-tight">
+          어떤 스타일이 더 좋아?
         </p>
         <p className="text-center text-sm text-gray-400 mt-1">
-          직관적으로 골라봐 — 정답 없어
+          직관적으로 골라봐
         </p>
       </div>
 
-      {/* 대결 카드 */}
+      {/* 대결 카드 — 사진 기반 */}
       <div className="w-full max-w-md flex gap-3">
-        {([left, right] as AppearanceType[]).map((type, idx) => {
-          const info = idx === 0 ? leftInfo : rightInfo
+        {([left, right] as AppearanceType[]).map((type) => {
+          const info = APPEARANCE_TYPE_INFO[type]
+          const isChosen = selectedType === type
+          const isRejected = selectedType !== null && selectedType !== type
+
           return (
             <button
               key={type}
               onClick={() => pick(type)}
               disabled={isAnimating}
               className={`
-                flex-1 rounded-2xl p-5 flex flex-col items-center gap-3 border-2 border-transparent
-                bg-gradient-to-b ${info.gradient} bg-opacity-20
-                hover:border-white active:scale-95 transition-all duration-200
-                disabled:opacity-50 disabled:cursor-not-allowed
+                relative flex-1 rounded-3xl overflow-hidden
+                aspect-[3/4]
+                border-2 transition-all duration-300
+                ${isChosen ? 'border-white scale-[1.03]' : 'border-transparent'}
+                ${isRejected ? 'opacity-30 scale-95' : ''}
+                ${!isAnimating ? 'hover:border-white/60 active:scale-95' : ''}
+                disabled:cursor-not-allowed
               `}
             >
-              <span className="text-5xl">{info.emoji}</span>
-              <span className="text-lg font-bold">{info.label}</span>
-              <div className="flex flex-wrap gap-1 justify-center">
-                {info.keywords.map((kw) => (
-                  <span
-                    key={kw}
-                    className="text-xs bg-white/20 rounded-full px-2 py-0.5"
-                  >
-                    {kw}
-                  </span>
-                ))}
+              {/* 사진 — public/appearance-types/{type}.jpg 없으면 gradient 폴백 */}
+              <div className={`absolute inset-0 bg-gradient-to-b ${info.gradient}`} />
+              <Image
+                src={info.imagePath}
+                alt={info.label}
+                fill
+                className="object-cover"
+                sizes="(max-width: 448px) 50vw, 200px"
+                priority
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+              />
+
+              {/* 하단 그라디언트 + 텍스트 오버레이 */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-lg font-black mb-1.5">{info.label}</p>
+                <div className="flex flex-wrap gap-1">
+                  {info.keywords.map((kw) => (
+                    <span
+                      key={kw}
+                      className="text-xs bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5"
+                    >
+                      {kw}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <p className="text-xs text-center text-white/70 leading-snug">
-                {info.description}
-              </p>
+
+              {/* 선택 시 체크 표시 */}
+              {isChosen && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+              )}
             </button>
           )
         })}
       </div>
 
+      <p className="mt-6 text-xs text-gray-600">탭해서 선택</p>
     </div>
   )
 }
