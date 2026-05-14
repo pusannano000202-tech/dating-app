@@ -66,8 +66,39 @@ export default function SchedulePicker({ initialValue, onChange }: Props) {
     })
   }
 
+  const enabledCount = DAYS.filter(({ key }) => slots[key].enabled).length
+  const allEnabled = enabledCount === DAYS.length
+
+  function toggleAll() {
+    const next = allEnabled
+    setSlots((prev) => {
+      const updated = { ...prev }
+      DAYS.forEach(({ key }) => { updated[key] = { ...prev[key], enabled: !next } })
+      const value: AvailableTimeslots = {
+        slots: next ? [] : DAYS.map(({ key }) => ({
+          day: key,
+          start: updated[key].start,
+          end: updated[key].end,
+        })),
+      }
+      onChange(value)
+      return updated
+    })
+  }
+
   return (
     <div className="flex flex-col gap-2.5">
+      {/* 모두 선택 / 해제 */}
+      <div className="flex justify-end mb-1">
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="text-xs text-violet-400 hover:text-violet-300 transition-colors px-2 py-1"
+        >
+          {allEnabled ? '모두 해제' : '모두 선택'}
+        </button>
+      </div>
+
       {DAYS.map(({ key, label }) => {
         const slot = slots[key]
         const isWeekend = key === 'saturday' || key === 'sunday'
