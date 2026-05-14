@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation'
 const STEPS = [
   { label: '이상형', path: '/profile/worldcup' },
   { label: '기본정보', path: '/profile/basic' },
-  { label: '사진', path: '/profile/photos' },
+  { label: '사진',   path: '/profile/photos' },
+  { label: '성격',   path: '/profile/survey' },
   { label: '시간대', path: '/profile/schedule' },
   { label: '가중치', path: '/profile/preferences' },
 ]

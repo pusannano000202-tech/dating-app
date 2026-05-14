@@ -62,45 +62,47 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 
 ## 다음 작업 목록 (TODO)
 
-### [Codex 담당] 기본정보 입력 페이지
-- [ ] `app/profile/basic/page.tsx` — 기본정보 폼 (성별, 나이, 키, 체형, 머리숱, 학교, 학과, 학년)
-- [ ] `components/profile/BasicInfoForm.tsx` — 폼 컴포넌트
-- [ ] 완성 시 Supabase `profiles` 테이블에 저장
+### [Claude 담당] 기본정보 입력 페이지 ✅
+- [x] `components/profile/BasicInfoForm.tsx` — 성별/나이/키/체형/머리숱/학교/학과/학년 폼
+- [x] `app/profile/basic/page.tsx` — Supabase profiles 저장 후 /profile/photos 이동
 
-### [Codex 담당] 사진 업로드 페이지
-- [ ] `app/profile/photos/page.tsx` — 사진 3장 업로드 UI
-- [ ] `components/profile/PhotoUpload.tsx` — Supabase Storage 연동
-- [ ] 업로드 완료 후 `POST /api/score-photos` 호출 트리거
+### [Claude 담당] 사진 업로드 페이지 ✅ (UI 완성, Storage 연동은 Codex 담당)
+- [x] `components/profile/PhotoUpload.tsx` — 3장 슬롯 UI, 미리보기
+- [x] `app/profile/photos/page.tsx` — Supabase Storage 업로드 로직 완성 (버킷만 만들면 됨)
+- [ ] **Codex 담당**: Supabase 버킷 `photos` 생성 + RLS 정책 추가 (`docs/handoff/CODEX_HANDOFF_PHOTOS.md` 참고)
+
+### [Claude 담당] Big5 성격 설문 ✅
+- [x] `components/profile/Big5Survey.tsx` — 5개 트레이트 × 2질문, 5점 척도
+- [x] `app/profile/survey/page.tsx` — big5_* 컬럼 5개 Supabase 저장 후 /profile/schedule 이동
 
 ### [Claude 담당] 이상형 가중치 슬라이더 ✅
-- [x] `app/profile/preferences/page.tsx` — 7개 항목 슬라이더 (합계 1.0 자동 조정)
+- [x] `app/profile/preferences/page.tsx`
 - [x] `components/profile/PreferenceSliders.tsx`
-- [x] `preference_weights` JSONB → `profiles` 저장 + `is_profile_complete = true`
 
 ### [Claude 담당] 가용 시간대 입력 ✅
-- [x] `app/profile/schedule/page.tsx` — 요일별 토글 + 18:00~23:00 시간 선택
+- [x] `app/profile/schedule/page.tsx`
 - [x] `components/profile/SchedulePicker.tsx`
-- [x] `available_timeslots` JSONB → `profiles` 저장
 
-### [Claude 담당] 월드컵 결과 Supabase 저장 연결 ✅
-- [x] `app/profile/worldcup/page.tsx` — `profiles.appearance_type` 저장 후 `/profile/basic` 이동
+### [Claude 담당] 월드컵 결과 저장 ✅
+- [x] `app/profile/worldcup/page.tsx`
 
-### 우선순위 LOW
-- [ ] `app/profile/survey/` — Big5 성격 설문 페이지
+### 남은 TODO
 - [ ] `model.py` — 실제 SCUT-FBP5500 가중치 파일 로드 (weights/resnet50_scut.pth)
 - [ ] 외모 AI 서버 Docker화
+- [ ] Supabase 실키 세팅 후 E2E 흐름 테스트
 
 ---
 
-## 프로필 입력 플로우 (전체 순서)
+## 프로필 입력 플로우 (전체 순서) — 모두 완성
 
 ```
-/profile/worldcup  → (이상형 타입 선택, 완료)
-/profile/basic     → (기본정보: 성별/나이/키 등, Codex 담당)
-/profile/photos    → (사진 3장 업로드 → AI 점수화, Codex 담당)
-/profile/schedule  → (가용 시간대, Claude 담당)
-/profile/preferences → (이상형 가중치, Claude 담당)
-→ is_profile_complete = true → 그룹 생성으로 이동
+/profile/worldcup   → 이상형 타입 선택 (appearance_type 저장)          ✅
+/profile/basic      → 기본정보 (gender/age/height/body_type 등 저장)    ✅
+/profile/photos     → 사진 3장 업로드 + AI 점수 트리거                  ✅
+/profile/survey     → Big5 성격 설문 (big5_* 5개 컬럼 저장)             ✅
+/profile/schedule   → 가용 시간대 (available_timeslots JSONB 저장)       ✅
+/profile/preferences → 이상형 가중치 (preference_weights JSONB 저장)     ✅
+/profile/complete   → 완료 화면 → /group/create 이동                    ✅
 ```
 
 ---
