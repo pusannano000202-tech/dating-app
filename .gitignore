@@ -12,6 +12,9 @@ __pycache__/
 venv/
 *.egg-info/
 
+# AI 모델 가중치 (용량 큼, 별도 공유)
+python/appearance/weights/
+
 # OS
 .DS_Store
 Thumbs.db
