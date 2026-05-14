@@ -27,7 +27,7 @@
 ## 현재 활성 브랜치
 
 ```
-profile/worldcup-ui   ← 현재 작업 중 (Claude 담당)
+profile/worldcup-ui   ← 현재 작업 중 (Claude 담당), 15커밋 ahead of origin
 profile/appearance-ai ← AI 서버 완료, 머지 대기
 ```
 
@@ -86,10 +86,29 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 ### [Claude 담당] 월드컵 결과 저장 ✅
 - [x] `app/profile/worldcup/page.tsx`
 
+### [세션 #3~#5 - 2026-05-15] 추가 개선 사항 (자율 작업)
+
+- [x] **전체 프로필 플로우 버그 수정** (기존 StepProgress, 에러 핸들링, HTML nesting 등)
+- [x] **DB prefill 패턴** — 모든 편집 페이지가 기존 데이터 로드 (`useEffect` + `key` remount)
+  - worldcup, basic, photos, survey, schedule, preferences 전부 적용
+- [x] **로딩 스켈레톤** — schedule, preferences, worldcup 페이지에 Supabase 로딩 중 skeleton
+- [x] **SchedulePicker 버그 수정** — start 변경 시 end가 start보다 작으면 자동 앞당김
+- [x] **photos 테이블 upsert** — 사진 업로드 시 photos 테이블에 메타데이터도 저장
+- [x] **기존 사진 유지 UI** — 사진 페이지에 기존 사진 썸네일 + "유지하고 넘어가기" 버튼
+- [x] **프로필 초기화 버그 수정** — edit 페이지 초기화가 실제로 DB 삭제함
+- [x] **로그인 UX** — 전화번호 자동 포맷, one-time-code autoComplete, ARIA 레이블
+- [x] **AI 서버 보안 개선** — `NEXT_PUBLIC_AI_SERVER_URL` 제거, `/api/score` 프록시 라우트 추가
+- [x] **메타데이터** — profile/auth/group 레이아웃에 SEO 메타데이터 추가
+- [x] **smart redirect** — 홈 페이지가 미완성 단계를 파악해 첫 번째 미완성 단계로 이동
+- [x] **Python pytest 스위트** — `tests/test_model.py`, `tests/test_api.py` (총 17 케이스)
+- [x] **GitHub Actions CI** — `.github/workflows/ci.yml` (pytest + tsc --noEmit)
+- [x] **Docker Compose** — `docker-compose.yml` (원커맨드 AI 서버 실행)
+- [x] **Python Makefile** — `make dev/test/lint/docker-build` 단축키
+
 ### 남은 TODO
 - [ ] `model.py` — 실제 SCUT-FBP5500 가중치 파일 로드 (weights/resnet50_scut.pth)
-- [ ] 외모 AI 서버 Docker화
-- [ ] Supabase 실키 세팅 후 E2E 흐름 테스트
+- [ ] Supabase Storage 버킷 `photos` 생성 + RLS (Codex 담당, CODEX_HANDOFF_PHOTOS.md 참고)
+- [ ] Supabase 실키 세팅 후 E2E 흐름 테스트 (성준이 URL/KEY 주면)
 
 ---
 
@@ -133,18 +152,17 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 
 ## 현재 세션 메모
 
-**날짜:** 2026-05-15
+**날짜:** 2026-05-15 (세션 #5)
 **작업 내용:**
-- 이상형 월드컵 → AI 사진 기반으로 전환 (imagePath 추가, 사진 카드 UI)
-- 월드컵 결과 Supabase 저장 연결 완료
-- SchedulePicker + /profile/schedule 완성
-- PreferenceSliders + /profile/preferences 완성
-- 프로필 입력 플로우 Claude 담당 부분 모두 완료
+- 충현 담당 프로필 플로우 전체 완성 + 품질 향상
+- Python AI 서버 pytest 스위트 작성
+- CI/CD 파이프라인(GitHub Actions) 추가
+- 보안: AI 서버 URL 서버사이드만 노출
+- 스마트 리다이렉트: 홈 → 첫 번째 미완성 단계
 
 **Claude 담당 TODO 전부 완료. 남은 것:**
-- Codex: /profile/basic, /profile/photos
-- 공통: Supabase 프로젝트 .env 세팅 후 실제 동작 테스트
-- 공통: public/appearance-types/ AI 사진 6장 생성·배치
+- Codex: Supabase Storage 버킷 생성 + 자기유사 이미지 생성
+- 공통: 성준이 Supabase URL/KEY 주면 .env.local 세팅 후 E2E 테스트
 
 **Codex 이미지/점수 작업 추가 메모:**
 - `public/appearance-types/` AI 사진 6장 생성·배치 완료
