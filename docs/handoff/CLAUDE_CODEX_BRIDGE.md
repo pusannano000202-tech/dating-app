@@ -260,6 +260,62 @@ Codex는 아래 "Codex 남은 작업" 섹션만 보면 된다.
 
 ---
 
+### [2026-05-15] 세션 #5 (자율 작업 세션)
+
+**완료한 작업:**
+
+#### UX/기능 개선
+
+| 파일 | 내용 |
+|------|------|
+| `app/profile/worldcup/page.tsx` | DB에 기존 appearance_type 있으면 결과 화면 바로 표시 + 로딩 스켈레톤 추가 |
+| `app/profile/schedule/page.tsx` | Supabase 데이터 로딩 중 스켈레톤 UI 추가 (`loaded` 상태) |
+| `app/profile/preferences/page.tsx` | Supabase 데이터 로딩 중 스켈레톤 UI 추가 (`loaded` 상태) |
+| `components/profile/SchedulePicker.tsx` | start 시간 변경 시 end가 start보다 작으면 자동으로 end 앞당김 (UX 버그 수정) |
+
+#### 신규 파일
+
+| 파일 | 설명 |
+|------|------|
+| `app/(auth)/layout.tsx` | 로그인 페이지 메타데이터 추가 |
+| `app/group/layout.tsx` | 그룹 섹션 메타데이터 추가 |
+| `app/api/score/route.ts` | AI 서버 프록시 (보안 강화: AI_SERVER_URL이 브라우저에 노출 안됨) |
+| `python/appearance/requirements-dev.txt` | 테스트용 의존성 분리 |
+| `python/appearance/tests/test_model.py` | model.py pytest 유닛 테스트 (8개 케이스) |
+| `python/appearance/tests/test_api.py` | FastAPI 엔드포인트 pytest 통합 테스트 (9개 케이스) |
+| `docker-compose.yml` | 외모 AI 서버 원커맨드 실행 (포트 8001, 헬스체크 포함) |
+
+#### 보안 개선: AI 서버 프록시
+
+기존: 브라우저 → AI 서버 직접 호출 (`NEXT_PUBLIC_AI_SERVER_URL` 노출)
+변경: 브라우저 → `/api/score` (Next.js 서버) → AI 서버 (`AI_SERVER_URL`, 비공개)
+- `/api/score` 에서 Supabase 세션 쿠키로 인증 검증 후 포워딩
+- `.env.local.example` 업데이트: `NEXT_PUBLIC_AI_SERVER_URL` → `AI_SERVER_URL`
+
+#### Python pytest 테스트 스위트
+
+```bash
+# 실행 방법 (python/appearance/ 에서)
+pip install -r requirements-dev.txt
+pytest tests/ -v
+```
+
+커버 범위:
+- `build_model`: 반환 타입, eval 모드, 출력 shape
+- `score_image`: 범위 검증, 클램핑(상한/하한), 중간값
+- `score_photos`: 단일/다중, 빈 입력, 부분 실패, 전체 실패
+- `/health` 엔드포인트
+- `/api/score-photos` 엔드포인트 (정상/에러/503)
+
+---
+
+**Codex 남은 작업 (변경 없음):**
+1. Supabase Storage 버킷 `photos` 생성 + RLS → `docs/handoff/CODEX_HANDOFF_PHOTOS.md`
+2. 자기유사 월드컵 이미지 (여자 21장, 남자 27장)
+3. Supabase `.env.local` 실키값 (성준이 URL/KEY 주면)
+
+---
+
 ## 공통 규칙
 
 - 서로의 섹션을 덮어쓰지 않는다
