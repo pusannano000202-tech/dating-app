@@ -24,6 +24,19 @@ python main.py
 ### `GET /health`
 서버/모델 상태 확인
 
+## Docker로 실행
+
+```bash
+cd python/appearance
+docker build -t appearance-ai .
+docker run -p 8001:8001 \
+  -e SUPABASE_URL=https://... \
+  -e SUPABASE_SERVICE_KEY=... \
+  -v $(pwd)/weights:/app/weights \
+  -e MODEL_WEIGHTS_PATH=/app/weights/resnet50_scut.pth \
+  appearance-ai
+```
+
 ## 모델 가중치
 
 `weights/resnet50_scut.pth` 위치에 SCUT-FBP5500으로 파인튜닝된 가중치 파일을 넣으면 된다.

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { Gender, BodyType, HairDensity } from '@/lib/types'
+import { searchDepartments } from '@/lib/pnu-departments'
 
 export interface BasicInfoData {
   gender: Gender
@@ -41,8 +42,10 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
   const [hairDensity, setHairDensity] = useState<HairDensity | null>(null)
   const [school, setSchool]       = useState('부산대학교')
   const [department, setDepartment] = useState('')
+  const [deptSuggestions, setDeptSuggestions] = useState<string[]>([])
   const [year, setYear]           = useState<number | null>(null)
   const [error, setError]         = useState<string | null>(null)
+  const deptRef = useRef<HTMLDivElement>(null)
 
   function handleSubmit() {
     if (!gender) { setError('성별을 선택해줘.'); return }
@@ -179,11 +182,37 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
           <label className="text-sm font-bold mb-3 block">
             학과 <span className="text-gray-600 font-normal text-xs">(선택)</span>
           </label>
-          <input type="text" placeholder="컴퓨터공학과" value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            disabled={saving}
-            className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
-          />
+          <div ref={deptRef} className="relative">
+            <input
+              type="text"
+              placeholder="컴퓨터공학과"
+              value={department}
+              onChange={(e) => {
+                setDepartment(e.target.value)
+                setDeptSuggestions(searchDepartments(e.target.value))
+              }}
+              onBlur={() => setTimeout(() => setDeptSuggestions([]), 150)}
+              disabled={saving}
+              className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
+            />
+            {deptSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 glass-strong rounded-2xl border border-white/10 overflow-hidden z-10">
+                {deptSuggestions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onMouseDown={() => {
+                      setDepartment(s)
+                      setDeptSuggestions([])
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/10 transition-colors"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div>
           <label className="text-sm font-bold mb-3 block">

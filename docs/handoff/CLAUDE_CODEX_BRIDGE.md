@@ -211,6 +211,55 @@ Codex는 아래 "Codex 남은 작업" 섹션만 보면 된다.
 
 ---
 
+### [2026-05-15] 세션 #4 (자율 작업 세션)
+
+**완료한 작업 (컨텍스트 압축 후 이어서 진행):**
+
+#### 버그 수정 및 UX 개선
+
+| 수정 위치 | 내용 |
+|-----------|------|
+| `app/profile/worldcup/page.tsx` | 저장 실패 시 에러 메시지를 `saveError` 상태로 관리, WorldcupResult에 전달 |
+| `components/profile/WorldcupResult.tsx` | `saveError?: string | null` prop 추가, 버튼 위에 에러 표시 |
+| `components/profile/StepProgress.tsx` | currentIdx === -1일 때 `null` 반환 (edit/complete 페이지에서 StepProgress 숨김) |
+| `components/profile/Big5Survey.tsx` | 이전 트레이트로 돌아가는 "이전" 버튼 추가 |
+| `app/profile/photos/page.tsx` | Supabase `photos` 테이블에도 메타데이터 insert 추가 (storage_path, public_url, sort_order) |
+
+#### 새 파일 추가
+
+| 파일 | 설명 |
+|------|------|
+| `python/appearance/Dockerfile` | Docker 컨테이너 빌드 파일 (uvicorn 기반) |
+| `python/appearance/.dockerignore` | .env, weights/, __pycache__ 제외 |
+
+#### 기존 파일 개선
+
+| 파일 | 개선 내용 |
+|------|-----------|
+| `app/profile/complete/page.tsx` | 카운트다운 타이머(5초), 완료 체크리스트, 프로필 수정 링크 추가 |
+| `app/group/create/page.tsx` | 플로우 미리보기 카드 UI로 개선 (개발 중 배지, 4단계 플로우 표시) |
+| `python/appearance/.env.example` | ALLOWED_ORIGINS, IMAGE_DOWNLOAD_TIMEOUT, MAX_IMAGE_BYTES 환경변수 추가 |
+| `python/appearance/README.md` | Docker 실행 섹션 추가 |
+
+#### photos 테이블 저장 흐름 (수정됨)
+
+```
+사진 업로드 시:
+1. Supabase Storage 업로드 (photos/{user_id}/photo_{idx}.{ext})
+2. photos 테이블 delete (기존 레코드 삭제) + insert (새 레코드)
+3. AI 서버 호출 (fire-and-forget)
+4. /profile/survey 이동
+```
+
+---
+
+**Codex 남은 작업 (변경 없음):**
+1. Supabase Storage 버킷 `photos` 생성 + RLS 정책 → `docs/handoff/CODEX_HANDOFF_PHOTOS.md` 참고
+2. 자기유사 월드컵 이미지 생성 계속 (여자 21장, 남자 27장 남음)
+3. Supabase 실키 `.env.local` 세팅 (성준이 URL/KEY 주면)
+
+---
+
 ## 공통 규칙
 
 - 서로의 섹션을 덮어쓰지 않는다

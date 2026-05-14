@@ -33,18 +33,31 @@ export default function PhotosPage() {
             const res = await fetch(previewUrl)
             const blob = await res.blob()
             const ext = blob.type.split('/')[1] ?? 'jpg'
-            const path = `${user.id}/photo_${idx}.${ext}`
+            const storagePath = `${user.id}/photo_${idx}.${ext}`
 
             const { error: upErr } = await supabase.storage
               .from(STORAGE_BUCKET)
-              .upload(path, blob, { upsert: true, contentType: blob.type })
+              .upload(storagePath, blob, { upsert: true, contentType: blob.type })
             if (upErr) throw upErr
 
-            const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path)
-            return data.publicUrl
+            const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath)
+            return { publicUrl: data.publicUrl, storagePath }
           })
         )
-        uploadedUrls = uploads
+
+        // 기존 레코드 삭제 후 새 레코드 insert (Storage는 upsert라 파일 손실 없음)
+        await supabase.from('photos').delete().eq('user_id', user.id)
+        const { error: insertErr } = await supabase.from('photos').insert(
+          uploads.map(({ publicUrl, storagePath }, idx) => ({
+            user_id: user.id,
+            storage_path: storagePath,
+            public_url: publicUrl,
+            sort_order: idx,
+          }))
+        )
+        if (insertErr) throw insertErr
+
+        uploadedUrls = uploads.map(({ publicUrl }) => publicUrl)
 
         // AI 점수 계산 요청 (fire-and-forget — 실패해도 진행)
         fetch(`${AI_SERVER_URL}/api/score-photos`, {

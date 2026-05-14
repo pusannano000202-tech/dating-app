@@ -7,11 +7,12 @@ import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
 interface Props {
   winner: AppearanceType
   saving?: boolean
+  saveError?: string | null
   onConfirm: () => void
   onRetry: () => void
 }
 
-export default function WorldcupResult({ winner, saving = false, onConfirm, onRetry }: Props) {
+export default function WorldcupResult({ winner, saving = false, saveError, onConfirm, onRetry }: Props) {
   const info = APPEARANCE_TYPE_INFO[winner]
 
   return (
@@ -55,6 +56,9 @@ export default function WorldcupResult({ winner, saving = false, onConfirm, onRe
         </p>
 
         <div className="mt-7 flex flex-col gap-3">
+          {saveError && (
+            <p className="text-xs text-red-400 text-center">{saveError}</p>
+          )}
           <button
             onClick={onConfirm}
             disabled={saving}

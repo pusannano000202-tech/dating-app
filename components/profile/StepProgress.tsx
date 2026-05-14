@@ -15,6 +15,8 @@ export default function StepProgress() {
   const pathname = usePathname()
   const currentIdx = STEPS.findIndex((s) => pathname.startsWith(s.path))
 
+  if (currentIdx === -1) return null
+
   return (
     <div className="px-5 pt-8 pb-3 max-w-md mx-auto w-full">
       <div className="flex items-center gap-1.5">

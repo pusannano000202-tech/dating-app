@@ -111,6 +111,10 @@ export default function Big5Survey({ onComplete }: Props) {
     }
   }
 
+  function handleBack() {
+    if (traitIdx > 0) setTraitIdx((i) => i - 1)
+  }
+
   const progress = Math.round(((traitIdx + (bothAnswered ? 1 : 0)) / TRAITS.length) * 100)
 
   return (
@@ -170,13 +174,25 @@ export default function Big5Survey({ onComplete }: Props) {
         </div>
       ))}
 
-      <button
-        onClick={handleNext}
-        disabled={!bothAnswered}
-        className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-30 disabled:cursor-not-allowed"
-      >
-        {isLast ? '완료' : '다음'}
-      </button>
+      <div className="flex gap-3">
+        {traitIdx > 0 && (
+          <button
+            type="button"
+            onClick={handleBack}
+            className="glass py-4 px-5 rounded-2xl font-medium text-sm text-gray-400 hover:text-gray-200 border border-white/10 transition-colors"
+          >
+            이전
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={!bothAnswered}
+          className="btn-gradient flex-1 py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          {isLast ? '완료' : '다음'}
+        </button>
+      </div>
     </div>
   )
 }

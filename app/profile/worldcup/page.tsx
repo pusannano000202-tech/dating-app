@@ -11,11 +11,13 @@ export default function WorldcupPage() {
   const router = useRouter()
   const [winner, setWinner] = useState<AppearanceType | null>(null)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [key, setKey] = useState(0)
 
   async function handleConfirm() {
     if (!winner || saving) return
     setSaving(true)
+    setSaveError(null)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -28,7 +30,7 @@ export default function WorldcupPage() {
 
       router.push('/profile/basic')
     } catch {
-      // 저장 실패 시 결과 화면에 그대로 머물러 재시도 가능하게
+      setSaveError('저장 중 오류가 발생했어요. 다시 시도해줘.')
     } finally {
       setSaving(false)
     }
@@ -39,8 +41,9 @@ export default function WorldcupPage() {
       <WorldcupResult
         winner={winner}
         saving={saving}
+        saveError={saveError}
         onConfirm={handleConfirm}
-        onRetry={() => { setWinner(null); setKey((k) => k + 1) }}
+        onRetry={() => { setWinner(null); setSaveError(null); setKey((k) => k + 1) }}
       />
     )
   }

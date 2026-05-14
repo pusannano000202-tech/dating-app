@@ -46,4 +46,14 @@
                 radial-gradient(ellipse at 80% 100%, #4a1040 0%, transparent 60%),
                 #0a0a14;
   }
+  /* 아이폰 노치/홈바 safe area */
+  .safe-area-padding {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .pb-safe {
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+  }
 }
