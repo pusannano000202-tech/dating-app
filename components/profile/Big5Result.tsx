@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import type { Big5Scores } from './Big5Survey'
 
 interface Props {
@@ -65,6 +66,17 @@ function getPersonalityTag(scores: Big5Scores): { tag: string; desc: string } {
 
 export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
   const { tag, desc } = getPersonalityTag(scores)
+
+  // Enter: 다음, R: 다시하기
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (saving) return
+      if (e.key === 'Enter') onNext()
+      if ((e.key === 'r' || e.key === 'R') && onRetry) onRetry()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [saving, onNext, onRetry])
 
   return (
     <div className="flex flex-col gap-5">
