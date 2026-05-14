@@ -5,6 +5,7 @@ import type { Big5Scores } from './Big5Survey'
 interface Props {
   scores: Big5Scores
   onNext: () => void
+  onRetry?: () => void
   saving?: boolean
 }
 
@@ -62,7 +63,7 @@ function getPersonalityTag(scores: Big5Scores): { tag: string; desc: string } {
   return { tag: '균형잡힌 현실주의형', desc: '상황에 맞게 유연하게 대처해' }
 }
 
-export default function Big5Result({ scores, onNext, saving }: Props) {
+export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
   const { tag, desc } = getPersonalityTag(scores)
 
   return (
@@ -114,6 +115,16 @@ export default function Big5Result({ scores, onNext, saving }: Props) {
       >
         {saving ? '저장 중...' : '다음'}
       </button>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          disabled={saving}
+          className="w-full py-3 rounded-2xl glass text-sm text-gray-400 hover:text-gray-200 border border-white/5 transition-colors"
+        >
+          다시 하기
+        </button>
+      )}
     </div>
   )
 }

@@ -95,7 +95,12 @@ export default function SurveyPage() {
       {phase === 'survey' ? (
         <Big5Survey onComplete={handleSurveyComplete} />
       ) : (
-        <Big5Result scores={scores!} onNext={handleConfirm} saving={saving} />
+        <Big5Result
+          scores={scores!}
+          onNext={handleConfirm}
+          saving={saving}
+          onRetry={() => { setScores(null); setPhase('survey') }}
+        />
       )}
 
       {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
