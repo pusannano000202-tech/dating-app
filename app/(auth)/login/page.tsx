@@ -85,6 +85,17 @@ function LoginContent() {
     if (e.key === 'Backspace' && !otp[idx] && idx > 0) otpRefs.current[idx - 1]?.focus()
   }
 
+  function handleOtpPaste(e: React.ClipboardEvent) {
+    const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    if (!digits) return
+    e.preventDefault()
+    const next = [...otp]
+    for (let i = 0; i < 6; i++) next[i] = digits[i] ?? ''
+    setOtp(next)
+    const focusIdx = Math.min(digits.length, 5)
+    otpRefs.current[focusIdx]?.focus()
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-5">
 
@@ -154,6 +165,7 @@ function LoginContent() {
                     autoComplete="one-time-code"
                     onChange={(e) => handleOtpInput(idx, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                    onPaste={handleOtpPaste}
                     className="flex-1 aspect-square text-center text-xl font-black glass rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
                   />
                 ))}
