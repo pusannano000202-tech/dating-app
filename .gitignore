@@ -11,6 +11,8 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+.pytest_cache/
+.ruff_cache/
 
 # AI 모델 가중치 (용량 큼, 별도 공유)
 python/appearance/weights/
