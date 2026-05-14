@@ -20,7 +20,7 @@ export default function PhotosPage() {
     if (!isSupabaseConfigured()) { setPhotosLoaded(true); return }
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+      if (!user) { setPhotosLoaded(true); return }
       supabase
         .from('photos')
         .select('public_url')

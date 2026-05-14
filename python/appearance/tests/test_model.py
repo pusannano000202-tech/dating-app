@@ -128,5 +128,56 @@ class TestScorePhotos(unittest.TestCase):
                 score_photos(model, ["https://example.com/a.jpg"])
 
 
+class TestLoadImageFromUrl(unittest.TestCase):
+    def _make_response(self, status_code=200, content_type="image/jpeg", data=None):
+        resp = MagicMock()
+        resp.status_code = status_code
+        resp.headers = {"Content-Type": content_type}
+        if data is None:
+            img = Image.new("RGB", (64, 64), color=(100, 100, 100))
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG")
+            data = buf.getvalue()
+        resp.raise_for_status = MagicMock()
+        resp.iter_content = MagicMock(return_value=iter([data]))
+        return resp
+
+    def test_valid_image_returns_pil(self):
+        resp = self._make_response()
+        with patch("model.requests.get", return_value=resp):
+            img = load_image_from_url("https://example.com/photo.jpg")
+        self.assertIsInstance(img, Image.Image)
+        self.assertEqual(img.mode, "RGB")
+
+    def test_non_image_content_type_raises(self):
+        resp = self._make_response(content_type="text/html", data=b"<html></html>")
+        with patch("model.requests.get", return_value=resp):
+            with self.assertRaises(ValueError) as ctx:
+                load_image_from_url("https://example.com/page.html")
+        self.assertIn("이미지가 아닌", str(ctx.exception))
+
+    def test_http_error_raises(self):
+        resp = MagicMock()
+        resp.raise_for_status.side_effect = Exception("404 Not Found")
+        with patch("model.requests.get", return_value=resp):
+            with self.assertRaises(Exception):
+                load_image_from_url("https://example.com/missing.jpg")
+
+    def test_oversized_image_raises(self):
+        big_chunk = b"x" * (21 * 1024 * 1024)
+        resp = self._make_response(data=big_chunk)
+        with patch("model.requests.get", return_value=resp):
+            with self.assertRaises(ValueError) as ctx:
+                load_image_from_url("https://example.com/huge.jpg")
+        self.assertIn("용량 초과", str(ctx.exception))
+
+    def test_invalid_image_data_raises(self):
+        resp = self._make_response(data=b"not-an-image")
+        with patch("model.requests.get", return_value=resp):
+            with self.assertRaises(ValueError) as ctx:
+                load_image_from_url("https://example.com/corrupt.jpg")
+        self.assertIn("파싱 실패", str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
