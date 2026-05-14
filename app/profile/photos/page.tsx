@@ -6,7 +6,6 @@ import Image from 'next/image'
 import PhotoUpload, { type PhotoUploadResult } from '@/components/profile/PhotoUpload'
 import { createClient } from '@/lib/supabase'
 
-const AI_SERVER_URL = process.env.NEXT_PUBLIC_AI_SERVER_URL ?? 'http://localhost:8001'
 const STORAGE_BUCKET = 'photos'
 
 export default function PhotosPage() {
@@ -86,11 +85,11 @@ export default function PhotosPage() {
 
         uploadedUrls = uploads.map(({ publicUrl }) => publicUrl)
 
-        // AI 점수 계산 요청 (fire-and-forget — 실패해도 진행)
-        fetch(`${AI_SERVER_URL}/api/score-photos`, {
+        // AI 점수 계산 요청 (fire-and-forget — 실패해도 진행, 서버 프록시 경유)
+        fetch('/api/score', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id, photo_urls: uploadedUrls }),
+          body: JSON.stringify({ photo_urls: uploadedUrls }),
         }).catch(() => {})
       }
 
