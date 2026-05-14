@@ -72,17 +72,18 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 - [ ] `components/profile/PhotoUpload.tsx` — Supabase Storage 연동
 - [ ] 업로드 완료 후 `POST /api/score-photos` 호출 트리거
 
-### [Claude 담당] 이상형 가중치 슬라이더
-- [ ] `app/profile/preferences/page.tsx` — 7개 항목 슬라이더 (합계 1.0 강제)
-- [ ] `preference_weights` JSONB → `profiles` 저장
+### [Claude 담당] 이상형 가중치 슬라이더 ✅
+- [x] `app/profile/preferences/page.tsx` — 7개 항목 슬라이더 (합계 1.0 자동 조정)
+- [x] `components/profile/PreferenceSliders.tsx`
+- [x] `preference_weights` JSONB → `profiles` 저장 + `is_profile_complete = true`
 
-### [Claude 담당] 가용 시간대 입력
-- [ ] `app/profile/schedule/page.tsx` — 요일×시간대 선택 UI
-- [ ] `available_timeslots` JSONB → `profiles` 저장
+### [Claude 담당] 가용 시간대 입력 ✅
+- [x] `app/profile/schedule/page.tsx` — 요일별 토글 + 18:00~23:00 시간 선택
+- [x] `components/profile/SchedulePicker.tsx`
+- [x] `available_timeslots` JSONB → `profiles` 저장
 
-### [Claude 담당] 월드컵 결과 Supabase 저장 연결
-- [ ] `app/profile/worldcup/page.tsx` TODO 부분에 실제 저장 로직 추가
-- [ ] Supabase `profiles.appearance_type` 업데이트
+### [Claude 담당] 월드컵 결과 Supabase 저장 연결 ✅
+- [x] `app/profile/worldcup/page.tsx` — `profiles.appearance_type` 저장 후 `/profile/basic` 이동
 
 ### 우선순위 LOW
 - [ ] `app/profile/survey/` — Big5 성격 설문 페이지
@@ -132,10 +133,13 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 
 **날짜:** 2026-05-15
 **작업 내용:**
-- Next.js 14 프로젝트 초기 세팅 완료
-- 이상형 월드컵 UI 구현 완료 (AppearanceWorldcup, WorldcupResult)
-- lib/types.ts, lib/constants.ts, lib/supabase.ts 생성
+- 이상형 월드컵 → AI 사진 기반으로 전환 (imagePath 추가, 사진 카드 UI)
+- 월드컵 결과 Supabase 저장 연결 완료
+- SchedulePicker + /profile/schedule 완성
+- PreferenceSliders + /profile/preferences 완성
+- 프로필 입력 플로우 Claude 담당 부분 모두 완료
 
-**다음 세션 시작 시 할 일:**
-- Claude: 가중치 슬라이더 / 시간대 UI / 월드컵 Supabase 저장 연결
-- Codex: 기본정보 폼 / 사진 업로드 (병렬 작업)
+**Claude 담당 TODO 전부 완료. 남은 것:**
+- Codex: /profile/basic, /profile/photos
+- 공통: Supabase 프로젝트 .env 세팅 후 실제 동작 테스트
+- 공통: public/appearance-types/ AI 사진 6장 생성·배치
