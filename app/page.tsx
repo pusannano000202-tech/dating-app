@@ -99,10 +99,37 @@ export default async function Home() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('is_profile_complete')
+    .select(`
+      is_profile_complete,
+      appearance_type,
+      gender,
+      big5_openness,
+      available_timeslots,
+      preference_weights
+    `)
     .eq('user_id', user.id)
     .single()
 
-  if (profile?.is_profile_complete) redirect('/group/create')
-  else redirect('/profile/worldcup')
+  if (profile?.is_profile_complete) {
+    redirect('/group/create')
+  }
+
+  // 첫 번째 미완성 단계로 이동
+  if (!profile?.appearance_type) redirect('/profile/worldcup')
+  if (!profile?.gender) redirect('/profile/basic')
+
+  const { count } = await supabase
+    .from('photos')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+  if (!count || count === 0) redirect('/profile/photos')
+
+  if (profile.big5_openness == null) redirect('/profile/survey')
+
+  const timeslots = profile.available_timeslots as { slots?: unknown[] } | null
+  if (!timeslots?.slots?.length) redirect('/profile/schedule')
+
+  if (!profile.preference_weights) redirect('/profile/preferences')
+
+  redirect('/profile/complete')
 }
