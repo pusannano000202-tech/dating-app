@@ -7,7 +7,7 @@ dev:
 	uvicorn main:app --reload --host 0.0.0.0 --port 8001
 
 test:
-	pytest tests/ -v --tb=short
+	pytest tests/
 
 lint:
 	ruff check .
