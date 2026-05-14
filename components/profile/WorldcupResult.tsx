@@ -6,11 +6,12 @@ import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
 
 interface Props {
   winner: AppearanceType
+  saving?: boolean
   onConfirm: () => void
   onRetry: () => void
 }
 
-export default function WorldcupResult({ winner, onConfirm, onRetry }: Props) {
+export default function WorldcupResult({ winner, saving = false, onConfirm, onRetry }: Props) {
   const info = APPEARANCE_TYPE_INFO[winner]
 
   return (
@@ -55,9 +56,10 @@ export default function WorldcupResult({ winner, onConfirm, onRetry }: Props) {
       <div className="mt-8 w-full max-w-xs flex flex-col gap-3">
         <button
           onClick={onConfirm}
-          className="w-full py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 font-bold text-lg transition-colors"
+          disabled={saving}
+          className="w-full py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 font-bold text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          이걸로 할게요
+          {saving ? '저장 중...' : '이걸로 할게요'}
         </button>
         <button
           onClick={onRetry}
