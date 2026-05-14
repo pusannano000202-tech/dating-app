@@ -57,6 +57,18 @@ class TestScorePhotosEndpoint(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()["status"], "ok")
 
+    def test_save_called_with_correct_args(self):
+        """save_appearance_score must receive the user_id and score from score_photos."""
+        expected_score = 82.5
+        with _patch_model(), \
+             patch("main.score_photos", return_value=expected_score), \
+             patch("main.save_appearance_score") as mock_save:
+            self.client.post("/api/score-photos", json={
+                "user_id": TEST_USER,
+                "photo_urls": [TEST_URL],
+            })
+        mock_save.assert_called_once_with(TEST_USER, expected_score)
+
     def test_empty_urls_returns_422(self):
         resp = self.client.post("/api/score-photos", json={
             "user_id": TEST_USER,
