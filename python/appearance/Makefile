@@ -10,7 +10,7 @@ test:
 	pytest tests/ -v --tb=short
 
 lint:
-	ruff check . --select E,F,W,I
+	ruff check .
 
 docker-build:
 	docker build -t appearance-ai .
