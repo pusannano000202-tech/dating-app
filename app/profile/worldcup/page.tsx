@@ -21,11 +21,14 @@ export default function WorldcupPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .upsert({ user_id: user.id, appearance_type: winner }, { onConflict: 'user_id' })
+      if (error) throw error
 
       router.push('/profile/basic')
+    } catch {
+      // 저장 실패 시 결과 화면에 그대로 머물러 재시도 가능하게
     } finally {
       setSaving(false)
     }

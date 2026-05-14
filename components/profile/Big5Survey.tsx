@@ -140,7 +140,7 @@ export default function Big5Survey({ onComplete }: Props) {
 
       {/* 질문들 */}
       {trait.questions.map((q, qIdx) => (
-        <div key={qIdx} className="glass rounded-2xl p-4">
+        <div key={`${traitIdx}-${qIdx}`} className="glass rounded-2xl p-4">
           <p className="text-sm font-bold mb-4 leading-relaxed">{q}</p>
 
           {/* 5점 척도 */}

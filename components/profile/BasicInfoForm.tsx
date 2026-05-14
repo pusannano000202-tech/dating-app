@@ -46,17 +46,24 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
 
   function handleSubmit() {
     if (!gender) { setError('성별을 선택해줘.'); return }
-    const ageNum = parseInt(age)
+    const ageNum = parseInt(age, 10)
     if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 35) {
       setError('나이를 올바르게 입력해줘. (18~35)')
       return
+    }
+    if (height) {
+      const h = parseInt(height, 10)
+      if (isNaN(h) || h < 100 || h > 250) {
+        setError('키를 올바르게 입력해줘. (100~250cm)')
+        return
+      }
     }
     if (!school.trim()) { setError('학교를 입력해줘.'); return }
     setError(null)
     onSubmit({
       gender,
       age: ageNum,
-      height: height ? parseInt(height) : null,
+      height: height ? parseInt(height, 10) : null,
       body_type: bodyType,
       hair_density: gender === 'male' ? hairDensity : null,
       school: school.trim(),
@@ -95,7 +102,8 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
           </label>
           <input type="number" placeholder="22" value={age}
             onChange={(e) => setAge(e.target.value)}
-            className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10"
+            disabled={saving}
+            className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
           />
         </div>
         <div>
@@ -105,7 +113,8 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
           <div className="relative">
             <input type="number" placeholder="173" value={height}
               onChange={(e) => setHeight(e.target.value)}
-              className="w-full glass rounded-2xl px-4 py-3.5 pr-10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10"
+              disabled={saving}
+              className="w-full glass rounded-2xl px-4 py-3.5 pr-10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">cm</span>
           </div>
@@ -159,7 +168,8 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
         </label>
         <input type="text" placeholder="부산대학교" value={school}
           onChange={(e) => setSchool(e.target.value)}
-          className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10"
+          disabled={saving}
+          className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
         />
       </div>
 
@@ -171,7 +181,8 @@ export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) 
           </label>
           <input type="text" placeholder="컴퓨터공학과" value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10"
+            disabled={saving}
+            className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
           />
         </div>
         <div>

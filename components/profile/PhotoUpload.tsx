@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import Image from 'next/image'
 
 export interface PhotoUploadResult {
   publicUrls: string[]
@@ -79,12 +78,11 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
           <div key={idx} className="aspect-[3/4] relative">
             {slot ? (
               <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                <Image
+                {/* blob: URL은 next/image 미지원 → 일반 img 사용 */}
+                <img
                   src={slot.preview}
                   alt={`사진 ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="33vw"
+                  className="w-full h-full object-cover"
                 />
                 {/* 삭제 버튼 */}
                 <button
