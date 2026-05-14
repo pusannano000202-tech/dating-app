@@ -83,6 +83,35 @@
 
 <!-- Codex가 작업 완료 후 여기에 기록 -->
 
+### [2026-05-15] 세션 #1
+
+**완료한 작업:**
+- `public/appearance-types/`에 이성 이상형 월드컵용 대표 이미지 6장 생성
+  - `cute.jpg`, `pure.jpg`, `chic.jpg`, `warm.jpg`, `stylish.jpg`, `healthy.jpg`
+- `public/appearance-types/CRITERIA.md` 작성 및 백분위 절대점수 기준으로 업데이트
+- `public/appearance-self/SCORE_GUIDE.md` 작성
+  - 외모절대점수는 호감도 느낌 점수가 아니라 백분위 점수로 정의
+  - 예: 30점은 하위 30퍼센트 지점, 50점은 평균 근처, 90점은 상위 10퍼센트 수준
+- 자기유사 월드컵용 여자 시범 이미지 3장 생성
+  - `public/appearance-self/female/female_self_28.jpg`
+  - `public/appearance-self/female/female_self_52.jpg`
+  - `public/appearance-self/female/female_self_73.jpg`
+- 검수용 카탈로그 작성
+  - `public/appearance-self/CATALOG.html`
+  - `public/appearance-self/female/METADATA.md`
+
+**Claude에게 알려야 할 사항:**
+- 이번 작업은 이미지/문서 자산만 추가했다.
+- `lib/types.ts`, `components/profile/AppearanceWorldcup.tsx`, DB 마이그레이션은 수정하지 않았다.
+- 자기유사 월드컵 이미지는 생성 프롬프트 목표 점수를 그대로 믿으면 안 된다.
+  이미지 모델이 기본적으로 얼굴을 미화하므로, 최종 점수는 생성 후 사람이 백분위 기준으로 재판정해야 한다.
+- 기존 이성 이상형 대표 이미지 6장은 전부 상위 호감형이다.
+  자기유사 월드컵처럼 20~90점대를 넓게 커버하는 세트로 쓰면 안 된다.
+
+**테스트/검수:**
+- 이미지 파일은 모두 3:4 세로형이며 `768x1024` 이상 조건을 만족한다.
+- 검수용 HTML 카탈로그를 만들어 한 화면에서 점수와 판정 근거를 볼 수 있게 했다.
+
 ---
 
 ## 공통 규칙

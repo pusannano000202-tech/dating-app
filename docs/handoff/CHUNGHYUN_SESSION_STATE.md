@@ -143,3 +143,16 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 - Codex: /profile/basic, /profile/photos
 - 공통: Supabase 프로젝트 .env 세팅 후 실제 동작 테스트
 - 공통: public/appearance-types/ AI 사진 6장 생성·배치
+
+**Codex 이미지/점수 작업 추가 메모:**
+- `public/appearance-types/` AI 사진 6장 생성·배치 완료
+- `public/appearance-types/CRITERIA.md`에 타입별 생성 기준과 백분위 절대점수 추가
+- `public/appearance-self/SCORE_GUIDE.md`에 자기유사 월드컵 절대점수 기준 정의
+- 여자 자기유사 시범 이미지 3장 생성:
+  - `public/appearance-self/female/female_self_28.jpg`
+  - `public/appearance-self/female/female_self_52.jpg`
+  - `public/appearance-self/female/female_self_73.jpg`
+- 검수용 HTML 카탈로그:
+  - `public/appearance-self/CATALOG.html`
+- 주의: 자기유사 월드컵 점수는 호감도 느낌 점수가 아니라 백분위 절대점수다.
+  생성 프롬프트 목표 점수와 실제 판정 점수가 다를 수 있으므로, 사람이 보고 재판정한 점수를 우선한다.
