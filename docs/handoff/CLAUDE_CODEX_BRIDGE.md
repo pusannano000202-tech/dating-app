@@ -131,6 +131,86 @@
 
 ---
 
+### [2026-05-15] 세션 #3
+
+**완료한 작업 (Codex가 맡았던 것 포함해서 Claude가 전부 완성):**
+
+Codex가 이미지 생성으로 바빠서 Claude가 Next.js 페이지 작업을 대신 완료했다.
+Codex는 아래 "Codex 남은 작업" 섹션만 보면 된다.
+
+#### 새로 완성된 파일 목록
+
+| 파일 | 설명 |
+|------|------|
+| `components/profile/BasicInfoForm.tsx` | 성별/나이/키/체형/머리숱/학교/학과/학년 입력 폼 |
+| `app/profile/basic/page.tsx` | 기본정보 페이지 → Supabase profiles 저장 |
+| `components/profile/PhotoUpload.tsx` | 사진 3장 슬롯 UI, 미리보기, 파일 검증 |
+| `app/profile/photos/page.tsx` | 사진 페이지 → Supabase Storage 업로드 + AI 서버 호출 |
+| `components/profile/Big5Survey.tsx` | 5트레이트 × 2질문 성격 테스트 (5점 척도) |
+| `app/profile/survey/page.tsx` | 성격 테스트 페이지 → big5_* 5개 컬럼 저장 |
+| `app/profile/complete/page.tsx` | 완료 축하 화면 → 3초 후 /group/create 이동 |
+| `app/group/create/page.tsx` | 임시 플레이스홀더 (성준 담당) |
+
+#### 전체 UI 리디자인 완료
+
+기존 회색 단조로운 UI → 프리미엄 데이팅앱 스타일로 전면 개편.
+- Pretendard Variable 폰트 적용
+- 배경: 보라/퍼플 radial gradient (`bg-app`)
+- 카드: glassmorphism (`glass`, `glass-strong`)
+- 버튼: violet→fuchsia gradient (`btn-gradient`, `gradient-brand`)
+- 변경된 파일: `app/globals.css`, `app/layout.tsx`, `app/page.tsx`, `app/(auth)/login/page.tsx`, `components/profile/StepProgress.tsx` 외 전체
+
+#### 프로필 입력 전체 플로우 완성
+
+```
+/profile/worldcup   → appearance_type 저장        ✅
+/profile/basic      → gender/age/height 등 저장   ✅
+/profile/photos     → Storage 업로드 + AI 트리거   ✅ (버킷 생성만 남음)
+/profile/survey     → big5_* 5개 컬럼 저장        ✅
+/profile/schedule   → available_timeslots 저장     ✅
+/profile/preferences → preference_weights 저장    ✅
+/profile/complete   → 완료 → /group/create         ✅
+```
+
+#### StepProgress 스텝 순서 (6단계)
+
+```
+이상형 → 기본정보 → 사진 → 성격 → 시간대 → 가중치
+```
+
+#### 코드 리뷰 후 수정된 버그 5건
+
+1. `PhotoUpload`: `next/image` → `<img>` 태그 (blob: URL 런타임 에러)
+2. `worldcup/page.tsx`: upsert 에러 무시 수정
+3. `Big5Survey`: key 충돌로 트레이트 전환 시 UI 잔상 제거
+4. `BasicInfoForm`: 키 범위 검증 추가 (100~250cm)
+5. `BasicInfoForm`: 저장 중 입력 필드 disabled 처리
+
+---
+
+**Codex 남은 작업 (이것만 하면 됨):**
+
+#### 1. Supabase Storage 버킷 생성 [필수 — 사진 업로드가 여기 달림]
+
+상세 가이드: `docs/handoff/CODEX_HANDOFF_PHOTOS.md`
+
+요약:
+- Supabase 대시보드 → Storage → 버킷 이름: `photos`, Public: ON
+- RLS 정책 3개 추가 (파일에 SQL 전문 있음)
+- `.env.local`에 `NEXT_PUBLIC_AI_SERVER_URL=http://localhost:8000` 추가
+
+#### 2. 자기유사 월드컵 이미지 생성 계속 [진행 중]
+
+현재: 여자 11장, 남자 5장 완료
+남은: 여자 21장, 남자 27장
+
+#### 3. Supabase 실키 `.env.local` 세팅 [성준이 줘야 가능]
+
+성준이 Supabase 프로젝트 URL/ANON_KEY 주면
+`.env.local`에 넣고 E2E 흐름 테스트 할 것.
+
+---
+
 ## 공통 규칙
 
 - 서로의 섹션을 덮어쓰지 않는다
