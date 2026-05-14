@@ -12,6 +12,7 @@ export default function SurveyPage() {
   const router = useRouter()
   const [phase, setPhase] = useState<Phase>('survey')
   const [scores, setScores] = useState<Big5Scores | null>(null)
+  const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -19,7 +20,7 @@ export default function SurveyPage() {
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+      if (!user) { setLoaded(true); return }
       supabase
         .from('profiles')
         .select('big5_openness, big5_conscientiousness, big5_extraversion, big5_agreeableness, big5_neuroticism')
@@ -42,6 +43,7 @@ export default function SurveyPage() {
             })
             setPhase('result')
           }
+          setLoaded(true)
         })
     })
   }, [])
@@ -92,7 +94,13 @@ export default function SurveyPage() {
         </p>
       </div>
 
-      {phase === 'survey' ? (
+      {!loaded ? (
+        <div className="flex flex-col gap-5 animate-pulse">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-16 bg-white/5 rounded-2xl" />
+          ))}
+        </div>
+      ) : phase === 'survey' ? (
         <Big5Survey onComplete={handleSurveyComplete} />
       ) : (
         <Big5Result

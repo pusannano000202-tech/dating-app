@@ -12,12 +12,12 @@ const STORAGE_BUCKET = 'photos'
 export default function PhotosPage() {
   const router = useRouter()
   const [existingPhotos, setExistingPhotos] = useState<string[]>([])
+  const [photosLoaded, setPhotosLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const isConfigured = isSupabaseConfigured()
-    if (!isConfigured) return
+    if (!isSupabaseConfigured()) { setPhotosLoaded(true); return }
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
@@ -30,6 +30,7 @@ export default function PhotosPage() {
           if (data && data.length > 0) {
             setExistingPhotos(data.map((p) => p.public_url as string))
           }
+          setPhotosLoaded(true)
         })
     })
   }, [])
@@ -43,14 +44,9 @@ export default function PhotosPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
-      const isConfigured = Boolean(
-        process.env.NEXT_PUBLIC_SUPABASE_URL &&
-        !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
-      )
-
       let uploadedUrls: string[] = localPreviews
 
-      if (isConfigured) {
+      if (isSupabaseConfigured()) {
         // 실제 Supabase Storage 업로드
         const uploads = await Promise.all(
           localPreviews.map(async (previewUrl, idx) => {
@@ -105,8 +101,18 @@ export default function PhotosPage() {
         <p className="text-sm text-gray-500 mt-1">AI가 사진으로 외모를 분석해. 얼굴이 잘 보이는 사진으로 올려줘.</p>
       </div>
 
+      {/* 기존 사진 로딩 스켈레톤 */}
+      {!photosLoaded && (
+        <div className="glass rounded-2xl p-4 mb-5 animate-pulse">
+          <div className="h-3 w-24 bg-white/10 rounded mb-3" />
+          <div className="flex gap-2">
+            {[1, 2, 3].map((i) => <div key={i} className="w-16 h-20 bg-white/5 rounded-xl" />)}
+          </div>
+        </div>
+      )}
+
       {/* 기존 사진이 있는 경우 유지 옵션 표시 */}
-      {existingPhotos.length > 0 && (
+      {photosLoaded && existingPhotos.length > 0 && (
         <div className="glass rounded-2xl p-4 mb-5 border border-violet-500/20">
           <p className="text-xs text-violet-300 font-medium mb-3">기존 등록 사진</p>
           <div className="flex gap-2 mb-3">

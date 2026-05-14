@@ -39,6 +39,13 @@ function LoginContent() {
     return () => clearTimeout(t)
   }, [resendCooldown])
 
+  // OTP 단계 진입 시 첫 번째 칸 자동 포커스
+  useEffect(() => {
+    if (step === 'otp') {
+      setTimeout(() => otpRefs.current[0]?.focus(), 50)
+    }
+  }, [step])
+
   // 6자리 모두 입력되면 자동 제출
   useEffect(() => {
     if (step === 'otp' && otp.every((d) => d !== '') && !loading) {
