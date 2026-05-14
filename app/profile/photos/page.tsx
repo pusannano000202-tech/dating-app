@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import PhotoUpload, { type PhotoUploadResult } from '@/components/profile/PhotoUpload'
 import { createClient } from '@/lib/supabase'
 
@@ -10,8 +11,31 @@ const STORAGE_BUCKET = 'photos'
 
 export default function PhotosPage() {
   const router = useRouter()
+  const [existingPhotos, setExistingPhotos] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const isConfigured = Boolean(
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
+    )
+    if (!isConfigured) return
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from('photos')
+        .select('public_url')
+        .eq('user_id', user.id)
+        .order('sort_order')
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            setExistingPhotos(data.map((p) => p.public_url as string))
+          }
+        })
+    })
+  }, [])
 
   async function handleComplete({ publicUrls: localPreviews }: PhotoUploadResult) {
     setSaving(true)
@@ -83,6 +107,26 @@ export default function PhotosPage() {
         <h1 className="text-2xl font-black">사진 등록</h1>
         <p className="text-sm text-gray-500 mt-1">AI가 사진으로 외모를 분석해. 얼굴이 잘 보이는 사진으로 올려줘.</p>
       </div>
+
+      {/* 기존 사진이 있는 경우 유지 옵션 표시 */}
+      {existingPhotos.length > 0 && (
+        <div className="glass rounded-2xl p-4 mb-5 border border-violet-500/20">
+          <p className="text-xs text-violet-300 font-medium mb-3">기존 등록 사진</p>
+          <div className="flex gap-2 mb-3">
+            {existingPhotos.map((url, i) => (
+              <div key={i} className="relative w-16 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                <Image src={url} alt={`기존 사진 ${i + 1}`} fill className="object-cover" sizes="64px" />
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => router.push('/profile/survey')}
+            className="glass w-full py-2.5 rounded-xl text-sm text-gray-300 hover:text-white border border-white/10 transition-colors"
+          >
+            기존 사진 유지하고 다음으로 →
+          </button>
+        </div>
+      )}
 
       <PhotoUpload onComplete={handleComplete} saving={saving} />
 
