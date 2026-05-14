@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
+import type { AppearanceType, Gender } from '@/lib/types'
 
 const EDIT_SECTIONS = [
   { href: '/profile/worldcup', emoji: '🎯', title: '이상형 스타일', desc: '선호하는 외모 타입 다시 고르기' },
@@ -14,10 +16,48 @@ const EDIT_SECTIONS = [
   { href: '/profile/preferences', emoji: '⚖️', title: '매칭 가중치', desc: '중요하게 보는 조건 조정하기' },
 ]
 
+interface ProfileSummary {
+  gender: Gender | null
+  age: number | null
+  school: string | null
+  department: string | null
+  appearance_type: AppearanceType | null
+  photo_count: number
+}
+
 export default function ProfileEditPage() {
   const router = useRouter()
   const [showConfirm, setShowConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [summary, setSummary] = useState<ProfileSummary | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      const [{ data: profile }, { count }] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('gender, age, school, department, appearance_type')
+          .eq('user_id', user.id)
+          .single(),
+        supabase
+          .from('photos')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+      ])
+      if (profile) {
+        setSummary({
+          gender: profile.gender as Gender | null,
+          age: profile.age,
+          school: profile.school,
+          department: profile.department,
+          appearance_type: profile.appearance_type as AppearanceType | null,
+          photo_count: count ?? 0,
+        })
+      }
+    })
+  }, [])
 
   async function handleReset() {
     setResetting(true)
@@ -52,6 +92,37 @@ export default function ProfileEditPage() {
           <p className="text-xs text-gray-500 mt-0.5">수정할 항목을 골라줘</p>
         </div>
       </div>
+
+      {/* 프로필 요약 카드 */}
+      {summary && (
+        <div className="relative glass rounded-2xl p-4 mb-5 border border-white/8">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl gradient-brand flex items-center justify-center text-2xl flex-shrink-0">
+              {summary.gender === 'male' ? '👨' : summary.gender === 'female' ? '👩' : '👤'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold">
+                {summary.gender === 'male' ? '남' : summary.gender === 'female' ? '여' : '?'}
+                {summary.age != null ? ` · ${summary.age}세` : ''}
+                {summary.school ? ` · ${summary.school}` : ''}
+              </p>
+              {summary.department && (
+                <p className="text-xs text-gray-500 mt-0.5 truncate">{summary.department}</p>
+              )}
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                {summary.appearance_type && (
+                  <span className="text-[10px] bg-violet-500/20 text-violet-300 rounded-full px-2 py-0.5">
+                    {APPEARANCE_TYPE_INFO[summary.appearance_type].label} 스타일 선호
+                  </span>
+                )}
+                <span className="text-[10px] bg-white/10 text-gray-400 rounded-full px-2 py-0.5">
+                  사진 {summary.photo_count}장
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="relative flex flex-col gap-3">
         {EDIT_SECTIONS.map(({ href, emoji, title, desc }) => (
