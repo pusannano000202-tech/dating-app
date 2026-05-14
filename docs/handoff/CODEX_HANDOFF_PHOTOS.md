@@ -50,10 +50,10 @@ CREATE POLICY "public_read" ON storage.objects
 ### 3. `.env.local`에 AI 서버 URL 추가
 
 ```bash
-NEXT_PUBLIC_AI_SERVER_URL=http://localhost:8000
+NEXT_PUBLIC_AI_SERVER_URL=http://localhost:8001
 ```
 
-실제 배포 시엔 AI 서버 주소로 변경.
+실제 배포 시엔 AI 서버 주소로 변경. (Python 서버는 기본 8001 포트)
 
 ---
 
