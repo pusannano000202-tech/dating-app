@@ -16,6 +16,7 @@ export interface BasicInfoData {
 }
 
 interface Props {
+  initialValue?: Partial<BasicInfoData>
   onSubmit: (data: BasicInfoData) => void
   saving?: boolean
   serverError?: string | null
@@ -34,16 +35,16 @@ const HAIR_DENSITIES: { key: HairDensity; label: string; emoji: string }[] = [
   { key: 'bald',     label: '탈모',  emoji: '🙃' },
 ]
 
-export default function BasicInfoForm({ onSubmit, saving, serverError }: Props) {
-  const [gender, setGender]       = useState<Gender | null>(null)
-  const [age, setAge]             = useState('')
-  const [height, setHeight]       = useState('')
-  const [bodyType, setBodyType]   = useState<BodyType | null>(null)
-  const [hairDensity, setHairDensity] = useState<HairDensity | null>(null)
-  const [school, setSchool]       = useState('부산대학교')
-  const [department, setDepartment] = useState('')
+export default function BasicInfoForm({ initialValue, onSubmit, saving, serverError }: Props) {
+  const [gender, setGender]       = useState<Gender | null>(initialValue?.gender ?? null)
+  const [age, setAge]             = useState(initialValue?.age?.toString() ?? '')
+  const [height, setHeight]       = useState(initialValue?.height?.toString() ?? '')
+  const [bodyType, setBodyType]   = useState<BodyType | null>(initialValue?.body_type ?? null)
+  const [hairDensity, setHairDensity] = useState<HairDensity | null>(initialValue?.hair_density ?? null)
+  const [school, setSchool]       = useState(initialValue?.school ?? '부산대학교')
+  const [department, setDepartment] = useState(initialValue?.department ?? '')
   const [deptSuggestions, setDeptSuggestions] = useState<string[]>([])
-  const [year, setYear]           = useState<number | null>(null)
+  const [year, setYear]           = useState<number | null>(initialValue?.year ?? null)
   const [error, setError]         = useState<string | null>(null)
   const deptRef = useRef<HTMLDivElement>(null)
 

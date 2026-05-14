@@ -1,14 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import BasicInfoForm, { type BasicInfoData } from '@/components/profile/BasicInfoForm'
 import { createClient } from '@/lib/supabase'
 
 export default function BasicInfoPage() {
   const router = useRouter()
+  const [initialData, setInitialData] = useState<Partial<BasicInfoData> | undefined>(undefined)
+  const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) { setLoaded(true); return }
+      supabase
+        .from('profiles')
+        .select('gender, age, height, body_type, hair_density, school, department, year')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) setInitialData(data as Partial<BasicInfoData>)
+          setLoaded(true)
+        })
+    })
+  }, [])
 
   async function handleSubmit(data: BasicInfoData) {
     setSaving(true)
@@ -38,7 +56,21 @@ export default function BasicInfoPage() {
         <p className="text-sm text-gray-500 mt-1">매칭에 활용되는 정보야. 솔직하게 적어줘.</p>
       </div>
 
-      <BasicInfoForm onSubmit={handleSubmit} saving={saving} serverError={serverError} />
+      {loaded ? (
+        <BasicInfoForm
+          key={initialData ? 'loaded' : 'empty'}
+          initialValue={initialData}
+          onSubmit={handleSubmit}
+          saving={saving}
+          serverError={serverError}
+        />
+      ) : (
+        <div className="flex flex-col gap-5 animate-pulse">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-14 bg-white/5 rounded-2xl" />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
