@@ -105,6 +105,21 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 - [x] **Docker Compose** — `docker-compose.yml` (원커맨드 AI 서버 실행)
 - [x] **Python Makefile** — `make dev/test/lint/docker-build` 단축키
 
+### [세션 #6 - 2026-05-15] UX 디테일 + 테스트 강화 (자율 작업, context compaction 후 계속)
+
+- [x] **OTP 자동 포커스** — OTP 단계 진입 시 첫 번째 입력 칸 자동 포커스 (50ms 딜레이)
+- [x] **OTP 자동 제출** — 6자리 모두 입력 시 자동 `verifyOtp()` 호출
+- [x] **Big5Survey 자동 다음** — 두 질문 모두 답하면 600ms 후 자동 다음 트레이트 이동 (마지막 제외)
+- [x] **Worldcup 키보드 단축키** — ← → 방향키로 카드 선택 가능
+- [x] **survey 페이지 loaded 상태** — 기존 결과 조회 중 서베이 플래시 방지 (skeleton 추가)
+- [x] **photos 페이지 photosLoaded** — 기존 사진 로딩 중 skeleton, 비로그인 시 bug 수정
+- [x] **edit 페이지 skeleton** — 프로필 요약 카드 로딩 중 skeleton 표시
+- [x] **API 타임아웃** — `/api/score` 프록시에 30초 AbortController 타임아웃 추가
+- [x] **npm typecheck** — `package.json`에 `npm run typecheck` 스크립트 추가
+- [x] **supabase_client 테스트** — `tests/test_supabase_client.py` 10개 케이스 추가
+- [x] **load_image_from_url 테스트** — `test_model.py`에 TestLoadImageFromUrl 4케이스 추가
+- [x] **isSupabaseConfigured 통일** — photos 페이지 인라인 중복 제거
+
 ### 남은 TODO
 - [ ] `model.py` — 실제 SCUT-FBP5500 가중치 파일 로드 (weights/resnet50_scut.pth)
 - [ ] Supabase Storage 버킷 `photos` 생성 + RLS (Codex 담당, CODEX_HANDOFF_PHOTOS.md 참고)
@@ -152,13 +167,14 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
 
 ## 현재 세션 메모
 
-**날짜:** 2026-05-15 (세션 #5)
+**날짜:** 2026-05-15 (세션 #6, context compaction 후 계속)
 **작업 내용:**
-- 충현 담당 프로필 플로우 전체 완성 + 품질 향상
-- Python AI 서버 pytest 스위트 작성
-- CI/CD 파이프라인(GitHub Actions) 추가
-- 보안: AI 서버 URL 서버사이드만 노출
-- 스마트 리다이렉트: 홈 → 첫 번째 미완성 단계
+- OTP UX: 자동 포커스 + 자동 제출
+- Big5Survey 자동 다음 트레이트 이동 (600ms)
+- Worldcup 키보드 방향키 지원
+- 모든 프로필 페이지 로딩 skeleton 추가 완료
+- Python 테스트 강화: supabase_client 10케이스, load_image_from_url 4케이스 추가
+- API 프록시 타임아웃, npm typecheck 스크립트, 버그 수정
 
 **Claude 담당 TODO 전부 완료. 남은 것:**
 - Codex: Supabase Storage 버킷 생성 + 자기유사 이미지 생성
