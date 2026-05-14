@@ -23,16 +23,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'photo_urls required' }, { status: 400 })
   }
 
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30_000)
   try {
     const res = await fetch(`${AI_SERVER_URL}/api/score-photos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: user.id, photo_urls: body.photo_urls }),
+      signal: controller.signal,
     })
     const data = await res.json()
     return NextResponse.json(data, { status: res.status })
   } catch {
     // Fire-and-forget semantics: never fail the client flow
     return NextResponse.json({ status: 'error', message: 'AI server unavailable' }, { status: 200 })
+  } finally {
+    clearTimeout(timeout)
   }
 }
