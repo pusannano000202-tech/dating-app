@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import type { Gender, BodyType, HairDensity } from '@/lib/types'
 import { searchDepartments } from '@/lib/pnu-departments'
 
@@ -48,7 +48,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
   const [error, setError]         = useState<string | null>(null)
   const deptRef = useRef<HTMLDivElement>(null)
 
-  function handleSubmit() {
+  const handleSubmit = useCallback(function handleSubmit() {
     if (!gender) { setError('성별을 선택해줘.'); return }
     const ageNum = parseInt(age, 10)
     if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 35) {
@@ -74,7 +74,21 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       department: department.trim() || null,
       year,
     })
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gender, age, height, bodyType, hairDensity, school, department, year, saving, onSubmit])
+
+  // Enter 키로 폼 제출 (텍스트 입력 focus 중에는 기본 동작 허용)
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (saving) return
+      if (e.key !== 'Enter') return
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      handleSubmit()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [saving, handleSubmit])
 
   const pillBase = 'py-3 rounded-2xl text-sm font-bold border transition-all duration-200'
   const pillOn   = 'btn-gradient border-transparent text-white shadow-md shadow-violet-900/30'

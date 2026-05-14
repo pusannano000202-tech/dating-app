@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-const CONFETTI = ['🎉', '✨', '🎊', '💜', '🌟']
+const CONFETTI = ['🎉', '✨', '🎊', '💜', '🌟', '💫', '🎈', '⭐']
 const AUTO_REDIRECT_SECS = 5
 
 const COMPLETED_STEPS = [
@@ -18,17 +18,18 @@ const COMPLETED_STEPS = [
 
 export default function ProfileCompletePage() {
   const router = useRouter()
-  const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; delay: number }[]>([])
+  const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; delay: number; duration: number }[]>([])
   const [countdown, setCountdown] = useState(AUTO_REDIRECT_SECS)
   const [cancelled, setCancelled] = useState(false)
 
   useEffect(() => {
     setParticles(
-      Array.from({ length: 14 }, (_, i) => ({
+      Array.from({ length: 18 }, (_, i) => ({
         id: i,
         emoji: CONFETTI[i % CONFETTI.length],
         x: Math.random() * 100,
-        delay: Math.random() * 1.5,
+        delay: Math.random() * 2.5,
+        duration: 2.5 + Math.random() * 2,
       }))
     )
   }, [])
@@ -53,11 +54,11 @@ export default function ProfileCompletePage() {
       </div>
 
       {/* 파티클 */}
-      {particles.map(({ id, emoji, x, delay }) => (
+      {particles.map(({ id, emoji, x, delay, duration }) => (
         <span
           key={id}
-          className="absolute top-0 text-2xl animate-bounce pointer-events-none select-none"
-          style={{ left: `${x}%`, animationDelay: `${delay}s`, animationDuration: `${1.5 + delay * 0.5}s` }}
+          className="fixed top-0 text-2xl confetti-fall pointer-events-none select-none"
+          style={{ left: `${x}%`, animationDelay: `${delay}s`, animationDuration: `${duration}s` }}
         >
           {emoji}
         </span>

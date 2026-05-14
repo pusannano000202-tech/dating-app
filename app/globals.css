@@ -12,6 +12,12 @@
   }
 }
 
+@keyframes confetti-fall {
+  0%   { transform: translateY(-30px) rotate(0deg) scale(1);   opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(540deg) scale(0.7); opacity: 0; }
+}
+
 @layer utilities {
   .gradient-brand {
     background: linear-gradient(135deg, #7c3aed 0%, #c026d3 50%, #f43f5e 100%);
@@ -45,6 +51,10 @@
     background: radial-gradient(ellipse at 20% 0%, #2d1b69 0%, transparent 60%),
                 radial-gradient(ellipse at 80% 100%, #4a1040 0%, transparent 60%),
                 #0a0a14;
+  }
+  /* 컨페티 낙하 애니메이션 */
+  .confetti-fall {
+    animation: confetti-fall linear forwards;
   }
   /* 아이폰 노치/홈바 safe area */
   .safe-area-padding {

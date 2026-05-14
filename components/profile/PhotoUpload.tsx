@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useCallback } from 'react'
 
 export interface PhotoUploadResult {
   publicUrls: string[]
@@ -22,6 +22,7 @@ interface SlotPhoto {
 export default function PhotoUpload({ onComplete, saving }: Props) {
   const [slots, setSlots] = useState<(SlotPhoto | null)[]>([null, null, null])
   const [error, setError] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState<number | null>(null)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   function handleFileChange(idx: number, file: File | null) {
@@ -42,6 +43,23 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
       return next
     })
   }
+
+  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+    e.preventDefault()
+    setDragOver(idx)
+  }, [])
+
+  const handleDragLeave = useCallback(() => {
+    setDragOver(null)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent, idx: number) => {
+    e.preventDefault()
+    setDragOver(null)
+    const file = e.dataTransfer.files?.[0] ?? null
+    handleFileChange(idx, file)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function removeSlot(idx: number) {
     setSlots((prev) => {
@@ -77,7 +95,12 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
         {slots.map((slot, idx) => (
           <div key={idx} className="aspect-[3/4] relative">
             {slot ? (
-              <div className="relative w-full h-full rounded-2xl overflow-hidden">
+              <div
+                className="relative w-full h-full rounded-2xl overflow-hidden"
+                onDragOver={(e) => handleDragOver(e, idx)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, idx)}
+              >
                 {/* blob: URL은 next/image 미지원 → 일반 img 사용 */}
                 <img
                   src={slot.preview}
@@ -102,15 +125,20 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
               <button
                 type="button"
                 onClick={() => inputRefs.current[idx]?.click()}
-                className={`w-full h-full rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors ${
-                  idx === 0
+                onDragOver={(e) => handleDragOver(e, idx)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, idx)}
+                className={`w-full h-full rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                  dragOver === idx
+                    ? 'border-violet-400 bg-violet-500/15 scale-[1.02]'
+                    : idx === 0
                     ? 'border-violet-500/50 bg-violet-500/5 hover:border-violet-400/70'
                     : 'border-white/15 bg-white/[0.03] hover:border-white/25'
                 }`}
               >
-                <span className="text-2xl">{idx === 0 ? '📷' : '+'}</span>
+                <span className="text-2xl">{dragOver === idx ? '📥' : idx === 0 ? '📷' : '+'}</span>
                 <span className="text-[10px] text-gray-500">
-                  {idx === 0 ? '대표 사진' : `${idx + 1}번째`}
+                  {dragOver === idx ? '놓으면 추가!' : idx === 0 ? '대표 사진' : `${idx + 1}번째`}
                 </span>
               </button>
             )}
@@ -141,6 +169,7 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
           '얼굴이 잘 보이는 정면 사진을 올려줘',
           '그룹 사진보다 혼자 찍은 사진이 좋아',
           '최대 3장까지 올릴 수 있어',
+          '사진을 슬롯에 드래그해서 바로 추가할 수 있어',
         ].map((tip) => (
           <div key={tip} className="flex items-start gap-2">
             <span className="text-violet-400 text-xs mt-0.5">•</span>
