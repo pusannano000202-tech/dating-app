@@ -6,12 +6,14 @@ POST /api/score-photos  →  사진 URL 목록 받아 외모 점수 산출 후 S
 import os
 import logging
 import time
+import uuid
 from contextlib import asynccontextmanager
 from typing import Annotated
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, field_validator, HttpUrl
 
 from model import build_model, score_photos
@@ -62,6 +64,15 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def add_request_id(request: Request, call_next) -> Response:
+    """각 요청에 X-Request-ID 헤더를 부여해 로그 추적을 용이하게 한다."""
+    req_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    response: Response = await call_next(request)
+    response.headers["X-Request-ID"] = req_id
+    return response
+
+
 class ScoreRequest(BaseModel):
     user_id: str
     photo_urls: list[str]
@@ -96,31 +107,35 @@ class ScoreResponse(BaseModel):
 
 
 @app.post("/api/score-photos", response_model=ScoreResponse)
-async def score_photos_endpoint(req: ScoreRequest) -> ScoreResponse:
+async def score_photos_endpoint(
+    req: ScoreRequest,
+    request: Request,
+) -> ScoreResponse:
     if _model is None:
         raise HTTPException(status_code=503, detail="모델이 준비되지 않았습니다")
 
+    req_id = request.headers.get("X-Request-ID", "-")
     t0 = time.perf_counter()
     try:
         raw_score = score_photos(_model, req.photo_urls)
         save_appearance_score(req.user_id, raw_score)
         elapsed = round((time.perf_counter() - t0) * 1000)
         logger.info(
-            "점수 저장 완료: user_id=%s score=%.1f elapsed=%dms photos=%d",
-            req.user_id, raw_score, elapsed, len(req.photo_urls)
+            "점수 저장 완료: req_id=%s user_id=%s score=%.1f elapsed=%dms photos=%d",
+            req_id, req.user_id, raw_score, elapsed, len(req.photo_urls)
         )
         return ScoreResponse(status="ok")
 
     except ValueError as e:
-        logger.warning("입력 오류: user_id=%s error=%s", req.user_id, e)
+        logger.warning("입력 오류: req_id=%s user_id=%s error=%s", req_id, req.user_id, e)
         return ScoreResponse(status="error", message=str(e))
 
     except ConnectionError as e:
-        logger.error("이미지 다운로드 실패: user_id=%s error=%s", req.user_id, e)
+        logger.error("이미지 다운로드 실패: req_id=%s user_id=%s error=%s", req_id, req.user_id, e)
         return ScoreResponse(status="error", message="사진을 불러올 수 없습니다")
 
     except Exception as e:
-        logger.exception("점수 산출 실패: user_id=%s", req.user_id)
+        logger.exception("점수 산출 실패: req_id=%s user_id=%s", req_id, req.user_id)
         return ScoreResponse(status="error", message="점수 산출 중 오류가 발생했습니다")
 
 

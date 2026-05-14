@@ -44,6 +44,20 @@ class TestHealthEndpoint(unittest.TestCase):
         self.assertFalse(data["model_loaded"])
 
 
+class TestRequestIdMiddleware(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(app)
+
+    def test_response_has_request_id_header(self):
+        resp = self.client.get("/health")
+        self.assertIn("x-request-id", resp.headers)
+
+    def test_custom_request_id_echoed_back(self):
+        custom_id = "test-req-abc123"
+        resp = self.client.get("/health", headers={"X-Request-ID": custom_id})
+        self.assertEqual(resp.headers.get("x-request-id"), custom_id)
+
+
 class TestScorePhotosEndpoint(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
@@ -114,6 +128,30 @@ class TestScorePhotosEndpoint(unittest.TestCase):
             })
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json()["status"], "error")
+
+    def test_score_value_error_returns_ok_with_error_status(self):
+        """score_photos raising ValueError (e.g. all images invalid) → 200 with status=error."""
+        with _patch_model(), patch("main.score_photos", side_effect=ValueError("사진이 없습니다")):
+            resp = self.client.post("/api/score-photos", json={
+                "user_id": TEST_USER,
+                "photo_urls": [TEST_URL],
+            })
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data["status"], "error")
+        self.assertIn("사진이 없습니다", data.get("message", ""))
+
+    def test_unexpected_exception_returns_ok_with_error_status(self):
+        """Unhandled exception inside handler → 200 with generic error message."""
+        with _patch_model(), patch("main.score_photos", side_effect=RuntimeError("GPU OOM")):
+            resp = self.client.post("/api/score-photos", json={
+                "user_id": TEST_USER,
+                "photo_urls": [TEST_URL],
+            })
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data["status"], "error")
+        self.assertIsNotNone(data.get("message"))
 
 
 if __name__ == "__main__":
