@@ -102,6 +102,15 @@ export default function Big5Survey({ onComplete }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [currentAnswers, traitIdx])
 
+  // 두 질문 모두 답하면 잠깐 후 자동 다음으로
+  useEffect(() => {
+    if (!bothAnswered || isLast) return
+    const t = setTimeout(() => handleNext(), 600)
+    return () => clearTimeout(t)
+  // handleNext reads traitIdx/answers/isLast via closure — bothAnswered + traitIdx as triggers
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bothAnswered, traitIdx])
+
   function setAnswer(qIdx: number, value: number) {
     setAnswers((prev) => {
       const next = prev.map((row) => [...row])
