@@ -24,11 +24,12 @@ const DEFAULT_WEIGHTS: PreferenceWeights = {
 }
 
 interface Props {
+  initialValue?: PreferenceWeights
   onChange: (weights: PreferenceWeights) => void
 }
 
-export default function PreferenceSliders({ onChange }: Props) {
-  const [weights, setWeights] = useState<PreferenceWeights>(DEFAULT_WEIGHTS)
+export default function PreferenceSliders({ initialValue, onChange }: Props) {
+  const [weights, setWeights] = useState<PreferenceWeights>(initialValue ?? DEFAULT_WEIGHTS)
 
   // 하나 바꾸면 나머지를 비례 조정해서 합계 1.0 유지
   const handleChange = useCallback(

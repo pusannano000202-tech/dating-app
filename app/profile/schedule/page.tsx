@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import SchedulePicker from '@/components/profile/SchedulePicker'
 import { createClient } from '@/lib/supabase'
@@ -9,8 +9,27 @@ import type { AvailableTimeslots } from '@/lib/types'
 export default function SchedulePage() {
   const router = useRouter()
   const [timeslots, setTimeslots] = useState<AvailableTimeslots>({ slots: [] })
+  const [initialTimeslots, setInitialTimeslots] = useState<AvailableTimeslots | undefined>(undefined)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from('profiles')
+        .select('available_timeslots')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.available_timeslots) {
+            setInitialTimeslots(data.available_timeslots as AvailableTimeslots)
+            setTimeslots(data.available_timeslots as AvailableTimeslots)
+          }
+        })
+    })
+  }, [])
 
   async function handleNext() {
     if (timeslots.slots.length === 0) { setError('가능한 시간대를 1개 이상 선택해줘.'); return }
@@ -34,7 +53,11 @@ export default function SchedulePage() {
         <p className="text-sm text-gray-500 mt-1">과팅 가능한 요일과 시간을 골라줘</p>
       </div>
 
-      <SchedulePicker onChange={setTimeslots} />
+      <SchedulePicker
+        key={initialTimeslots ? 'loaded' : 'empty'}
+        initialValue={initialTimeslots}
+        onChange={setTimeslots}
+      />
 
       {timeslots.slots.length > 0 && (
         <div className="mt-4 glass rounded-2xl px-4 py-3 border border-violet-500/30">

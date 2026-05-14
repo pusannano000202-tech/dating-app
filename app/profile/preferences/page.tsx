@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import PreferenceSliders from '@/components/profile/PreferenceSliders'
 import { createClient } from '@/lib/supabase'
@@ -19,8 +19,28 @@ const DEFAULT_WEIGHTS: PreferenceWeights = {
 export default function PreferencesPage() {
   const router = useRouter()
   const [weights, setWeights] = useState<PreferenceWeights>(DEFAULT_WEIGHTS)
+  const [initialWeights, setInitialWeights] = useState<PreferenceWeights | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from('profiles')
+        .select('preference_weights')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.preference_weights) {
+            const w = data.preference_weights as PreferenceWeights
+            setWeights(w)
+            setInitialWeights(w)
+          }
+        })
+    })
+  }, [])
 
   const total = Math.round(Object.values(weights).reduce((s, v) => s + v, 0) * 100)
 
@@ -56,7 +76,11 @@ export default function PreferencesPage() {
         <p className="text-sm text-gray-500 mt-1">슬라이더로 중요도 조절해봐. 자동으로 100%가 맞춰져.</p>
       </div>
 
-      <PreferenceSliders onChange={setWeights} />
+      <PreferenceSliders
+        key={initialWeights ? 'loaded' : 'default'}
+        initialValue={initialWeights ?? undefined}
+        onChange={setWeights}
+      />
 
       {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
 
