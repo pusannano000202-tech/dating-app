@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useRef } from 'react'
+import { Suspense, useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
@@ -30,7 +30,14 @@ function LoginContent() {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [resendCooldown, setResendCooldown] = useState(0)
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendCooldown])
 
   async function sendOtp() {
     setError(null)
@@ -41,6 +48,7 @@ function LoginContent() {
       const { error: err } = await supabase.auth.signInWithOtp({ phone: toE164(phone) })
       if (err) throw err
       setStep('otp')
+      setResendCooldown(60)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '오류가 발생했어요. 다시 시도해줘.')
     } finally {
@@ -158,10 +166,19 @@ function LoginContent() {
                 {loading ? '확인 중...' : '확인'}
               </button>
 
-              <button onClick={() => { setStep('phone'); setOtp(['','','','','','']); setError(null) }}
-                className="w-full py-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                번호 다시 입력하기
-              </button>
+              <div className="flex items-center justify-between">
+                <button onClick={() => { setStep('phone'); setOtp(['','','','','','']); setError(null); setResendCooldown(0) }}
+                  className="py-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                  번호 다시 입력
+                </button>
+                <button
+                  onClick={sendOtp}
+                  disabled={loading || resendCooldown > 0}
+                  className="py-2 text-xs text-violet-400 hover:text-violet-300 transition-colors disabled:text-gray-600 disabled:cursor-not-allowed"
+                >
+                  {resendCooldown > 0 ? `재발송 (${resendCooldown}초)` : '재발송'}
+                </button>
+              </div>
             </>
           )}
         </div>
