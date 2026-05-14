@@ -9,3 +9,12 @@ def mock_env(monkeypatch):
     monkeypatch.setenv("SUPABASE_URL", "https://test.supabase.co")
     monkeypatch.setenv("SUPABASE_SERVICE_KEY", "test-service-key")
     monkeypatch.setenv("ALLOWED_ORIGINS", "http://localhost:3000")
+
+
+@pytest.fixture(autouse=True)
+def reset_supabase_singleton():
+    """각 테스트 전후로 supabase_client 모듈의 싱글톤을 초기화해 테스트 격리 보장."""
+    import supabase_client as sc
+    sc._client = None
+    yield
+    sc._client = None

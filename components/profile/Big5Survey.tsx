@@ -96,11 +96,15 @@ export default function Big5Survey({ onComplete }: Props) {
       if (val < 1 || val > 5) return
       const unansweredIdx = currentAnswers.findIndex((a) => a === null)
       if (unansweredIdx === -1) return
-      setAnswer(unansweredIdx, val)
+      setAnswers((prev) => {
+        const next = prev.map((row) => [...row])
+        next[traitIdx][unansweredIdx] = val
+        return next
+      })
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [currentAnswers, traitIdx])
+  }, [currentAnswers, traitIdx, setAnswers])
 
   // 두 질문 모두 답하면 잠깐 후 자동 다음으로
   useEffect(() => {
