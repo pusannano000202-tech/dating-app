@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import PhotoUpload, { type PhotoUploadResult } from '@/components/profile/PhotoUpload'
 import { createClient } from '@/lib/supabase'
 
-const AI_SERVER_URL = process.env.NEXT_PUBLIC_AI_SERVER_URL ?? 'http://localhost:8000'
+const AI_SERVER_URL = process.env.NEXT_PUBLIC_AI_SERVER_URL ?? 'http://localhost:8001'
 const STORAGE_BUCKET = 'photos'
 
 export default function PhotosPage() {
@@ -22,7 +22,10 @@ export default function PhotosPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
-      const isConfigured = !process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder')
+      const isConfigured = Boolean(
+        process.env.NEXT_PUBLIC_SUPABASE_URL &&
+        !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
+      )
 
       let uploadedUrls: string[] = localPreviews
 

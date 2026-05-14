@@ -134,6 +134,8 @@ function LoginContent() {
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
+                    aria-label={`인증번호 ${idx + 1}번째 자리`}
+                    autoComplete="one-time-code"
                     onChange={(e) => handleOtpInput(idx, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                     className="flex-1 aspect-square text-center text-xl font-black glass rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"

@@ -63,14 +63,4 @@ export const APPEARANCE_TYPE_INFO: Record<
   },
 }
 
-// 월드컵 대진표 (8강 → 4강 → 결승, 6개 타입 + 2 부전승)
-// 인덱스: 0=cute, 1=pure, 2=chic, 3=warm, 4=stylish, 5=healthy
-// [4], [5]가 8강에서 부전승
-export const WORLDCUP_BRACKET: [number, number][][] = [
-  // 8강 (4경기, 이 중 2경기는 실제 유저 선택)
-  [[0, 1], [2, 3]], // 유저가 고름
-  // 4강 (2경기)
-  // 결승 (1경기)
-]
-
-export const DEPOSIT_AMOUNT = 5000 // 원
+export const DEPOSIT_AMOUNT = 20000 // 원 (1인당 보증금)
