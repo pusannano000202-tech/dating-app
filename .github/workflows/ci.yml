@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "profile/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── 외모 AI 서버 (Python) ───────────────────────────────────────────────
+  appearance-tests:
+    name: Appearance AI — pytest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python/appearance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: python/appearance/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        env:
+          SUPABASE_URL: https://test.supabase.co
+          SUPABASE_SERVICE_KEY: test-service-key
+        run: pytest tests/ -v --tb=short
+
+  # ─── Next.js 타입 체크 ───────────────────────────────────────────────────
+  nextjs-typecheck:
+    name: Next.js — TypeScript
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
