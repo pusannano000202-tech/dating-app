@@ -89,6 +89,7 @@ export default function PreferenceSliders({ initialValue, onChange }: Props) {
               max={100}
               step={5}
               value={pct}
+              aria-label={`${label} 중요도 ${pct}%`}
               onChange={(e) => handleChange(key, Number(e.target.value) / 100)}
               className="w-full h-2 rounded-full appearance-none cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none

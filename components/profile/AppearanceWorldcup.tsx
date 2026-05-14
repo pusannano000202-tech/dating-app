@@ -134,6 +134,7 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
               key={type}
               onClick={() => pick(type)}
               disabled={isAnimating}
+              aria-label={`${info.label} 스타일 선택`}
               className={`
                 relative flex-1 rounded-3xl overflow-hidden
                 aspect-[3/4]
