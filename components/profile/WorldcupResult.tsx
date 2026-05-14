@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Image from 'next/image'
 import type { AppearanceType } from '@/lib/types'
 import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
@@ -14,6 +15,17 @@ interface Props {
 
 export default function WorldcupResult({ winner, saving = false, saveError, onConfirm, onRetry }: Props) {
   const info = APPEARANCE_TYPE_INFO[winner]
+
+  // Enter 키로 확정, R 키로 다시하기
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (saving) return
+      if (e.key === 'Enter') onConfirm()
+      if (e.key === 'r' || e.key === 'R') onRetry()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [saving, onConfirm, onRetry])
 
   return (
     <div className="flex flex-col items-center min-h-screen px-4 py-10">
