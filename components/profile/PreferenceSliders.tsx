@@ -107,15 +107,24 @@ export default function PreferenceSliders({ initialValue, onChange }: Props) {
         )
       })}
 
-      <div className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-colors ${
-        total === 100
-          ? 'bg-emerald-500/10 border-emerald-500/30'
-          : 'bg-red-500/10 border-red-500/30'
-      }`}>
-        <span className="text-sm text-gray-400">합계</span>
-        <span className={`text-lg font-black ${total === 100 ? 'text-emerald-400' : 'text-red-400'}`}>
-          {total}%
-        </span>
+      <div className="flex items-center justify-between">
+        <div className={`flex-1 flex items-center justify-between px-4 py-3 rounded-2xl border transition-colors ${
+          total === 100
+            ? 'bg-emerald-500/10 border-emerald-500/30'
+            : 'bg-red-500/10 border-red-500/30'
+        }`}>
+          <span className="text-sm text-gray-400">합계</span>
+          <span className={`text-lg font-black ${total === 100 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {total}%
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => { setWeights(DEFAULT_WEIGHTS); onChange(DEFAULT_WEIGHTS) }}
+          className="ml-3 text-xs text-gray-600 hover:text-gray-400 transition-colors whitespace-nowrap px-1"
+        >
+          초기화
+        </button>
       </div>
     </div>
   )
