@@ -65,56 +65,54 @@ export default function PreferenceSliders({ onChange }: Props) {
   const total = Math.round(ITEMS.reduce((s, { key }) => s + weights[key], 0) * 100)
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {ITEMS.map(({ key, label, emoji, desc }) => {
         const pct = Math.round(weights[key] * 100)
         return (
-          <div key={key} className="bg-white/5 rounded-2xl p-4">
+          <div key={key} className="glass rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{emoji}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xl">{emoji}</span>
                 <div>
                   <p className="text-sm font-bold">{label}</p>
                   <p className="text-xs text-gray-500">{desc}</p>
                 </div>
               </div>
-              <span className="text-lg font-black text-purple-400 tabular-nums w-12 text-right">
+              <span className="text-lg font-black text-violet-400 tabular-nums w-12 text-right">
                 {pct}%
               </span>
             </div>
-
-            <div className="relative">
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                value={pct}
-                onChange={(e) => handleChange(key, Number(e.target.value) / 100)}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer
-                  bg-white/10
-                  [&::-webkit-slider-thumb]:appearance-none
-                  [&::-webkit-slider-thumb]:w-5
-                  [&::-webkit-slider-thumb]:h-5
-                  [&::-webkit-slider-thumb]:rounded-full
-                  [&::-webkit-slider-thumb]:bg-purple-500
-                  [&::-webkit-slider-thumb]:shadow-lg
-                  [&::-webkit-slider-thumb]:cursor-pointer"
-                style={{
-                  background: `linear-gradient(to right, #9333ea ${pct}%, rgba(255,255,255,0.1) ${pct}%)`,
-                }}
-              />
-            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={pct}
+              onChange={(e) => handleChange(key, Number(e.target.value) / 100)}
+              className="w-full h-2 rounded-full appearance-none cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none
+                [&::-webkit-slider-thumb]:w-5
+                [&::-webkit-slider-thumb]:h-5
+                [&::-webkit-slider-thumb]:rounded-full
+                [&::-webkit-slider-thumb]:bg-violet-500
+                [&::-webkit-slider-thumb]:shadow-lg
+                [&::-webkit-slider-thumb]:shadow-violet-900/50
+                [&::-webkit-slider-thumb]:cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, #7c3aed ${pct}%, rgba(255,255,255,0.1) ${pct}%)`,
+              }}
+            />
           </div>
         )
       })}
 
-      {/* 합계 표시 */}
-      <div className={`flex items-center justify-between px-4 py-3 rounded-2xl ${
-        total === 100 ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'
+      <div className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-colors ${
+        total === 100
+          ? 'bg-emerald-500/10 border-emerald-500/30'
+          : 'bg-red-500/10 border-red-500/30'
       }`}>
         <span className="text-sm text-gray-400">합계</span>
-        <span className={`text-lg font-black ${total === 100 ? 'text-green-400' : 'text-red-400'}`}>
+        <span className={`text-lg font-black ${total === 100 ? 'text-emerald-400' : 'text-red-400'}`}>
           {total}%
         </span>
       </div>

@@ -50,34 +50,25 @@ export default function PreferencesPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-950 text-white px-4 py-10">
-      {/* 헤더 */}
-      <div className="mb-8">
+    <div className="flex flex-col min-h-screen px-5 pb-10">
+      <div className="mb-7">
         <h1 className="text-2xl font-black">뭘 제일 중요하게 봐?</h1>
-        <p className="text-sm text-gray-400 mt-1.5">
-          슬라이더로 중요도를 조절해봐. 자동으로 100%가 맞춰져.
-        </p>
+        <p className="text-sm text-gray-500 mt-1">슬라이더로 중요도 조절해봐. 자동으로 100%가 맞춰져.</p>
       </div>
 
-      {/* 슬라이더 */}
       <PreferenceSliders onChange={setWeights} />
 
-      {error && (
-        <p className="mt-4 text-sm text-red-400 text-center">{error}</p>
-      )}
+      {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
 
-      {/* 완료 버튼 */}
       <div className="mt-auto pt-8">
         <button
           onClick={handleComplete}
           disabled={saving || total !== 100}
-          className="w-full py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 font-bold text-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {saving ? '저장 중...' : '프로필 완성!'}
         </button>
-        <p className="mt-3 text-xs text-gray-600 text-center">
-          완성 후 그룹을 만들고 과팅을 신청할 수 있어
-        </p>
+        <p className="mt-3 text-xs text-gray-700 text-center">완성 후 그룹을 만들고 과팅을 신청할 수 있어</p>
       </div>
     </div>
   )

@@ -1,3 +1,49 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * { -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'PretendardVariable', -apple-system, sans-serif;
+    background: #0a0a14;
+  }
+}
+
+@layer utilities {
+  .gradient-brand {
+    background: linear-gradient(135deg, #7c3aed 0%, #c026d3 50%, #f43f5e 100%);
+  }
+  .gradient-brand-text {
+    background: linear-gradient(135deg, #a78bfa 0%, #e879f9 50%, #fb7185 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .btn-gradient {
+    background: linear-gradient(135deg, #7c3aed, #c026d3);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-gradient:hover { opacity: 0.9; }
+  .btn-gradient:active { transform: scale(0.98); }
+  .btn-gradient:disabled { opacity: 0.4; cursor: not-allowed; }
+  .bg-app {
+    background: radial-gradient(ellipse at 20% 0%, #2d1b69 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, #4a1040 0%, transparent 60%),
+                #0a0a14;
+  }
+}

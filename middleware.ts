@@ -5,6 +5,11 @@ import type { NextRequest } from 'next/server'
 const PROTECTED_PREFIXES = ['/profile', '/group', '/match']
 
 export async function middleware(request: NextRequest) {
+  // Supabase 키 없으면 인증 체크 스킵 (로컬 UI 확인용)
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+    return NextResponse.next({ request })
+  }
+
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(

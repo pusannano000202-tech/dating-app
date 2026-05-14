@@ -93,27 +93,21 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
   const progress = Math.round((currentMatch / totalUserChoices) * 100)
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-950 text-white px-4 py-8">
+    <div className="flex flex-col items-center min-h-screen px-4 py-6">
       {/* 헤더 */}
       <div className="w-full max-w-md mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-purple-400">{roundLabel}</span>
-          <span className="text-sm text-gray-400">
-            {currentMatch + 1} / {totalUserChoices}
-          </span>
+          <span className="text-xs font-bold text-violet-400 tracking-widest uppercase">{roundLabel}</span>
+          <span className="text-xs text-gray-500 tabular-nums">{currentMatch + 1} / {totalUserChoices}</span>
         </div>
-        <div className="w-full bg-gray-800 rounded-full h-1.5">
+        <div className="w-full bg-white/10 rounded-full h-1">
           <div
-            className="bg-purple-500 h-1.5 rounded-full transition-all duration-500"
+            className="gradient-brand h-1 rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="mt-5 text-center text-xl font-bold tracking-tight">
-          어떤 스타일이 더 좋아?
-        </p>
-        <p className="text-center text-sm text-gray-400 mt-1">
-          직관적으로 골라봐
-        </p>
+        <p className="mt-5 text-center text-xl font-black tracking-tight">어떤 스타일이 더 좋아?</p>
+        <p className="text-center text-sm text-gray-500 mt-1">직관적으로 골라봐</p>
       </div>
 
       {/* 대결 카드 — 사진 기반 */}
@@ -182,7 +176,7 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
         })}
       </div>
 
-      <p className="mt-6 text-xs text-gray-600">탭해서 선택</p>
+      <p className="mt-5 text-xs text-gray-700">탭해서 선택</p>
     </div>
   )
 }

@@ -15,27 +15,21 @@ export default function StepProgress() {
   const currentIdx = STEPS.findIndex((s) => pathname.startsWith(s.path))
 
   return (
-    <div className="px-4 pt-6 pb-2">
-      <div className="flex items-center gap-1.5 max-w-md mx-auto">
+    <div className="px-5 pt-8 pb-3 max-w-md mx-auto w-full">
+      <div className="flex items-center gap-1.5">
         {STEPS.map((step, i) => {
           const isDone = i < currentIdx
           const isActive = i === currentIdx
           return (
-            <div key={step.path} className="flex-1 flex flex-col items-center gap-1">
-              <div
-                className={`h-1 w-full rounded-full transition-all duration-300 ${
-                  isDone
-                    ? 'bg-purple-400'
-                    : isActive
-                    ? 'bg-purple-600'
-                    : 'bg-white/15'
-                }`}
-              />
-              <span
-                className={`text-[10px] transition-colors ${
-                  isActive ? 'text-purple-400 font-semibold' : isDone ? 'text-purple-300/60' : 'text-gray-600'
-                }`}
-              >
+            <div key={step.path} className="flex-1 flex flex-col items-center gap-1.5">
+              <div className={`h-1 w-full rounded-full transition-all duration-500 ${
+                isDone ? 'gradient-brand' :
+                isActive ? 'bg-violet-500' : 'bg-white/10'
+              }`} />
+              <span className={`text-[9px] font-medium tracking-wide transition-colors ${
+                isActive ? 'text-violet-400' :
+                isDone ? 'text-violet-600' : 'text-gray-700'
+              }`}>
                 {step.label}
               </span>
             </div>
