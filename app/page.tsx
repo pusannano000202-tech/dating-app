@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
+import { isSupabaseConfigured } from '@/lib/utils'
 
 function LandingPage() {
   return (
@@ -82,10 +83,7 @@ function LandingPage() {
 }
 
 export default async function Home() {
-  const isConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
-
-  if (!isConfigured) return <LandingPage />
+  if (!isSupabaseConfigured()) return <LandingPage />
 
   const cookieStore = cookies()
   const supabase = createServerClient(

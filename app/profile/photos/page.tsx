@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import PhotoUpload, { type PhotoUploadResult } from '@/components/profile/PhotoUpload'
 import { createClient } from '@/lib/supabase'
+import { isSupabaseConfigured } from '@/lib/utils'
 
 const STORAGE_BUCKET = 'photos'
 
@@ -15,10 +16,7 @@ export default function PhotosPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const isConfigured = Boolean(
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
-    )
+    const isConfigured = isSupabaseConfigured()
     if (!isConfigured) return
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
