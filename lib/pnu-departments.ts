@@ -38,5 +38,5 @@ export const PNU_DEPARTMENTS: string[] = [
 export function searchDepartments(query: string): string[] {
   if (!query.trim()) return []
   const q = query.trim().toLowerCase()
-  return [...new Set(PNU_DEPARTMENTS.filter((d) => d.toLowerCase().includes(q)))].slice(0, 6)
+  return PNU_DEPARTMENTS.filter((d) => d.toLowerCase().includes(q)).slice(0, 6)
 }
