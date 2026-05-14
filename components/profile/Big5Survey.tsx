@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export interface Big5Scores {
   openness: number           // 0~1
@@ -88,6 +88,19 @@ export default function Big5Survey({ onComplete }: Props) {
   const currentAnswers = answers[traitIdx]
   const bothAnswered = currentAnswers.every((a) => a !== null)
   const isLast = traitIdx === TRAITS.length - 1
+
+  // 키보드 단축키: 1~5로 첫 번째 미답 질문에 응답
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const val = Number(e.key)
+      if (val < 1 || val > 5) return
+      const unansweredIdx = currentAnswers.findIndex((a) => a === null)
+      if (unansweredIdx === -1) return
+      setAnswer(unansweredIdx, val)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [currentAnswers, traitIdx])
 
   function setAnswer(qIdx: number, value: number) {
     setAnswers((prev) => {
