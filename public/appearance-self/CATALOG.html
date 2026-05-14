@@ -3,76 +3,67 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>자기유사 월드컵 이미지 카탈로그</title>
+  <title>자기유사 월드컵 64장 카탈로그</title>
   <style>
     body{margin:0;background:#111827;color:#f9fafb;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    main{max-width:1440px;margin:0 auto;padding:30px 18px 50px}
-    h1{margin:0 0 8px;font-size:30px}
-    .lead{margin:0 0 18px;color:#d1d5db;line-height:1.6}
+    main{max-width:1500px;margin:0 auto;padding:28px 18px 52px}
+    h1{margin:0 0 8px;font-size:30px}.lead{margin:0 0 18px;color:#d1d5db;line-height:1.6}
     .notice{margin:18px 0 26px;padding:14px 16px;border-left:4px solid #a855f7;background:#1f2937;color:#e5e7eb;line-height:1.6}
-    .section-title{margin:30px 0 14px;font-size:24px}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-    .card{background:#1f2937;border:1px solid #374151;border-radius:14px;overflow:hidden}
-    .card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#374151}
-    .body{padding:13px}
-    .score{display:inline-flex;padding:5px 9px;border-radius:999px;background:#713f12;color:#fde68a;font-weight:800;font-size:13px;margin-bottom:8px}
+    .section-title{margin:30px 0 14px;font-size:24px}.grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;overflow:hidden}.card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#374151}
+    .body{padding:9px}.score{display:inline-flex;padding:4px 8px;border-radius:999px;font-weight:800;font-size:12px;margin-bottom:6px}
     .low{background:#7c2d12;color:#fed7aa}.mid{background:#713f12;color:#fde68a}.high{background:#14532d;color:#bbf7d0}.top{background:#581c87;color:#e9d5ff}
-    h2{margin:0 0 6px;font-size:17px}
-    p{margin:6px 0;color:#d1d5db;line-height:1.45;font-size:13px}
-    @media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:560px){.grid{grid-template-columns:1fr}}
+    h2{margin:0 0 4px;font-size:14px}p{margin:0;color:#d1d5db;line-height:1.35;font-size:12px}
+    @media(max-width:1200px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   </style>
 </head>
 <body>
 <main>
-  <h1>자기유사 월드컵 이미지 카탈로그</h1>
-  <p class="lead">점수는 호감도 느낌이 아니라 백분위 절대점수다. 30점은 같은 성별·비슷한 연령대 100명 중 하위 30퍼센트 지점이라는 뜻이다.</p>
+  <h1>자기유사 월드컵 64장 카탈로그</h1>
+  <p class="lead">남자 32장, 여자 32장. 점수는 호감도 느낌이 아니라 같은 성별·비슷한 연령대 안에서의 백분위 절대점수다.</p>
   <div class="notice">
-    현재는 전체 64장 중 1차 파형이다. 여자 11장, 남자 5장을 먼저 만들었다.
-    낮은 점수대는 피부 상태, 얼굴 비대칭, 눈 크기, 이목구비 조화, 표정, 헤어/스타일, 체형을 분리해서 반영했다.
-    생성 목표 점수와 실제 판정 점수는 다를 수 있으므로, 이 카탈로그를 보고 사람 기준으로 재조정한다.
+    사용자 화면에는 점수를 보여주지 않는다. 이 파일은 내부 검수용이다.
+    낮은 점수대는 뚱뚱함 하나로만 만들지 않고 피부 상태, 비대칭, 작은 눈, 낮은 이목구비 조화, 표정, 헤어/스타일, 체형을 분리해서 반영했다.
   </div>
-  <h2 class="section-title">여자 자기유사 기준</h2>
+  <h2 class="section-title">여자 자기유사 32장</h2>
   <section class="grid" id="female"></section>
-  <h2 class="section-title">남자 자기유사 기준</h2>
+  <h2 class="section-title">남자 자기유사 32장</h2>
   <section class="grid" id="male"></section>
 </main>
 <script>
-const female = [
-  [18,'female/female_self_18.jpg','하위 10~20%','비대칭, 피부 트러블, 낮은 이목구비 선명도, 낮은 꾸밈'],
-  [24,'female/female_self_24.jpg','하위 20%대','작은 눈, 피곤한 인상, 피부 자국, 낮은 얼굴 조화'],
-  [30,'female/female_self_30.jpg','하위 30%대','마른 체형이지만 얼굴 조화와 피부 상태가 불리한 케이스'],
-  [36,'female/female_self_36.jpg','하위 30~40%','통통한 체형, 둥근 얼굴형, 약한 턱선, 낮은 꾸밈'],
-  [42,'female/female_self_42.jpg','평균 이하','흔한 현실 외모, 약한 미형 신호, 낮은 스타일 조화'],
-  [50,'female/female_self_50.jpg','평균 근처','무난한 얼굴 균형, 강한 매력도 약한 결점도 적은 기준'],
-  [58,'female/female_self_58.jpg','평균보다 약간 위','부드러운 인상, 보통 이상 눈 크기, 무난한 정돈감'],
-  [66,'female/female_self_66.jpg','평균 이상','얼굴 조화 안정, 정돈감 좋음, 호감 요소 분명'],
-  [74,'female/female_self_74.jpg','상위 30%','예쁘다는 평가 가능, 큰 눈과 좋은 얼굴 조화'],
-  [82,'female/female_self_82.jpg','상위 20%','확실한 상위 호감형, 좋은 피부와 선명한 인상'],
-  [90,'female/female_self_90.jpg','상위 10%','최상위권 기준, 강한 미형 신호와 높은 정돈감']
-];
-const male = [
-  [18,'male/male_self_18.jpg','하위 10~20%','비대칭, 작은 눈, 피부 트러블, 낮은 꾸밈'],
-  [30,'male/male_self_30.jpg','하위 30%대','마른 체형이지만 얼굴 조화와 스타일이 불리한 케이스'],
-  [42,'male/male_self_42.jpg','평균 이하','평범 이하의 이목구비 선명도와 낮은 정돈감'],
-  [55,'male/male_self_55.jpg','평균 근처보다 약간 위','무난한 얼굴 균형, 평범한 정돈감'],
-  [68,'male/male_self_68.jpg','평균 이상','훈훈함이 있는 현실 호감형']
-];
+const female=[18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,73,74,76,82,86,90];
+const male=[18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,55,58,60,62,64,66,68,70,72,74,76,78,82,88];
+function band(score){
+  if(score<30)return '하위 20%대';
+  if(score<40)return '하위 30%대';
+  if(score<50)return '평균 이하';
+  if(score<60)return '평균 근처';
+  if(score<70)return '평균 이상';
+  if(score<80)return '상위 호감형';
+  return '최상위권';
+}
+function desc(score){
+  if(score<30)return '피부/비대칭/작은 눈/낮은 조화 중 하나 이상이 강함';
+  if(score<40)return '낮은 꾸밈, 약한 턱선, 표정/스타일 불리 요소';
+  if(score<50)return '미형 신호가 약하고 전체 호감도가 평균 아래';
+  if(score<60)return '평균권. 강한 장점도 약한 결점도 적은 기준';
+  if(score<70)return '얼굴 조화와 정돈감이 평균 이상';
+  if(score<80)return '훈훈함/예쁨이 분명한 상위 호감형';
+  return '강한 미형 신호와 높은 정돈감';
+}
 function cls(score){return score<40?'low':score<70?'mid':score<85?'high':'top'}
-function render(id, rows){
-  document.getElementById(id).innerHTML = rows.map(([score,src,band,desc]) => `
+function render(id, scores){
+  document.getElementById(id).innerHTML=scores.map(score=>`
     <article class="card">
-      <img src="./${src}" alt="${id} ${score}점 기준 이미지">
+      <img src="./${id}/${id}_self_${score}.jpg" alt="${id} ${score}점 기준 이미지">
       <div class="body">
         <div class="score ${cls(score)}">절대점수 ${score}</div>
-        <h2>${band}</h2>
-        <p>${desc}</p>
+        <h2>${band(score)}</h2>
+        <p>${desc(score)}</p>
       </div>
-    </article>
-  `).join('');
+    </article>`).join('');
 }
-render('female', female);
-render('male', male);
+render('female',female);render('male',male);
 </script>
 </body>
 </html>

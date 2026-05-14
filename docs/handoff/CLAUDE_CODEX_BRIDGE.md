@@ -123,11 +123,11 @@
 - `public/appearance-self/CATALOG.html`을 1차 파형 전체 검수용으로 갱신했다.
 - `public/appearance-self/female/METADATA.md`, `public/appearance-self/male/METADATA.md`를 갱신했다.
 
-**남은 작업:**
-- 전체 목표는 남자 32장 + 여자 32장이다.
-- 현재 생성 완료 수는 여자 11장, 남자 5장이다.
-- 남은 수량은 여자 21장, 남자 27장이다.
-- 1차 파형 점수 감각 검수 후 같은 기준으로 나머지를 생성해야 한다.
+**완료 상태 업데이트:**
+- 남자 32장 + 여자 32장 자기유사 월드컵 이미지 생성 완료.
+- `public/appearance-self/CATALOG.html`을 64장 전체 검수용으로 갱신했다.
+- `public/appearance-self/female/METADATA.md`, `public/appearance-self/male/METADATA.md`를 32장 전체 기준으로 갱신했다.
+- 낮은 점수대는 뚱뚱함 하나가 아니라 피부 상태, 비대칭, 작은 눈, 낮은 이목구비 조화, 표정, 헤어/스타일, 체형을 분리해 반영했다.
 
 ---
 

@@ -1,25 +1,40 @@
-# 여자 자기유사 월드컵 이미지 메타데이터
+# 여자 자기유사 월드컵 32장 메타데이터
 
-점수는 백분위 절대점수다. 생성 프롬프트 목표가 아니라 실제 결과를 보고 재판정한 점수를 우선한다.
+점수는 백분위 절대점수다. 사용자 화면에는 표시하지 않는다.
 
-| 파일 | 절대점수 | 구간 | 핵심 판정 근거 |
-|------|----------|------|----------------|
-| `female_self_18.jpg` | 18 | 하위 10~20% | 비대칭, 작은 눈, 낮은 이목구비 선명도, 피부 트러블, 낮은 꾸밈 |
-| `female_self_24.jpg` | 24 | 하위 20%대 | 피곤한 인상, 피부 자국, 낮은 얼굴 조화, 어색한 표정 |
-| `female_self_30.jpg` | 30 | 하위 30%대 | 마른 체형이지만 얼굴 구조와 피부 상태가 불리한 케이스 |
-| `female_self_36.jpg` | 36 | 하위 30~40% | 둥근 얼굴형, 약한 턱선, 통통한 체형, 낮은 스타일 조화 |
-| `female_self_42.jpg` | 42 | 평균 이하 | 흔한 현실 외모, 약한 미형 신호, 낮은 꾸밈 |
-| `female_self_50.jpg` | 50 | 평균 근처 | 무난한 얼굴 균형, 강한 장점도 약한 결점도 적은 기준 |
-| `female_self_58.jpg` | 58 | 평균보다 약간 위 | 부드러운 인상, 보통 이상 눈 크기, 무난한 정돈감 |
-| `female_self_66.jpg` | 66 | 평균 이상 | 얼굴 조화 안정, 정돈감 좋음, 호감 요소 분명 |
-| `female_self_74.jpg` | 74 | 상위 30% | 예쁘다는 평가 가능, 큰 눈과 좋은 얼굴 조화 |
-| `female_self_82.jpg` | 82 | 상위 20% | 확실한 상위 호감형, 좋은 피부와 선명한 인상 |
-| `female_self_90.jpg` | 90 | 상위 10% | 최상위권 기준, 강한 미형 신호와 높은 정돈감 |
+| 점수 | 파일 |
+|------|------|
+| 18 | `female_self_18.jpg` |
+| 20 | `female_self_20.jpg` |
+| 22 | `female_self_22.jpg` |
+| 24 | `female_self_24.jpg` |
+| 26 | `female_self_26.jpg` |
+| 28 | `female_self_28.jpg` |
+| 30 | `female_self_30.jpg` |
+| 32 | `female_self_32.jpg` |
+| 34 | `female_self_34.jpg` |
+| 36 | `female_self_36.jpg` |
+| 38 | `female_self_38.jpg` |
+| 40 | `female_self_40.jpg` |
+| 42 | `female_self_42.jpg` |
+| 44 | `female_self_44.jpg` |
+| 46 | `female_self_46.jpg` |
+| 48 | `female_self_48.jpg` |
+| 50 | `female_self_50.jpg` |
+| 52 | `female_self_52.jpg` |
+| 54 | `female_self_54.jpg` |
+| 56 | `female_self_56.jpg` |
+| 58 | `female_self_58.jpg` |
+| 60 | `female_self_60.jpg` |
+| 62 | `female_self_62.jpg` |
+| 64 | `female_self_64.jpg` |
+| 66 | `female_self_66.jpg` |
+| 68 | `female_self_68.jpg` |
+| 73 | `female_self_73.jpg` |
+| 74 | `female_self_74.jpg` |
+| 76 | `female_self_76.jpg` |
+| 82 | `female_self_82.jpg` |
+| 86 | `female_self_86.jpg` |
+| 90 | `female_self_90.jpg` |
 
-## 남은 확장
-
-32장 완성 시 같은 점수대 안에서도 원인을 분리해야 한다.
-
-- 낮은 점수: 피부형, 비대칭형, 작은눈형, 낮은꾸밈형, 체형불리형, 표정불리형
-- 중간 점수: 평균형, 자연형, 단정형, 평범호감형
-- 높은 점수: 귀여움형, 청순형, 시크형, 따뜻함형, 스타일형, 건강형
+낮은 점수대에는 피부 상태, 비대칭, 작은 눈, 낮은 이목구비 조화, 표정, 헤어/스타일, 체형을 분리해서 반영했다.
