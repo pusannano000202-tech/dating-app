@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import type { AppearanceType } from '@/lib/types'
 import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
@@ -84,6 +84,18 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
     },
     [isAnimating, matchQueue, nextRoundPool, onComplete]
   )
+
+  // 키보드: ← 왼쪽, → 오른쪽으로 카드 선택
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (isAnimating || matchQueue.length === 0) return
+      const [l, r] = matchQueue[0]
+      if (e.key === 'ArrowLeft') pick(l)
+      else if (e.key === 'ArrowRight') pick(r)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isAnimating, matchQueue, pick])
 
   if (matchQueue.length === 0) {
     return <div className="text-center py-20 text-gray-400">로딩 중...</div>
@@ -176,7 +188,7 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
         })}
       </div>
 
-      <p className="mt-5 text-xs text-gray-700">탭해서 선택</p>
+      <p className="mt-5 text-xs text-gray-700">탭해서 선택 · ← → 키보드 사용 가능</p>
     </div>
   )
 }
