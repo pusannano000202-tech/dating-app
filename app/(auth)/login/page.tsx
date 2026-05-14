@@ -13,6 +13,13 @@ function toE164(raw: string): string {
   return '+82' + digits
 }
 
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+}
+
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -105,8 +112,9 @@ function LoginContent() {
                   type="tel"
                   placeholder="010-0000-0000"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(formatPhone(e.target.value))}
                   onKeyDown={(e) => e.key === 'Enter' && sendOtp()}
+                  autoComplete="tel"
                   className="flex-1 glass rounded-xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-transparent"
                 />
               </div>
