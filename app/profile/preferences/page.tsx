@@ -53,7 +53,6 @@ export default function PreferencesPage() {
     <div className="flex flex-col min-h-screen bg-gray-950 text-white px-4 py-10">
       {/* 헤더 */}
       <div className="mb-8">
-        <p className="text-sm text-purple-400 font-semibold mb-1">5 / 5</p>
         <h1 className="text-2xl font-black">뭘 제일 중요하게 봐?</h1>
         <p className="text-sm text-gray-400 mt-1.5">
           슬라이더로 중요도를 조절해봐. 자동으로 100%가 맞춰져.

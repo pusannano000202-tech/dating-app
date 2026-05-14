@@ -41,7 +41,6 @@ export default function SchedulePage() {
     <div className="flex flex-col min-h-screen bg-gray-950 text-white px-4 py-10">
       {/* 헤더 */}
       <div className="mb-8">
-        <p className="text-sm text-purple-400 font-semibold mb-1">4 / 5</p>
         <h1 className="text-2xl font-black">언제 시간 돼?</h1>
         <p className="text-sm text-gray-400 mt-1.5">
           과팅 가능한 요일과 시간대를 골라줘 (저녁 기준)
