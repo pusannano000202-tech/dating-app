@@ -41,7 +41,7 @@ export default function PreferencesPage() {
         )
 
       if (dbErr) throw dbErr
-      router.push('/group/create') // 성준 영역 — 프로필 완성 후 그룹 생성으로
+      router.push('/profile/complete')
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해주세요.')
     } finally {
