@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Big5Survey, { type Big5Scores } from '@/components/profile/Big5Survey'
 import Big5Result from '@/components/profile/Big5Result'
@@ -14,6 +14,37 @@ export default function SurveyPage() {
   const [scores, setScores] = useState<Big5Scores | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // 기존 점수가 있으면 바로 결과 화면으로 이동
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase
+        .from('profiles')
+        .select('big5_openness, big5_conscientiousness, big5_extraversion, big5_agreeableness, big5_neuroticism')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (
+            data?.big5_openness != null &&
+            data?.big5_conscientiousness != null &&
+            data?.big5_extraversion != null &&
+            data?.big5_agreeableness != null &&
+            data?.big5_neuroticism != null
+          ) {
+            setScores({
+              openness: data.big5_openness,
+              conscientiousness: data.big5_conscientiousness,
+              extraversion: data.big5_extraversion,
+              agreeableness: data.big5_agreeableness,
+              neuroticism: data.big5_neuroticism,
+            })
+            setPhase('result')
+          }
+        })
+    })
+  }, [])
 
   function handleSurveyComplete(s: Big5Scores) {
     setScores(s)
