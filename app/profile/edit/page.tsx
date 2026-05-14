@@ -93,6 +93,23 @@ export default function ProfileEditPage() {
         </div>
       </div>
 
+      {/* 프로필 요약 카드 — 로딩 중 스켈레톤 */}
+      {!summary && (
+        <div className="glass rounded-2xl p-4 mb-5 animate-pulse">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 flex-shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-white/10 rounded w-3/4" />
+              <div className="h-3 bg-white/5 rounded w-1/2" />
+              <div className="flex gap-2 mt-1">
+                <div className="h-4 bg-white/10 rounded-full w-20" />
+                <div className="h-4 bg-white/5 rounded-full w-14" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 프로필 요약 카드 */}
       {summary && (
         <div className="relative glass rounded-2xl p-4 mb-5 border border-white/8">
