@@ -37,6 +37,30 @@ docker run -p 8001:8001 \
   appearance-ai
 ```
 
+## Docker Compose로 실행 (권장)
+
+프로젝트 루트에서:
+
+```bash
+# .env 파일 준비
+cp python/appearance/.env.example python/appearance/.env
+# (SUPABASE_URL, SUPABASE_SERVICE_KEY 입력)
+
+docker compose up appearance-ai
+```
+
+## 테스트
+
+```bash
+cd python/appearance
+pip install -r requirements-dev.txt
+make test        # pytest 실행
+make lint        # ruff 린트
+
+# 서버 실행 후 통합 테스트
+python test_server.py
+```
+
 ## 모델 가중치
 
 `weights/resnet50_scut.pth` 위치에 SCUT-FBP5500으로 파인튜닝된 가중치 파일을 넣으면 된다.
