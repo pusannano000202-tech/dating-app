@@ -1,6 +1,5 @@
 """unit tests for model.py — no HTTP, no GPU required"""
 import io
-import types
 import unittest
 from unittest.mock import MagicMock, patch
 

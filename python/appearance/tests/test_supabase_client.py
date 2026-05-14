@@ -1,6 +1,6 @@
 """Unit tests for supabase_client.py — no real Supabase connection required."""
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 import supabase_client as sc
 
