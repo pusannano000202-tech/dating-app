@@ -51,76 +51,39 @@ profile/worldcup-ui (이 브랜치에서 작업할 것)
 
 ---
 
-## 지금 해야 할 작업 (2가지)
+## ⚠️ 현재 상태 (2026-05-15 업데이트)
 
-### 작업 1: 기본정보 입력 페이지
+**Claude가 세션 #3~#5에서 아래 작업을 모두 완료했다:**
+- `components/profile/BasicInfoForm.tsx` ✅
+- `app/profile/basic/page.tsx` ✅  
+- `components/profile/PhotoUpload.tsx` ✅
+- `app/profile/photos/page.tsx` ✅
+- 전체 프로필 플로우 (Big5, schedule, preferences, complete) ✅
 
-파일 위치:
-- app/profile/basic/page.tsx
-- components/profile/BasicInfoForm.tsx
+**Codex에게 남은 작업 (2가지만):**
 
-입력 항목과 DB 컬럼 매핑:
-- 성별 (gender): 'male' | 'female' — 남자/여자 큰 버튼 2개
-- 나이 (age): 숫자 입력 (18~30 범위 제한)
-- 키 (height): cm 단위 숫자 입력
-- 체형 (body_type): 'slim' | 'average' | 'athletic' | 'chubby' — 4개 버튼 중 택1
-  - slim=슬림, average=보통, athletic=근육, chubby=통통
-- 머리숱 (hair_density): 'full' | 'thinning' | 'bald' — 3개 버튼 중 택1
-  - full=많음, thinning=적음, bald=없음
-- 학교 (school): 텍스트 입력 (기본값: '부산대학교')
-- 학과 (department): 텍스트 입력
-- 학년 (year): 1~6 중 택1 (버튼 또는 셀렉트)
+### 작업 1: Supabase Storage 버킷 `photos` 생성 [필수]
 
-완료 후 동작:
-1. Supabase profiles 테이블에 위 값들 upsert (user_id 기준)
-2. router.push('/profile/photos') 로 이동
+상세 가이드: `docs/handoff/CODEX_HANDOFF_PHOTOS.md`
 
-Supabase 저장 예시:
-```ts
-const supabase = createClient()
-await supabase.from('profiles').upsert({
-  user_id: userId, // supabase.auth.getUser() 로 가져옴
-  gender,
-  age,
-  height,
-  body_type: bodyType,
-  hair_density: hairDensity,
-  school,
-  department,
-  year,
-})
-```
+요약:
+1. Supabase 대시보드 → Storage → New bucket
+   - Name: `photos`
+   - Public bucket: ON
+2. SQL Editor에서 RLS 정책 3개 추가 (파일에 SQL 전문 있음):
+   - `owner_upload` — 본인 폴더에만 업로드
+   - `owner_delete` — 본인 파일만 삭제
+   - `public_read` — 누구나 읽기 가능
 
-### 작업 2: 사진 업로드 페이지
+### 작업 2: 자기유사 월드컵 이미지 생성 계속 [진행 중]
 
-파일 위치:
-- app/profile/photos/page.tsx
-- components/profile/PhotoUpload.tsx
+현재: 여자 11장, 남자 5장 완료
+남은: **여자 21장, 남자 27장** (총 48장)
 
-기능:
-- 사진 3장 업로드 (각각 독립적으로 파일 선택 가능)
-- 업로드 전 미리보기 (URL.createObjectURL)
-- Supabase Storage 'photos' 버킷에 저장
-  - 경로: photos/{user_id}/{index}.jpg
-- 3장 모두 업로드 완료 후 외모 AI 서버 호출:
-  ```ts
-  await fetch(`${process.env.NEXT_PUBLIC_APPEARANCE_API_URL}/api/score-photos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId, photo_urls: [url1, url2, url3] })
-  })
-  ```
-- 완료 후 router.push('/profile/schedule') 로 이동
-
-Supabase Storage 업로드 예시:
-```ts
-const { data } = await supabase.storage
-  .from('photos')
-  .upload(`${userId}/${index}.jpg`, file, { upsert: true })
-const { data: { publicUrl } } = supabase.storage
-  .from('photos')
-  .getPublicUrl(`${userId}/${index}.jpg`)
-```
+생성 기준: `public/appearance-self/SCORE_GUIDE.md` 참고
+점수별 이미지 위치:
+- 여자: `public/appearance-self/female/female_self_{score}.jpg`  
+- 남자: `public/appearance-self/male/male_self_{score}.jpg`
 
 ---
 
