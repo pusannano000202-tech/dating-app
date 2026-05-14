@@ -47,7 +47,13 @@ export default function SchedulePicker({ initialValue, onChange }: Props) {
 
   function update(day: DayOfWeek, patch: Partial<DaySlot>) {
     setSlots((prev) => {
-      const next = { ...prev, [day]: { ...prev[day], ...patch } }
+      const merged = { ...prev[day], ...patch }
+      // Auto-advance end time if start >= end after a start change
+      if (patch.start !== undefined && merged.start >= merged.end) {
+        const nextEnd = TIME_OPTIONS.find((t) => t > merged.start)
+        if (nextEnd) merged.end = nextEnd
+      }
+      const next = { ...prev, [day]: merged }
       const value: AvailableTimeslots = {
         slots: DAYS.filter(({ key }) => next[key].enabled).map(({ key }) => ({
           day: key,

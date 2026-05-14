@@ -10,13 +10,14 @@ export default function SchedulePage() {
   const router = useRouter()
   const [timeslots, setTimeslots] = useState<AvailableTimeslots>({ slots: [] })
   const [initialTimeslots, setInitialTimeslots] = useState<AvailableTimeslots | undefined>(undefined)
+  const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+      if (!user) { setLoaded(true); return }
       supabase
         .from('profiles')
         .select('available_timeslots')
@@ -24,9 +25,11 @@ export default function SchedulePage() {
         .single()
         .then(({ data }) => {
           if (data?.available_timeslots) {
-            setInitialTimeslots(data.available_timeslots as AvailableTimeslots)
-            setTimeslots(data.available_timeslots as AvailableTimeslots)
+            const ts = data.available_timeslots as AvailableTimeslots
+            setInitialTimeslots(ts)
+            setTimeslots(ts)
           }
+          setLoaded(true)
         })
     })
   }, [])
@@ -53,11 +56,25 @@ export default function SchedulePage() {
         <p className="text-sm text-gray-500 mt-1">과팅 가능한 요일과 시간을 골라줘</p>
       </div>
 
-      <SchedulePicker
-        key={initialTimeslots ? 'loaded' : 'empty'}
-        initialValue={initialTimeslots}
-        onChange={setTimeslots}
-      />
+      {loaded ? (
+        <SchedulePicker
+          key={initialTimeslots ? 'loaded' : 'empty'}
+          initialValue={initialTimeslots}
+          onChange={setTimeslots}
+        />
+      ) : (
+        <div className="flex flex-col gap-4 animate-pulse">
+          <div className="h-10 bg-white/5 rounded-2xl" />
+          <div className="grid grid-cols-7 gap-1.5">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="h-12 bg-white/5 rounded-xl" />
+            ))}
+          </div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-14 bg-white/5 rounded-2xl" />
+          ))}
+        </div>
+      )}
 
       {timeslots.slots.length > 0 && (
         <div className="mt-4 glass rounded-2xl px-4 py-3 border border-violet-500/30">

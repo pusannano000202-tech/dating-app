@@ -20,13 +20,14 @@ export default function PreferencesPage() {
   const router = useRouter()
   const [weights, setWeights] = useState<PreferenceWeights>(DEFAULT_WEIGHTS)
   const [initialWeights, setInitialWeights] = useState<PreferenceWeights | null>(null)
+  const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+      if (!user) { setLoaded(true); return }
       supabase
         .from('profiles')
         .select('preference_weights')
@@ -38,6 +39,7 @@ export default function PreferencesPage() {
             setWeights(w)
             setInitialWeights(w)
           }
+          setLoaded(true)
         })
     })
   }, [])
@@ -76,11 +78,25 @@ export default function PreferencesPage() {
         <p className="text-sm text-gray-500 mt-1">슬라이더로 중요도 조절해봐. 자동으로 100%가 맞춰져.</p>
       </div>
 
-      <PreferenceSliders
-        key={initialWeights ? 'loaded' : 'default'}
-        initialValue={initialWeights ?? undefined}
-        onChange={setWeights}
-      />
+      {loaded ? (
+        <PreferenceSliders
+          key={initialWeights ? 'loaded' : 'default'}
+          initialValue={initialWeights ?? undefined}
+          onChange={setWeights}
+        />
+      ) : (
+        <div className="flex flex-col gap-4 animate-pulse">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2">
+              <div className="flex justify-between">
+                <div className="h-4 w-20 bg-white/10 rounded" />
+                <div className="h-4 w-10 bg-white/10 rounded" />
+              </div>
+              <div className="h-3 bg-white/5 rounded-full" />
+            </div>
+          ))}
+        </div>
+      )}
 
       {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
 
