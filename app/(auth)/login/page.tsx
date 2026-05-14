@@ -39,6 +39,15 @@ function LoginContent() {
     return () => clearTimeout(t)
   }, [resendCooldown])
 
+  // 6자리 모두 입력되면 자동 제출
+  useEffect(() => {
+    if (step === 'otp' && otp.every((d) => d !== '') && !loading) {
+      verifyOtp()
+    }
+  // verifyOtp is stable (no deps), otp/step/loading are the actual signals
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp, step])
+
   async function sendOtp() {
     setError(null)
     if (!phone.trim()) { setError('번호를 입력해줘.'); return }
