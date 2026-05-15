@@ -3,18 +3,66 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import {
+  Crosshair, Sparkles, ClipboardList, Camera,
+  Brain, CalendarDays, SlidersHorizontal, ChevronRight,
+  AlertTriangle
+} from 'lucide-react'
+import DestinyLogo from '@/components/DestinyLogo'
 import { createClient } from '@/lib/supabase'
 import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
 import type { AppearanceType, Gender } from '@/lib/types'
 
 const EDIT_SECTIONS = [
-  { href: '/profile/worldcup',      emoji: '🎯', title: '이상형 스타일', desc: '선호하는 외모 타입 다시 고르기' },
-  { href: '/profile/self-worldcup', emoji: '🪞', title: '내 외모 스타일', desc: '자기유사 월드컵 다시 하기' },
-  { href: '/profile/basic',         emoji: '📝', title: '기본 정보',      desc: '나이, 키, 학과 등 수정하기' },
-  { href: '/profile/photos',   emoji: '📸', title: '사진',          desc: '프로필 사진 바꾸기' },
-  { href: '/profile/survey',   emoji: '🧬', title: '성격 테스트',   desc: 'Big5 성격 테스트 다시 하기' },
-  { href: '/profile/schedule', emoji: '🗓️', title: '가능한 시간대', desc: '과팅 가능한 요일/시간 수정' },
-  { href: '/profile/preferences', emoji: '⚖️', title: '매칭 가중치', desc: '중요하게 보는 조건 조정하기' },
+  {
+    href: '/profile/worldcup',
+    icon: Crosshair,
+    iconBg: 'from-violet-600 to-purple-700',
+    title: '이상형 스타일',
+    desc: '선호하는 외모 타입 다시 고르기',
+  },
+  {
+    href: '/profile/self-worldcup',
+    icon: Sparkles,
+    iconBg: 'from-fuchsia-600 to-pink-700',
+    title: '내 외모 스타일',
+    desc: '자기유사 월드컵 다시 하기',
+  },
+  {
+    href: '/profile/basic',
+    icon: ClipboardList,
+    iconBg: 'from-indigo-600 to-violet-700',
+    title: '기본 정보',
+    desc: '나이, 키, 학과 등 수정하기',
+  },
+  {
+    href: '/profile/photos',
+    icon: Camera,
+    iconBg: 'from-pink-600 to-rose-700',
+    title: '사진',
+    desc: '프로필 사진 바꾸기',
+  },
+  {
+    href: '/profile/survey',
+    icon: Brain,
+    iconBg: 'from-purple-600 to-fuchsia-700',
+    title: '성격 테스트',
+    desc: 'Big5 성격 테스트 다시 하기',
+  },
+  {
+    href: '/profile/schedule',
+    icon: CalendarDays,
+    iconBg: 'from-violet-700 to-indigo-700',
+    title: '가능한 시간대',
+    desc: '과팅 가능한 요일/시간 수정',
+  },
+  {
+    href: '/profile/preferences',
+    icon: SlidersHorizontal,
+    iconBg: 'from-fuchsia-700 to-violet-600',
+    title: '매칭 가중치',
+    desc: '중요하게 보는 조건 조정하기',
+  },
 ]
 
 interface ProfileSummary {
@@ -77,16 +125,16 @@ export default function ProfileEditPage() {
 
   return (
     <div className="flex flex-col min-h-screen px-5 pb-10">
-      {/* 배경 */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-20%] w-[400px] h-[400px] rounded-full bg-violet-600/15 blur-[100px]" />
+      {/* 배경 glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-15%] left-[-20%] w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-15%] w-[350px] h-[350px] rounded-full bg-fuchsia-700/15 blur-[100px]" />
       </div>
 
+      {/* 헤더 */}
       <div className="relative pt-6 mb-7 flex items-center gap-3">
         <button onClick={() => router.back()} className="p-2 glass rounded-xl">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronRight className="w-5 h-5 rotate-180" />
         </button>
         <div>
           <h1 className="text-xl font-black">프로필 수정</h1>
@@ -94,9 +142,9 @@ export default function ProfileEditPage() {
         </div>
       </div>
 
-      {/* 프로필 요약 카드 — 로딩 중 스켈레톤 */}
+      {/* 프로필 요약 카드 — 로딩 스켈레톤 */}
       {!summary && (
-        <div className="glass rounded-2xl p-4 mb-5 animate-pulse">
+        <div className="glass-card rounded-2xl p-4 mb-5 animate-pulse">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-white/10 flex-shrink-0" />
             <div className="flex-1 space-y-2">
@@ -113,10 +161,10 @@ export default function ProfileEditPage() {
 
       {/* 프로필 요약 카드 */}
       {summary && (
-        <div className="relative glass rounded-2xl p-4 mb-5 border border-white/8">
+        <div className="relative glass-card rounded-2xl p-4 mb-5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl gradient-brand flex items-center justify-center text-2xl flex-shrink-0">
-              {summary.gender === 'male' ? '👨' : summary.gender === 'female' ? '👩' : '👤'}
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-950 via-rose-950 to-amber-950 flex items-center justify-center flex-shrink-0 shadow-lg border border-white/10">
+              <DestinyLogo size={30} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold">
@@ -142,35 +190,38 @@ export default function ProfileEditPage() {
         </div>
       )}
 
-      <div className="relative flex flex-col gap-3">
-        {EDIT_SECTIONS.map(({ href, emoji, title, desc }) => (
+      {/* 수정 섹션 리스트 */}
+      <div className="relative flex flex-col gap-2.5">
+        {EDIT_SECTIONS.map(({ href, icon: Icon, iconBg, title, desc }) => (
           <Link
             key={href}
             href={href}
-            className="glass rounded-2xl px-4 py-4 flex items-center gap-4 hover:border-violet-500/30 border border-white/5 transition-colors"
+            className="glass-card rounded-2xl px-4 py-3.5 flex items-center gap-4 hover:border-violet-500/30 border border-white/[0.06] transition-all hover:bg-white/[0.07] active:scale-[0.99]"
           >
-            <span className="text-2xl w-10 text-center flex-shrink-0">{emoji}</span>
+            {/* 컬러 아이콘 박스 */}
+            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${iconBg} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+              <Icon className="w-5 h-5 text-white" strokeWidth={1.8} />
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold">{title}</p>
               <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
             </div>
-            <svg className="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-4 h-4 text-gray-600 flex-shrink-0" />
           </Link>
         ))}
 
         {/* 위험 구역 */}
-        <div className="mt-4 pt-4 border-t border-white/5">
+        <div className="mt-3 pt-4 border-t border-white/[0.06]">
           {!showConfirm ? (
             <button
               onClick={() => setShowConfirm(true)}
-              className="w-full py-3.5 rounded-2xl text-sm text-red-400 glass border border-red-500/20 hover:border-red-500/40 transition-colors"
+              className="w-full py-3.5 rounded-2xl text-sm text-red-400 glass border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/5 transition-all flex items-center justify-center gap-2"
             >
+              <AlertTriangle className="w-4 h-4" />
               프로필 초기화
             </button>
           ) : (
-            <div className="glass rounded-2xl p-4 border border-red-500/30">
+            <div className="glass-card rounded-2xl p-4 border border-red-500/30">
               <p className="text-sm font-bold text-red-400 mb-1">정말 초기화할 거야?</p>
               <p className="text-xs text-gray-500 mb-4">프로필 정보가 모두 삭제돼. 되돌릴 수 없어.</p>
               <div className="flex gap-2">
