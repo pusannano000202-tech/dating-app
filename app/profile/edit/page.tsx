@@ -8,8 +8,9 @@ import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
 import type { AppearanceType, Gender } from '@/lib/types'
 
 const EDIT_SECTIONS = [
-  { href: '/profile/worldcup', emoji: '🎯', title: '이상형 스타일', desc: '선호하는 외모 타입 다시 고르기' },
-  { href: '/profile/basic',    emoji: '📝', title: '기본 정보',     desc: '나이, 키, 학과 등 수정하기' },
+  { href: '/profile/worldcup',      emoji: '🎯', title: '이상형 스타일', desc: '선호하는 외모 타입 다시 고르기' },
+  { href: '/profile/self-worldcup', emoji: '🪞', title: '내 외모 스타일', desc: '자기유사 월드컵 다시 하기' },
+  { href: '/profile/basic',         emoji: '📝', title: '기본 정보',      desc: '나이, 키, 학과 등 수정하기' },
   { href: '/profile/photos',   emoji: '📸', title: '사진',          desc: '프로필 사진 바꾸기' },
   { href: '/profile/survey',   emoji: '🧬', title: '성격 테스트',   desc: 'Big5 성격 테스트 다시 하기' },
   { href: '/profile/schedule', emoji: '🗓️', title: '가능한 시간대', desc: '과팅 가능한 요일/시간 수정' },

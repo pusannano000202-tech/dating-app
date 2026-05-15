@@ -9,6 +9,7 @@ const AUTO_REDIRECT_SECS = 5
 
 const COMPLETED_STEPS = [
   { label: '이상형 월드컵', icon: '💘' },
+  { label: '내 외모 스타일', icon: '🪞' },
   { label: '기본 정보', icon: '📋' },
   { label: '프로필 사진', icon: '📸' },
   { label: '성격 분석', icon: '🧠' },
