@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>부산대 과팅앱 v1.2 정의서 색상판</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #1f2328;
+      --muted: #667085;
+      --line: #d0d7de;
+      --bg: #f6f8fa;
+      --paper: #ffffff;
+      --red: #d1242f;
+      --red-bg: #fff1f1;
+      --blue: #0969da;
+      --blue-bg: #eef6ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.68;
+      font-size: 16px;
+    }
+    main {
+      max-width: 980px;
+      margin: 32px auto;
+      padding: 44px 52px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(27, 31, 36, 0.08);
+    }
+    h1 { font-size: 30px; line-height: 1.25; padding-bottom: 16px; border-bottom: 2px solid var(--line); }
+    h2 { margin-top: 42px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 23px; }
+    h3 { margin-top: 30px; font-size: 19px; }
+    h4 { margin-top: 24px; font-size: 17px; }
+    p, li { word-break: keep-all; overflow-wrap: anywhere; }
+    blockquote {
+      margin: 18px 0;
+      padding: 14px 18px;
+      border-left: 4px solid #8c959f;
+      background: #f6f8fa;
+      color: #24292f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 24px;
+      font-size: 15px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+    }
+    th { background: #f6f8fa; font-weight: 700; }
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #f6f8fa;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 0.92em;
+    }
+    a { color: var(--blue); }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
+    .change-red,
+    .change-blue {
+      display: inline;
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-weight: 650;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .change-red { color: var(--red); background: var(--red-bg); }
+    .change-blue { color: var(--blue); background: var(--blue-bg); }
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 8px 0 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    @media (max-width: 720px) {
+      main { margin: 0; padding: 24px 18px; border: 0; border-radius: 0; }
+      h1 { font-size: 24px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="legend">
+      <span class="change-red">[수정] v1.1에서 바뀐 핵심 변경</span>
+      <span class="change-blue">[보완] v1.2에서 추가한 의견/주의</span>
+    </div>
+<h1>부산대에서 시작하는 대학생 그룹미팅 매칭 앱 — v1.2 정의서</h1>
+<p><strong>작성일</strong>: 2026-05-13 (최초) / 2026-05-14 (v1.2 보완)</p>
+<p><strong>팀</strong>:</p>
+<ul>
+<li><strong>김충현 (충현)</strong> — v1.1/v1.2 정의서 작성 및 기획 주도</li>
+<li><strong>성준</strong> — 팀원, v1.0 원안 작성자</li>
+</ul>
+<p><strong>개발 도구</strong>: Claude x 2 + Codex x 2 (각 팀원이 둘 다 보유, 총 4 LLM)</p>
+<p><strong>프로젝트 기간</strong>: 6주 (부산대 AI &amp; ML 기말 팀 프로젝트)</p>
+<p><strong>프로젝트 성격</strong>: 학교 기말 프로젝트 + 부산대 축제/오프라인 홍보 기반 초기 실사용 + 추후 실서비스/수익화 가능성 염두</p>
+<hr>
+<h2>문서 편집 가이드</h2>
+<ul>
+<li>이 문서는 일반 마크다운 파일이므로 텍스트 에디터로 자유롭게 수정 가능</li>
+<li><span class="change-red">[수정]</span> 표시는 v1.1 내용에서 방향이 바뀐 핵심 변경 사항</li>
+<li><span class="change-blue">[보완]</span> 표시는 v1.2에서 새로 추가된 보완 의견 또는 구현 주의 사항</li>
+<li>**TBD 또는 *(미확정)* 마커가 붙은 항목**은 결정 필요 항목</li>
+<li>새로운 결정이 생기면 섹션 11 <strong>미해결 항목</strong>에서 제거하고 본문에 반영</li>
+<li>큰 변경은 섹션 14 <strong>변경 이력</strong>에 한 줄 추가</li>
+</ul>
+<hr>
+<h2>0. 이 문서의 위치</h2>
+<ul>
+<li><strong>v1.0</strong>: 성준이 작성한 &quot;시스템 동작 방식 정의서&quot; (Big5 AI 인터뷰 기반)</li>
+<li><strong>v1.1</strong>: AI 인터뷰 폐기 + 외모 자동 평가 + 보증금 시스템 도입</li>
+<li><strong>v1.2 (이 문서)</strong>: <span class="change-red">[수정] 1:1 중심이 아니라 그룹미팅 중심으로 재정의</span></li>
+<li><strong>충돌 시 v1.2 우선</strong></li>
+</ul>
+<hr>
+<h2>1. 프로젝트 한 줄 정의</h2>
+<blockquote><strong>부산대에서 시작해 부산권 대학생으로 확장 가능한 그룹미팅 매칭 앱. 사용자가 친구들과 그룹을 만들고 보증금을 걸어 신청하면, 시스템이 상대 그룹·시간·장소를 자동으로 정해 실제 만남까지 성사시키는 &quot;프로필 비공개 자동확정 과팅 앱&quot;.</strong></blockquote>
+<p><span class="change-red">[수정] 서비스의 1차 홍보 거점은 부산대이지만, 서비스 대상을 부산대 학생으로만 제한하지 않는다.</span></p>
+<p><span class="change-blue">[보완] 이 앱의 본질은 틴더/위피처럼 상대 프로필을 보고 선택하는 데이팅앱이 아니다. 사용자는 매칭 컴퓨터가 판단할 데이터를 제출하고, 앱은 그룹 단위로 실제 만남을 성사시키는 데 집중한다.</span></p>
+<p>기존 데이팅앱과의 차별점:</p>
+<ul>
+<li>프로필 쇼핑 X → 매칭 전후 상대 프로필/사진 비공개</li>
+<li>채팅 단계 X → 매칭되면 바로 시간/장소 자동 확정</li>
+<li>1:1보다 그룹미팅 우선 → 친구와 함께 신청해 접근성 상승</li>
+<li>실제 소액 보증금 → 노쇼 방지와 서비스 신뢰 확보</li>
+<li>외모 AI + 월드컵식 선택 → 사진 기반 객관 신호와 사용자 선호 신호를 함께 사용</li>
+<li>만남 후 누적 리뷰 → 거짓말/노쇼/프로필 신뢰도 관리</li>
+</ul>
+<hr>
+<h2>2. v1.1 → v1.2 주요 변경사항</h2>
+<table>
+<tr><th>항목</th><th>v1.1</th><th>v1.2</th></tr>
+<tr><td>서비스 범위</td><td>특정 학교 제한형 기존안</td><td><span class="change-red">[수정] 부산대에서 시작하지만 부산권 대학생으로 확장 가능</span></td></tr>
+<tr><td>인증</td><td>학교 이메일 중심 기존안</td><td><span class="change-red">[수정] 휴대폰 인증 우선, 학교 정보는 프로필 입력값</span></td></tr>
+<tr><td>핵심 매칭</td><td>1:1 + 그룹</td><td><span class="change-red">[수정] 그룹매칭 MVP 우선, 1:1은 후순위 확장</span></td></tr>
+<tr><td>그룹 인원</td><td>일부 TBD</td><td><span class="change-red">[수정] 2~5명, 동일 인원 그룹끼리 매칭</span></td></tr>
+<tr><td>성별 구조</td><td>미정</td><td><span class="change-blue">[보완] 이성 그룹미팅 목적. 남녀 성비가 상호 보완되는 그룹끼리 매칭</span></td></tr>
+<tr><td>프로필 공개</td><td>매칭 결과에서 상대 프로필 공개</td><td><span class="change-red">[수정] 만남 전까지 상대 프로필/사진 비공개</span></td></tr>
+<tr><td>매칭 확정</td><td>양측 수락/거절</td><td><span class="change-red">[수정] 신청과 보증금 결제 후 매칭되면 자동확정</span></td></tr>
+<tr><td>외모 타입</td><td>AI 자동 분류</td><td><span class="change-red">[수정] 이상형 월드컵식 선택 후 AI가 사진 기반으로 보정</span></td></tr>
+<tr><td>리뷰/페널티</td><td>단일 신고 기반 즉시 차감 기존안</td><td><span class="change-red">[수정] 만남 리뷰 3회 이상 누적 후 신뢰도/페널티 반영</span></td></tr>
+<tr><td>보증금</td><td>보증금 아이디어 추가</td><td><span class="change-blue">[보완] 핵심 차별화 기능. 정상 출석자는 환불, 노쇼 보증금은 출석자 보상</span></td></tr>
+</table>
+<hr>
+<h2>3. 전체 서비스 플로우</h2>
+<ol>
+<li><strong>회원가입</strong></li>
+</ol>
+<ul>
+<li><span class="change-red">[수정] 휴대폰 번호 인증을 기본으로 한다.</span></li>
+<li>학교/학과/학년은 프로필 입력값으로 받는다.</li>
+<li>초기 홍보는 부산대 축제/오프라인 네트워크를 활용하되, 가입 자체를 특정 학교 이메일로 제한하지 않는다.</li>
+</ul>
+<ol>
+<li><strong>개인 프로필 작성</strong></li>
+</ol>
+<ul>
+<li>기본 정보: 학교, 학과, 학년, 나이, 성별, 키, 체형, 머리숱 등</li>
+<li>사진 3장 업로드</li>
+<li>AI가 내부용 절대 외모점수 산출</li>
+<li>이상형 월드컵식 선택으로 자기 이미지/선호 이미지 데이터 수집</li>
+<li>AI가 사진 기반으로 외모 타입을 보정</li>
+<li>성격 설문 작성</li>
+<li>가능 시간대 입력</li>
+</ul>
+<ol>
+<li><strong>그룹 생성</strong></li>
+</ol>
+<ul>
+<li>사용자는 2~5명 그룹을 만든다.</li>
+<li>친구 초대 링크 또는 초대코드로 멤버를 모은다.</li>
+<li>모든 멤버가 프로필, 사진, 설문, 가능 시간대 입력을 완료해야 매칭 신청 가능</li>
+</ul>
+<ol>
+<li><strong>보증금 결제 후 그룹매칭 신청</strong></li>
+</ol>
+<ul>
+<li><span class="change-red">[수정] 그룹이 매칭 풀에 들어가기 전 각 멤버가 소액 보증금을 결제한다.</span></li>
+<li>신청 후에는 매칭 결과에 대한 수락/거절 없이 자동확정되는 것에 동의한다.</li>
+</ul>
+<ol>
+<li><strong>주 1회 배치 그룹매칭</strong></li>
+</ol>
+<ul>
+<li>같은 인원 수 그룹끼리만 매칭한다.</li>
+<li>남녀 성비가 상호 보완되는 그룹끼리 매칭한다.</li>
+<li>예: 남3 ↔ 여3, 남1여2 ↔ 남2여1</li>
+<li>그룹 단위 양방향 점수와 조화평균을 사용해 최적 조합을 산출한다.</li>
+</ul>
+<ol>
+<li><strong>자동확정</strong></li>
+</ol>
+<ul>
+<li><span class="change-red">[수정] 매칭이 성사되면 상대 프로필을 보여주고 수락받는 단계 없이, 시스템이 바로 시간/장소를 확정한다.</span></li>
+<li>만남 전까지 상대의 사진/상세 프로필은 공개하지 않는다.</li>
+<li>앱은 &quot;몇 명 대 몇 명&quot;, &quot;장소&quot;, &quot;시간&quot;, &quot;주의사항&quot;만 제공한다.</li>
+</ul>
+<ol>
+<li><strong>만남 진행</strong></li>
+</ol>
+<ul>
+<li>만남 장소는 부산대/부산권 대학가 근처 카페, 술집, 식당 등에서 선택</li>
+<li>초기 프로젝트에서는 관리자 큐레이션 장소 DB를 사용</li>
+<li>실서비스에서는 지역별 장소 DB로 확장</li>
+</ul>
+<ol>
+<li><strong>출석 인증 및 보증금 처리</strong></li>
+</ol>
+<ul>
+<li>GPS 체크인 + 그룹 상호 인증을 기본 출석 검증 방식으로 사용</li>
+<li>정상 출석자는 보증금 환불</li>
+<li>노쇼자의 보증금은 출석자 보상 재원으로 사용</li>
+</ul>
+<ol>
+<li><strong>만남 후 리뷰</strong></li>
+</ol>
+<ul>
+<li>각 멤버는 만남 1회마다 상대방에 대한 간단한 리뷰를 남긴다.</li>
+<li>리뷰는 즉시 페널티가 아니라 누적 신뢰도 계산에 사용한다.</li>
+<li>동일 항목 리뷰가 3회 이상 쌓인 뒤부터 프로필 신뢰도/거짓말 페널티에 반영한다.</li>
+</ul>
+<ol>
+<li><strong>호감 연결</strong></li>
+</ol>
+<ul>
+<li>만남 후 서로 호감 표시가 일치한 사람끼리만 앱 내 연결 생성</li>
+<li>연결 후에만 1:1 채팅 또는 연락처 교환 기능 제공</li>
+</ul>
+<hr>
+<h2>4. 매칭 시스템 상세</h2>
+<h3>4.1 프로필의 의미</h3>
+<p><span class="change-red">[수정] 프로필은 상대방에게 보여주는 소개장이 아니라, 매칭 엔진에 제출하는 비공개 데이터다.</span></p>
+<p>프로필 데이터의 용도:</p>
+<ul>
+<li>그룹 간 매칭 점수 계산</li>
+<li>그룹 내부 균형도 계산</li>
+<li>시간/장소 자동 배정</li>
+<li>노쇼/거짓말/리뷰 신뢰도 관리</li>
+<li>만남 후 연결 추천</li>
+</ul>
+<p>사용자에게 공개하지 않는 정보:</p>
+<ul>
+<li>절대 외모점수</li>
+<li>AI가 산출한 세부 점수</li>
+<li>매칭 전 상대 사진</li>
+<li>매칭 전 상대 상세 프로필</li>
+<li>매칭 점수 산식의 개별 결과</li>
+</ul>
+<h3>4.2 외모 점수</h3>
+<p><strong>1단 — 절대점수 (AI 내부 산출)</strong></p>
+<ul>
+<li>모델 후보: SCUT-FBP5500 + ResNet50</li>
+<li>사용자 사진 3장 평균으로 내부용 0~100 점수 산출</li>
+<li><span class="change-red">[수정] 절대 외모점수는 사용자에게 공개하지 않는다.</span></li>
+<li>사용자 화면에는 &quot;사진 평가 완료&quot;, &quot;다음 매칭부터 반영&quot; 같은 상태만 표시한다.</li>
+</ul>
+<p><strong>사진 업데이트와 재평가</strong></p>
+<ul>
+<li>사용자는 사진을 업데이트할 수 있다.</li>
+<li>사진 업데이트 시 AI가 외모점수와 외모 타입을 재평가한다.</li>
+<li>새 점수는 다음 매칭부터 반영한다.</li>
+<li>점수 숫자와 상승/하락 폭은 공개하지 않는다.</li>
+<li>큰 변동이 감지되면 운영자 검토 플래그를 둘 수 있다.</li>
+</ul>
+<h3>4.3 외모 타입: 월드컵 판정 후 AI 보정</h3>
+<p><span class="change-red">[수정] 외모 타입은 사용자가 마음대로 직접 고르는 방식도 아니고, AI가 단독으로 판정하는 방식도 아니다.</span></p>
+<p>절차:</p>
+<ol>
+<li>사용자는 이상형 월드컵처럼 2개 이미지 중 더 가깝다고 느끼는 이미지를 반복 선택한다.</li>
+<li>월드컵은 두 종류로 나눈다.</li>
+</ol>
+<ul>
+<li>자기 이미지 월드컵: &quot;나는 어느 쪽 이미지에 더 가까운가&quot;</li>
+<li>선호 이미지 월드컵: &quot;나는 어느 쪽 이미지가 더 끌리는가&quot;</li>
+</ul>
+<ol>
+<li>AI는 업로드 사진을 보고 외모 타입 후보를 산출한다.</li>
+<li>시스템은 월드컵 결과와 AI 결과를 비교한다.</li>
+<li>자기 선택이 사진 기반 신호와 크게 다르면 AI 보정값을 반영한다.</li>
+</ol>
+<p>외모 타입 예시:</p>
+<ul>
+<li>귀여움</li>
+<li>청순</li>
+<li>시크</li>
+<li>훈훈</li>
+<li>스타일리시</li>
+<li>건강함</li>
+</ul>
+<p><span class="change-blue">[보완] 자기 외모를 유리하게 선택하는 문제를 줄이기 위해, 자기 이미지 월드컵 결과는 그대로 확정값으로 쓰지 않고 AI 보정 대상으로 둔다. 반대로 선호 이미지 월드컵은 사용자의 취향이므로 그대로 중요한 매칭 신호로 사용한다.</span></p>
+<h3>4.4 성격 점수</h3>
+<ul>
+<li>AI 인터뷰는 사용하지 않는다.</li>
+<li>고정 설문 기반으로 성격 데이터를 수집한다.</li>
+<li>후보: IPIP-NEO 단축형 50문항 한국어판</li>
+<li>빅5 5차원 점수로 변환한다.</li>
+<li>LLM API 기반 분석은 v1.2 핵심 기능에서 제외한다.</li>
+</ul>
+<h3>4.5 가중치 시스템</h3>
+<p>사용자는 매칭에서 중요한 요소를 직접 분배한다.</p>
+<p>항목 후보:</p>
+<ul>
+<li>외모</li>
+<li>성격</li>
+<li>키</li>
+<li>체형</li>
+<li>학교/학과</li>
+<li>취미/분위기</li>
+<li>시간대 적합성</li>
+</ul>
+<p><span class="change-blue">[보완] 그룹매칭에서는 개인 가중치뿐 아니라 그룹 평균 가중치도 함께 계산한다. 예를 들어 한 그룹 전체가 외모를 매우 중요하게 보면 상대 그룹 평가에서 외모 비중이 커진다.</span></p>
+<h3>4.6 그룹매칭 알고리즘</h3>
+<p><strong>기본 원칙</strong></p>
+<ul>
+<li>그룹매칭이 MVP의 1순위다.</li>
+<li>그룹 인원은 2~5명이다.</li>
+<li>동일 인원 그룹끼리만 매칭한다.</li>
+<li>성비가 상호 보완되는 그룹끼리만 후보가 된다.</li>
+</ul>
+<p>성비 매칭 예시:</p>
+<ul>
+<li>남2 ↔ 여2</li>
+<li>남3 ↔ 여3</li>
+<li>남1여1 ↔ 남1여1</li>
+<li>남1여2 ↔ 남2여1</li>
+<li>남2여3 ↔ 남3여2</li>
+</ul>
+<p><strong>Step 1 — 후보 필터링</strong></p>
+<ul>
+<li>인원 수 동일</li>
+<li>성비 상호 보완</li>
+<li>가능 시간대 교집합 존재</li>
+<li>이전에 만남이 성사된 그룹/개인 조합 제외</li>
+<li>보증금 결제 완료</li>
+</ul>
+<p><strong>Step 2 — 개인 간 점수 계산</strong></p>
+<ul>
+<li>A그룹의 각 멤버가 B그룹의 각 멤버를 평가하는 점수 계산</li>
+<li>B그룹의 각 멤버가 A그룹의 각 멤버를 평가하는 점수 계산</li>
+<li>각 사용자의 가중치와 선호를 반영</li>
+</ul>
+<p><strong>Step 3 — 그룹 간 점수 계산</strong></p>
+<ul>
+<li>A그룹 → B그룹 평균 점수</li>
+<li>B그룹 → A그룹 평균 점수</li>
+<li>두 값을 조화평균으로 결합</li>
+</ul>
+<p>공식:</p>
+<p><code>2 x (A그룹→B그룹) x (B그룹→A그룹) / ((A그룹→B그룹) + (B그룹→A그룹))</code></p>
+<p><strong>Step 4 — 그룹 내부 불균형 페널티</strong></p>
+<ul>
+<li>한 명만 지나치게 손해 보는 매칭을 줄이기 위해 개인 최저점이 너무 낮으면 감점</li>
+<li>그룹 내 외모점수 최고-최저 차이는 하드 차단보다 감점 요소로 사용</li>
+<li><span class="change-blue">[보완] 가변 인원 그룹에서는 &quot;평균은 높지만 특정 멤버가 완전히 소외되는 매칭&quot;을 막는 것이 중요하다.</span></li>
+</ul>
+<p><strong>Step 5 — 최적 매칭</strong></p>
+<ul>
+<li>같은 인원/성비 후보군별로 헝가리안 알고리즘 적용</li>
+<li>목표는 전체 그룹 매칭 만족도 합계 최대화</li>
+</ul>
+<h3>4.7 1:1 매칭</h3>
+<p><span class="change-red">[수정] 1:1 매칭은 MVP 우선순위에서 제외하고, 그룹매칭 이후 확장 기능으로 둔다.</span></p>
+<p>후순위 기능으로 남기는 이유:</p>
+<ul>
+<li>초기 사용자 접근성은 친구와 함께 신청하는 그룹미팅이 더 높다.</li>
+<li>보증금/노쇼 방지의 설득력도 그룹 단위에서 더 강하다.</li>
+<li>앱의 정체성이 일반 데이팅앱으로 보이는 것을 줄일 수 있다.</li>
+</ul>
+<hr>
+<h2>5. 안전/페널티/리뷰 시스템</h2>
+<h3>5.1 누적 리뷰 기반 프로필 신뢰도</h3>
+<p><span class="change-red">[수정] 신고 1회로 즉시 점수를 차감하지 않는다.</span></p>
+<p>리뷰 구조:</p>
+<ul>
+<li>만남 1회마다 상대방 리뷰 가능</li>
+<li>리뷰 대상은 외모 점수 자체가 아니라 프로필 정보의 정확도와 만남 태도</li>
+<li>예: 키, 체형, 머리숱, 사진과 실물 차이, 노쇼, 지각, 불쾌한 태도</li>
+</ul>
+<p>반영 원칙:</p>
+<ul>
+<li>동일 사용자에 대한 리뷰가 3회 이상 쌓이기 전까지 자동 페널티 없음</li>
+<li>다수 리뷰가 같은 항목을 지적하면 프로필 신뢰도 하락</li>
+<li>소수 의견이 다수 의견과 크게 다르면 신고자 신뢰도 하락</li>
+<li>운영자는 고위험 신고만 수동 검토</li>
+</ul>
+<p>예시:</p>
+<ul>
+<li>A가 3번 만남</li>
+<li>상대 1은 &quot;탈모 있음&quot; 리뷰</li>
+<li>상대 2, 3은 &quot;탈모 없음&quot; 리뷰</li>
+<li>결과: A의 점수 차감 없음, 상대 1의 리뷰 신뢰도 하락 가능</li>
+</ul>
+<h3>5.2 노쇼 페널티</h3>
+<ul>
+<li>보증금 몰수 또는 보상 이전</li>
+<li>노쇼 횟수 누적 시 N주 매칭 제한</li>
+<li>반복 노쇼 사용자는 영구 제한 가능</li>
+<li>거짓 출석 인증 적발 시 강한 페널티 적용</li>
+</ul>
+<h3>5.3 이전 만남 차단</h3>
+<ul>
+<li>한 번 만남이 성사된 개인 조합은 <code>excluded_pairs</code>에 기록한다.</li>
+<li>같은 두 사람이 다시 매칭되지 않도록 한다.</li>
+<li>그룹 단위에서도 이전 그룹 조합을 기록한다.</li>
+<li>단, 그룹 멤버가 일부 바뀐 경우는 개인 단위 제외 규칙을 우선 적용한다.</li>
+</ul>
+<hr>
+<h2>6. 보증금 시스템</h2>
+<p>보증금은 v1.2의 핵심 차별화 기능이다.</p>
+<p><span class="change-blue">[보완] 보증금이 없으면 사용자는 &quot;또 하나의 데이팅앱 장사&quot;로 받아들일 수 있다. 이 앱은 보증금을 통해 노쇼를 줄이고, 실제 만남을 보장하려는 서비스라는 인상을 줘야 한다.</span></p>
+<h3>6.1 기본 메커니즘</h3>
+<ul>
+<li>그룹매칭 신청 시 각 멤버가 실제 소액 보증금을 결제한다.</li>
+<li>매칭이 성사되면 별도 수락 없이 자동확정된다.</li>
+<li>정상 출석자는 보증금을 환불받는다.</li>
+<li>노쇼자는 보증금을 돌려받지 못한다.</li>
+<li><span class="change-red">[수정] 노쇼자의 보증금은 출석자에게 보상되는 것을 목표 구조로 한다.</span></li>
+</ul>
+<h3>6.2 금액</h3>
+<ul>
+<li>초기 후보: 1,000원~5,000원</li>
+<li>실서비스 후보: 5,000원~20,000원</li>
+<li>v1.2 권장: 학교 프로젝트/초기 검증 단계에서는 3,000원 수준의 소액 모델로 설명</li>
+</ul>
+<p><span class="change-blue">[보완] 금액이 너무 크면 진입장벽과 법적/분쟁 리스크가 커지고, 너무 작으면 노쇼 방지 효과가 약해진다. 초기에는 &quot;부담은 작지만 장난 신청은 막는 금액&quot;이 적합하다.</span></p>
+<h3>6.3 출석 검증</h3>
+<p>기본 조합:</p>
+<ul>
+<li>GPS 체크인</li>
+<li>그룹 상호 인증</li>
+</ul>
+<p>출석 인정 조건:</p>
+<ul>
+<li>약속 시간 전후 일정 범위 안에 장소 반경 내 체크인</li>
+<li>상대 그룹이 실제 만남을 확인</li>
+<li>그룹 단위로 과반 이상 출석 확인</li>
+</ul>
+<p>보완 검증:</p>
+<ul>
+<li>제휴 장소 QR 인증 *(후순위)*</li>
+<li>운영자 수동 검토 *(분쟁 시)*</li>
+<li>사진 인증 *(사생활 이슈가 있어 기본값으로 두지 않음)*</li>
+</ul>
+<h3>6.4 결제/환불/보상 구현 단계</h3>
+<p><strong>학교 프로젝트 단계</strong></p>
+<ul>
+<li>실제 돈 이동 없이 DB 상태 또는 PG 테스트 결제로 플로우 구현</li>
+<li>결제 상태: <code>paid</code>, <code>refunded</code>, <code>forfeited</code>, <code>compensated</code></li>
+<li>출석 검증 후 보증금 처리 시나리오를 화면과 DB로 증명</li>
+</ul>
+<p><strong>초기 실서비스 단계</strong></p>
+<ul>
+<li>PG 결제 사용</li>
+<li>정상 출석자는 결제 취소/부분 취소로 환불</li>
+<li>노쇼자는 미환불 처리</li>
+<li>출석자 보상은 수동 정산 또는 쿠폰/무료매칭권으로 시작 가능</li>
+</ul>
+<p><strong>확장 단계</strong></p>
+<ul>
+<li>PG 지급대행 또는 별도 정산 API 검토</li>
+<li>출석자에게 자동 보상금 지급</li>
+<li>사용자 본인확인, 계좌정보, 정산 로그, 분쟁 처리 정책 필요</li>
+</ul>
+<p>참고:</p>
+<ul>
+<li>토스페이먼츠 결제 취소/부분 취소: <a href="https://docs.tosspayments.com/guides/v2/cancel-payment" target="_blank" rel="noreferrer">https://docs.tosspayments.com/guides/v2/cancel-payment</a></li>
+<li>토스페이먼츠 지급대행: <a href="https://docs.tosspayments.com/guides/v2/payouts" target="_blank" rel="noreferrer">https://docs.tosspayments.com/guides/v2/payouts</a></li>
+</ul>
+<p><span class="change-blue">[보완] 지급대행은 기술적으로 가능하지만 별도 계약, 본인확인, 정산 책임이 붙는다. v1.2에서는 &quot;서비스 목표 구조&quot;와 &quot;학교 프로젝트 구현 방식&quot;을 분리한다.</span></p>
+<h3>6.5 수익 모델</h3>
+<p>기본 수익 후보:</p>
+<ul>
+<li>노쇼 보증금 일부 운영비 귀속 *(단, 사용자 반감 가능)*</li>
+<li>정상 만남 후 자율 수고비</li>
+<li>프리미엄 매칭권</li>
+<li>장소 제휴 수수료</li>
+</ul>
+<p>v1.2 권장:</p>
+<ul>
+<li>초기에는 &quot;노쇼 방지&quot;를 전면에 내세우고, 수익화는 후순위로 둔다.</li>
+<li>사용자에게는 &quot;돈을 벌려고 만든 앱&quot;보다 &quot;노쇼 없는 과팅을 만들기 위한 보증금&quot;으로 설명한다.</li>
+</ul>
+<hr>
+<h2>7. 호감 연결</h2>
+<ul>
+<li>만남 후 각 사용자는 상대 그룹 멤버 중 호감 있는 사람을 선택할 수 있다.</li>
+<li>서로 선택이 일치하면 <code>connections</code> 테이블에 연결을 생성한다.</li>
+<li>연결 후에만 1:1 채팅 또는 연락처 교환 기능 제공</li>
+<li>연결되지 않은 사용자끼리는 앱 내 대화 불가</li>
+</ul>
+<p><span class="change-blue">[보완] 이 구조는 만남 전 프로필 쇼핑과 채팅 피로를 줄이면서, 실제 만남 후 호감이 생긴 사람만 연결되게 한다.</span></p>
+<hr>
+<h2>8. 외모 AI 기술 스택</h2>
+<h3>8.1 절대 외모점수 산출</h3>
+<ul>
+<li>SCUT-FBP5500 + ResNet50 후보</li>
+<li>Python + PyTorch로 추론</li>
+<li>사진 3장 평균 → 내부 점수화</li>
+<li>점수는 절대 공개하지 않음</li>
+<li>매칭 엔진 입력값으로만 사용</li>
+</ul>
+<h3>8.2 월드컵 + AI 보정형 외모 타입</h3>
+<p>구성:</p>
+<ul>
+<li>프론트엔드: 이상형 월드컵 UI</li>
+<li>백엔드: 월드컵 선택 로그 저장</li>
+<li>AI 서버: 사진 기반 타입 후보 산출</li>
+<li>매칭 엔진: 월드컵 결과와 AI 보정값을 결합</li>
+</ul>
+<p>결합 방식:</p>
+<ul>
+<li>자기 이미지: 사용자 선택 40%, AI 사진 보정 60%</li>
+<li>선호 이미지: 사용자 선택 80%, 시스템 보정 20%</li>
+</ul>
+<p><span class="change-blue">[보완] 자기 이미지에는 과장 가능성이 있으므로 AI 비중을 높이고, 선호 이미지는 주관 취향이므로 사용자 선택 비중을 높인다.</span></p>
+<h3>8.3 LLM API 사용 여부</h3>
+<p><span class="change-red">[수정] LLM API는 v1.2 핵심 기능에서 제외한다.</span></p>
+<p>이유:</p>
+<ul>
+<li>비용 발생</li>
+<li>결과 재현성 낮음</li>
+<li>학교 프로젝트의 핵심 기술 설명이 흐려짐</li>
+<li>고정 설문/수식/오픈소스 CV 모델로 충분히 구현 가능</li>
+</ul>
+<hr>
+<h2>9. 전체 기술 스택</h2>
+<table>
+<tr><th>영역</th><th>기술</th><th>비고</th></tr>
+<tr><td>Frontend</td><td>Next.js 14</td><td>웹앱 우선</td></tr>
+<tr><td>Auth</td><td>Supabase Auth 또는 SMS 인증 Provider</td><td>휴대폰 인증 우선</td></tr>
+<tr><td>DB</td><td>Supabase Postgres</td><td>그룹/매칭/리뷰/보증금 상태 관리</td></tr>
+<tr><td>Storage</td><td>Supabase Storage</td><td>사진 업로드</td></tr>
+<tr><td>외모 AI</td><td>SCUT-FBP5500 + ResNet50</td><td>내부 점수 산출</td></tr>
+<tr><td>외모 타입</td><td>월드컵 UI + CV 보정</td><td>LLM API 제외</td></tr>
+<tr><td>성격 설문</td><td>직접 구현</td><td>IPIP-NEO 단축형 후보</td></tr>
+<tr><td>매칭 엔진</td><td>Python + scipy.optimize.linear_sum_assignment</td><td>그룹 단위 배치</td></tr>
+<tr><td>결제</td><td>PG 테스트 결제 → 실서비스 PG</td><td>보증금 플로우</td></tr>
+<tr><td>배포</td><td>Vercel + Python 서버</td><td>AI 추론/매칭 배치 분리</td></tr>
+</table>
+<hr>
+<h2>10. 개발 로드맵 (6주, v1.2)</h2>
+<table>
+<tr><th>주차</th><th>작업</th></tr>
+<tr><td>1주차</td><td>프로젝트 세팅, DB 스키마 v1.2 확정, 휴대폰 인증 흐름, 그룹/멤버 모델 설계</td></tr>
+<tr><td>2주차</td><td>개인 프로필 입력, 사진 업로드, 성격 설문, 가능 시간대 입력</td></tr>
+<tr><td>3주차</td><td>그룹 생성/초대/멤버 완료 상태, 보증금 결제 상태 모사 또는 테스트 결제</td></tr>
+<tr><td>4주차</td><td>그룹매칭 엔진, 성비 보완 필터, 동일 인원 필터, 시간/장소 자동 확정</td></tr>
+<tr><td>5주차</td><td>출석 인증, 보증금 환불/몰수/보상 상태 처리, 만남 후 리뷰</td></tr>
+<tr><td>6주차</td><td>외모 AI 프로토타입 연결, 월드컵 UI, 실사용 테스트, 발표 자료 정리</td></tr>
+</table>
+<p><span class="change-red">[수정] v1.1의 1:1 중심 로드맵에서 그룹매칭/보증금/자동확정 중심 로드맵으로 변경한다.</span></p>
+<hr>
+<h2>11. 미해결 항목</h2>
+<h3>매칭/UX 관련</h3>
+<ol>
+<li><strong>휴대폰 인증 Provider</strong>: Supabase Auth 휴대폰 OTP, Firebase Auth, 국내 SMS API 중 선택</li>
+<li><strong>학교 정보 검증 수준</strong>: 초기에는 자기입력만 둘지, 학생증 인증을 후순위로 둘지</li>
+<li><strong>외모 타입 월드컵 이미지셋</strong>: 실제 인물 사진, 스타일 예시 이미지, 일러스트 중 선택</li>
+<li><strong>그룹 성비 보완 규칙의 세부 예외</strong>: 혼성 그룹끼리 매칭 시 어떤 조합까지 허용할지</li>
+<li><strong>장소 지정 방식</strong>: 완전 자동 1곳 지정 vs 후보 3곳 중 시스템 선택</li>
+<li><strong>만남 전 공개 정보</strong>: 완전 비공개를 원칙으로 하되, 안전을 위해 인원/성비/장소/시간 외 추가 공개가 필요한지</li>
+</ol>
+<h3>보증금 관련</h3>
+<ol>
+<li><strong>초기 보증금 금액</strong>: 1,000원 / 3,000원 / 5,000원</li>
+<li><strong>학교 프로젝트 결제 구현</strong>: DB 모사 vs PG 테스트 결제</li>
+<li><strong>실서비스 보상 방식</strong>: 수동 정산, 무료매칭권, PG 지급대행 중 우선순위</li>
+<li><strong>분쟁 처리 정책</strong>: GPS는 찍혔지만 실제 만남이 없었다고 주장하는 경우 처리</li>
+</ol>
+<h3>AI/리뷰 관련</h3>
+<ol>
+<li><strong>SCUT-FBP5500 한국 대학생 사진 적합성 검증</strong></li>
+<li><strong>리뷰 3회 누적 기준의 세부 계산식</strong></li>
+<li><strong>외모 재평가 시 큰 점수 변동 기준</strong></li>
+</ol>
+<hr>
+<h2>12. 폐기 또는 후순위로 밀린 항목</h2>
+<ul>
+<li>Claude/LLM 성격 인터뷰</li>
+<li>매칭 전 프로필 공개</li>
+<li>매칭 후 수락/거절 단계</li>
+<li>만남 전 채팅방</li>
+<li>1:1 매칭 우선 개발</li>
+<li>외모 타입 AI 단독 확정</li>
+<li>신고 1회 즉시 페널티</li>
+<li>학교 이메일 인증만 허용</li>
+</ul>
+<hr>
+<h2>13. 협업 가이드</h2>
+<p><strong>원칙</strong></p>
+<ul>
+<li>결정 사항은 v1.2 정의서에 반영</li>
+<li>그룹매칭/보증금/자동확정 흐름을 최우선으로 구현</li>
+<li>LLM API 사용을 전제로 설계하지 않음</li>
+<li>학교 프로젝트 구현과 실서비스 구현을 문서에서 명확히 분리</li>
+</ul>
+<p><strong>역할 분담 예시</strong></p>
+<ul>
+<li>프론트엔드: 그룹 생성, 초대, 프로필 입력, 월드컵 UI, 보증금 상태 UI</li>
+<li>백엔드/DB: 사용자, 그룹, 매칭, 보증금, 리뷰 테이블</li>
+<li>AI/매칭: 외모 점수 프로토타입, 월드컵 보정값, 그룹매칭 배치 엔진</li>
+<li>QA/운영: 출석 인증, 노쇼 시나리오, 리뷰 누적 로직 테스트</li>
+</ul>
+<hr>
+<h2>14. 변경 이력</h2>
+<table>
+<tr><th>버전</th><th>날짜</th><th>작성자</th><th>변경 사항</th></tr>
+<tr><td>v1.0</td><td>2025 (추정)</td><td>성준</td><td>초기 설계 (AI 인터뷰 기반)</td></tr>
+<tr><td>v1.1</td><td>2026-05-13</td><td>김충현 + Claude</td><td>외모 AI 자동 평가, 가중치 시스템, 양방향 매칭, 강제 만남, 거짓말 페널티, 전 매칭 차단 추가</td></tr>
+<tr><td>v1.1.1</td><td>2026-05-14</td><td>김충현 + Claude</td><td>보증금 시스템 (노쇼 페널티 + 수익 모델 통합) 추가, 출석 검증 방안 정리</td></tr>
+<tr><td>v1.2</td><td>2026-05-14</td><td>김충현 + Codex</td><td>그룹매칭 우선, 휴대폰 인증, 비공개 자동확정, 보증금 보상형 구조, 월드컵+AI 외모타입 보정 반영</td></tr>
+</table>
+  </main>
+</body>
+</html>

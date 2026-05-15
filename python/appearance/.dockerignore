@@ -1,0 +1,26 @@
+# 환경 / 시크릿
+.env
+.env.*
+
+# 모델 가중치 (볼륨으로 주입)
+weights/
+*.pth
+*.pt
+
+# 파이썬 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 테스트 / 개발 도구
+tests/
+test_server.py
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+requirements-dev.txt
+
+# 문서
+*.md

@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /profile/
+Disallow: /group/
+Disallow: /match/
+Disallow: /api/
+
+Allow: /
+Allow: /login

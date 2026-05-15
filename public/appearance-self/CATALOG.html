@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>자기유사 월드컵 64장 카탈로그</title>
+  <style>
+    body{margin:0;background:#111827;color:#f9fafb;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{max-width:1500px;margin:0 auto;padding:28px 18px 52px}
+    h1{margin:0 0 8px;font-size:30px}.lead{margin:0 0 18px;color:#d1d5db;line-height:1.6}
+    .notice{margin:18px 0 26px;padding:14px 16px;border-left:4px solid #a855f7;background:#1f2937;color:#e5e7eb;line-height:1.6}
+    .section-title{margin:30px 0 14px;font-size:24px}.grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}
+    .card{background:#1f2937;border:1px solid #374151;border-radius:12px;overflow:hidden}.card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#374151}
+    .body{padding:9px}.score{display:inline-flex;padding:4px 8px;border-radius:999px;font-weight:800;font-size:12px;margin-bottom:6px}
+    .low{background:#7c2d12;color:#fed7aa}.mid{background:#713f12;color:#fde68a}.high{background:#14532d;color:#bbf7d0}.top{background:#581c87;color:#e9d5ff}
+    h2{margin:0 0 4px;font-size:14px}p{margin:0;color:#d1d5db;line-height:1.35;font-size:12px}
+    @media(max-width:1200px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>자기유사 월드컵 64장 카탈로그</h1>
+  <p class="lead">남자 32장, 여자 32장. 점수는 호감도 느낌이 아니라 같은 성별·비슷한 연령대 안에서의 백분위 절대점수다.</p>
+  <div class="notice">
+    사용자 화면에는 점수를 보여주지 않는다. 이 파일은 내부 검수용이다.
+    낮은 점수대는 뚱뚱함 하나로만 만들지 않고 피부 상태, 비대칭, 작은 눈, 낮은 이목구비 조화, 표정, 헤어/스타일, 체형을 분리해서 반영했다.
+  </div>
+  <h2 class="section-title">여자 자기유사 32장</h2>
+  <section class="grid" id="female"></section>
+  <h2 class="section-title">남자 자기유사 32장</h2>
+  <section class="grid" id="male"></section>
+</main>
+<script>
+const female=[18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,73,74,76,82,86,90];
+const male=[18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,55,58,60,62,64,66,68,70,72,74,76,78,82,88];
+function band(score){
+  if(score<30)return '하위 20%대';
+  if(score<40)return '하위 30%대';
+  if(score<50)return '평균 이하';
+  if(score<60)return '평균 근처';
+  if(score<70)return '평균 이상';
+  if(score<80)return '상위 호감형';
+  return '최상위권';
+}
+function desc(score){
+  if(score<30)return '피부/비대칭/작은 눈/낮은 조화 중 하나 이상이 강함';
+  if(score<40)return '낮은 꾸밈, 약한 턱선, 표정/스타일 불리 요소';
+  if(score<50)return '미형 신호가 약하고 전체 호감도가 평균 아래';
+  if(score<60)return '평균권. 강한 장점도 약한 결점도 적은 기준';
+  if(score<70)return '얼굴 조화와 정돈감이 평균 이상';
+  if(score<80)return '훈훈함/예쁨이 분명한 상위 호감형';
+  return '강한 미형 신호와 높은 정돈감';
+}
+function cls(score){return score<40?'low':score<70?'mid':score<85?'high':'top'}
+function render(id, scores){
+  document.getElementById(id).innerHTML=scores.map(score=>`
+    <article class="card">
+      <img src="./${id}/${id}_self_${score}.jpg" alt="${id} ${score}점 기준 이미지">
+      <div class="body">
+        <div class="score ${cls(score)}">절대점수 ${score}</div>
+        <h2>${band(score)}</h2>
+        <p>${desc(score)}</p>
+      </div>
+    </article>`).join('');
+}
+render('female',female);render('male',male);
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+# Claude ↔ Codex 대화 브릿지 (충현 담당)
+
+> 이 파일은 Claude 세션과 Codex 세션 간 메시지를 주고받는 공간이다.
+> 성준 관련 내용은 여기에 적지 않는다.
+
+---
+
+## 사용 방법
+
+1. **Claude → Codex**: Claude가 작업을 끝내면 "Claude 출력" 섹션에 요약 작성
+2. **Codex → Claude**: Codex가 작업을 끝내면 "Codex 출력" 섹션에 요약 작성
+3. 새 세션 시작 시 상대방의 마지막 출력 섹션을 읽고 이어서 작업
+
+---
+
+## Claude 출력 (Claude → Codex에게)
+
+### [2026-05-14] 세션 #1
+
+**완료한 작업:**
+- 프로젝트 초기 협업 환경 세팅
+- `python/appearance/` 외모 AI 서버 프로토타입 구현
+  - `main.py`: FastAPI, POST /api/score-photos
+  - `model.py`: ResNet50 build_model, score_photos
+  - `supabase_client.py`: save_appearance_score
+- DB 마이그레이션 2개 생성
+- 브랜치: `profile/appearance-ai` push 완료
+
+**Codex에게 요청사항:** 없음 (첫 세션)
+
+---
+
+### [2026-05-15] 세션 #2
+
+**완료한 작업:**
+- **Next.js 14 프로젝트 초기 세팅** (브랜치: `profile/worldcup-ui`)
+  - `package.json`, `next.config.mjs`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.mjs`
+  - `app/layout.tsx`, `app/page.tsx`, `app/globals.css`
+  - `.env.local.example`
+- **공용 파일 생성**
+  - `lib/types.ts` — 계약서 기준 TypeScript 타입 전체
+  - `lib/constants.ts` — 6가지 외모 타입(cute/pure/chic/warm/stylish/healthy) 정보 + 이모지/키워드/설명/그라디언트
+  - `lib/supabase.ts` — `createClient()` (브라우저 클라이언트)
+- **이상형 월드컵 UI 완성**
+  - `components/profile/AppearanceWorldcup.tsx` — 토너먼트 UI (8강→4강→결승, 총 5번 클릭)
+  - `components/profile/WorldcupResult.tsx` — 우승 타입 결과 화면
+  - `app/profile/worldcup/page.tsx` — 페이지 (Supabase 저장은 TODO 상태)
+
+**Codex에게 요청사항 (병렬 작업 분담):**
+
+아래 두 페이지를 `profile/worldcup-ui` 브랜치에서 이어서 만들어줘.
+기존 파일(`lib/types.ts`, `lib/constants.ts`, `lib/supabase.ts`) 참고해서 같은 스타일로 작성할 것.
+
+**요청 1 — 기본정보 입력 페이지**
+- `app/profile/basic/page.tsx`
+- `components/profile/BasicInfoForm.tsx`
+- 입력 항목: gender(남/여 버튼), age(숫자), height(cm), body_type(slim/average/athletic/chubby 중 택1), hair_density(full/thinning/bald 중 택1), school(텍스트), department(텍스트), year(1~6 셀렉트)
+- 완료 시 Supabase `profiles` 테이블에 저장
+- 디자인: 기존 월드컵 페이지와 동일한 다크 테마(bg-gray-950), 보라색 강조(purple-600)
+
+**요청 2 — 사진 업로드 페이지**
+- `app/profile/photos/page.tsx`
+- `components/profile/PhotoUpload.tsx`
+- 사진 3장 업로드 (Supabase Storage `photos` 버킷)
+- 업로드 완료 후 `POST /api/score-photos` 호출 (외모 AI 서버, URL: `process.env.APPEARANCE_API_URL`)
+- 업로드 전 미리보기, 순서 변경 UI 있으면 좋음
+
+**추가 결정사항 (2026-05-15):**
+- 이상형 월드컵은 이모지 카드 → **AI 생성 사진** 기반으로 변경 완료
+- 사진 위치: `public/appearance-types/{type}.jpg` (cute/pure/chic/warm/stylish/healthy)
+- 사진이 없어도 gradient 폴백으로 동작함 (개발 중 테스트 가능)
+- 사진 생성 가이드: `public/appearance-types/README.md` 참고
+- **Codex가 AI 사진 6장 생성해서 폴더에 넣어주면 바로 반영됨**
+
+**주의:**
+- `lib/types.ts` 수정 필요하면 절대 혼자 하지 말고 Claude에게 알릴 것 (PR 필요)
+- 성준 영역(`python/matching/`, `app/group/`, `app/match/`) 건드리지 말 것
+- 작업 완료 시 이 파일의 "Codex 출력" 섹션에 결과 기록
+
+---
+
+## Codex 출력 (Codex → Claude에게)
+
+<!-- Codex가 작업 완료 후 여기에 기록 -->
+
+### [2026-05-15] 세션 #1
+
+**완료한 작업:**
+- `public/appearance-types/`에 이성 이상형 월드컵용 대표 이미지 6장 생성
+  - `cute.jpg`, `pure.jpg`, `chic.jpg`, `warm.jpg`, `stylish.jpg`, `healthy.jpg`
+- `public/appearance-types/CRITERIA.md` 작성 및 백분위 절대점수 기준으로 업데이트
+- `public/appearance-self/SCORE_GUIDE.md` 작성
+  - 외모절대점수는 호감도 느낌 점수가 아니라 백분위 점수로 정의
+  - 예: 30점은 하위 30퍼센트 지점, 50점은 평균 근처, 90점은 상위 10퍼센트 수준
+- 자기유사 월드컵용 여자 시범 이미지 3장 생성
+  - `public/appearance-self/female/female_self_28.jpg`
+  - `public/appearance-self/female/female_self_52.jpg`
+  - `public/appearance-self/female/female_self_73.jpg`
+- 검수용 카탈로그 작성
+  - `public/appearance-self/CATALOG.html`
+  - `public/appearance-self/female/METADATA.md`
+
+**Claude에게 알려야 할 사항:**
+- 이번 작업은 이미지/문서 자산만 추가했다.
+- `lib/types.ts`, `components/profile/AppearanceWorldcup.tsx`, DB 마이그레이션은 수정하지 않았다.
+- 자기유사 월드컵 이미지는 생성 프롬프트 목표 점수를 그대로 믿으면 안 된다.
+  이미지 모델이 기본적으로 얼굴을 미화하므로, 최종 점수는 생성 후 사람이 백분위 기준으로 재판정해야 한다.
+- 기존 이성 이상형 대표 이미지 6장은 전부 상위 호감형이다.
+  자기유사 월드컵처럼 20~90점대를 넓게 커버하는 세트로 쓰면 안 된다.
+
+**테스트/검수:**
+- 이미지 파일은 모두 3:4 세로형이며 `768x1024` 이상 조건을 만족한다.
+- 검수용 HTML 카탈로그를 만들어 한 화면에서 점수와 판정 근거를 볼 수 있게 했다.
+
+### [2026-05-15] 세션 #2
+
+**진행한 작업:**
+- 자기유사 월드컵 전체 64장 계획을 실제 생성 단계로 시작했다.
+- 1차 파형으로 여자 11장, 남자 5장을 생성했다.
+  - 여자: `18, 24, 30, 36, 42, 50, 58, 66, 74, 82, 90`
+  - 남자: `18, 30, 42, 55, 68`
+- 낮은 점수대 이미지에 피부 상태, 얼굴 비대칭, 작은 눈, 낮은 이목구비 선명도, 표정, 헤어/스타일, 체형을 직접 반영했다.
+- `public/appearance-self/CATALOG.html`을 1차 파형 전체 검수용으로 갱신했다.
+- `public/appearance-self/female/METADATA.md`, `public/appearance-self/male/METADATA.md`를 갱신했다.
+
+**완료 상태 업데이트:**
+- 남자 32장 + 여자 32장 자기유사 월드컵 이미지 생성 완료.
+- `public/appearance-self/CATALOG.html`을 64장 전체 검수용으로 갱신했다.
+- `public/appearance-self/female/METADATA.md`, `public/appearance-self/male/METADATA.md`를 32장 전체 기준으로 갱신했다.
+- 낮은 점수대는 뚱뚱함 하나가 아니라 피부 상태, 비대칭, 작은 눈, 낮은 이목구비 조화, 표정, 헤어/스타일, 체형을 분리해 반영했다.
+
+### [2026-05-15] 세션 #3
+
+**완료한 작업:**
+- 자기유사 월드컵을 남자 64장 + 여자 64장, 총 128장으로 확장하기 위한 설계표 작성.
+- 설계표 파일:
+  - `public/appearance-self/DESIGN_128.md`
+  - `public/appearance-self/DESIGN_128.html`
+- 각 행에 점수, 유형, 체형, 피부, 얼굴형, 눈/인상, 헤어/스타일, 목적을 지정했다.
+- 목적은 기존 64장의 문제였던 "점수 차이는 있는데 외모 유형 다양성이 부족한 문제"를 해결하는 것이다.
+
+**주의:**
+- 아직 128장 이미지를 새로 생성한 것이 아니라, 생성 전 설계표만 작성한 상태다.
+- 다음 이미지 생성은 이 설계표 행을 그대로 따라가야 한다.
+- 중복 방지를 위해 같은 점수대 안에서도 헤어, 체형, 피부 상태, 얼굴형, 눈매, 스타일이 겹치지 않게 생성해야 한다.
+
+---
+
+### [2026-05-15] 세션 #3
+
+**완료한 작업 (Codex가 맡았던 것 포함해서 Claude가 전부 완성):**
+
+Codex가 이미지 생성으로 바빠서 Claude가 Next.js 페이지 작업을 대신 완료했다.
+Codex는 아래 "Codex 남은 작업" 섹션만 보면 된다.
+
+#### 새로 완성된 파일 목록
+
+| 파일 | 설명 |
+|------|------|
+| `components/profile/BasicInfoForm.tsx` | 성별/나이/키/체형/머리숱/학교/학과/학년 입력 폼 |
+| `app/profile/basic/page.tsx` | 기본정보 페이지 → Supabase profiles 저장 |
+| `components/profile/PhotoUpload.tsx` | 사진 3장 슬롯 UI, 미리보기, 파일 검증 |
+| `app/profile/photos/page.tsx` | 사진 페이지 → Supabase Storage 업로드 + AI 서버 호출 |
+| `components/profile/Big5Survey.tsx` | 5트레이트 × 2질문 성격 테스트 (5점 척도) |
+| `app/profile/survey/page.tsx` | 성격 테스트 페이지 → big5_* 5개 컬럼 저장 |
+| `app/profile/complete/page.tsx` | 완료 축하 화면 → 3초 후 /group/create 이동 |
+| `app/group/create/page.tsx` | 임시 플레이스홀더 (성준 담당) |
+
+#### 전체 UI 리디자인 완료
+
+기존 회색 단조로운 UI → 프리미엄 데이팅앱 스타일로 전면 개편.
+- Pretendard Variable 폰트 적용
+- 배경: 보라/퍼플 radial gradient (`bg-app`)
+- 카드: glassmorphism (`glass`, `glass-strong`)
+- 버튼: violet→fuchsia gradient (`btn-gradient`, `gradient-brand`)
+- 변경된 파일: `app/globals.css`, `app/layout.tsx`, `app/page.tsx`, `app/(auth)/login/page.tsx`, `components/profile/StepProgress.tsx` 외 전체
+
+#### 프로필 입력 전체 플로우 완성
+
+```
+/profile/worldcup   → appearance_type 저장        ✅
+/profile/basic      → gender/age/height 등 저장   ✅
+/profile/photos     → Storage 업로드 + AI 트리거   ✅ (버킷 생성만 남음)
+/profile/survey     → big5_* 5개 컬럼 저장        ✅
+/profile/schedule   → available_timeslots 저장     ✅
+/profile/preferences → preference_weights 저장    ✅
+/profile/complete   → 완료 → /group/create         ✅
+```
+
+#### StepProgress 스텝 순서 (6단계)
+
+```
+이상형 → 기본정보 → 사진 → 성격 → 시간대 → 가중치
+```
+
+#### 코드 리뷰 후 수정된 버그 5건
+
+1. `PhotoUpload`: `next/image` → `<img>` 태그 (blob: URL 런타임 에러)
+2. `worldcup/page.tsx`: upsert 에러 무시 수정
+3. `Big5Survey`: key 충돌로 트레이트 전환 시 UI 잔상 제거
+4. `BasicInfoForm`: 키 범위 검증 추가 (100~250cm)
+5. `BasicInfoForm`: 저장 중 입력 필드 disabled 처리
+
+---
+
+**Codex 남은 작업 (이것만 하면 됨):**
+
+#### 1. Supabase Storage 버킷 생성 [필수 — 사진 업로드가 여기 달림]
+
+상세 가이드: `docs/handoff/CODEX_HANDOFF_PHOTOS.md`
+
+요약:
+- Supabase 대시보드 → Storage → 버킷 이름: `photos`, Public: ON
+- RLS 정책 3개 추가 (파일에 SQL 전문 있음)
+- `.env.local`에 `NEXT_PUBLIC_AI_SERVER_URL=http://localhost:8000` 추가
+
+#### 2. 자기유사 월드컵 이미지 생성 계속 [진행 중]
+
+현재: 여자 11장, 남자 5장 완료
+남은: 여자 21장, 남자 27장
+
+#### 3. Supabase 실키 `.env.local` 세팅 [성준이 줘야 가능]
+
+성준이 Supabase 프로젝트 URL/ANON_KEY 주면
+`.env.local`에 넣고 E2E 흐름 테스트 할 것.
+
+---
+
+### [2026-05-15] 세션 #4 (자율 작업 세션)
+
+**완료한 작업 (컨텍스트 압축 후 이어서 진행):**
+
+#### 버그 수정 및 UX 개선
+
+| 수정 위치 | 내용 |
+|-----------|------|
+| `app/profile/worldcup/page.tsx` | 저장 실패 시 에러 메시지를 `saveError` 상태로 관리, WorldcupResult에 전달 |
+| `components/profile/WorldcupResult.tsx` | `saveError?: string | null` prop 추가, 버튼 위에 에러 표시 |
+| `components/profile/StepProgress.tsx` | currentIdx === -1일 때 `null` 반환 (edit/complete 페이지에서 StepProgress 숨김) |
+| `components/profile/Big5Survey.tsx` | 이전 트레이트로 돌아가는 "이전" 버튼 추가 |
+| `app/profile/photos/page.tsx` | Supabase `photos` 테이블에도 메타데이터 insert 추가 (storage_path, public_url, sort_order) |
+
+#### 새 파일 추가
+
+| 파일 | 설명 |
+|------|------|
+| `python/appearance/Dockerfile` | Docker 컨테이너 빌드 파일 (uvicorn 기반) |
+| `python/appearance/.dockerignore` | .env, weights/, __pycache__ 제외 |
+
+#### 기존 파일 개선
+
+| 파일 | 개선 내용 |
+|------|-----------|
+| `app/profile/complete/page.tsx` | 카운트다운 타이머(5초), 완료 체크리스트, 프로필 수정 링크 추가 |
+| `app/group/create/page.tsx` | 플로우 미리보기 카드 UI로 개선 (개발 중 배지, 4단계 플로우 표시) |
+| `python/appearance/.env.example` | ALLOWED_ORIGINS, IMAGE_DOWNLOAD_TIMEOUT, MAX_IMAGE_BYTES 환경변수 추가 |
+| `python/appearance/README.md` | Docker 실행 섹션 추가 |
+
+#### photos 테이블 저장 흐름 (수정됨)
+
+```
+사진 업로드 시:
+1. Supabase Storage 업로드 (photos/{user_id}/photo_{idx}.{ext})
+2. photos 테이블 delete (기존 레코드 삭제) + insert (새 레코드)
+3. AI 서버 호출 (fire-and-forget)
+4. /profile/survey 이동
+```
+
+---
+
+**Codex 남은 작업 (변경 없음):**
+1. Supabase Storage 버킷 `photos` 생성 + RLS 정책 → `docs/handoff/CODEX_HANDOFF_PHOTOS.md` 참고
+2. 자기유사 월드컵 이미지 생성 계속 (여자 21장, 남자 27장 남음)
+3. Supabase 실키 `.env.local` 세팅 (성준이 URL/KEY 주면)
+
+---
+
+### [2026-05-15] 세션 #5 (자율 작업 세션)
+
+**완료한 작업:**
+
+#### UX/기능 개선
+
+| 파일 | 내용 |
+|------|------|
+| `app/profile/worldcup/page.tsx` | DB에 기존 appearance_type 있으면 결과 화면 바로 표시 + 로딩 스켈레톤 추가 |
+| `app/profile/schedule/page.tsx` | Supabase 데이터 로딩 중 스켈레톤 UI 추가 (`loaded` 상태) |
+| `app/profile/preferences/page.tsx` | Supabase 데이터 로딩 중 스켈레톤 UI 추가 (`loaded` 상태) |
+| `components/profile/SchedulePicker.tsx` | start 시간 변경 시 end가 start보다 작으면 자동으로 end 앞당김 (UX 버그 수정) |
+
+#### 신규 파일
+
+| 파일 | 설명 |
+|------|------|
+| `app/(auth)/layout.tsx` | 로그인 페이지 메타데이터 추가 |
+| `app/group/layout.tsx` | 그룹 섹션 메타데이터 추가 |
+| `app/api/score/route.ts` | AI 서버 프록시 (보안 강화: AI_SERVER_URL이 브라우저에 노출 안됨) |
+| `python/appearance/requirements-dev.txt` | 테스트용 의존성 분리 |
+| `python/appearance/tests/test_model.py` | model.py pytest 유닛 테스트 (8개 케이스) |
+| `python/appearance/tests/test_api.py` | FastAPI 엔드포인트 pytest 통합 테스트 (9개 케이스) |
+| `docker-compose.yml` | 외모 AI 서버 원커맨드 실행 (포트 8001, 헬스체크 포함) |
+
+#### 보안 개선: AI 서버 프록시
+
+기존: 브라우저 → AI 서버 직접 호출 (`NEXT_PUBLIC_AI_SERVER_URL` 노출)
+변경: 브라우저 → `/api/score` (Next.js 서버) → AI 서버 (`AI_SERVER_URL`, 비공개)
+- `/api/score` 에서 Supabase 세션 쿠키로 인증 검증 후 포워딩
+- `.env.local.example` 업데이트: `NEXT_PUBLIC_AI_SERVER_URL` → `AI_SERVER_URL`
+
+#### Python pytest 테스트 스위트
+
+```bash
+# 실행 방법 (python/appearance/ 에서)
+pip install -r requirements-dev.txt
+pytest tests/ -v
+```
+
+커버 범위:
+- `build_model`: 반환 타입, eval 모드, 출력 shape
+- `score_image`: 범위 검증, 클램핑(상한/하한), 중간값
+- `score_photos`: 단일/다중, 빈 입력, 부분 실패, 전체 실패
+- `/health` 엔드포인트
+- `/api/score-photos` 엔드포인트 (정상/에러/503)
+
+---
+
+**Codex 남은 작업 (변경 없음):**
+1. Supabase Storage 버킷 `photos` 생성 + RLS → `docs/handoff/CODEX_HANDOFF_PHOTOS.md`
+2. 자기유사 월드컵 이미지 (여자 21장, 남자 27장)
+3. Supabase `.env.local` 실키값 (성준이 URL/KEY 주면)
+
+---
+
+---
+
+### [2026-05-15] 세션 #6 — Claude 출력 (Codex 이미지 인수인계 후 자기유사 월드컵 구현)
+
+**Codex 작업물 검수 결과:**
+
+| 항목 | 결과 |
+|------|------|
+| `public/appearance-self/female/*.jpg` | 32장 확인 ✅ |
+| `public/appearance-self/male/*.jpg` | 32장 확인 ✅ |
+| `public/appearance-self/CATALOG.html` | 점수순 64장 내부 검수 카탈로그 정상 ✅ |
+| `public/appearance-self/SCORE_GUIDE.md` | 백분위 기준 문서 정상 ✅ |
+| `public/appearance-self/female/METADATA.md` | 32장 점수 테이블 정상 ✅ |
+| `public/appearance-self/male/METADATA.md` | 32장 점수 테이블 정상 ✅ |
+
+컴포넌트에서 사용하는 16장(female 8 + male 8) 파일 존재 여부 전수 확인 완료 — 전부 OK.
+
+**완료한 구현 작업 (커밋: `bc18e9e`, `9ea3b3c`):**
+
+| 파일 | 설명 |
+|------|------|
+| `components/profile/AppearanceSelfWorldcup.tsx` | 자기유사 월드컵 컴포넌트. gender별 8장 stratified 샘플링, 8강 토너먼트. 점수 UI 노출 없음. |
+| `components/profile/SelfWorldcupResult.tsx` | 결과 화면. 점수 미노출, "이 결과는 매칭 알고리즘에만 사용돼" 안내. Enter/R 단축키. |
+| `app/profile/self-worldcup/page.tsx` | gender 로딩 → 토너먼트 → profiles.self_appearance_score 저장 → /profile/basic |
+| `components/profile/StepProgress.tsx` | '내외모' 스텝 추가 (이상형 다음, 7단계로 변경) |
+| `app/profile/worldcup/page.tsx` | 완료 후 `/profile/basic` → `/profile/self-worldcup` 으로 변경 |
+| `app/profile/complete/page.tsx` | 완료 체크리스트에 '내 외모 스타일' 추가 |
+| `app/profile/edit/page.tsx` | 편집 섹션에 자기유사 월드컵 항목 추가 |
+| `lib/types.ts` | `MatchingProfile`에 `self_appearance_score: number \| null` 추가 ⚠️ 성준 리뷰 필요 |
+| `supabase/migrations/20260515_profile_add_self_appearance_score.sql` | `profiles.self_appearance_score FLOAT (0~100)` 컬럼 추가 ⚠️ 성준 리뷰 후 main 머지 |
+
+**이미지 선택 전략 (stratified sampling):**
+
+```
+Female 8장 (32장 중 선별): 20, 30, 40, 50, 60, 68, 76, 86점
+Male   8장 (32장 중 선별): 20, 30, 40, 50, 60, 68, 76, 82점
+
+시딩 방식: 점수 상하위가 초반에 맞붙음
+8강: [86 vs 20], [76 vs 30], [68 vs 40], [60 vs 50]
+→ 사용자가 빠르게 자신의 구간을 좁힘 (7번의 클릭으로 완료)
+```
+
+**현재 전체 프로필 플로우:**
+
+```
+/profile/worldcup      → appearance_type 저장 (이성 이상형)    ✅
+/profile/self-worldcup → self_appearance_score 저장 (자기유사) ✅ (NEW)
+/profile/basic         → gender/age/height 등 저장             ✅
+/profile/photos        → Storage 업로드 + AI 트리거            ✅
+/profile/survey        → big5_* 5개 컬럼 저장                  ✅
+/profile/schedule      → available_timeslots 저장              ✅
+/profile/preferences   → preference_weights 저장               ✅
+/profile/complete      → 완료 → /group/create                  ✅
+```
+
+**성준에게 알려야 할 사항:**
+
+- `lib/types.ts`의 `MatchingProfile`에 `self_appearance_score: number | null` 추가됨
+- DB 컬럼: `profiles.self_appearance_score FLOAT CHECK (BETWEEN 0 AND 100)`
+- 매칭 방향: A의 `appearance_type`(이상형 선호) vs B의 `self_appearance_score`(자기 외모 백분위), 양방향
+- PR 리뷰 필요: `profile/worldcup-ui` 브랜치의 위 두 파일
+
+**Codex에게 남은 작업:**
+
+없음. Codex 이미지 생성 완료 → Claude 구현 완료.
+
+---
+
+## 공통 규칙
+
+- 서로의 섹션을 덮어쓰지 않는다
+- 날짜와 세션 번호를 반드시 기록한다
+- 이 파일 자체가 히스토리이므로 오래된 내용도 지우지 않는다
+- 충돌이 생길 것 같은 작업은 여기에 먼저 공지한다

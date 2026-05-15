@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  appearance-ai:
+    build:
+      context: ./python/appearance
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./python/appearance/.env
+    volumes:
+      # 학습된 가중치 파일 마운트 (없어도 ImageNet pretrained로 동작)
+      - ./python/appearance/weights:/app/weights:ro
+    environment:
+      PORT: "8001"
+      MODEL_WEIGHTS_PATH: "/app/weights/resnet50_scut.pth"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
