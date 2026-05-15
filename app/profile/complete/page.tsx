@@ -74,8 +74,8 @@ export default function ProfileCompletePage() {
           <DestinyLogo size={58} />
         </div>
 
-        <h1 className="text-3xl font-black mb-1 gradient-brand-text">운명 준비 완료!</h1>
-        <p className="text-gray-400 text-sm mb-6">이제 친구들이랑 팀을 만들어봐</p>
+        <h1 className="font-destiny text-3xl font-bold mb-1 gradient-brand-text">당신의 인연이<br/>완성되었습니다</h1>
+        <p className="text-gray-400 text-sm mb-6 mt-1">이제 친구들이랑 팀을 만들어봐</p>
 
         {/* 완료 항목 체크리스트 */}
         <div className="glass-card rounded-2xl p-4 mb-6 text-left space-y-2.5">

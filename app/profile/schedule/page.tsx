@@ -52,7 +52,7 @@ export default function SchedulePage() {
   return (
     <div className="flex flex-col min-h-screen px-5 pb-10">
       <div className="mb-7">
-        <h1 className="text-2xl font-black">언제 시간 돼?</h1>
+        <h1 className="text-2xl font-black gradient-fate-text">언제 시간 돼?</h1>
         <p className="text-sm text-gray-500 mt-1">과팅 가능한 요일과 시간을 골라줘</p>
       </div>
 

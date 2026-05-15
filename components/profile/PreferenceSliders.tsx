@@ -1,16 +1,23 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { Sparkles, MessageCircle, Ruler, Dumbbell, GraduationCap, Gamepad2, Clock, type LucideIcon } from 'lucide-react'
 import type { PreferenceWeights } from '@/lib/types'
 
-const ITEMS: { key: keyof PreferenceWeights; label: string; emoji: string; desc: string }[] = [
-  { key: 'appearance',   label: '외모',     emoji: '✨', desc: '얼마나 중요해?' },
-  { key: 'personality',  label: '성격',     emoji: '💬', desc: '대화 스타일, 성격' },
-  { key: 'height',       label: '키',       emoji: '📏', desc: '키 차이가 중요해?' },
-  { key: 'body_type',    label: '체형',     emoji: '💪', desc: '체형을 따져?' },
-  { key: 'school',       label: '학교',     emoji: '🏫', desc: '같은 학교 선호?' },
-  { key: 'hobby',        label: '취미',     emoji: '🎮', desc: '취미가 맞아야 해?' },
-  { key: 'time_fit',     label: '시간대',   emoji: '🕐', desc: '일정이 잘 맞아야 해?' },
+const ITEMS: {
+  key: keyof PreferenceWeights
+  label: string
+  Icon: LucideIcon
+  iconBg: string
+  desc: string
+}[] = [
+  { key: 'appearance',   label: '외모',   Icon: Sparkles,       iconBg: 'from-violet-600 to-fuchsia-600', desc: '얼마나 중요해?' },
+  { key: 'personality',  label: '성격',   Icon: MessageCircle,  iconBg: 'from-fuchsia-600 to-pink-600',   desc: '대화 스타일, 성격' },
+  { key: 'height',       label: '키',     Icon: Ruler,          iconBg: 'from-blue-600 to-cyan-600',      desc: '키 차이가 중요해?' },
+  { key: 'body_type',    label: '체형',   Icon: Dumbbell,       iconBg: 'from-orange-500 to-amber-500',   desc: '체형을 따져?' },
+  { key: 'school',       label: '학교',   Icon: GraduationCap,  iconBg: 'from-indigo-600 to-violet-600',  desc: '같은 학교 선호?' },
+  { key: 'hobby',        label: '취미',   Icon: Gamepad2,       iconBg: 'from-emerald-600 to-teal-600',   desc: '취미가 맞아야 해?' },
+  { key: 'time_fit',     label: '시간대', Icon: Clock,          iconBg: 'from-rose-600 to-pink-600',      desc: '일정이 잘 맞아야 해?' },
 ]
 
 const DEFAULT_WEIGHTS: PreferenceWeights = {
@@ -67,13 +74,15 @@ export default function PreferenceSliders({ initialValue, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      {ITEMS.map(({ key, label, emoji, desc }) => {
+      {ITEMS.map(({ key, label, Icon, iconBg, desc }) => {
         const pct = Math.round(weights[key] * 100)
         return (
           <div key={key} className="glass rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <span className="text-xl">{emoji}</span>
+                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${iconBg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className="w-4 h-4 text-white" strokeWidth={1.8} />
+                </div>
                 <div>
                   <p className="text-sm font-bold">{label}</p>
                   <p className="text-xs text-gray-500">{desc}</p>

@@ -74,7 +74,7 @@ export default function PreferencesPage() {
   return (
     <div className="flex flex-col min-h-screen px-5 pb-10">
       <div className="mb-7">
-        <h1 className="text-2xl font-black">뭘 제일 중요하게 봐?</h1>
+        <h1 className="text-2xl font-black gradient-fate-text">뭘 제일 중요하게 봐?</h1>
         <p className="text-sm text-gray-500 mt-1">슬라이더로 중요도 조절해봐. 자동으로 100%가 맞춰져.</p>
       </div>
 

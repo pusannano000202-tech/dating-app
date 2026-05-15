@@ -37,7 +37,7 @@ export default function WorldcupResult({ winner, saving = false, saveError, onCo
 
       <div className="relative w-full max-w-xs">
         <p className="text-xs font-bold text-violet-400 tracking-widest uppercase text-center mb-1">최종 우승</p>
-        <h1 className="text-2xl font-black text-center mb-6">내 이상형 스타일은</h1>
+        <h1 className="text-2xl font-black text-center gradient-fate-text mb-6">내 이상형 스타일은</h1>
 
         <div className="relative rounded-3xl overflow-hidden aspect-[3/4] mb-4 ring-2 ring-violet-500/60 shadow-2xl shadow-violet-900/40">
           <div className={`absolute inset-0 bg-gradient-to-b ${info.gradient}`} />

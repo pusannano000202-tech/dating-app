@@ -3,84 +3,108 @@ interface Props {
   className?: string
 }
 
-/* Destiny 앱 로고 아이콘 — 두 궤도가 교차하는 순간, 운명의 별 */
+/*
+ * Destiny 로고 — Manus 디자인 기반
+ * 두 궤도 링이 교차해 나비/하트 실루엣을 이루고
+ * 중심에 운명의 4포인트 별이 빛나는 형태
+ */
 export default function DestinyLogo({ size = 48, className = '' }: Props) {
-  const id = 'dl'
+  const id = `dl-${size}`
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 48 48"
+      viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
       <defs>
-        {/* 메인 그라디언트: 보라 → 로즈 → 앰버 */}
-        <linearGradient id={`${id}-g1`} x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#a78bfa" />
-          <stop offset="45%"  stopColor="#f472b6" />
-          <stop offset="100%" stopColor="#fbbf24" />
+        {/* 로즈골드 → 바이올렛 */}
+        <linearGradient id={`${id}-orbit`} x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#f9a8d4" />
+          <stop offset="40%"  stopColor="#e879f9" />
+          <stop offset="100%" stopColor="#7c3aed" />
         </linearGradient>
-        {/* 링 그라디언트 */}
-        <linearGradient id={`${id}-g2`} x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#7c3aed" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#be185d" stopOpacity="0.6" />
-        </linearGradient>
-        <linearGradient id={`${id}-g3`} x1="48" y1="0" x2="0" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#be185d" stopOpacity="0.7" />
-          <stop offset="100%" stopColor="#d97706" stopOpacity="0.5" />
+        {/* 별 그라디언트 — 중심 밝게 */}
+        <linearGradient id={`${id}-star`} x1="35" y1="35" x2="65" y2="65" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#fde68a" />
+          <stop offset="50%"  stopColor="#fbbf24" />
+          <stop offset="100%" stopColor="#f472b6" />
         </linearGradient>
         {/* 중심 glow */}
         <radialGradient id={`${id}-glow`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor="#fde68a" stopOpacity="1" />
-          <stop offset="60%"  stopColor="#fbbf24" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#f472b6" stopOpacity="0" />
+          <stop offset="0%"   stopColor="#fde68a" stopOpacity="0.9" />
+          <stop offset="50%"  stopColor="#f59e0b" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#be185d" stopOpacity="0" />
         </radialGradient>
-        <filter id={`${id}-blur`} x="-50%" y="-50%" width="200%" height="200%">
+        {/* 블러 필터 */}
+        <filter id={`${id}-blur-sm`}>
           <feGaussianBlur stdDeviation="1.5" />
+        </filter>
+        <filter id={`${id}-blur-glow`}>
+          <feGaussianBlur stdDeviation="3" />
         </filter>
       </defs>
 
-      {/* ── 두 궤도 링: "두 사람의 길이 교차하다" ── */}
-      {/* 왼쪽 기울기 타원 */}
+      {/* ── 궤도 glow 레이어 (블러) ── */}
       <ellipse
-        cx="24" cy="24" rx="17" ry="8"
-        stroke={`url(#${id}-g2)`}
-        strokeWidth="1.8"
-        fill="none"
-        transform="rotate(-38 24 24)"
+        cx="50" cy="50" rx="38" ry="15"
+        stroke={`url(#${id}-orbit)`} strokeWidth="3.5" fill="none"
+        transform="rotate(-38 50 50)"
+        filter={`url(#${id}-blur-sm)`} opacity="0.5"
+      />
+      <ellipse
+        cx="50" cy="50" rx="38" ry="15"
+        stroke={`url(#${id}-orbit)`} strokeWidth="3.5" fill="none"
+        transform="rotate(38 50 50)"
+        filter={`url(#${id}-blur-sm)`} opacity="0.5"
+      />
+
+      {/* ── 궤도 링 본체 ── */}
+      <ellipse
+        cx="50" cy="50" rx="38" ry="15"
+        stroke={`url(#${id}-orbit)`} strokeWidth="2" fill="none"
+        transform="rotate(-38 50 50)"
         strokeLinecap="round"
       />
-      {/* 오른쪽 기울기 타원 */}
       <ellipse
-        cx="24" cy="24" rx="17" ry="8"
-        stroke={`url(#${id}-g3)`}
-        strokeWidth="1.8"
-        fill="none"
-        transform="rotate(38 24 24)"
+        cx="50" cy="50" rx="38" ry="15"
+        stroke={`url(#${id}-orbit)`} strokeWidth="2" fill="none"
+        transform="rotate(38 50 50)"
         strokeLinecap="round"
       />
 
-      {/* ── 4-포인트 별: 운명의 별 ── */}
-      {/* 별 glow (블러) */}
+      {/* ── 궤도 끝점 작은 구슬 ── */}
+      {/* 왼쪽 끝 */}
+      <circle cx="12" cy="50" r="3" fill={`url(#${id}-orbit)`} opacity="0.9" />
+      {/* 오른쪽 끝 */}
+      <circle cx="88" cy="50" r="3" fill={`url(#${id}-orbit)`} opacity="0.9" />
+      {/* 위 끝 */}
+      <circle cx="50" cy="13" r="2.5" fill={`url(#${id}-orbit)`} opacity="0.7" />
+      {/* 아래 끝 */}
+      <circle cx="50" cy="87" r="2.5" fill={`url(#${id}-orbit)`} opacity="0.7" />
+
+      {/* ── 중심 glow ── */}
+      <circle cx="50" cy="50" r="12" fill={`url(#${id}-glow)`} filter={`url(#${id}-blur-glow)`} />
+
+      {/* ── 4포인트 별 (운명의 별) ── */}
+      {/* 별 glow */}
       <path
-        d="M24 9 L26.2 21.8 L39 24 L26.2 26.2 L24 39 L21.8 26.2 L9 24 L21.8 21.8 Z"
-        fill={`url(#${id}-g1)`}
-        filter={`url(#${id}-blur)`}
-        opacity="0.55"
+        d="M50 33 L52.5 47.5 L67 50 L52.5 52.5 L50 67 L47.5 52.5 L33 50 L47.5 47.5 Z"
+        fill={`url(#${id}-star)`}
+        filter={`url(#${id}-blur-sm)`}
+        opacity="0.6"
       />
       {/* 별 본체 */}
       <path
-        d="M24 10 L25.8 22.2 L38 24 L25.8 25.8 L24 38 L22.2 25.8 L10 24 L22.2 22.2 Z"
-        fill={`url(#${id}-g1)`}
+        d="M50 35 L52.2 47.8 L65 50 L52.2 52.2 L50 65 L47.8 52.2 L35 50 L47.8 47.8 Z"
+        fill={`url(#${id}-star)`}
       />
 
-      {/* ── 중심점: 만남의 순간 ── */}
-      {/* 큰 glow */}
-      <circle cx="24" cy="24" r="5" fill={`url(#${id}-glow)`} opacity="0.5" />
-      {/* 선명한 중심 */}
-      <circle cx="24" cy="24" r="2.4" fill="white" opacity="0.95" />
+      {/* ── 중심 백색 코어 ── */}
+      <circle cx="50" cy="50" r="3.5" fill="white" opacity="0.95" />
+      <circle cx="50" cy="50" r="5.5" fill="white" opacity="0.15" />
     </svg>
   )
 }

@@ -152,11 +152,11 @@ function LoginContent() {
             </div>
           </div>
 
-          <h1 className="text-4xl font-black tracking-tight gradient-brand-text">
+          <h1 className="font-destiny text-4xl font-bold tracking-widest gradient-brand-text">
             Destiny
           </h1>
-          <p className="text-sm text-gray-500 mt-2 tracking-wide">
-            운명적인 만남이 기다리고 있어
+          <p className="text-sm text-gray-400 mt-2 leading-relaxed text-center">
+            당신의 인연이 여기서 시작됩니다
           </p>
         </div>
 
@@ -189,7 +189,7 @@ function LoginContent() {
                 disabled={loading}
                 className="btn-gradient-animated w-full py-3.5 rounded-xl font-bold text-sm text-white"
               >
-                {loading ? '발송 중...' : '인연 찾으러 가기 →'}
+                {loading ? '발송 중...' : '인연 찾기'}
               </button>
             </>
           ) : (

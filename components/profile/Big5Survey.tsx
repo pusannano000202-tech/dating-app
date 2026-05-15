@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Palette, ClipboardCheck, Zap, Heart, Waves, type LucideIcon } from 'lucide-react'
 
 export interface Big5Scores {
   openness: number           // 0~1
@@ -17,7 +18,8 @@ interface Props {
 interface Trait {
   key: keyof Big5Scores
   label: string
-  emoji: string
+  Icon: LucideIcon
+  iconBg: string
   color: string
   questions: string[]
 }
@@ -26,7 +28,8 @@ const TRAITS: Trait[] = [
   {
     key: 'openness',
     label: '개방성',
-    emoji: '🎨',
+    Icon: Palette,
+    iconBg: 'from-violet-600 to-fuchsia-600',
     color: 'from-violet-500 to-fuchsia-500',
     questions: [
       '새로운 취미나 경험을 즐겨 찾는 편이야?',
@@ -36,7 +39,8 @@ const TRAITS: Trait[] = [
   {
     key: 'conscientiousness',
     label: '성실성',
-    emoji: '📋',
+    Icon: ClipboardCheck,
+    iconBg: 'from-blue-600 to-cyan-600',
     color: 'from-blue-500 to-cyan-500',
     questions: [
       '계획을 세우고 체계적으로 일하는 편이야?',
@@ -46,7 +50,8 @@ const TRAITS: Trait[] = [
   {
     key: 'extraversion',
     label: '외향성',
-    emoji: '🎉',
+    Icon: Zap,
+    iconBg: 'from-orange-500 to-amber-500',
     color: 'from-orange-500 to-amber-500',
     questions: [
       '사람들과 어울릴 때 에너지가 충전되는 편이야?',
@@ -56,7 +61,8 @@ const TRAITS: Trait[] = [
   {
     key: 'agreeableness',
     label: '친화성',
-    emoji: '🤝',
+    Icon: Heart,
+    iconBg: 'from-emerald-600 to-teal-600',
     color: 'from-emerald-500 to-teal-500',
     questions: [
       '다른 사람 감정에 잘 공감하는 편이야?',
@@ -66,7 +72,8 @@ const TRAITS: Trait[] = [
   {
     key: 'neuroticism',
     label: '감수성',
-    emoji: '🌊',
+    Icon: Waves,
+    iconBg: 'from-rose-600 to-pink-600',
     color: 'from-rose-500 to-pink-500',
     questions: [
       '스트레스나 걱정을 자주 느끼는 편이야?',
@@ -161,8 +168,8 @@ export default function Big5Survey({ onComplete }: Props) {
 
       {/* 트레이트 카드 */}
       <div className="glass-strong rounded-3xl p-5 text-center border border-white/10">
-        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${trait.color} mb-3 shadow-lg`}>
-          <span className="text-3xl">{trait.emoji}</span>
+        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${trait.iconBg} mb-3 shadow-lg`}>
+          <trait.Icon className="w-8 h-8 text-white" strokeWidth={1.8} />
         </div>
         <h2 className="text-xl font-black mb-1">{trait.label}</h2>
         <p className="text-xs text-gray-500">솔직하게 답해줘 — 정답은 없어</p>

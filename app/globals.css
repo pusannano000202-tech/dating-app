@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 
 @tailwind base;
@@ -10,27 +11,22 @@
   body {
     font-family: 'PretendardVariable', -apple-system, sans-serif;
     background: #060612;
-    /* 운명적인 만남 — 깊은 우주 같은 배경 */
     background:
-      radial-gradient(ellipse 90% 55% at 10%  -5%,  rgba(120, 40, 200, 0.45) 0%, transparent 55%),
-      radial-gradient(ellipse 70% 45% at 90%  -5%,  rgba(190, 30, 100, 0.35) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 50% 110%,  rgba(100, 20, 160, 0.30) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 30% at 80%  60%,  rgba(220, 60, 130, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 60% at 10%  -5%,  rgba(120, 40, 200, 0.40) 0%, transparent 55%),
+      radial-gradient(ellipse  75% 50% at 90%  -5%,  rgba(190, 30, 100, 0.30) 0%, transparent 50%),
+      radial-gradient(ellipse  65% 45% at 50% 110%,  rgba(100, 20, 160, 0.28) 0%, transparent 55%),
+      radial-gradient(ellipse  35% 25% at 80%  60%,  rgba(220, 60, 130, 0.10) 0%, transparent 50%),
+      /* 붉은 실 — 은은하게 */
+      radial-gradient(ellipse  20% 80% at 30%  50%,  rgba(180, 30, 60, 0.07)  0%, transparent 100%),
       #060612;
   }
 }
 
-/* ── 브랜드 그라디언트 ─────────────────────────── */
-/* 운명 = 보라(신비) → 로즈(설렘) → 앰버(따뜻한 운) */
+/* ── 애니메이션 ─────────────────────── */
 @keyframes brand-shift {
   0%   { background-position: 0%   50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0%   50%; }
-}
-
-@keyframes float-up {
-  0%   { transform: translateY(0px)   opacity: 1; }
-  100% { transform: translateY(-100vh); opacity: 0; }
 }
 
 @keyframes confetti-fall {
@@ -40,19 +36,36 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(168, 40, 180, 0.4), 0 0 60px rgba(168, 40, 180, 0.15); }
-  50%       { box-shadow: 0 0 30px rgba(220, 60, 140, 0.6), 0 0 80px rgba(220, 60, 140, 0.25); }
+  0%, 100% { box-shadow: 0 0 20px rgba(190, 24, 93, 0.40), 0 0 60px rgba(124, 58, 237, 0.15); }
+  50%       { box-shadow: 0 0 35px rgba(190, 24, 93, 0.65), 0 0 90px rgba(124, 58, 237, 0.30); }
 }
 
 @keyframes star-twinkle {
   0%, 100% { opacity: 0.2; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.4); }
+  50%       { opacity: 1;   transform: scale(1.5); }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes red-thread {
+  0%   { stroke-dashoffset: 1000; opacity: 0; }
+  20%  { opacity: 0.4; }
+  80%  { opacity: 0.4; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
 }
 
 @layer utilities {
-  /* 브랜드 그라디언트 — 애니메이션 */
+  /* 폰트 */
+  .font-destiny {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  /* 브랜드 그라디언트 */
   .gradient-brand {
-    background: linear-gradient(135deg, #6d28d9 0%, #be185d 50%, #f59e0b 100%);
+    background: linear-gradient(135deg, #7c3aed 0%, #be185d 55%, #d97706 100%);
   }
   .gradient-brand-animated {
     background: linear-gradient(270deg, #7c3aed, #be185d, #f59e0b, #be185d, #7c3aed);
@@ -60,64 +73,62 @@
     animation: brand-shift 6s ease infinite;
   }
   .gradient-brand-text {
-    background: linear-gradient(135deg, #a78bfa 0%, #f472b6 45%, #fbbf24 100%);
+    background: linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-fate-text {
+    background: linear-gradient(135deg, #f9a8d4 0%, #e879f9 40%, #c084fc 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* 글래스 계열 */
+  /* 글래스 */
   .glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.055);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
   .glass-strong {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.09);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border: 1px solid rgba(255, 255, 255, 0.12);
   }
-  /* 안쪽 상단 하이라이트 + 미묘한 rose tint */
   .glass-card {
     background: linear-gradient(
       160deg,
       rgba(255, 255, 255, 0.07) 0%,
-      rgba(180, 30, 100, 0.04) 50%,
+      rgba(190, 24, 93, 0.04) 50%,
       rgba(255, 255, 255, 0.03) 100%
     );
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid rgba(255, 255, 255, 0.09);
     box-shadow:
-      0 4px 32px rgba(0, 0, 0, 0.35),
+      0 4px 32px rgba(0, 0, 0, 0.40),
       inset 0 1px 0 rgba(255, 255, 255, 0.09),
-      inset 0 -1px 0 rgba(180, 30, 100, 0.08);
+      inset 0 -1px 0 rgba(190, 24, 93, 0.08);
   }
   .glass-rose {
-    background: linear-gradient(
-      145deg,
-      rgba(190, 24, 93, 0.12) 0%,
-      rgba(109, 40, 217, 0.08) 100%
-    );
+    background: linear-gradient(145deg, rgba(190, 24, 93, 0.12) 0%, rgba(109, 40, 217, 0.08) 100%);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(190, 24, 93, 0.20);
-    box-shadow: 0 4px 24px rgba(190, 24, 93, 0.10);
   }
 
   /* 버튼 */
   .btn-gradient {
     background: linear-gradient(135deg, #7c3aed 0%, #be185d 55%, #d97706 100%);
-    box-shadow: 0 4px 24px rgba(190, 24, 93, 0.40), 0 1px 0 rgba(255,255,255,0.15) inset;
+    box-shadow: 0 4px 24px rgba(190, 24, 93, 0.40), inset 0 1px 0 rgba(255,255,255,0.15);
     transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+    color: white;
   }
-  .btn-gradient:hover {
-    opacity: 0.93;
-    box-shadow: 0 6px 32px rgba(190, 24, 93, 0.55), 0 1px 0 rgba(255,255,255,0.15) inset;
-  }
-  .btn-gradient:active  { transform: scale(0.98); }
+  .btn-gradient:hover  { opacity: 0.93; box-shadow: 0 6px 32px rgba(190, 24, 93, 0.58), inset 0 1px 0 rgba(255,255,255,0.15); }
+  .btn-gradient:active { transform: scale(0.98); }
   .btn-gradient:disabled { opacity: 0.38; cursor: not-allowed; box-shadow: none; }
 
   .btn-gradient-animated {
@@ -126,24 +137,24 @@
     animation: brand-shift 5s ease infinite;
     box-shadow: 0 4px 28px rgba(190, 24, 93, 0.45);
     transition: transform 0.1s, box-shadow 0.2s;
+    color: white;
   }
-  .btn-gradient-animated:hover  { box-shadow: 0 6px 36px rgba(190, 24, 93, 0.60); }
+  .btn-gradient-animated:hover  { box-shadow: 0 6px 36px rgba(190, 24, 93, 0.62); }
   .btn-gradient-animated:active { transform: scale(0.98); }
   .btn-gradient-animated:disabled { opacity: 0.38; cursor: not-allowed; animation: none; }
 
-  /* glow 애니메이션 */
-  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
-  .animate-star       { animation: star-twinkle 2s ease-in-out infinite; }
-
-  /* 컨페티 */
-  .confetti-fall { animation: confetti-fall linear forwards; }
+  /* 특수 효과 */
+  .animate-pulse-glow  { animation: pulse-glow 3s ease-in-out infinite; }
+  .animate-star        { animation: star-twinkle 2s ease-in-out infinite; }
+  .animate-float       { animation: float-gentle 4s ease-in-out infinite; }
+  .confetti-fall       { animation: confetti-fall linear forwards; }
 
   /* bg-app */
   .bg-app {
     background:
-      radial-gradient(ellipse 90% 55% at 10%  -5%,  rgba(120, 40, 200, 0.45) 0%, transparent 55%),
-      radial-gradient(ellipse 70% 45% at 90%  -5%,  rgba(190, 30, 100, 0.35) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 50% 110%,  rgba(100, 20, 160, 0.30) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 10%  -5%,  rgba(120, 40, 200, 0.40) 0%, transparent 55%),
+      radial-gradient(ellipse  75% 50% at 90%  -5%,  rgba(190, 30, 100, 0.30) 0%, transparent 50%),
+      radial-gradient(ellipse  65% 45% at 50% 110%,  rgba(100, 20, 160, 0.28) 0%, transparent 55%),
       #060612;
   }
 
@@ -151,10 +162,6 @@
   .safe-area-padding {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
   }
-  .pb-safe {
-    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
-  }
+  .pb-safe { padding-bottom: max(2.5rem, env(safe-area-inset-bottom)); }
 }

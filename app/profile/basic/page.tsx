@@ -52,7 +52,7 @@ export default function BasicInfoPage() {
   return (
     <div className="flex flex-col min-h-screen px-5 pb-10">
       <div className="mb-7">
-        <h1 className="text-2xl font-black">기본 정보</h1>
+        <h1 className="text-2xl font-black gradient-fate-text">기본 정보</h1>
         <p className="text-sm text-gray-500 mt-1">매칭에 활용되는 정보야. 솔직하게 적어줘.</p>
       </div>
 

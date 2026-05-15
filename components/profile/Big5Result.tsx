@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { Palette, ClipboardCheck, Zap, Heart, Waves, type LucideIcon } from 'lucide-react'
 import type { Big5Scores } from './Big5Survey'
 
 interface Props {
@@ -14,7 +15,8 @@ const TRAITS = [
   {
     key: 'openness' as keyof Big5Scores,
     label: '개방성',
-    emoji: '🎨',
+    Icon: Palette,
+    iconBg: 'from-violet-600 to-fuchsia-600',
     color: '#7c3aed',
     low: '안정적이고 익숙한 것을 선호해',
     high: '새로운 경험과 창의성을 즐겨',
@@ -22,7 +24,8 @@ const TRAITS = [
   {
     key: 'conscientiousness' as keyof Big5Scores,
     label: '성실성',
-    emoji: '📋',
+    Icon: ClipboardCheck,
+    iconBg: 'from-blue-600 to-cyan-600',
     color: '#2563eb',
     low: '자유롭고 유연한 편이야',
     high: '계획적이고 책임감이 강해',
@@ -30,7 +33,8 @@ const TRAITS = [
   {
     key: 'extraversion' as keyof Big5Scores,
     label: '외향성',
-    emoji: '🎉',
+    Icon: Zap,
+    iconBg: 'from-orange-500 to-amber-500',
     color: '#ea580c',
     low: '혼자만의 시간을 소중히 여겨',
     high: '사람들과 어울릴 때 에너지가 넘쳐',
@@ -38,7 +42,8 @@ const TRAITS = [
   {
     key: 'agreeableness' as keyof Big5Scores,
     label: '친화성',
-    emoji: '🤝',
+    Icon: Heart,
+    iconBg: 'from-emerald-600 to-teal-600',
     color: '#059669',
     low: '독립적이고 솔직한 편이야',
     high: '배려심이 깊고 협력을 잘해',
@@ -46,7 +51,8 @@ const TRAITS = [
   {
     key: 'neuroticism' as keyof Big5Scores,
     label: '감수성',
-    emoji: '🌊',
+    Icon: Waves,
+    iconBg: 'from-rose-600 to-pink-600',
     color: '#e11d48',
     low: '감정이 안정적이고 여유로워',
     high: '감수성이 풍부하고 섬세해',
@@ -95,7 +101,9 @@ export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
             <div key={t.key} className="glass rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">{t.emoji}</span>
+                  <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${t.iconBg} flex items-center justify-center flex-shrink-0`}>
+                    <t.Icon className="w-4 h-4 text-white" strokeWidth={2} />
+                  </div>
                   <span className="text-sm font-bold">{t.label}</span>
                 </div>
                 <span className="text-sm font-black tabular-nums" style={{ color: t.color }}>

@@ -97,7 +97,7 @@ export default function PhotosPage() {
   return (
     <div className="flex flex-col min-h-screen px-5 pb-10">
       <div className="mb-7">
-        <h1 className="text-2xl font-black">사진 등록</h1>
+        <h1 className="text-2xl font-black gradient-fate-text">사진 등록</h1>
         <p className="text-sm text-gray-500 mt-1">AI가 사진으로 외모를 분석해. 얼굴이 잘 보이는 사진으로 올려줘.</p>
       </div>
 

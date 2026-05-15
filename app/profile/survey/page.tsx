@@ -86,7 +86,7 @@ export default function SurveyPage() {
   return (
     <div className="flex flex-col min-h-screen px-5 pb-10">
       <div className="mb-7">
-        <h1 className="text-2xl font-black">성격 테스트</h1>
+        <h1 className="text-2xl font-black gradient-fate-text">성격 테스트</h1>
         <p className="text-sm text-gray-500 mt-1">
           {phase === 'survey'
             ? '나랑 잘 맞는 사람을 찾기 위한 5가지 성격 특성 테스트야.'

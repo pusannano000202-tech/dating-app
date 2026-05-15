@@ -3,63 +3,58 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { isSupabaseConfigured } from '@/lib/utils'
+import DestinyLogo from '@/components/DestinyLogo'
+import MatchingPool from '@/components/MatchingPool'
 
 function LandingPage() {
   return (
-    <main className="flex flex-col items-center min-h-screen px-5 pt-14 pb-10 overflow-hidden">
+    <main className="flex flex-col items-center min-h-screen px-5 pt-12 pb-16 overflow-hidden">
 
-      {/* 배경 glow orbs */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-20%] w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-20%] w-[400px] h-[400px] rounded-full bg-fuchsia-600/20 blur-[100px]" />
+      {/* 배경 강화 glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] left-[-20%]  w-[600px] h-[600px] rounded-full bg-violet-700/25  blur-[160px]" />
+        <div className="absolute top-[-10%] right-[-20%] w-[450px] h-[450px] rounded-full bg-rose-700/20    blur-[130px]" />
+        <div className="absolute bottom-[-15%] left-1/2  -translate-x-1/2 w-[500px] h-[400px] rounded-full bg-purple-800/18 blur-[140px]" />
+        <div className="absolute top-[40%] right-[5%]   w-[180px] h-[180px] rounded-full bg-amber-600/6   blur-[70px]" />
       </div>
 
       <div className="relative w-full max-w-sm flex flex-col items-center">
 
-        {/* 배지 */}
-        <div className="glass rounded-full px-4 py-1.5 text-xs font-semibold text-violet-300 mb-8 tracking-wide">
-          🎓 부산대에서 시작하는 그룹미팅
+        {/* 로고 */}
+        <div className="flex flex-col items-center mb-8 animate-float">
+          <DestinyLogo size={52} className="mb-3" />
+          <h1 className="font-destiny text-3xl font-bold tracking-wider gradient-brand-text">
+            Destiny
+          </h1>
         </div>
 
-        {/* 헤드라인 */}
-        <h1 className="text-5xl font-black text-center leading-[1.1] mb-4 tracking-tight">
-          지금,<br />
-          <span className="gradient-brand-text">과팅하자</span>
-        </h1>
-        <p className="text-center text-gray-400 text-base leading-relaxed mb-10">
-          친구들이랑 팀 짜고 보증금 걸면<br />
-          <span className="text-white font-medium">시간·장소까지 자동으로</span> 잡아줘
+        {/* 헤드라인 — Manus 카피 */}
+        <h2 className="text-[28px] font-black text-center leading-[1.2] mb-3 tracking-tight">
+          당신의 인연이<br />
+          <span className="gradient-fate-text">여기서 시작됩니다</span>
+        </h2>
+        <p className="text-center text-gray-400 text-sm leading-relaxed mb-10">
+          운명적인 만남을 기다리고 있어요<br />
+          <span className="text-white/70 font-medium">시간·장소까지 자동으로</span> 잡아줘
         </p>
 
-        {/* 미니 카드 프리뷰 */}
-        <div className="w-full mb-10 relative h-36">
-          {/* 뒤 카드 */}
-          <div className="glass absolute left-0 right-8 top-3 bottom-0 rounded-3xl" />
-          {/* 앞 카드 */}
-          <div className="glass-strong absolute left-4 right-0 top-0 bottom-3 rounded-3xl p-4 flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center text-2xl flex-shrink-0">
-              🎯
-            </div>
-            <div>
-              <p className="text-sm font-bold mb-0.5">매칭 확정!</p>
-              <p className="text-xs text-gray-400">금요일 저녁 7시</p>
-              <p className="text-xs text-gray-400">서면 카페거리</p>
-            </div>
-            <div className="ml-auto">
-              <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center text-sm">✓</div>
-            </div>
-          </div>
+        {/* ── Soul Orbs 매칭 풀 시각화 ── */}
+        <div className="glass-card rounded-3xl p-6 w-full mb-8 flex flex-col items-center">
+          <MatchingPool />
         </div>
 
-        {/* 차별점 */}
-        <div className="w-full flex flex-col gap-2.5 mb-10">
+        {/* 차별점 3가지 */}
+        <div className="w-full flex flex-col gap-2 mb-8">
           {[
-            { icon: '🙈', title: '프로필 비공개', desc: '만날 때까지 상대 사진 안 보여요' },
-            { icon: '⚡', title: '자동 확정', desc: '채팅 없이 시간·장소 바로 확정' },
-            { icon: '💰', title: '보증금으로 노쇼 방지', desc: '출석하면 환불, 노쇼는 상대방에게 보상' },
-          ].map(({ icon, title, desc }) => (
+            { color: '#a78bfa', title: '프로필 비공개', desc: '만날 때까지 상대 사진 안 보여요' },
+            { color: '#f472b6', title: '자동 확정',     desc: '채팅 없이 시간·장소 바로 확정' },
+            { color: '#fbbf24', title: '보증금 노쇼 방지', desc: '출석하면 환불, 노쇼는 상대방에게 보상' },
+          ].map(({ color, title, desc }) => (
             <div key={title} className="glass rounded-2xl px-4 py-3 flex items-center gap-3">
-              <span className="text-2xl">{icon}</span>
+              <div
+                className="w-2 h-8 rounded-full flex-shrink-0"
+                style={{ background: color, boxShadow: `0 0 10px ${color}` }}
+              />
               <div>
                 <p className="text-sm font-bold">{title}</p>
                 <p className="text-xs text-gray-500">{desc}</p>
@@ -71,11 +66,11 @@ function LandingPage() {
         {/* CTA */}
         <Link
           href="/login"
-          className="btn-gradient w-full py-4 rounded-2xl font-bold text-lg text-center block shadow-lg shadow-violet-900/40"
+          className="btn-gradient-animated w-full py-4 rounded-2xl font-bold text-lg text-center block"
         >
-          무료로 시작하기
+          인연 찾기
         </Link>
-        <p className="mt-3 text-xs text-gray-600">휴대폰 번호로 10초 가입</p>
+        <p className="mt-3 text-xs text-gray-600">휴대폰 번호로 10초 가입 · 무료</p>
 
       </div>
     </main>
@@ -98,23 +93,15 @@ export default async function Home() {
   const { data: profile } = await supabase
     .from('profiles')
     .select(`
-      is_profile_complete,
-      appearance_type,
-      gender,
-      big5_openness,
-      available_timeslots,
-      preference_weights
+      is_profile_complete, appearance_type, gender,
+      big5_openness, available_timeslots, preference_weights
     `)
     .eq('user_id', user.id)
     .single()
 
-  if (profile?.is_profile_complete) {
-    redirect('/group/create')
-  }
-
-  // 첫 번째 미완성 단계로 이동
-  if (!profile?.appearance_type) redirect('/profile/worldcup')
-  if (!profile?.gender) redirect('/profile/basic')
+  if (profile?.is_profile_complete) redirect('/group/create')
+  if (!profile?.appearance_type)    redirect('/profile/worldcup')
+  if (!profile?.gender)             redirect('/profile/basic')
 
   const { count } = await supabase
     .from('photos')

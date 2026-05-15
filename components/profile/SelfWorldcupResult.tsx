@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Sparkles, Star, Crosshair } from 'lucide-react'
 
 /**
  * 자기유사 월드컵 결과 화면.
@@ -15,13 +16,14 @@ interface Props {
 }
 
 const MESSAGES = [
-  { emoji: '✨', text: '나를 잘 알고 있네!' },
-  { emoji: '💫', text: '솔직하게 골랐어?' },
-  { emoji: '🎯', text: '딱 맞는 선택이야!' },
+  { Icon: Sparkles, text: '나를 잘 알고 있네!' },
+  { Icon: Star,     text: '솔직하게 골랐어?' },
+  { Icon: Crosshair, text: '딱 맞는 선택이야!' },
 ]
 
 export default function SelfWorldcupResult({ saving, saveError, onConfirm, onRetry }: Props) {
-  const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)]
+  const [msgIdx] = useState(() => Math.floor(Math.random() * MESSAGES.length))
+  const { Icon, text } = MESSAGES[msgIdx]
 
   // Enter: 확정, R: 다시하기
   useEffect(() => {
@@ -43,12 +45,12 @@ export default function SelfWorldcupResult({ saving, saveError, onConfirm, onRet
       </div>
 
       <div className="relative text-center max-w-xs w-full">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl gradient-brand mb-6 shadow-2xl shadow-violet-900/50">
-          <span className="text-5xl">{msg.emoji}</span>
+        <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl gradient-brand mb-6 shadow-2xl shadow-violet-900/50 border border-white/10">
+          <Icon className="w-12 h-12 text-white" strokeWidth={1.5} />
         </div>
 
-        <h1 className="text-2xl font-black mb-2">완료!</h1>
-        <p className="text-gray-400 text-sm mb-2">{msg.text}</p>
+        <h1 className="text-2xl font-black gradient-fate-text mb-2">완료!</h1>
+        <p className="text-gray-400 text-sm mb-2">{text}</p>
         <p className="text-xs text-gray-600 mb-8">
           이 결과는 매칭 알고리즘에만 사용돼. 상대방에게 공개되지 않아.
         </p>
