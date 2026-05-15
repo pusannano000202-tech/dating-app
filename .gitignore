@@ -28,3 +28,10 @@ Thumbs.db
 # Supabase
 supabase/.branches/
 supabase/.temp/
+
+# Claude Code / 도구 내부 파일
+.claude/
+.superpowers/
+
+# 빌드 캐시
+tsconfig.tsbuildinfo
