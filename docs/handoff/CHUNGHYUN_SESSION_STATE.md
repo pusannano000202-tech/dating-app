@@ -197,3 +197,8 @@ profile/appearance-ai ← AI 서버 완료, 머지 대기
   - 여자 32장 생성 완료 (`public/appearance-self/female/`)
   - 남자 32장 생성 완료 (`public/appearance-self/male/`)
   - 전체 검수 카탈로그 갱신 (`public/appearance-self/CATALOG.html`)
+- 2026-05-15 설계 추가:
+  - 자기유사 월드컵을 총 128장으로 확장하기 위한 설계표 작성
+  - 여자 64행 + 남자 64행
+  - 파일: `public/appearance-self/DESIGN_128.md`, `public/appearance-self/DESIGN_128.html`
+  - 아직 128장 이미지를 새로 생성한 것은 아니며, 다음 생성 작업은 이 설계표를 따라 진행해야 함
