@@ -45,7 +45,7 @@ export default function WorldcupPage() {
         .upsert({ user_id: user.id, appearance_type: winner }, { onConflict: 'user_id' })
       if (error) throw error
 
-      router.push('/profile/basic')
+      router.push('/profile/self-worldcup')
     } catch {
       setSaveError('저장 중 오류가 발생했어요. 다시 시도해줘.')
     } finally {

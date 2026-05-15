@@ -44,8 +44,11 @@ export interface MatchingProfile {
   age: number
   height: number | null
   body_type: BodyType | null
-  appearance_score_normalized: number // 0~1
+  appearance_score_normalized: number // 0~1, AI 외모 점수 정규화값
   appearance_type: AppearanceType | null
+  // 자기유사 월드컵 결과 (0~100 백분위). 사용자에게 절대 노출 금지.
+  // 매칭 계산: A.appearance_type vs B.self_appearance_score (양방향)
+  self_appearance_score: number | null
   big5: {
     openness: number
     conscientiousness: number
