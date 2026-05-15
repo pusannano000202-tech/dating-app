@@ -316,6 +316,74 @@ pytest tests/ -v
 
 ---
 
+---
+
+### [2026-05-15] 세션 #6 — Claude 출력 (Codex 이미지 인수인계 후 자기유사 월드컵 구현)
+
+**Codex 작업물 검수 결과:**
+
+| 항목 | 결과 |
+|------|------|
+| `public/appearance-self/female/*.jpg` | 32장 확인 ✅ |
+| `public/appearance-self/male/*.jpg` | 32장 확인 ✅ |
+| `public/appearance-self/CATALOG.html` | 점수순 64장 내부 검수 카탈로그 정상 ✅ |
+| `public/appearance-self/SCORE_GUIDE.md` | 백분위 기준 문서 정상 ✅ |
+| `public/appearance-self/female/METADATA.md` | 32장 점수 테이블 정상 ✅ |
+| `public/appearance-self/male/METADATA.md` | 32장 점수 테이블 정상 ✅ |
+
+컴포넌트에서 사용하는 16장(female 8 + male 8) 파일 존재 여부 전수 확인 완료 — 전부 OK.
+
+**완료한 구현 작업 (커밋: `bc18e9e`, `9ea3b3c`):**
+
+| 파일 | 설명 |
+|------|------|
+| `components/profile/AppearanceSelfWorldcup.tsx` | 자기유사 월드컵 컴포넌트. gender별 8장 stratified 샘플링, 8강 토너먼트. 점수 UI 노출 없음. |
+| `components/profile/SelfWorldcupResult.tsx` | 결과 화면. 점수 미노출, "이 결과는 매칭 알고리즘에만 사용돼" 안내. Enter/R 단축키. |
+| `app/profile/self-worldcup/page.tsx` | gender 로딩 → 토너먼트 → profiles.self_appearance_score 저장 → /profile/basic |
+| `components/profile/StepProgress.tsx` | '내외모' 스텝 추가 (이상형 다음, 7단계로 변경) |
+| `app/profile/worldcup/page.tsx` | 완료 후 `/profile/basic` → `/profile/self-worldcup` 으로 변경 |
+| `app/profile/complete/page.tsx` | 완료 체크리스트에 '내 외모 스타일' 추가 |
+| `app/profile/edit/page.tsx` | 편집 섹션에 자기유사 월드컵 항목 추가 |
+| `lib/types.ts` | `MatchingProfile`에 `self_appearance_score: number \| null` 추가 ⚠️ 성준 리뷰 필요 |
+| `supabase/migrations/20260515_profile_add_self_appearance_score.sql` | `profiles.self_appearance_score FLOAT (0~100)` 컬럼 추가 ⚠️ 성준 리뷰 후 main 머지 |
+
+**이미지 선택 전략 (stratified sampling):**
+
+```
+Female 8장 (32장 중 선별): 20, 30, 40, 50, 60, 68, 76, 86점
+Male   8장 (32장 중 선별): 20, 30, 40, 50, 60, 68, 76, 82점
+
+시딩 방식: 점수 상하위가 초반에 맞붙음
+8강: [86 vs 20], [76 vs 30], [68 vs 40], [60 vs 50]
+→ 사용자가 빠르게 자신의 구간을 좁힘 (7번의 클릭으로 완료)
+```
+
+**현재 전체 프로필 플로우:**
+
+```
+/profile/worldcup      → appearance_type 저장 (이성 이상형)    ✅
+/profile/self-worldcup → self_appearance_score 저장 (자기유사) ✅ (NEW)
+/profile/basic         → gender/age/height 등 저장             ✅
+/profile/photos        → Storage 업로드 + AI 트리거            ✅
+/profile/survey        → big5_* 5개 컬럼 저장                  ✅
+/profile/schedule      → available_timeslots 저장              ✅
+/profile/preferences   → preference_weights 저장               ✅
+/profile/complete      → 완료 → /group/create                  ✅
+```
+
+**성준에게 알려야 할 사항:**
+
+- `lib/types.ts`의 `MatchingProfile`에 `self_appearance_score: number | null` 추가됨
+- DB 컬럼: `profiles.self_appearance_score FLOAT CHECK (BETWEEN 0 AND 100)`
+- 매칭 방향: A의 `appearance_type`(이상형 선호) vs B의 `self_appearance_score`(자기 외모 백분위), 양방향
+- PR 리뷰 필요: `profile/worldcup-ui` 브랜치의 위 두 파일
+
+**Codex에게 남은 작업:**
+
+없음. Codex 이미지 생성 완료 → Claude 구현 완료.
+
+---
+
 ## 공통 규칙
 
 - 서로의 섹션을 덮어쓰지 않는다
