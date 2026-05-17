@@ -399,6 +399,69 @@ Male   8장 (32장 중 선별): 20, 30, 40, 50, 60, 68, 76, 82점
 
 ---
 
+## Claude 출력 (Claude → Codex에게)
+
+### [2026-05-17] 세션 #7 — 현황 정리 + 협업 프로토콜 수립
+
+**배경:**
+Claude Code와 Codex가 병렬 작업하면서 용어 혼용, 인수인계 누락 문제가 계속 발생함.
+이를 해결하기 위해 이번 세션에서 협업 프로토콜과 현재 상태 문서를 정비함.
+
+**새로 만든 파일:**
+- `docs/SYNC_PROTOCOL.md` — 모든 세션 시작/종료 시 따라야 할 규칙
+- `docs/CURRENT_STATE.md` — 단일 진실 소스 (현재 상태, 진행 중, 다음 할 일)
+- `부산대_과팅앱_v1.5_정의서.md` — 외모 벡터 시스템 확정 포함
+
+**핵심 결정 (Codex 필독):**
+
+① `self_appearance_score` (단일 숫자) → `self_appearance_vector` (6차원 JSON)으로 설계 확정
+```
+{
+  cute: 80,     // 귀여움 유사도
+  pure: 30,     // 청순함 유사도
+  chic: 10,     // 시크함 유사도
+  warm: 70,     // 따뜻함 유사도
+  stylish: 20,  // 스타일리시함 유사도
+  healthy: 40   // 건강미 유사도
+}
+```
+→ 각 이미지(F01~F64, M01~M64)마다 이 6차원 점수를 METADATA에 기록해야 함
+→ 기록 후 Claude Code가 types.ts PR 및 DB 마이그레이션 진행 예정
+
+② 현재 GitHub 상태 확인 결과:
+- female-64/: 16장만 push됨 (F01,F02,F05,F08,F11,F16,F21,F22,F26,F27,F28,F29,F31,F54,F59,F63)
+- male-64/: 아직 없음
+- 노트북 로컬에 더 만든 이미지가 있다면 먼저 push 부탁
+
+**Codex에게 요청:**
+
+1. **[즉시] 노트북 로컬 이미지 push**
+   - `feature/codex/images-128` 브랜치 생성 후 push
+   - female-64/, male-64/ 폴더 전체 올리기
+
+2. **female-64 나머지 48슬롯 완성** (DESIGN_128.md 기준)
+   - 현재 없는 슬롯: F03,F04,F06,F07,F09,F10,F12~F15,F17~F20,F23~F25,F30,F32~F53,F55~F58,F60~F62,F64
+
+3. **male-64 64슬롯 전체 생성** (DESIGN_128.md 기준, M01~M64)
+
+4. **벡터 METADATA 작성** (신규 형식)
+   - 위치: `public/appearance-self/female-64/METADATA.md`, `public/appearance-self/male-64/METADATA.md`
+   - 형식:
+   ```
+   | ID  | 점수 | cute | pure | chic | warm | stylish | healthy |
+   |-----|------|------|------|------|------|---------|---------|
+   | F01 | 20   | 15   | 10   | 5    | 20   | 8       | 12      |
+   ```
+
+5. **작업 완료 후**: `docs/CURRENT_STATE.md`의 "진행 중" 섹션 업데이트 + push
+
+**주의:**
+- `lib/types.ts`, `supabase/migrations/` 건드리지 말 것 (Claude Code가 PR로 처리)
+- 성준 영역(`python/matching/`, `app/group/`, `app/match/`) 건드리지 말 것
+- 매 작업 단위마다 commit + push (중간에 끊겨도 이어받을 수 있게)
+
+---
+
 ## 공통 규칙
 
 - 서로의 섹션을 덮어쓰지 않는다
