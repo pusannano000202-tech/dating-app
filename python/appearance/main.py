@@ -16,8 +16,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, field_validator, HttpUrl
 
-from model import build_model, score_photos
+from model import build_model, score_photos, load_image_from_url
 from supabase_client import save_appearance_score
+from clip_classifier import load_clip_model, classify_type, get_top_type
 
 load_dotenv()
 
@@ -43,6 +44,7 @@ async def lifespan(app: FastAPI):
     logger.info("외모 AI 모델 로딩 중...")
     _model = build_model(weights_path if weights_path else None)
     logger.info("외모 AI 모델 로드 완료 (weights=%s)", weights_path or "ImageNet pretrained")
+    load_clip_model()
     yield
     _model = None
     logger.info("서버 종료")
@@ -137,6 +139,63 @@ async def score_photos_endpoint(
     except Exception as e:
         logger.exception("점수 산출 실패: req_id=%s user_id=%s", req_id, req.user_id)
         return ScoreResponse(status="error", message="점수 산출 중 오류가 발생했습니다")
+
+
+class AnalyzeRequest(BaseModel):
+    photo_url: str
+    gender: str = "female"
+
+    @field_validator("gender")
+    @classmethod
+    def validate_gender(cls, v: str) -> str:
+        if v not in ("female", "male"):
+            raise ValueError("gender는 'female' 또는 'male'")
+        return v
+
+    @field_validator("photo_url")
+    @classmethod
+    def validate_url(cls, v: str) -> str:
+        if not v.startswith(("https://", "http://")):
+            raise ValueError("유효하지 않은 URL")
+        return v
+
+
+class AnalyzeResponse(BaseModel):
+    status: str
+    appearance_score: float | None = None   # 0~100 절대외모점수
+    top_type: str | None = None             # 최고점 타입
+    type_scores: dict | None = None         # 타입별 점수 (합계 100)
+    message: str | None = None
+
+
+@app.post("/api/analyze", response_model=AnalyzeResponse)
+async def analyze_endpoint(req: AnalyzeRequest) -> AnalyzeResponse:
+    """
+    성능 테스트용 — 사진 1장 URL을 받아 절대외모점수 + 타입 분류 결과를 즉시 반환.
+    (실서비스용 /api/score-photos 와 달리 결과를 응답에 포함함)
+    """
+    if _model is None:
+        raise HTTPException(status_code=503, detail="모델이 준비되지 않았습니다")
+    try:
+        img = load_image_from_url(req.photo_url)
+
+        # 절대외모점수
+        from model import score_image
+        score = score_image(_model, img)
+
+        # 타입 분류
+        type_scores = classify_type(img, gender=req.gender)
+        top = get_top_type(type_scores)
+
+        return AnalyzeResponse(
+            status="ok",
+            appearance_score=round(score, 1),
+            top_type=top,
+            type_scores=type_scores,
+        )
+    except Exception as e:
+        logger.exception("analyze 실패: %s", e)
+        return AnalyzeResponse(status="error", message=str(e))
 
 
 @app.get("/health")
