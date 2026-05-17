@@ -1,10 +1,14 @@
 """
-ResNet50-based facial beauty scorer trained on SCUT-FBP5500.
+ResNet-18 based facial beauty scorer trained on SCUT-FBP5500.
 Outputs a raw score in [0, 100].
+
+가중치: Hugging Face - Gustrd/SCUT-FBP5500-PyTorch-Model (resnet18_py3.pth)
+서버 최초 실행 시 자동 다운로드, 이후 로컬 캐시 사용.
 """
 import os
 import logging
 from io import BytesIO
+from pathlib import Path
 
 import torch
 import torch.nn as nn
@@ -14,7 +18,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-SCORE_MIN = 1.0  # SCUT-FBP5500 label range
+SCORE_MIN = 1.0  # SCUT-FBP5500 레이블 범위
 SCORE_MAX = 5.0
 
 _DOWNLOAD_TIMEOUT = int(os.getenv("IMAGE_DOWNLOAD_TIMEOUT", "15"))
@@ -31,24 +35,67 @@ _HEADERS = {
     "User-Agent": "AppearanceAI/1.0 (scoring-bot)",
 }
 
+_HF_WEIGHTS_URL = (
+    "https://huggingface.co/Gustrd/SCUT-FBP5500-PyTorch-Model"
+    "/resolve/main/resnet18_py3.pth"
+)
+_DEFAULT_WEIGHTS_PATH = Path("weights/resnet18_scut.pth")
+
+
+def _download_weights(dest: Path) -> None:
+    """Hugging Face에서 SCUT 가중치 자동 다운로드"""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    logger.info("SCUT 가중치 다운로드 중 (최초 1회): %s", _HF_WEIGHTS_URL)
+    resp = requests.get(_HF_WEIGHTS_URL, timeout=120, stream=True)
+    resp.raise_for_status()
+    with open(dest, "wb") as f:
+        for chunk in resp.iter_content(chunk_size=65536):
+            f.write(chunk)
+    logger.info("가중치 다운로드 완료: %s (%.1f MB)", dest, dest.stat().st_size / 1e6)
+
 
 def build_model(weights_path: str | None = None) -> nn.Module:
-    model = models.resnet50(weights=None)
+    """
+    ResNet-18 모델 빌드.
+    우선순위: 환경변수 경로 > 로컬 캐시 > HF 자동 다운로드 > ImageNet fallback
+    """
+    model = models.resnet18(weights=None)
     model.fc = nn.Linear(model.fc.in_features, 1)
 
-    if weights_path and os.path.exists(weights_path):
-        logger.info("학습된 가중치 로드: %s", weights_path)
-        state = torch.load(weights_path, map_location="cpu", weights_only=True)
-        model.load_state_dict(state)
-    else:
-        logger.warning("가중치 파일 없음 — ImageNet pretrained backbone 사용 (점수 정확도 낮음)")
-        backbone = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
-        backbone.fc = nn.Linear(backbone.fc.in_features, 1)
-        nn.init.xavier_uniform_(backbone.fc.weight)
-        nn.init.zeros_(backbone.fc.bias)
-        model = backbone
+    path = Path(weights_path) if weights_path else _DEFAULT_WEIGHTS_PATH
 
+    if not path.exists():
+        try:
+            _download_weights(path)
+        except Exception as e:
+            logger.warning(
+                "가중치 다운로드 실패: %s — ImageNet backbone으로 fallback (점수 의미 없음)", e
+            )
+            backbone = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+            backbone.fc = nn.Linear(backbone.fc.in_features, 1)
+            nn.init.xavier_uniform_(backbone.fc.weight)
+            nn.init.zeros_(backbone.fc.bias)
+            return backbone.eval()
+
+    logger.info("SCUT 가중치 로드: %s", path)
+    checkpoint = torch.load(path, map_location="cpu", weights_only=False)
+    state = checkpoint.get("state_dict", checkpoint)
+
+    # SCUT 공식 Nets.py의 키 형식을 torchvision ResNet-18 키로 변환
+    # group1.conv1 → conv1, group2.fullyconnected → fc
+    # layerN.M.group1.conv1 → layerN.M.conv1
+    def _remap(k: str) -> str:
+        k = k.replace("module.", "")
+        k = k.replace("group2.fullyconnected", "fc")
+        k = k.replace(".group1.", ".")
+        if k.startswith("group1."):
+            k = k[len("group1."):]
+        return k
+
+    state = {_remap(k): v for k, v in state.items()}
+    model.load_state_dict(state)
     model.eval()
+    logger.info("외모 AI 모델 로드 완료 (ResNet-18 + SCUT-FBP5500)")
     return model
 
 

@@ -1,6 +1,20 @@
 # 외모 AI 추론 서버
 
-충현 담당 모듈. SCUT-FBP5500 + ResNet50 기반 외모 점수 산출 후 Supabase에 저장.
+충현 담당 모듈. SCUT-FBP5500 + **ResNeXt-50** 기반 외모 점수 산출 후 Supabase에 저장.
+
+## 외모 절대점수 구현 전략 (2026-05-17 확정)
+
+**1단계 (현재):** SCUT-FBP5500 공식 가중치 (ResNeXt-50) 적용  
+→ 공식 레포: https://github.com/HCIILAB/SCUT-FBP5500-Database-Release  
+→ 가중치 파일: `weights/resnext50_scut.pth`
+
+**2단계 (출시 전):** 한국인 보정 레이어 추가  
+→ SCUT 점수를 한국 대학생 기준으로 calibration
+
+**3단계 (출시 후):** 실서비스 데이터로 fine-tuning  
+→ 자체 한국형 외모 평가 모델로 진화
+
+> ResNet50 → ResNeXt-50으로 변경한 이유: 공식 SCUT 가중치가 ResNeXt-50으로 학습됨
 
 ## 실행
 
@@ -63,7 +77,9 @@ python test_server.py
 
 ## 모델 가중치
 
-`weights/resnet50_scut.pth` 위치에 SCUT-FBP5500으로 파인튜닝된 가중치 파일을 넣으면 된다.
-파일이 없으면 ImageNet pretrained backbone으로 동작 (개발/테스트용).
+`weights/resnext50_scut.pth` 위치에 SCUT-FBP5500 공식 가중치 파일을 넣으면 된다.  
+파일이 없으면 ImageNet pretrained backbone으로 동작 (개발/테스트용, 점수 의미 없음).
 
 가중치 파일은 용량이 크므로 Git에 포함하지 않는다. 별도 공유.
+
+**공식 가중치 출처:** https://github.com/HCIILAB/SCUT-FBP5500-Database-Release (trained_models_for_pytorch/)
