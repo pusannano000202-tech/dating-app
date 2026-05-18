@@ -1,0 +1,11 @@
+Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.
+
+ID: FI16. Target score sense: 88, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 청순/자연형. Subtype: 최상위 청순. Core intent: 매우 균형 잡힌 청순형, 맑은 눈과 깨끗한 분위기, 비현실적 인형 피부 금지.
+
+Required visual anchors: face shape: 부드러운 계란형; eye impression: 투명한 눈매; hair: 자연 웨이브; clothing: 아이보리 셔츠; expression: 고요한 미소; background/lighting: 깨끗한 자연광.
+
+Precise facial and style details: eyes: 투명한 중대형 눈, 눈꼬리 내려감, 얇은 쌍꺼풀. Brows/nose: 옅은 곡선 눈썹, 중간 콧대, 코끝 둥근 편. Mouth/ears: 중간 입, 부드러운 미소, 귀 가림. Hair details: 애쉬브라운 기운, 자연 웨이브, 이마 일부 노출. Neck/shoulders/outfit silhouette: 긴 목선, 아이보리 셔츠, 어깨선 좁음.
+
+Differentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.
+
+No text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look.

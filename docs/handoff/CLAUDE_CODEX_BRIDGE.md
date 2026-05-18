@@ -399,6 +399,253 @@ Male   8장 (32장 중 선별): 20, 30, 40, 50, 60, 68, 76, 82점
 
 ---
 
+### [2026-05-18] 세션 #7 — Claude 출력 (이상형 월드컵 measured vector 구조 구현)
+
+`docs/handoff/CLAUDE_IDEAL_WORLDCUP_MEASURED_VECTOR_PROMPT.md` 인수인계 그대로 따라서 구현했다. 핵심은 **"생성은 target 기준, 선별과 매칭은 measured 기준"**.
+
+**작업 전 읽은 문서:**
+- `docs/IDEAL_WORLDCUP_64_DESIGN.md`
+- `docs/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md`
+- `docs/APPEARANCE_ANALYSIS_GPT_PROMPT.md`
+- `docs/APPEARANCE_ANALYSIS_SCHEMA.md`
+- `docs/APPEARANCE_VECTOR_CALIBRATION.md`
+- `public/appearance-self/SCORE_GUIDE.md` (점수 정의 single source of truth)
+
+**1. 수정/생성한 파일 목록**
+
+| 파일 | 종류 | 내용 |
+|---|---|---|
+| `public/appearance-ideal/METADATA.json` | 생성 (fixture) | target/measured/final_bucket/review 구조. Codex가 실제 분석 결과로 교체 필요. 현재 샘플 8개. |
+| `lib/appearance/vector.ts` | 생성 | 13축/12축 정의, cosine/mean/weighted_mean/sub, female/male bucket_score 공식 |
+| `lib/appearance/metadata.ts` | 생성 | METADATA.json 로더, active 필터, pool_mean 계산 |
+| `lib/appearance/preference.ts` | 생성 | ChoiceLog, computePreference (라운드 가중 평균, delta, choice_delta) |
+| `lib/appearance/bucket-to-legacy.ts` | 생성 | 새 8버킷 → 기존 6 enum 임시 매핑 (호환 레이어) |
+| `components/profile/IdealWorldcup.tsx` | 생성 | measured 기반 N강 토너먼트. 카드 위 라벨/점수 노출 0. |
+| `components/profile/IdealWorldcupResult.tsx` | 생성 | 결과 화면. preferred_vector raw 값 노출 금지, 추상적 메시지만. |
+| `app/profile/worldcup/page.tsx` | 수정 | IdealWorldcup + IdealWorldcupResult 사용, METADATA 로더, sessionStorage 임시 저장 |
+
+**2. 월드컵 UI가 읽는 데이터 소스**
+
+```
+public/appearance-ideal/METADATA.json
+└── items[]
+    ├── status === "active"  ← 이 조건만 통과한 이미지 사용
+    ├── measured.appearance_vector ← 매칭 입력 (필수)
+    ├── final_bucket ← bucket_weights 집계에 사용
+    └── file ← Next.js Image src
+```
+
+`target.*` 필드는 코드에서 읽지 않는다 (검수 흔적 보존용으로만 저장).
+
+**3. 선택 로그 저장 구조**
+
+```ts
+interface ChoiceLog {
+  round: '64강' | '32강' | '16강' | '8강' | '4강' | '결승' | '최종우승'
+  match_index: number
+  winner_id: string
+  loser_id: string
+  winner_vector: AppearanceVector       // 검수용 — measured 그대로
+  loser_vector: AppearanceVector
+  choice_delta_vector: AppearanceVector // winner - loser
+  weight: number                         // 라운드 가중치
+  created_at: string
+}
+```
+
+라운드 가중치 표는 PLAN 문서 10-2 그대로:
+
+```
+64강 1.00, 32강 1.15, 16강 1.35, 8강 1.60, 4강 1.90, 결승 2.30, 최종우승 2.80
+```
+
+**4. `preferred_appearance_vector` 계산 방식**
+
+```
+preferred_appearance_vector
+= Σ(winner.measured.appearance_vector × round_weight) / Σ(round_weight)
++ final_winner.measured.appearance_vector × 2.80 (가중치 추가)
+```
+
+모든 라운드의 winner 벡터를 라운드 가중치로 가중 평균. 최종 우승자는 별도 2.80 가중치를 한 번 더 받는다.
+
+**5. `preferred_appearance_delta_vector` 계산 방식**
+
+```
+preferred_appearance_delta_vector
+= preferred_appearance_vector - worldcup_pool_mean_vector
+```
+
+`worldcup_pool_mean_vector` 는 성별별 active 풀의 measured_vector 산술 평균. 매번 계산 (캐시는 metadata loader 에서).
+
+이게 청순 쏠림 보정의 핵심이다. 풀이 청순함=0.69 로 치우쳐 있고 사용자 선택 평균도 0.72 면 delta=0.03 (약한 신호). 풀이 시크함=0.34 인데 선택 평균이 0.62 면 delta=0.28 (강한 신호).
+
+추가로 저장:
+
+- `preferred_choice_delta_vector` = Σ(choice_delta × weight) / Σ(weight). 보조 신호.
+- `preferred_score_range` = winner measured score 의 mean/min/max.
+- `preferred_bucket_weights` = winner.final_bucket 빈도 × 가중치 (정규화).
+
+**6. `target_type`을 매칭에 쓰지 않는다는 확인**
+
+- `lib/appearance/preference.ts` 의 `buildChoiceLog`, `computePreference` 어디서도 `target.*` 읽지 않음.
+- `lib/appearance/metadata.ts` 의 `selectActivePool` 도 `measured != null` 만 필터링.
+- `IdealWorldcup.tsx` 컴포넌트가 카드에 표시하는 텍스트 0개 (alt="", 오버레이 없음).
+- 결과 화면 `IdealWorldcupResult.tsx` 도 raw 벡터/점수/유형명 노출 없음. 추상 메시지만.
+
+**7. 검수 결과 (인수인계 문서 7번 체크리스트)**
+
+- [x] `target.type`을 선호 계산에 사용하지 않았는가
+- [x] `measured.appearance_vector`를 기준으로 계산하는가
+- [x] `pool_mean_vector`를 빼서 청순 쏠림을 보정하는가
+- [x] winner-loser delta를 저장하는가
+- [x] 사용자 UI에 점수/유형/키워드가 노출되지 않는가
+- [x] placeholder 이미지를 실제 취향 계산에 넣지 않는가 (measured=null 이면 풀 진입 자체 불가)
+- [x] 여자/남자 벡터 축이 다를 때 안전하게 처리하는가 (`gender` 파라미터 분기)
+- [x] 자기유사 월드컵 폴더(`public/appearance-self/`)를 건드리지 않았는가
+- [x] 대표 타입 이미지 폴더(`public/appearance-types/`)와 섞지 않았는가
+
+**8. 임시 처리 사항 (성준 리뷰 필요)**
+
+DB 컬럼 추가 마이그레이션은 만들지 않았다. 이상형 월드컵 결과는 현재 두 방식으로 저장된다:
+
+- **sessionStorage** (`ideal_worldcup_preference_v1`): 새 벡터 결과 전체. 페이지 이동 후 사용 가능.
+- **profiles.appearance_type** (기존 컬럼): `bucket_to_legacy.ts` 의 매핑으로 6 enum 호환 저장.
+
+성준 리뷰 후 추가해야 할 마이그레이션:
+
+```sql
+ALTER TABLE profiles
+  ADD COLUMN preferred_appearance_vector        jsonb,
+  ADD COLUMN preferred_appearance_delta_vector  jsonb,
+  ADD COLUMN preferred_choice_delta_vector      jsonb,
+  ADD COLUMN preferred_score_range              jsonb,
+  ADD COLUMN preferred_bucket_weights           jsonb,
+  ADD COLUMN worldcup_pool_mean_vector          jsonb;
+
+CREATE TABLE worldcup_choice_logs (
+  id          bigserial PRIMARY KEY,
+  user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  round       text NOT NULL,
+  match_index int NOT NULL,
+  winner_id   text NOT NULL,
+  loser_id    text NOT NULL,
+  winner_vector       jsonb NOT NULL,
+  loser_vector        jsonb NOT NULL,
+  choice_delta_vector jsonb NOT NULL,
+  weight              real NOT NULL,
+  created_at  timestamptz DEFAULT now()
+);
+```
+
+`lib/types.ts` 도 새 선호 벡터 타입을 export 해야 하는데, 그 파일은 양측 PR 리뷰가 필요하므로 이번에는 건드리지 않았다. `lib/appearance/preference.ts` 의 `PreferenceResult` 타입을 그대로 사용 가능.
+
+**9. Codex에게 남은 작업**
+
+가장 중요한 것: **`public/appearance-ideal/METADATA.json` 을 실제 GPT 분석 결과로 교체**.
+
+순서:
+
+1. 이미지 생성 완료 — `public/appearance-ideal/female-64/FI01.jpg ~ FI64.jpg`, `male-64/MI01.jpg ~ MI64.jpg` (현재 FI01~FI64 일부 존재, 남자는 아직)
+2. 각 이미지를 `docs/APPEARANCE_ANALYSIS_GPT_PROMPT.md` 의 프롬프트로 GPT Vision 분석
+3. 결과를 `public/appearance-ideal/ANALYSIS_RAW.json` 으로 저장 (raw 응답 보존)
+4. PLAN 문서 5/6절 버킷 점수 공식을 돌려서 `bucket_scores`, `final_bucket` 계산 (또는 `lib/appearance/vector.ts` 의 `computeBucketScores` 함수 그대로 호출 가능)
+5. PLAN 문서 7절 자동 배정 규칙으로 `final_bucket` 결정
+6. PLAN 문서 8절 버킷 균형 검수 — 과잉 8장 초과는 candidate, 부족 버킷은 재생성
+7. `METADATA.json` 의 `items[]` 를 채우고, `female_pool_mean_vector` / `male_pool_mean_vector` 도 산출해서 채운다
+8. `REVIEW.md` 작성 (PLAN 문서 14절)
+
+`lib/appearance/vector.ts` 의 `computeFemaleBucketScores` / `computeMaleBucketScores` / `computeBucketScores` 함수를 사용하면 PLAN 5/6 공식을 그대로 호출할 수 있다. Node 스크립트로 한 번 돌리면 자동 채워진다.
+
+**10. 커밋 안 함**
+
+사용자 요청 전까지 커밋하지 않았다. 현재 `profile/appearance-ai` 브랜치 working tree 에만 변경 있음.
+
+---
+
+### [2026-05-18] 세션 #8 — Claude 출력 (CODEX_FEMALE_64_IMAGE_GENERATION_PROMPT 정합성 맞춤)
+
+`docs/handoff/CODEX_FEMALE_64_IMAGE_GENERATION_PROMPT.md` 를 읽고 세션 #7에서 내가 만든 코드와 정합성 점검을 했다. 6가지 차이를 발견해서 **내 코드를 Codex 표준에 맞춰 수정**했다. MD 파일은 손대지 않음.
+
+**발견된 차이와 수정 내역:**
+
+| # | 차이점 | 수정한 파일 |
+|---|---|---|
+| 1 | `file` 경로 형식 (`public/` 접두사 유무) | `lib/appearance/metadata.ts` `publicImageUrl()` 함수가 `public/` 접두사를 잘라내도록 수정. METADATA.json fixture 도 `public/appearance-ideal/...` 형식으로 통일. |
+| 2 | `visual_review` 필드 누락 | `IdealImageItem` 인터페이스에 `visual_review?: {duplicate_risk, similar_to, difference_notes}` 추가 (선택 필드). fixture 도 채움. |
+| 3 | `review.decision` 필드 누락 | `IdealImageReview` 에 `decision?: 'active'|'candidate'|'rejected'|'regenerate'` 추가. fixture 도 채움. |
+| 4 | `bucket_scores: null` 허용 | METADATA.json fixture 에서 모든 항목을 8버킷 점수 객체(0.0 placeholder) 로 채움. Codex 가 실제 값으로 갱신. |
+| 5 | per-axis 분포 통계 미계산 | `lib/appearance/vector.ts` 에 `AxisStats`, `PoolAxisStats`, `computePoolAxisStats`, `valuePercentile`, `valueZScore`, `computeAxisPercentileVector`, `computeAxisZVector` 추가. `lib/appearance/metadata.ts` 에 `computePoolStats(gender, items)` 헬퍼 노출. |
+| 6 | **`preferred_axis_percentile_vector` / `preferred_axis_z_vector` 미구현** (Codex "매칭 유효성 시뮬레이션" 핵심) | `lib/appearance/preference.ts` `PreferenceResult` 에 두 벡터 추가. `computePreference` 가 자동 계산. `IdealWorldcup.tsx` 가 `poolAxisStats` 를 인자로 전달하도록 수정. |
+
+**왜 #6이 가장 중요한가:**
+
+Codex 인수인계 문서의 "매칭 유효성 시뮬레이션" 절은 다음 실패 사례를 명시한다.
+
+```
+사용자가 청순 상위 이미지를 골랐는데
+preferred_appearance_vector.청순함은 높지만
+매칭 계산에서 청순함이 거의 무시됨
+```
+
+내가 만든 `preferred_appearance_delta_vector` (= preferred - pool_mean) 는 절대값 차이만 본다. 풀의 청순함이 0.65±0.05 로 좁게 몰려 있고 사용자 선택 평균이 0.78 이라면 delta=0.13 (작아 보임). 하지만 z-score 로는 (0.78-0.65)/0.05 = 2.6 (강한 신호).
+
+`preferred_axis_z_vector` 와 `preferred_axis_percentile_vector` 는 풀 분포의 spread 까지 반영해서, 사용자가 풀 내에서 어디 위치를 골랐는지를 정확히 표현한다. 매칭 엔진은 이 두 값을 우선 보고 어느 축이 사용자에게 진짜로 강한 신호인지 판단해야 한다.
+
+**최종 `PreferenceResult` 구조:**
+
+```ts
+{
+  preferred_appearance_vector,         // raw 가중 평균
+  preferred_appearance_delta_vector,   // - pool_mean (절대값 보정)
+  preferred_choice_delta_vector,       // winner-loser 가중 평균
+  preferred_axis_percentile_vector,    // 0~100 풀 분포 내 위치 ★ 신규
+  preferred_axis_z_vector,             // z-score 풀 분포 기준 ★ 신규
+  preferred_score_range,               // mean/min/max
+  preferred_bucket_weights,            // bucket 빈도 정규화
+  worldcup_pool_mean_vector,
+  pool_axis_stats,                     // 검수/매칭 가중치용 ★ 신규
+  choice_logs,
+  meta: { total_choices, final_winner_id, gender }
+}
+```
+
+**Codex 가 추가로 산출해야 할 파일과 그 활용:**
+
+- `ANALYSIS_RAW_FEMALE.json` — GPT 분석기 raw 응답. 검수와 디버그에만 사용. 앱 코드는 읽지 않음.
+- `METADATA_FEMALE.json` — 여자 분리본. 통합 `METADATA.json` 으로 합쳐지면 그 후로는 분리본은 보조 자료.
+- `REVIEW_FEMALE.md` — 사람 검수용. 앱 코드는 읽지 않음.
+- 통합 `METADATA.json` 갱신 — 앱이 직접 읽음. 이 파일이 single source of truth.
+
+`lib/appearance/vector.ts` 의 `computeFemaleBucketScores`, `computeBucketScores` 함수를 그대로 Node 스크립트에서 호출하면 `bucket_scores` 자동 계산 가능. `computePoolAxisStats` 도 동일하게 활용 가능.
+
+**`female_pool_mean_vector` / `male_pool_mean_vector` 필드:**
+
+METADATA.json 최상위에 두 필드가 있다. Codex 가 채워두면 런타임에 한 번 더 계산하지 않아도 된다. 비워두면 (`null`) 앱이 active 풀에서 자동 계산. 일관성을 위해 Codex 가 채워주는 게 좋다.
+
+**검수 결과 (Codex 가 검증 가능):**
+
+- [x] 모든 메타데이터 항목이 `visual_review` 와 `review.decision` 을 채울 수 있다 (선택 필드, optional 처리).
+- [x] `file` 경로가 `public/appearance-ideal/...` 또는 `appearance-ideal/...` 어느 쪽이든 작동한다 (`publicImageUrl` 정규화).
+- [x] 사용자가 청순 상위만 골라도 `preferred_axis_z_vector.청순함` 이 풀 분포 기준으로 계산되어 매칭에서 무시되지 않는다.
+- [x] 사용자가 시크 상위만 골라도 같은 메커니즘으로 시크함 z-score 가 높게 나온다.
+- [x] target_type 은 어떤 계산에도 들어가지 않는다.
+
+**수정된 파일 목록 (세션 #8):**
+
+```text
+lib/appearance/vector.ts        (axis stats + percentile/z 유틸 추가)
+lib/appearance/metadata.ts      (visual_review/decision 필드, file 경로 정규화, computePoolStats 노출)
+lib/appearance/preference.ts    (percentile/z 벡터 + pool_axis_stats 결과 추가)
+components/profile/IdealWorldcup.tsx  (poolStats 전달)
+public/appearance-ideal/METADATA.json (fixture 를 Codex 표준 형식으로 통일)
+docs/handoff/CLAUDE_CODEX_BRIDGE.md   (이 기록)
+```
+
+세션 #7과 같이 커밋은 안 했다. working tree 변경만.
+
+---
+
 ## 공통 규칙
 
 - 서로의 섹션을 덮어쓰지 않는다

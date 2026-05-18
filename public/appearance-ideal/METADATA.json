@@ -1,0 +1,482 @@
+{
+  "_meta": {
+    "version": 2,
+    "generated_at": "2026-05-18T00:00:00Z",
+    "design_doc": "docs/IDEAL_WORLDCUP_64_DESIGN.md",
+    "plan_doc": "docs/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md",
+    "schema_doc": "docs/APPEARANCE_ANALYSIS_SCHEMA.md",
+    "codex_prompt_doc": "docs/handoff/CODEX_FEMALE_64_IMAGE_GENERATION_PROMPT.md",
+    "notes": [
+      "이 파일은 Codex가 이미지 GPT 재분석 후 채운다.",
+      "target = 생성 의도. measured = GPT 재분석 결과. 매칭에는 measured만 사용한다.",
+      "final_bucket 은 measured 기준이며 target_type 과 다를 수 있다.",
+      "status: active = 월드컵에 사용. 그 외 (candidate/rejected/regenerate)는 사용 안 함.",
+      "file 경로는 'public/appearance-ideal/...' 형식. lib/appearance/metadata.ts 의 publicImageUrl 이 public/ 를 자동으로 잘라냄.",
+      "현재는 fixture(샘플 8개)만 들어있다. Codex의 실제 분석 결과로 교체되어야 한다."
+    ]
+  },
+  "female_pool_mean_vector": null,
+  "male_pool_mean_vector": null,
+  "items": [
+    {
+      "id": "FI01",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI01.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 62,
+        "type": "귀여운/동안형",
+        "subtype": "둥근 얼굴 귀여움",
+        "prompt": "둥근 얼굴형, 보통보다 큰 눈, 부드러운 미소, 밝은 니트, 귀여움은 있지만 상위권 미녀 느낌은 약한 현실 호감형"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 60,
+        "score_confidence": 0.72,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": ["따뜻한/부드러운형"],
+        "appearance_vector": {
+          "귀여움": 0.80,
+          "청순함": 0.48,
+          "시크함": 0.10,
+          "따뜻함": 0.62,
+          "스타일리시함": 0.30,
+          "건강함": 0.38,
+          "성숙함": 0.18,
+          "지적단정함": 0.32,
+          "눈큼": 0.72,
+          "부드러운인상": 0.74,
+          "날카로운인상": 0.10,
+          "자연스러움": 0.58,
+          "화려함": 0.18
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.0,
+        "청순/자연형": 0.0,
+        "시크/도도형": 0.0,
+        "따뜻한/부드러운형": 0.0,
+        "스타일리시/화려형": 0.0,
+        "건강/활동형": 0.0,
+        "성숙/분위기형": 0.0,
+        "지적/단정형": 0.0
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI06",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI06.jpg",
+      "status": "active",
+      "generation_round": 2,
+      "target": {
+        "score": 80,
+        "type": "귀여운/동안형",
+        "subtype": "단정한 귀여움",
+        "prompt": "단정한 니트, 자연스러운 긴 머리, 큰 눈, 동안 인상, 깔끔하고 안정적인 상위권 귀여움"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 80,
+        "score_confidence": 0.66,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": ["청순/자연형", "지적/단정형"],
+        "appearance_vector": {
+          "귀여움": 0.43,
+          "청순함": 0.76,
+          "시크함": 0.37,
+          "따뜻함": 0.55,
+          "스타일리시함": 0.63,
+          "건강함": 0.55,
+          "성숙함": 0.73,
+          "지적단정함": 0.72,
+          "눈큼": 0.60,
+          "부드러운인상": 0.61,
+          "날카로운인상": 0.39,
+          "자연스러움": 0.73,
+          "화려함": 0.34
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.0,
+        "청순/자연형": 0.0,
+        "시크/도도형": 0.0,
+        "따뜻한/부드러운형": 0.0,
+        "스타일리시/화려형": 0.0,
+        "건강/활동형": 0.0,
+        "성숙/분위기형": 0.0,
+        "지적/단정형": 0.0
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample — target vs measured mismatch 예시"
+      },
+      "review": {
+        "target_measured_mismatch": true,
+        "decision": "active",
+        "accepted_reason": "귀여운 슬롯에서는 제외하지만 성숙/청순/지적 선호 측정용으로 유효함",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI17",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI17.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 63,
+        "type": "시크/도도형",
+        "subtype": "차분한 무표정",
+        "prompt": "갸름한 얼굴, 차분한 무표정, 검은 셔츠, 선명하지만 과하지 않은 눈매, 현실 호감형"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 65,
+        "score_confidence": 0.75,
+        "primary_type": "시크/도도형",
+        "secondary_types": ["성숙/분위기형"],
+        "appearance_vector": {
+          "귀여움": 0.18,
+          "청순함": 0.30,
+          "시크함": 0.78,
+          "따뜻함": 0.20,
+          "스타일리시함": 0.55,
+          "건강함": 0.35,
+          "성숙함": 0.62,
+          "지적단정함": 0.45,
+          "눈큼": 0.42,
+          "부드러운인상": 0.22,
+          "날카로운인상": 0.72,
+          "자연스러움": 0.50,
+          "화려함": 0.42
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.0,
+        "청순/자연형": 0.0,
+        "시크/도도형": 0.0,
+        "따뜻한/부드러운형": 0.0,
+        "스타일리시/화려형": 0.0,
+        "건강/활동형": 0.0,
+        "성숙/분위기형": 0.0,
+        "지적/단정형": 0.0
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI41",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI41.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 61,
+        "type": "건강/활동형",
+        "subtype": "밝은 활동형",
+        "prompt": "묶은 머리, 스포티한 집업, 밝은 표정, 피부 현실 질감, 건강한 현실 호감형"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 62,
+        "score_confidence": 0.78,
+        "primary_type": "건강/활동형",
+        "secondary_types": ["따뜻한/부드러운형"],
+        "appearance_vector": {
+          "귀여움": 0.45,
+          "청순함": 0.40,
+          "시크함": 0.18,
+          "따뜻함": 0.58,
+          "스타일리시함": 0.40,
+          "건강함": 0.82,
+          "성숙함": 0.30,
+          "지적단정함": 0.30,
+          "눈큼": 0.55,
+          "부드러운인상": 0.50,
+          "날카로운인상": 0.25,
+          "자연스러움": 0.72,
+          "화려함": 0.22
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.0,
+        "청순/자연형": 0.0,
+        "시크/도도형": 0.0,
+        "따뜻한/부드러운형": 0.0,
+        "스타일리시/화려형": 0.0,
+        "건강/활동형": 0.0,
+        "성숙/분위기형": 0.0,
+        "지적/단정형": 0.0
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "MI01",
+      "gender": "male",
+      "file": "public/appearance-ideal/male-64/MI01.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 62,
+        "type": "훈훈/부드러운형",
+        "subtype": "편안한 미소",
+        "prompt": "부드러운 얼굴형, 편안한 미소, 니트, 현실적인 훈훈함, 상위권 미남 느낌은 약함"
+      },
+      "measured": {
+        "subject_gender": "male",
+        "appearance_score_normalized": 63,
+        "score_confidence": 0.74,
+        "primary_type": "훈훈/부드러운형",
+        "secondary_types": [],
+        "appearance_vector": {
+          "훈훈함": 0.78,
+          "댄디함": 0.42,
+          "시크함": 0.18,
+          "소년미": 0.40,
+          "건강함": 0.45,
+          "지적단정함": 0.38,
+          "남성미": 0.25,
+          "스타일리시함": 0.32,
+          "부드러운인상": 0.74,
+          "날카로운인상": 0.16,
+          "체형탄탄함": 0.30,
+          "자연스러움": 0.66
+        }
+      },
+      "bucket_scores": {
+        "훈훈/부드러운형": 0.0,
+        "댄디/단정형": 0.0,
+        "시크/날카로운형": 0.0,
+        "소년미/귀여운형": 0.0,
+        "운동/건강형": 0.0,
+        "지적/안경형": 0.0,
+        "강한 인상/남성미형": 0.0,
+        "스타일리시/개성형": 0.0
+      },
+      "final_bucket": "훈훈/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "MI17",
+      "gender": "male",
+      "file": "public/appearance-ideal/male-64/MI17.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 63,
+        "type": "시크/날카로운형",
+        "subtype": "차분한 무표정",
+        "prompt": "마른 체형, 차분한 무표정, 검은 티, 선명도 중간 눈매"
+      },
+      "measured": {
+        "subject_gender": "male",
+        "appearance_score_normalized": 64,
+        "score_confidence": 0.76,
+        "primary_type": "시크/날카로운형",
+        "secondary_types": ["스타일리시/개성형"],
+        "appearance_vector": {
+          "훈훈함": 0.22,
+          "댄디함": 0.40,
+          "시크함": 0.76,
+          "소년미": 0.15,
+          "건강함": 0.30,
+          "지적단정함": 0.42,
+          "남성미": 0.45,
+          "스타일리시함": 0.55,
+          "부드러운인상": 0.20,
+          "날카로운인상": 0.72,
+          "체형탄탄함": 0.32,
+          "자연스러움": 0.52
+        }
+      },
+      "bucket_scores": {
+        "훈훈/부드러운형": 0.0,
+        "댄디/단정형": 0.0,
+        "시크/날카로운형": 0.0,
+        "소년미/귀여운형": 0.0,
+        "운동/건강형": 0.0,
+        "지적/안경형": 0.0,
+        "강한 인상/남성미형": 0.0,
+        "스타일리시/개성형": 0.0
+      },
+      "final_bucket": "시크/날카로운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "MI33",
+      "gender": "male",
+      "file": "public/appearance-ideal/male-64/MI33.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 62,
+        "type": "운동/건강형",
+        "subtype": "밝은 운동형",
+        "prompt": "운동감 약간, 밝은 표정, 스포티 집업, 현실 호감형"
+      },
+      "measured": {
+        "subject_gender": "male",
+        "appearance_score_normalized": 64,
+        "score_confidence": 0.80,
+        "primary_type": "운동/건강형",
+        "secondary_types": ["강한 인상/남성미형"],
+        "appearance_vector": {
+          "훈훈함": 0.45,
+          "댄디함": 0.30,
+          "시크함": 0.25,
+          "소년미": 0.20,
+          "건강함": 0.82,
+          "지적단정함": 0.28,
+          "남성미": 0.58,
+          "스타일리시함": 0.40,
+          "부드러운인상": 0.40,
+          "날카로운인상": 0.35,
+          "체형탄탄함": 0.76,
+          "자연스러움": 0.68
+        }
+      },
+      "bucket_scores": {
+        "훈훈/부드러운형": 0.0,
+        "댄디/단정형": 0.0,
+        "시크/날카로운형": 0.0,
+        "소년미/귀여운형": 0.0,
+        "운동/건강형": 0.0,
+        "지적/안경형": 0.0,
+        "강한 인상/남성미형": 0.0,
+        "스타일리시/개성형": 0.0
+      },
+      "final_bucket": "운동/건강형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "MI41",
+      "gender": "male",
+      "file": "public/appearance-ideal/male-64/MI41.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 61,
+        "type": "지적/안경형",
+        "subtype": "기본 안경형",
+        "prompt": "얇은 안경, 셔츠, 차분한 표정, 얼굴은 현실 호감형"
+      },
+      "measured": {
+        "subject_gender": "male",
+        "appearance_score_normalized": 63,
+        "score_confidence": 0.78,
+        "primary_type": "지적/안경형",
+        "secondary_types": ["댄디/단정형"],
+        "appearance_vector": {
+          "훈훈함": 0.45,
+          "댄디함": 0.60,
+          "시크함": 0.32,
+          "소년미": 0.25,
+          "건강함": 0.32,
+          "지적단정함": 0.82,
+          "남성미": 0.28,
+          "스타일리시함": 0.40,
+          "부드러운인상": 0.55,
+          "날카로운인상": 0.30,
+          "체형탄탄함": 0.28,
+          "자연스러움": 0.60
+        }
+      },
+      "bucket_scores": {
+        "훈훈/부드러운형": 0.0,
+        "댄디/단정형": 0.0,
+        "시크/날카로운형": 0.0,
+        "소년미/귀여운형": 0.0,
+        "운동/건강형": 0.0,
+        "지적/안경형": 0.0,
+        "강한 인상/남성미형": 0.0,
+        "스타일리시/개성형": 0.0
+      },
+      "final_bucket": "지적/안경형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "fixture sample"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "fixture sample",
+        "rejection_reason": ""
+      }
+    }
+  ]
+}

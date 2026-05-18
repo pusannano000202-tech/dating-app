@@ -9,16 +9,19 @@
 ## 1. 소유권 경계
 
 ### 충현 소유 (프로필/외모)
+
 - DB 테이블: `users`, `profiles`, `photos`, `personality_scores`, `appearance_scores`
 - Python 서버: `python/appearance/`
 - Next.js: `app/profile/`, `components/profile/`
 
 ### 성준 소유 (그룹/매칭)
+
 - DB 테이블: `groups`, `group_members`, `match_requests`, `matches`, `deposits`, `attendances`, `reviews`, `connections`, `excluded_pairs`
 - Python 서버: `python/matching/`
 - Next.js: `app/group/`, `app/match/`, `components/matching/`
 
 ### 공용 (수정 시 상대방 알림 필수)
+
 - `lib/supabase.ts` — Supabase 클라이언트 초기화
 - `lib/types.ts` — 공용 TypeScript 타입
 - `lib/constants.ts` — 공용 상수
@@ -240,4 +243,4 @@ export type MatchStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled'
 3. 두 사람이 동시에 자기 모듈을 업데이트한다
 4. 업데이트 완료 확인 후 `dev` → `main` 머지
 
-**절대 금지:** 계약서 먼저 머지하고 상대방 코드는 나중에 고치는 방식 (인터페이스 불일치 기간 발생)
+**절대 금지:** 계약서 먼저 머지하고 상대방 코드는 그 나중에 고치는 방식 (인터페이스 불일치 기간 발생)

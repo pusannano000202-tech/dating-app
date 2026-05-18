@@ -1,0 +1,11 @@
+Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.
+
+ID: FI01. Target score sense: 62, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 귀여운/동안형. Subtype: 둥근 얼굴 귀여움. Core intent: 둥근 얼굴형, 보통보다 큰 눈, 부드러운 미소, 밝은 니트, 귀여움은 있지만 상위권 미녀 느낌은 약한 현실 호감형.
+
+Required visual anchors: face shape: 둥근 얼굴; eye impression: 큰 둥근 눈; hair: 짧은 앞머리 단발; clothing: 밝은 니트; expression: 부드러운 미소; background/lighting: 실내 자연광.
+
+Precise facial and style details: eyes: 큰 둥근 눈, 눈꼬리 살짝 내려감, 얇은 속쌍, 눈 사이 약간 넓음. Brows/nose: 짧고 부드러운 일자 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 작은 입, 얇은 입술, 부드러운 미소, 귀 대부분 가림. Hair details: 자연 흑발, 턱선 단발, 짧은 앞머리 끝이 고르지 않음. Neck/shoulders/outfit silhouette: 짧은 목선, 둥근 어깨, 높은 니트 네크라인.
+
+Differentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.
+
+No text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look.
