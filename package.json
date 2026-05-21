@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:matching": "tsc -p tsconfig.matching-tests.json && node --test .tmp/matching-tests/tests/matching/*.test.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
