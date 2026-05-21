@@ -224,6 +224,14 @@ export default function MatchDetailPage() {
                 매칭 취소
               </button>
             )}
+            {match.match_status === 'completed' && (
+              <Link
+                href={`/match/${encodeURIComponent(matchId)}/review`}
+                className="btn-gradient w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
+              >
+                만남 평가 작성
+              </Link>
+            )}
           </>
         ) : (
           <section className="glass rounded-3xl p-5">
