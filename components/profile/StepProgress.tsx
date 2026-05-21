@@ -3,9 +3,8 @@
 import { usePathname } from 'next/navigation'
 
 const STEPS = [
-  { label: '이상형', path: '/profile/worldcup' },
-  { label: '내외모', path: '/profile/self-worldcup' },
   { label: '기본정보', path: '/profile/basic' },
+  { label: '이상형', path: '/profile/worldcup' },
   { label: '사진',   path: '/profile/photos' },
   { label: '성격',   path: '/profile/survey' },
   { label: '시간대', path: '/profile/schedule' },

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Crosshair, Sparkles, ClipboardList, Camera,
+  Crosshair, ClipboardList, Camera,
   Brain, CalendarDays, SlidersHorizontal, ChevronRight,
   AlertTriangle
 } from 'lucide-react'
@@ -20,13 +20,6 @@ const EDIT_SECTIONS = [
     iconBg: 'from-violet-600 to-purple-700',
     title: '이상형 스타일',
     desc: '선호하는 외모 타입 다시 고르기',
-  },
-  {
-    href: '/profile/self-worldcup',
-    icon: Sparkles,
-    iconBg: 'from-fuchsia-600 to-pink-700',
-    title: '내 외모 스타일',
-    desc: '자기유사 월드컵 다시 하기',
   },
   {
     href: '/profile/basic',

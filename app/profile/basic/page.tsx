@@ -41,7 +41,7 @@ export default function BasicInfoPage() {
         .upsert({ user_id: user.id, ...data }, { onConflict: 'user_id' })
       if (error) throw error
 
-      router.push('/profile/photos')
+      router.push('/profile/worldcup')
     } catch {
       setServerError('저장 중 오류가 발생했어요. 다시 시도해줘.')
     } finally {

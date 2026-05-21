@@ -100,8 +100,8 @@ export default async function Home() {
     .single()
 
   if (profile?.is_profile_complete) redirect('/group/create')
-  if (!profile?.appearance_type)    redirect('/profile/worldcup')
   if (!profile?.gender)             redirect('/profile/basic')
+  if (!profile?.appearance_type)    redirect('/profile/worldcup')
 
   const { count } = await supabase
     .from('photos')

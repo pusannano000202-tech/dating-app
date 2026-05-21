@@ -34,7 +34,7 @@ const STARS = [
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') ?? '/profile/worldcup'
+  const redirectTo = searchParams.get('redirect') ?? '/profile/basic'
 
   const [step, setStep] = useState<Step>('phone')
   const [phone, setPhone] = useState('')
