@@ -3,16 +3,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Crosshair, Sparkles, ClipboardList, Camera, Brain, CalendarDays, SlidersHorizontal, Check } from 'lucide-react'
+import { Crosshair, ClipboardList, Camera, Brain, CalendarDays, SlidersHorizontal, Check } from 'lucide-react'
 import DestinyLogo from '@/components/DestinyLogo'
 
 const CONFETTI = ['🎉', '✨', '🎊', '💜', '🌟', '💫', '🎈', '⭐']
 const AUTO_REDIRECT_SECS = 5
 
+// D-02 결정으로 self-worldcup(내 외모 스타일) 단계는 폐기되어 체크리스트에서 제외.
 const COMPLETED_STEPS = [
-  { label: '이상형 월드컵', Icon: Crosshair,       color: 'text-violet-400' },
-  { label: '내 외모 스타일', Icon: Sparkles,        color: 'text-fuchsia-400' },
   { label: '기본 정보',     Icon: ClipboardList,   color: 'text-indigo-400' },
+  { label: '이상형 월드컵', Icon: Crosshair,       color: 'text-violet-400' },
   { label: '프로필 사진',   Icon: Camera,          color: 'text-pink-400' },
   { label: '성격 분석',     Icon: Brain,           color: 'text-purple-400' },
   { label: '가능 시간대',   Icon: CalendarDays,    color: 'text-violet-400' },
