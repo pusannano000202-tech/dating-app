@@ -51,7 +51,7 @@ export async function GET() {
   }
 
   const state = await loadGroupState(supabase, user.id)
-  return NextResponse.json(state)
+  return NextResponse.json({ ...state, current_user_id: user.id })
 }
 
 export async function POST(req: NextRequest) {
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
   }
 
   const state = await loadGroupState(supabase, user.id)
-  return NextResponse.json(state, { status: 201 })
+  return NextResponse.json({ ...state, current_user_id: user.id }, { status: 201 })
 }
 
 async function loadGroupState(
