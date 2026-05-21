@@ -33,20 +33,15 @@ export default function GroupInvitePage() {
         const res = await fetch(`/api/group-invites?token=${encodeURIComponent(token)}`)
         if (cancelled) return
 
-        if (res.status === 401) {
-          setState('unauthorized')
-          return
-        }
-
         if (!res.ok) {
           setState('error')
           setError('초대 링크를 확인할 수 없어요.')
           return
         }
 
-        const data = await res.json() as { invite: InviteDetails }
+        const data = await res.json() as { invite: InviteDetails; authenticated: boolean }
         setInvite(data.invite)
-        setState('ready')
+        setState(data.authenticated ? 'ready' : 'unauthorized')
       } catch {
         if (!cancelled) {
           setState('error')
@@ -107,7 +102,22 @@ export default function GroupInvitePage() {
             </div>
           )}
 
-          {state === 'unauthorized' && (
+          {state === 'unauthorized' && invite && (
+            <div>
+              <p className="text-xs text-gray-500">초대 그룹</p>
+              <p className="mt-1 text-lg font-black">{invite.group_name ?? '내 운명 그룹'}</p>
+              <p className="mt-1 text-xs text-gray-500">{invite.group_size}명 그룹 · {invite.group_status}</p>
+              <p className="mt-4 text-sm text-gray-300">로그인 후 초대를 수락할 수 있어요.</p>
+              <Link
+                href={`/login?next=${encodeURIComponent(`/group/invite/${token}`)}`}
+                className="btn-gradient mt-3 block w-full rounded-2xl py-3 text-center text-sm font-bold"
+              >
+                로그인하기
+              </Link>
+            </div>
+          )}
+
+          {state === 'unauthorized' && !invite && (
             <div>
               <p className="text-sm text-gray-300">로그인 후 초대를 수락할 수 있어요.</p>
               <Link href="/login" className="btn-gradient mt-4 block w-full rounded-2xl py-3 text-center text-sm font-bold">
