@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   Crosshair, ClipboardList, Camera,
   Brain, CalendarDays, SlidersHorizontal, ChevronRight,
-  AlertTriangle
+  AlertTriangle, Pencil, Check,
 } from 'lucide-react'
 import DestinyLogo from '@/components/DestinyLogo'
 import { createClient } from '@/lib/supabase'
@@ -73,6 +73,10 @@ export default function ProfileEditPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [summary, setSummary] = useState<ProfileSummary | null>(null)
+  const [editingName, setEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
+  const [savingName, setSavingName] = useState(false)
+  const [nameError, setNameError] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -102,6 +106,40 @@ export default function ProfileEditPage() {
       }
     })
   }, [])
+
+  function startEditName() {
+    if (!summary) return
+    setNameDraft(summary.display_name ?? '')
+    setNameError(null)
+    setEditingName(true)
+  }
+
+  async function saveDisplayName() {
+    if (savingName) return
+    const trimmed = nameDraft.trim()
+    if (trimmed.length < 2 || trimmed.length > 20) {
+      setNameError('이름은 2~20자 사이로 입력해줘.')
+      return
+    }
+    setSavingName(true)
+    setNameError(null)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: trimmed })
+        .eq('user_id', user.id)
+      if (error) throw error
+      setSummary((s) => s ? { ...s, display_name: trimmed } : s)
+      setEditingName(false)
+    } catch {
+      setNameError('저장에 실패했어요. 잠시 후 다시 시도해줘.')
+    } finally {
+      setSavingName(false)
+    }
+  }
 
   async function handleReset() {
     setResetting(true)
@@ -162,8 +200,55 @@ export default function ProfileEditPage() {
               <DestinyLogo size={30} />
             </div>
             <div className="flex-1 min-w-0">
-              {summary.display_name && (
-                <p className="text-base font-black truncate">{summary.display_name}</p>
+              {editingName ? (
+                <div className="mb-1">
+                  <div className="flex gap-1.5 items-center">
+                    <input
+                      type="text"
+                      value={nameDraft}
+                      onChange={(e) => setNameDraft(e.target.value)}
+                      maxLength={20}
+                      autoFocus
+                      placeholder="2~20자"
+                      className="flex-1 min-w-0 bg-white/[0.05] border border-violet-400/30 rounded-lg px-2 py-1 text-sm font-bold text-white focus:outline-none focus:border-violet-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={saveDisplayName}
+                      disabled={savingName}
+                      className="p-1.5 rounded-lg bg-violet-400/20 border border-violet-400/30 text-violet-200 disabled:opacity-50"
+                      aria-label="저장"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setEditingName(false); setNameError(null) }}
+                      disabled={savingName}
+                      className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300"
+                      aria-label="취소"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {nameError && (
+                    <p className="mt-1 text-[10px] text-red-400">{nameError}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <p className="text-base font-black truncate">
+                    {summary.display_name ?? '이름을 입력해주세요'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={startEditName}
+                    className="p-1 rounded text-gray-500 hover:text-violet-300"
+                    aria-label="이름 수정"
+                  >
+                    <Pencil size={12} />
+                  </button>
+                </div>
               )}
               <p className="text-sm font-bold">
                 {summary.gender === 'male' ? '남' : summary.gender === 'female' ? '여' : '?'}
