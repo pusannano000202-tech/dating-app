@@ -134,7 +134,7 @@ async function loadGroupState(
 
   const members = group ? await loadMembers(supabase, group.id) : []
   const invites = group ? await loadInvites(supabase, group.id) : []
-  const friends = await loadFriends(supabase, userId, members, invites)
+  const friends = await loadFriends(supabase, members, invites)
 
   return {
     group,
@@ -186,15 +186,10 @@ async function loadInvites(
 
 async function loadFriends(
   supabase: ReturnType<typeof createSupabaseServerClient>,
-  userId: string,
   members: GroupMemberRecord[],
   invites: GroupInviteRecord[]
 ): Promise<FriendSummary[]> {
-  const { data } = await supabase
-    .from('friendships')
-    .select('user_id,friend_user_id,status')
-    .eq('status', 'active')
-    .or(`user_id.eq.${userId},friend_user_id.eq.${userId}`)
+  const { data } = await supabase.rpc('get_friend_summaries')
 
   const memberIds = new Set(members.map((member) => member.user_id))
   const invitedIds = new Set(
@@ -203,20 +198,18 @@ async function loadFriends(
       .map((invite) => invite.invited_user_id as string)
   )
 
-  return ((data ?? []) as Array<{ user_id: string; friend_user_id: string }>).map((row) => {
-    const friendId = row.user_id === userId ? row.friend_user_id : row.user_id
-    return {
-      user_id: friendId,
-      display_name: `친구 ${friendId.slice(0, 8)}`,
-      phone: null,
-      status: 'active',
-      group_status: memberIds.has(friendId)
-        ? 'in_group'
-        : invitedIds.has(friendId)
-          ? 'invited'
-          : 'available',
-    }
-  })
+  type Row = { user_id: string; display_name: string | null; status: string }
+  return ((data ?? []) as Row[]).map((row) => ({
+    user_id: row.user_id,
+    display_name: row.display_name ?? `친구 ${row.user_id.slice(0, 8)}`,
+    phone: null,
+    status: 'active',
+    group_status: memberIds.has(row.user_id)
+      ? 'in_group'
+      : invitedIds.has(row.user_id)
+        ? 'invited'
+        : 'available',
+  }))
 }
 
 async function getUser(supabase: ReturnType<typeof createSupabaseServerClient>) {

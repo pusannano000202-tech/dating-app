@@ -18,7 +18,7 @@ export default function BasicInfoPage() {
       if (!user) { setLoaded(true); return }
       supabase
         .from('profiles')
-        .select('gender, age, height, body_type, hair_density, school, department, year')
+        .select('display_name, gender, age, height, body_type, hair_density, school, department, year')
         .eq('user_id', user.id)
         .single()
         .then(({ data }) => {

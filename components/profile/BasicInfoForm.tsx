@@ -5,6 +5,7 @@ import type { Gender, BodyType, HairDensity } from '@/lib/types'
 import { searchDepartments } from '@/lib/pnu-departments'
 
 export interface BasicInfoData {
+  display_name: string
   gender: Gender
   age: number
   height: number | null
@@ -36,6 +37,7 @@ const HAIR_DENSITIES: { key: HairDensity; label: string; emoji: string }[] = [
 ]
 
 export default function BasicInfoForm({ initialValue, onSubmit, saving, serverError }: Props) {
+  const [displayName, setDisplayName] = useState(initialValue?.display_name ?? '')
   const [gender, setGender]       = useState<Gender | null>(initialValue?.gender ?? null)
   const [age, setAge]             = useState(initialValue?.age?.toString() ?? '')
   const [height, setHeight]       = useState(initialValue?.height?.toString() ?? '')
@@ -49,6 +51,12 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
   const deptRef = useRef<HTMLDivElement>(null)
 
   const handleSubmit = useCallback(function handleSubmit() {
+    const trimmedName = displayName.trim()
+    if (!trimmedName) { setError('친구에게 보여줄 이름을 입력해줘.'); return }
+    if (trimmedName.length < 2 || trimmedName.length > 20) {
+      setError('이름은 2~20자 사이로 입력해줘.')
+      return
+    }
     if (!gender) { setError('성별을 선택해줘.'); return }
     const ageNum = parseInt(age, 10)
     if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 35) {
@@ -65,6 +73,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
     if (!school.trim()) { setError('학교를 입력해줘.'); return }
     setError(null)
     onSubmit({
+      display_name: trimmedName,
       gender,
       age: ageNum,
       height: height ? parseInt(height, 10) : null,
@@ -75,7 +84,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       year,
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gender, age, height, bodyType, hairDensity, school, department, year, saving, onSubmit])
+  }, [displayName, gender, age, height, bodyType, hairDensity, school, department, year, saving, onSubmit])
 
   // Enter 키로 폼 제출 (텍스트 입력 focus 중에는 기본 동작 허용)
   useEffect(() => {
@@ -96,6 +105,23 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
 
   return (
     <div className="flex flex-col gap-6">
+
+      {/* 친구에게 보여줄 이름 */}
+      <div>
+        <label className="text-sm font-bold mb-3 block">
+          이름 <span className="text-rose-400">*</span>
+          <span className="ml-2 text-xs text-gray-600 font-normal">친구·그룹 멤버에게만 보여요</span>
+        </label>
+        <input
+          type="text"
+          placeholder="별명 또는 이름 (2~20자)"
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          disabled={saving}
+          maxLength={20}
+          className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
+        />
+      </div>
 
       {/* 성별 */}
       <div>

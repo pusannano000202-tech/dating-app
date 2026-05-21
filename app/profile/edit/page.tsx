@@ -59,6 +59,7 @@ const EDIT_SECTIONS = [
 ]
 
 interface ProfileSummary {
+  display_name: string | null
   gender: Gender | null
   age: number | null
   school: string | null
@@ -80,7 +81,7 @@ export default function ProfileEditPage() {
       const [{ data: profile }, { count }] = await Promise.all([
         supabase
           .from('profiles')
-          .select('gender, age, school, department, appearance_type')
+          .select('display_name, gender, age, school, department, appearance_type')
           .eq('user_id', user.id)
           .single(),
         supabase
@@ -90,6 +91,7 @@ export default function ProfileEditPage() {
       ])
       if (profile) {
         setSummary({
+          display_name: profile.display_name ?? null,
           gender: profile.gender as Gender | null,
           age: profile.age,
           school: profile.school,
@@ -160,6 +162,9 @@ export default function ProfileEditPage() {
               <DestinyLogo size={30} />
             </div>
             <div className="flex-1 min-w-0">
+              {summary.display_name && (
+                <p className="text-base font-black truncate">{summary.display_name}</p>
+              )}
               <p className="text-sm font-bold">
                 {summary.gender === 'male' ? '남' : summary.gender === 'female' ? '여' : '?'}
                 {summary.age != null ? ` · ${summary.age}세` : ''}
