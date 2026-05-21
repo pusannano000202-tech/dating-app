@@ -9,6 +9,12 @@ import { isSupabaseConfigured } from '@/lib/utils'
 
 const STORAGE_BUCKET = 'photos'
 
+interface ScoreApiResponse {
+  status?: string
+  self_appearance_score_persisted?: boolean
+  self_appearance_score_persist_error?: string
+}
+
 export default function PhotosPage() {
   const router = useRouter()
   const [existingPhotos, setExistingPhotos] = useState<string[]>([])
@@ -79,17 +85,37 @@ export default function PhotosPage() {
 
         uploadedUrls = uploads.map(({ publicUrl }) => publicUrl)
 
-        // AI 점수 계산 요청 (fire-and-forget — 실패해도 진행, 서버 프록시 경유)
-        fetch('/api/score', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ photo_urls: uploadedUrls }),
-        }).catch(() => {})
+        // Block progression until the internal matching score is persisted.
+        await requestScorePersistence(uploadedUrls)
       }
 
       router.push('/profile/survey')
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.message === 'score_failed') {
+        setError('사진 분석 점수 저장에 실패했어요. 다시 시도해줘.')
+        setSaving(false)
+        return
+      }
       setError('사진 업로드 중 오류가 발생했어요. 다시 시도해줘.')
+      setSaving(false)
+    }
+  }
+
+  async function handleKeepExistingPhotos() {
+    if (saving) return
+    setSaving(true)
+    setError(null)
+
+    try {
+      await requestScorePersistence(existingPhotos)
+      router.push('/profile/survey')
+    } catch (err) {
+      if (err instanceof Error && err.message === 'score_failed') {
+        setError('사진 분석 점수 저장에 실패했어요. 다시 시도해줘.')
+        setSaving(false)
+        return
+      }
+      setError('사진 분석 중 오류가 발생했어요. 다시 시도해줘.')
       setSaving(false)
     }
   }
@@ -123,7 +149,8 @@ export default function PhotosPage() {
             ))}
           </div>
           <button
-            onClick={() => router.push('/profile/survey')}
+            onClick={handleKeepExistingPhotos}
+            disabled={saving}
             className="glass w-full py-2.5 rounded-xl text-sm text-gray-300 hover:text-white border border-white/10 transition-colors"
           >
             기존 사진 유지하고 다음으로 →
@@ -136,4 +163,29 @@ export default function PhotosPage() {
       {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
     </div>
   )
+}
+
+async function parseScoreResponse(response: Response): Promise<ScoreApiResponse | null> {
+  try {
+    return await response.json() as ScoreApiResponse
+  } catch {
+    return null
+  }
+}
+
+async function requestScorePersistence(photoUrls: string[]): Promise<void> {
+  const scoreRes = await fetch('/api/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photo_urls: photoUrls }),
+  })
+  const scoreData = await parseScoreResponse(scoreRes)
+
+  if (
+    !scoreRes.ok ||
+    scoreData?.status === 'error' ||
+    scoreData?.self_appearance_score_persisted !== true
+  ) {
+    throw new Error('score_failed')
+  }
 }

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:matching": "tsc -p tsconfig.matching-tests.json && node --test .tmp/matching-tests/tests/matching/*.test.js",
+    "test:profile": "tsc -p tsconfig.profile-tests.json && node --test .tmp/profile-tests/tests/profile/*.test.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
