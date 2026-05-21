@@ -38,6 +38,8 @@ Non-negotiable decisions:
 
 ## 1. Current State
 
+> Update 2026-05-22: Task D / E 까지 완료. 이번 절은 본 세션 종료 시점 기준으로 갱신.
+
 Already implemented:
 - `public.users` mirror and new matching tables exist in migrations.
 - Worldcup result save path writes `preferred_*` vectors and `worldcup_choice_logs`.
@@ -45,14 +47,30 @@ Already implemented:
 - `profiles_public` view is explicitly marked `security_invoker`.
 - `group_members` active membership uniqueness uses `left_at`.
 - Strict RLS bridge policies exist for friend requests, friendships, group members, invites, and match queue.
+- `lib/matching` deterministic core library complete (filter / time / score / group-summary / simulate). 8 tests pass.
+- `self_appearance_score` 생산/저장 흐름 완료 (`/api/score` + `lib/profile/appearance-score.ts` + z13 마이그). 9 tests pass.
+- **Group API + Invite acceptance flow** (Task D 완료):
+  - `app/api/groups/route.ts`, `app/api/group-invites/{route,accept}/route.ts`
+  - `app/group/invite/[token]/page.tsx`
+  - `accept_group_invite_by_token` RPC + invite guard bypass
+- **MatchingPool 실데이터 연결** (Task E 완료):
+  - `get_match_pool_stats()` RPC, `/api/match-pool/stats/route.ts`
+  - `app/page.tsx` server-side fetch + `components/MatchingPool.tsx` 동적 렌더
+- **큐 진입/취소 RPC** (보증금 미통합):
+  - `enter_match_pool` / `cancel_match_pool` SECURITY DEFINER + leader 검증
+  - `/api/match-pool/{enter,cancel}/route.ts`
+- **profiles.display_name + friend/group member summary RPC**:
+  - `get_friend_summaries` / `get_group_member_summaries`
+  - BasicInfoForm 에 이름 입력, 그룹/친구 UI 에서 placeholder 제거
+- **invite_kind 컬럼 정리** — link invite `invited_phone='link:...'` hack 제거.
+- **invite 익명 미리보기** — `get_group_invite_by_token` anon GRANT.
 
 Still blocking:
-- Supabase migration apply/reset has not been verified in this machine because Supabase CLI is unavailable.
-- `lib/matching` only has `config.ts`; scoring/filtering/group summary/simulation are missing.
-- `app/group/create/page.tsx` is still mock state.
-- `components/MatchingPool.tsx` still uses hardcoded queue counts.
-- `self_appearance_score` is not produced or guaranteed.
-- Male ideal worldcup pool has only 4 metadata entries.
+- Supabase migration apply/reset 가 본 환경에서 미검증 (CLI 부재). staging 에서 `supabase db reset` 1회 필요.
+- Friend search / request UI 0 — 사용자가 친구를 생성할 경로가 없음. `/group/create` 의 친구 목록은 항상 빈 상태.
+- 보증금 / 토스페이먼츠 미통합 — `enter_match_pool` 이 deposits 검증 없이 큐 진입.
+- Task F (Python Hungarian batch runner) 미시작 — 성준 영역.
+- Male ideal worldcup pool 4 entries — Manus 작업 대기.
 
 ---
 
@@ -453,3 +471,75 @@ docs: add matching v1.6 master plan
 ```
 
 Do not start group UI DB integration before Task B matching core has a tested contract.
+
+---
+
+## 12. Track Update 2026-05-22 (Claude Code)
+
+Task D ~ E 완료 이후 추가된 작업/트랙. 본 절은 이후 작업자가 받아가야 할 순서를 명시.
+
+### 12.A Fresh DB Apply 검증 (High)
+
+본 세션에 추가된 마이그 7개 (z14~z21) 가 ASCII 정렬 순서로 의존 대상 이후에 적용되는지, RLS / SECURITY DEFINER + BYPASSRLS 가정이 동작하는지 staging 에서 검증.
+
+```powershell
+supabase db reset
+```
+
+검증 후 실패하면 7-D 처방 적용 (group_members / match_pool 정책에 `app.bypass_*_guard` 패턴 추가).
+
+### 12.B Friend Search / Request UI (High)
+
+현재 친구를 생성할 경로가 없음. `friend_requests` 테이블 + RLS 정책 + guard trigger 까지 갖춰져 있지만 UI 가 0.
+
+필요한 것:
+- `/friends/page.tsx`: 친구 목록 + 받은 요청 + 보낸 요청
+- `app/api/friend-requests/route.ts`: GET / POST (전화번호 또는 user_id 로)
+- `app/api/friend-requests/[id]/route.ts`: accept / decline POST
+- 가능한 후속: `accept_friend_request(p_request_id)` SECURITY DEFINER RPC 로 status update + friendships insert 를 한 트랜잭션에 묶기
+
+### 12.C 보증금 / 토스페이먼츠 (High, v1 출시 전 필수)
+
+`enter_match_pool` 이 deposits 검증 없이 큐 진입 중. 운영 출시 전 통합 필수.
+
+흐름:
+- `deposits` insert (status='pending', toss_order_id)
+- 토스 결제창 호출 (client SDK)
+- 토스 webhook → `deposits.status='paid'`, paid_at set
+- `enter_match_pool` 내부에 `EXISTS deposits.status='paid'` 검증 추가
+
+추가 라우트: `/api/payments/toss/webhook/route.ts`, `/api/deposits/route.ts`. 토스 sandbox 키 필요.
+
+### 12.D Task F: Python Hungarian Batch (Medium, 성준 영역)
+
+본 master plan 7절 그대로 유지. 충현 단독 진입 X. 성준 ping 필요.
+
+### 12.E z12 BYPASSRLS 안전 패턴 통일 (Low)
+
+12.A 검증이 통과해도, 코드 명시성을 위해 모든 SECURITY DEFINER 함수 안의 INSERT/UPDATE 가 `app.bypass_*_guard` 패턴을 일관되게 쓰도록 갱신 가능. 현재는 group_invites 만 사용 중.
+
+대상:
+- `group_members_strict_insert` 정책에 bypass 추가 + `accept_group_invite_by_token` RPC 내부 set_config
+- `match_pool_member_insert` 정책에 bypass + `enter_match_pool` RPC 내부 set_config
+- `match_pool_member_cancel_update` 정책에 bypass + `cancel_match_pool` RPC 내부 set_config
+
+### 12.F UI 잔여 (Low)
+
+- `/profile/edit` 에 display_name 단독 수정 입력 추가 (현재는 `/profile/basic` 전체 폼만)
+- group_invites pending 카드의 link invite 표시 UX 개선
+- 친구 목록 빈 상태 안내 카피 개선 ("친구 추가하러 가기" 버튼 등)
+
+### 12.G Male MI01-MI64 (External Track)
+
+Manus 작업 — 8절 그대로 유지. v1 출시 차단 항목.
+
+---
+
+## 13. Handoff Files Index
+
+```
+docs/handoff/CODEX_TO_CLAUDE_HANDOFF_2026-05-22.md   (Codex → Claude, 본 세션 입력)
+docs/handoff/CLAUDE_TO_CODEX_HANDOFF_2026-05-22.md   (Claude → Codex, 본 세션 출력)
+docs/handoff/MANUS_MALE_64_HANDOFF.md                 (Manus 작업)
+docs/handoff/ADMIN_APPEARANCE_SCORE_OVERRIDE.md       (D-03 admin 설계)
+```
