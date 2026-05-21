@@ -19,6 +19,7 @@ interface GroupRecord {
 interface GroupMemberRecord {
   group_id: string
   user_id: string
+  display_name: string | null
   role: GroupRole
   joined_at: string
   left_at: string | null
@@ -162,14 +163,17 @@ async function loadMembers(
   supabase: ReturnType<typeof createSupabaseServerClient>,
   groupId: string
 ): Promise<GroupMemberRecord[]> {
-  const { data } = await supabase
-    .from('group_members')
-    .select('group_id,user_id,role,joined_at,left_at')
-    .eq('group_id', groupId)
-    .is('left_at', null)
-    .order('joined_at')
+  const { data } = await supabase.rpc('get_group_member_summaries', { p_group_id: groupId })
 
-  return (data ?? []) as GroupMemberRecord[]
+  type Row = { user_id: string; display_name: string | null; role: GroupRole; joined_at: string }
+  return ((data ?? []) as Row[]).map((row) => ({
+    group_id: groupId,
+    user_id: row.user_id,
+    display_name: row.display_name,
+    role: row.role,
+    joined_at: row.joined_at,
+    left_at: null,
+  }))
 }
 
 async function loadInvites(

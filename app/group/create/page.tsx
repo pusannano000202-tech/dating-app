@@ -32,6 +32,7 @@ interface GroupRecord {
 interface GroupMemberRecord {
   group_id: string
   user_id: string
+  display_name: string | null
   role: GroupRole
   joined_at: string
   left_at: string | null
@@ -309,22 +310,26 @@ export default function GroupCreatePage() {
 
               <p className="mt-5 mb-2 text-xs font-bold text-gray-500">그룹 멤버</p>
               <div className="grid grid-cols-3 gap-2">
-                {members.map((member) => (
-                  <div
-                    key={member.user_id}
-                    className="min-h-[86px] rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-3 text-center"
-                  >
-                    <div className="mx-auto mb-2 h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">
-                      {member.role === 'leader' ? <ShieldCheck size={16} /> : <Check size={16} />}
+                {members.map((member) => {
+                  const isSelf = currentUserId != null && member.user_id === currentUserId
+                  const name = isSelf
+                    ? '나'
+                    : member.display_name ?? `친구 ${member.user_id.slice(0, 4)}`
+                  return (
+                    <div
+                      key={member.user_id}
+                      className="min-h-[86px] rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-3 text-center"
+                    >
+                      <div className="mx-auto mb-2 h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">
+                        {member.role === 'leader' ? <ShieldCheck size={16} /> : <Check size={16} />}
+                      </div>
+                      <p className="text-sm font-bold truncate">{name}</p>
+                      <p className="mt-0.5 text-[10px] text-gray-600">
+                        {member.role === 'leader' ? '리더' : '참여중'}
+                      </p>
                     </div>
-                    <p className="text-sm font-bold truncate">
-                      {member.role === 'leader' ? '나' : `친구 ${member.user_id.slice(0, 4)}`}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-gray-600">
-                      {member.role === 'leader' ? '리더' : '참여중'}
-                    </p>
-                  </div>
-                ))}
+                  )
+                })}
                 {Array.from({ length: openSlots }).map((_, index) => (
                   <div
                     key={`open-${index}`}
