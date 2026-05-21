@@ -478,15 +478,20 @@ Do not start group UI DB integration before Task B matching core has a tested co
 
 Task D ~ E 완료 이후 추가된 작업/트랙. 본 절은 이후 작업자가 받아가야 할 순서를 명시.
 
-### 12.A Fresh DB Apply 검증 (High)
+### 12.A Fresh DB Apply 검증 🟡 정적 검증 통과 (실제 적용 미수행)
 
-본 세션에 추가된 마이그 7개 (z14~z21) 가 ASCII 정렬 순서로 의존 대상 이후에 적용되는지, RLS / SECURITY DEFINER + BYPASSRLS 가정이 동작하는지 staging 에서 검증.
+마이그 13개 (z14~z26) 신규. 본 환경에 Supabase CLI / Docker / Postgres 모두 부재로 `supabase db reset` 실행 불가.
 
-```powershell
-supabase db reset
-```
+대신 `scripts/verify-migrations.py` 로 정적 검증 완료:
+- 24개 파일 / 152 객체 정의 / 452 참조
+- ASCII 정렬 순서 / 의존성 / 정책·트리거 중복 / $$ 짝 모두 PASS
 
-검증 후 실패하면 7-D 처방 적용 (group_members / match_pool 정책에 `app.bypass_*_guard` 패턴 추가).
+자세한 결과: `docs/MIGRATION_VERIFY_REPORT_2026-05-22.md`
+
+**운영 출시 전 필수**:
+- Supabase 클라우드 dev 프로젝트 또는 staging 에서 1회 `supabase db reset` + RPC 흐름 수동 검증
+- 12.E 의 RPC bypass guard 가 실제로 동작하는지 (BYPASSRLS 환경 의존성 해소 확인)
+- leader 가 그룹 생성 → invite 수락 → 보증금 결제 → 큐 진입 흐름 end-to-end
 
 ### 12.B Friend Search / Request UI ✅ 완료 (2026-05-22)
 
