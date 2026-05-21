@@ -4,9 +4,25 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { isSupabaseConfigured } from '@/lib/utils'
 import DestinyLogo from '@/components/DestinyLogo'
-import MatchingPool from '@/components/MatchingPool'
+import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
+import { aggregate as aggregatePoolStats } from '@/app/api/match-pool/stats/route'
 
-function LandingPage() {
+type ServerSupabaseClient = ReturnType<typeof createServerClient>
+
+const EMPTY_POOL: PoolStats = {
+  female: 0,
+  male: 0,
+  bySize: { '2': { female: 0, male: 0 }, '3': { female: 0, male: 0 } },
+}
+
+async function loadPoolStats(supabase: ServerSupabaseClient | null): Promise<PoolStats> {
+  if (!supabase) return EMPTY_POOL
+  const { data, error } = await supabase.rpc('get_match_pool_stats')
+  if (error) return EMPTY_POOL
+  return aggregatePoolStats((data ?? []) as Parameters<typeof aggregatePoolStats>[0])
+}
+
+function LandingPage({ poolStats }: { poolStats: PoolStats }) {
   return (
     <main className="flex flex-col items-center min-h-screen px-5 pt-12 pb-16 overflow-hidden">
 
@@ -40,7 +56,7 @@ function LandingPage() {
 
         {/* ── Soul Orbs 매칭 풀 시각화 ── */}
         <div className="glass-card rounded-3xl p-6 w-full mb-8 flex flex-col items-center">
-          <MatchingPool />
+          <MatchingPool stats={poolStats} />
         </div>
 
         {/* 차별점 3가지 */}
@@ -78,7 +94,7 @@ function LandingPage() {
 }
 
 export default async function Home() {
-  if (!isSupabaseConfigured()) return <LandingPage />
+  if (!isSupabaseConfigured()) return <LandingPage poolStats={EMPTY_POOL} />
 
   const cookieStore = cookies()
   const supabase = createServerClient(
@@ -87,8 +103,10 @@ export default async function Home() {
     { cookies: { getAll() { return cookieStore.getAll() }, setAll() {} } }
   )
 
+  const poolStats = await loadPoolStats(supabase)
+
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return <LandingPage />
+  if (!user) return <LandingPage poolStats={poolStats} />
 
   const { data: profile } = await supabase
     .from('profiles')

@@ -1,11 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CalendarClock, LockKeyhole, ShieldCheck, Users } from 'lucide-react'
 
-interface PoolStats {
+export interface PoolStats {
   female: number
   male: number
+  bySize?: {
+    '2': { female: number; male: number }
+    '3': { female: number; male: number }
+  }
 }
 
 interface Props {
@@ -13,14 +17,10 @@ interface Props {
   className?: string
 }
 
-const QUEUE_ROWS = [
-  { label: '2:2 그룹', male: 4, female: 5, active: true },
-  { label: '3:3 그룹', male: 3, female: 4, active: false },
-  { label: '시간대 겹침', male: 2, female: 3, active: false },
-]
+const FALLBACK_STATS: PoolStats = { female: 0, male: 0 }
 
 export default function MatchingPool({ stats, className = '' }: Props) {
-  const target = stats ?? { female: 12, male: 9 }
+  const target = stats ?? FALLBACK_STATS
   const [displayed, setDisplayed] = useState({ female: 0, male: 0 })
 
   useEffect(() => {
@@ -42,6 +42,27 @@ export default function MatchingPool({ stats, className = '' }: Props) {
   }, [target.female, target.male])
 
   const totalGroups = displayed.female + displayed.male
+
+  const queueRows = useMemo(() => {
+    const bySize = target.bySize
+    const empty = bySize == null
+    const row2 = bySize?.['2'] ?? { female: 0, male: 0 }
+    const row3 = bySize?.['3'] ?? { female: 0, male: 0 }
+    return [
+      {
+        label: '2:2 그룹',
+        male: row2.male,
+        female: row2.female,
+        active: !empty && (row2.male > 0 || row2.female > 0),
+      },
+      {
+        label: '3:3 그룹',
+        male: row3.male,
+        female: row3.female,
+        active: !empty && (row3.male > 0 || row3.female > 0),
+      },
+    ]
+  }, [target.bySize])
 
   return (
     <div className={`w-full ${className}`}>
@@ -66,26 +87,30 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         </div>
 
         <div className="space-y-2.5">
-          {QUEUE_ROWS.map((row) => (
-            <div key={row.label} className="grid grid-cols-[76px_1fr] items-center gap-3">
-              <span className="text-[11px] text-gray-500">{row.label}</span>
-              <div className="h-10 rounded-2xl bg-black/20 border border-white/5 px-2 flex items-center gap-2 overflow-hidden">
-                <div
-                  className={`h-6 rounded-xl bg-violet-400/35 border border-violet-300/20 transition-all duration-700 ${
-                    row.active ? 'shadow-[0_0_18px_rgba(167,139,250,0.28)]' : ''
-                  }`}
-                  style={{ width: `${Math.max(18, row.male * 13)}%` }}
-                />
-                <div className="h-px flex-1 bg-white/10" />
-                <div
-                  className={`h-6 rounded-xl bg-rose-400/35 border border-rose-300/20 transition-all duration-700 ${
-                    row.active ? 'shadow-[0_0_18px_rgba(251,113,133,0.24)]' : ''
-                  }`}
-                  style={{ width: `${Math.max(18, row.female * 11)}%` }}
-                />
+          {queueRows.map((row) => {
+            const maleWidth = Math.max(18, Math.min(70, row.male * 13))
+            const femaleWidth = Math.max(18, Math.min(70, row.female * 11))
+            return (
+              <div key={row.label} className="grid grid-cols-[76px_1fr] items-center gap-3">
+                <span className="text-[11px] text-gray-500">{row.label}</span>
+                <div className="h-10 rounded-2xl bg-black/20 border border-white/5 px-2 flex items-center gap-2 overflow-hidden">
+                  <div
+                    className={`h-6 rounded-xl bg-violet-400/35 border border-violet-300/20 transition-all duration-700 ${
+                      row.active ? 'shadow-[0_0_18px_rgba(167,139,250,0.28)]' : ''
+                    }`}
+                    style={{ width: `${maleWidth}%` }}
+                  />
+                  <div className="h-px flex-1 bg-white/10" />
+                  <div
+                    className={`h-6 rounded-xl bg-rose-400/35 border border-rose-300/20 transition-all duration-700 ${
+                      row.active ? 'shadow-[0_0_18px_rgba(251,113,133,0.24)]' : ''
+                    }`}
+                    style={{ width: `${femaleWidth}%` }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
