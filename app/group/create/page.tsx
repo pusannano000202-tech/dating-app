@@ -42,6 +42,7 @@ interface GroupInviteRecord {
   group_id: string
   invited_phone: string | null
   invited_user_id: string | null
+  invite_kind: 'user' | 'phone' | 'link'
   token: string
   status: string
   expires_at: string
@@ -384,9 +385,11 @@ export default function GroupCreatePage() {
                   {pendingInvites.map((invite) => (
                     <div key={invite.id} className="rounded-2xl bg-white/[0.03] px-3 py-2 flex items-center justify-between gap-3">
                       <span className="min-w-0 truncate text-xs text-gray-400">
-                        {invite.invited_user_id
-                          ? `친구 ${invite.invited_user_id.slice(0, 8)}`
-                          : invite.invited_phone}
+                        {invite.invite_kind === 'link'
+                          ? '공개 초대 링크'
+                          : invite.invited_user_id
+                            ? `친구 ${invite.invited_user_id.slice(0, 8)}`
+                            : invite.invited_phone ?? '대상 없음'}
                       </span>
                       <span className="text-[10px] font-bold text-amber-300">수락 대기</span>
                     </div>

@@ -63,6 +63,12 @@ export async function POST(req: NextRequest) {
     return jsonError('cannot_invite_self', 400)
   }
 
+  const inviteKind: 'user' | 'phone' | 'link' = isLinkInvite
+    ? 'link'
+    : invitedUserId
+      ? 'user'
+      : 'phone'
+
   const token = randomUUID().replace(/-/g, '')
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
@@ -72,12 +78,13 @@ export async function POST(req: NextRequest) {
       group_id: groupId,
       invited_by_user_id: user.id,
       invited_user_id: invitedUserId,
-      invited_phone: invitedPhone ?? (isLinkInvite ? `link:${token.slice(0, 12)}` : null),
+      invited_phone: isLinkInvite ? null : invitedPhone,
+      invite_kind: inviteKind,
       token,
       status: 'pending',
       expires_at: expiresAt,
     })
-    .select('id,group_id,invited_phone,invited_user_id,token,status,expires_at,created_at')
+    .select('id,group_id,invited_phone,invited_user_id,invite_kind,token,status,expires_at,created_at')
     .single()
 
   if (error || !data) {

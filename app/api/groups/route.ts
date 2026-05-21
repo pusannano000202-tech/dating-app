@@ -29,6 +29,7 @@ interface GroupInviteRecord {
   group_id: string
   invited_phone: string | null
   invited_user_id: string | null
+  invite_kind: 'user' | 'phone' | 'link'
   token: string
   status: string
   expires_at: string
@@ -177,7 +178,7 @@ async function loadInvites(
 ): Promise<GroupInviteRecord[]> {
   const { data } = await supabase
     .from('group_invites')
-    .select('id,group_id,invited_phone,invited_user_id,token,status,expires_at,created_at')
+    .select('id,group_id,invited_phone,invited_user_id,invite_kind,token,status,expires_at,created_at')
     .eq('group_id', groupId)
     .order('created_at', { ascending: false })
 
