@@ -1,0 +1,2862 @@
+{
+  "created_at": "2026-05-18T17:38:33.757127+00:00",
+  "analysis_method": "codex_gpt_visual_pass_from_contact_sheet",
+  "external_api_called": false,
+  "note": "이 파일은 현재 접촉시트/개별 이미지 육안 기반 1차 GPT-style measured 벡터다. 실제 OpenAI Vision API 배치 결과가 들어오면 같은 스키마로 덮어쓸 수 있다.",
+  "evaluations": [
+    {
+      "image_id": "FI01",
+      "subject_gender": "female",
+      "appearance_score_normalized": 72,
+      "score_confidence": 0.7,
+      "primary_type": "귀여운/동안형",
+      "secondary_types": [
+        "청순/자연형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.8,
+        "청순함": 0.7,
+        "시크함": 0.19,
+        "따뜻함": 0.73,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.33,
+        "지적단정함": 0.58,
+        "눈큼": 0.68,
+        "부드러운인상": 0.8,
+        "날카로운인상": 0.2,
+        "자연스러움": 0.73,
+        "화려함": 0.24
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "둥글고 순한 눈매",
+        "hair_style": "짧은 단발, 앞머리",
+        "makeup_or_grooming": "정돈된 자연 메이크업",
+        "clothing_style": "아이보리 니트",
+        "overall_mood": "귀엽고 부드러운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI02",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "귀여운/동안형",
+        "건강/활동형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.78,
+        "청순함": 0.78,
+        "시크함": 0.24,
+        "따뜻함": 0.66,
+        "스타일리시함": 0.5,
+        "건강함": 0.66,
+        "성숙함": 0.42,
+        "지적단정함": 0.64,
+        "눈큼": 0.64,
+        "부드러운인상": 0.72,
+        "날카로운인상": 0.26,
+        "자연스러움": 0.79,
+        "화려함": 0.26
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "또렷하고 순한 눈매",
+        "hair_style": "반묶음 느낌의 긴 머리",
+        "makeup_or_grooming": "자연스럽게 정돈된 피부 표현",
+        "clothing_style": "연보라색 후드",
+        "overall_mood": "밝고 친근한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI03",
+      "subject_gender": "female",
+      "appearance_score_normalized": 75,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "지적/단정형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.68,
+        "청순함": 0.79,
+        "시크함": 0.27,
+        "따뜻함": 0.65,
+        "스타일리시함": 0.51,
+        "건강함": 0.56,
+        "성숙함": 0.47,
+        "지적단정함": 0.7,
+        "눈큼": 0.61,
+        "부드러운인상": 0.7,
+        "날카로운인상": 0.29,
+        "자연스러움": 0.79,
+        "화려함": 0.27
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "둥글고 부드러운 눈매",
+        "hair_style": "턱선 단발, 앞머리",
+        "makeup_or_grooming": "연한 메이크업",
+        "clothing_style": "크림색 니트",
+        "overall_mood": "차분한 귀여움"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI04",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.7,
+      "primary_type": "귀여운/동안형",
+      "secondary_types": [
+        "따뜻한/부드러운형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.88,
+        "청순함": 0.69,
+        "시크함": 0.19,
+        "따뜻함": 0.84,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.33,
+        "지적단정함": 0.57,
+        "눈큼": 0.74,
+        "부드러운인상": 0.82,
+        "날카로운인상": 0.19,
+        "자연스러움": 0.72,
+        "화려함": 0.28
+      },
+      "visible_features": {
+        "face_shape": "작은 둥근형",
+        "eye_impression": "웃을 때 접히는 눈매",
+        "hair_style": "묶은 머리, 앞머리",
+        "makeup_or_grooming": "밝은 피부 표현",
+        "clothing_style": "아이보리 카디건",
+        "overall_mood": "환하고 친근한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI05",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "지적/단정형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.54,
+        "청순함": 0.77,
+        "시크함": 0.31,
+        "따뜻함": 0.6,
+        "스타일리시함": 0.54,
+        "건강함": 0.55,
+        "성숙함": 0.57,
+        "지적단정함": 0.69,
+        "눈큼": 0.61,
+        "부드러운인상": 0.67,
+        "날카로운인상": 0.32,
+        "자연스러움": 0.76,
+        "화려함": 0.32
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분하고 긴 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "낮은 화장",
+        "clothing_style": "흰색 상의",
+        "overall_mood": "청순하고 조용한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI06",
+      "subject_gender": "female",
+      "appearance_score_normalized": 80,
+      "score_confidence": 0.68,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "청순/자연형",
+        "지적/단정형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.43,
+        "청순함": 0.65,
+        "시크함": 0.46,
+        "따뜻함": 0.51,
+        "스타일리시함": 0.62,
+        "건강함": 0.53,
+        "성숙함": 0.73,
+        "지적단정함": 0.72,
+        "눈큼": 0.59,
+        "부드러운인상": 0.58,
+        "날카로운인상": 0.41,
+        "자연스러움": 0.64,
+        "화려함": 0.49
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분한 눈매",
+        "hair_style": "긴 웨이브, 옆가르마",
+        "makeup_or_grooming": "정돈된 헤어와 피부",
+        "clothing_style": "아이보리 블라우스",
+        "overall_mood": "성숙하고 단정한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.72
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI07",
+      "subject_gender": "female",
+      "appearance_score_normalized": 79,
+      "score_confidence": 0.7,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "청순/자연형",
+        "귀여운/동안형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.7,
+        "청순함": 0.71,
+        "시크함": 0.34,
+        "따뜻함": 0.59,
+        "스타일리시함": 0.56,
+        "건강함": 0.52,
+        "성숙함": 0.53,
+        "지적단정함": 0.78,
+        "눈큼": 0.6,
+        "부드러운인상": 0.65,
+        "날카로운인상": 0.34,
+        "자연스러움": 0.72,
+        "화려함": 0.32
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "또렷하고 부드러운 눈매",
+        "hair_style": "긴 웨이브, 앞머리",
+        "makeup_or_grooming": "깔끔한 피부 표현",
+        "clothing_style": "연보라 셔츠",
+        "overall_mood": "단정하고 밝은 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI08",
+      "subject_gender": "female",
+      "appearance_score_normalized": 81,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.51,
+        "청순함": 0.78,
+        "시크함": 0.29,
+        "따뜻함": 0.63,
+        "스타일리시함": 0.66,
+        "건강함": 0.56,
+        "성숙함": 0.66,
+        "지적단정함": 0.67,
+        "눈큼": 0.61,
+        "부드러운인상": 0.69,
+        "날카로운인상": 0.3,
+        "자연스러움": 0.77,
+        "화려함": 0.31
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "차분하고 또렷한 눈매",
+        "hair_style": "중단발 웨이브",
+        "makeup_or_grooming": "정돈된 피부와 헤어",
+        "clothing_style": "크림색 니트",
+        "overall_mood": "청순하고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI09",
+      "subject_gender": "female",
+      "appearance_score_normalized": 74,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.56,
+        "청순함": 0.81,
+        "시크함": 0.24,
+        "따뜻함": 0.67,
+        "스타일리시함": 0.5,
+        "건강함": 0.57,
+        "성숙함": 0.45,
+        "지적단정함": 0.67,
+        "눈큼": 0.62,
+        "부드러운인상": 0.72,
+        "날카로운인상": 0.27,
+        "자연스러움": 0.83,
+        "화려함": 0.2
+      },
+      "visible_features": {
+        "face_shape": "갸름한 타원형",
+        "eye_impression": "길고 차분한 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "자연스러운 메이크업",
+        "clothing_style": "흰색 반팔",
+        "overall_mood": "자연스럽고 깨끗한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI10",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.7,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.45,
+        "청순함": 0.77,
+        "시크함": 0.35,
+        "따뜻함": 0.58,
+        "스타일리시함": 0.56,
+        "건강함": 0.51,
+        "성숙함": 0.55,
+        "지적단정함": 0.78,
+        "눈큼": 0.58,
+        "부드러운인상": 0.64,
+        "날카로운인상": 0.36,
+        "자연스러움": 0.72,
+        "화려함": 0.32
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "부드럽고 차분한 눈매",
+        "hair_style": "묶은 듯한 긴 머리",
+        "makeup_or_grooming": "단정한 메이크업",
+        "clothing_style": "흰 셔츠",
+        "overall_mood": "지적이고 청순한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI11",
+      "subject_gender": "female",
+      "appearance_score_normalized": 73,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.57,
+        "청순함": 0.8,
+        "시크함": 0.24,
+        "따뜻함": 0.72,
+        "스타일리시함": 0.5,
+        "건강함": 0.57,
+        "성숙함": 0.44,
+        "지적단정함": 0.66,
+        "눈큼": 0.62,
+        "부드러운인상": 0.73,
+        "날카로운인상": 0.26,
+        "자연스러움": 0.82,
+        "화려함": 0.26
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "부드러운 눈매",
+        "hair_style": "중단발",
+        "makeup_or_grooming": "연한 피부 표현",
+        "clothing_style": "크림 니트",
+        "overall_mood": "차분하고 편안한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI12",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "지적/단정형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.49,
+        "청순함": 0.77,
+        "시크함": 0.31,
+        "따뜻함": 0.6,
+        "스타일리시함": 0.6,
+        "건강함": 0.55,
+        "성숙함": 0.58,
+        "지적단정함": 0.69,
+        "눈큼": 0.61,
+        "부드러운인상": 0.67,
+        "날카로운인상": 0.32,
+        "자연스러움": 0.76,
+        "화려함": 0.32
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "또렷하고 차분한 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "아이보리 니트",
+        "overall_mood": "청순하고 세련된 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI13",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "귀여운/동안형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.61,
+        "청순함": 0.79,
+        "시크함": 0.23,
+        "따뜻함": 0.68,
+        "스타일리시함": 0.49,
+        "건강함": 0.57,
+        "성숙함": 0.42,
+        "지적단정함": 0.65,
+        "눈큼": 0.66,
+        "부드러운인상": 0.74,
+        "날카로운인상": 0.25,
+        "자연스러움": 0.82,
+        "화려함": 0.26
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "순하고 큰 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "자연스러운 메이크업",
+        "clothing_style": "흰 셔츠",
+        "overall_mood": "깨끗하고 순한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI14",
+      "subject_gender": "female",
+      "appearance_score_normalized": 79,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "건강/활동형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.56,
+        "청순함": 0.78,
+        "시크함": 0.24,
+        "따뜻함": 0.72,
+        "스타일리시함": 0.51,
+        "건강함": 0.67,
+        "성숙함": 0.44,
+        "지적단정함": 0.64,
+        "눈큼": 0.62,
+        "부드러운인상": 0.72,
+        "날카로운인상": 0.26,
+        "자연스러움": 0.81,
+        "화려함": 0.26
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "맑고 부드러운 눈매",
+        "hair_style": "묶은 머리",
+        "makeup_or_grooming": "자연스러운 피부 표현",
+        "clothing_style": "하늘색 셔츠",
+        "overall_mood": "야외 자연광 청순함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI15",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.7,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.45,
+        "청순함": 0.71,
+        "시크함": 0.35,
+        "따뜻함": 0.58,
+        "스타일리시함": 0.56,
+        "건강함": 0.51,
+        "성숙함": 0.55,
+        "지적단정함": 0.76,
+        "눈큼": 0.58,
+        "부드러운인상": 0.64,
+        "날카로운인상": 0.36,
+        "자연스러움": 0.72,
+        "화려함": 0.22
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "또렷하고 순한 눈매",
+        "hair_style": "중단발",
+        "makeup_or_grooming": "정돈된 자연 메이크업",
+        "clothing_style": "아이보리 터틀넥",
+        "overall_mood": "단정하고 청순한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI16",
+      "subject_gender": "female",
+      "appearance_score_normalized": 77,
+      "score_confidence": 0.7,
+      "primary_type": "청순/자연형",
+      "secondary_types": [
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.57,
+        "청순함": 0.8,
+        "시크함": 0.24,
+        "따뜻함": 0.68,
+        "스타일리시함": 0.5,
+        "건강함": 0.57,
+        "성숙함": 0.44,
+        "지적단정함": 0.66,
+        "눈큼": 0.62,
+        "부드러운인상": 0.73,
+        "날카로운인상": 0.26,
+        "자연스러움": 0.78,
+        "화려함": 0.26
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분한 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "연한 메이크업",
+        "clothing_style": "베이지 니트",
+        "overall_mood": "차분한 자연형 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI17",
+      "subject_gender": "female",
+      "appearance_score_normalized": 67,
+      "score_confidence": 0.7,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "지적/단정형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.28,
+        "청순함": 0.48,
+        "시크함": 0.8,
+        "따뜻함": 0.37,
+        "스타일리시함": 0.69,
+        "건강함": 0.48,
+        "성숙함": 0.64,
+        "지적단정함": 0.66,
+        "눈큼": 0.51,
+        "부드러운인상": 0.38,
+        "날카로운인상": 0.72,
+        "자연스러움": 0.57,
+        "화려함": 0.26
+      },
+      "visible_features": {
+        "face_shape": "작은 계란형",
+        "eye_impression": "긴 직선형 눈매",
+        "hair_style": "짧은 단발",
+        "makeup_or_grooming": "낮은 채도의 정돈감",
+        "clothing_style": "검은 셔츠",
+        "overall_mood": "차갑고 미니멀한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI18",
+      "subject_gender": "female",
+      "appearance_score_normalized": 73,
+      "score_confidence": 0.7,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.3,
+        "청순함": 0.58,
+        "시크함": 0.72,
+        "따뜻함": 0.38,
+        "스타일리시함": 0.68,
+        "건강함": 0.5,
+        "성숙함": 0.62,
+        "지적단정함": 0.62,
+        "눈큼": 0.52,
+        "부드러운인상": 0.4,
+        "날카로운인상": 0.68,
+        "자연스러움": 0.6,
+        "화려함": 0.43
+      },
+      "visible_features": {
+        "face_shape": "갸름한 타원형",
+        "eye_impression": "긴 눈매",
+        "hair_style": "어깨선 단발",
+        "makeup_or_grooming": "깔끔한 메이크업",
+        "clothing_style": "검은 니트",
+        "overall_mood": "조용한 시크함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI19",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.7,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.25,
+        "청순함": 0.46,
+        "시크함": 0.78,
+        "따뜻함": 0.35,
+        "스타일리시함": 0.71,
+        "건강함": 0.49,
+        "성숙함": 0.65,
+        "지적단정함": 0.62,
+        "눈큼": 0.52,
+        "부드러운인상": 0.37,
+        "날카로운인상": 0.71,
+        "자연스러움": 0.55,
+        "화려함": 0.49
+      },
+      "visible_features": {
+        "face_shape": "긴 계란형",
+        "eye_impression": "날카롭고 긴 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "세련된 메이크업",
+        "clothing_style": "검은 상의",
+        "overall_mood": "도도하고 도시적인 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI20",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.7,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "지적/단정형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.28,
+        "청순함": 0.49,
+        "시크함": 0.73,
+        "따뜻함": 0.38,
+        "스타일리시함": 0.7,
+        "건강함": 0.49,
+        "성숙함": 0.67,
+        "지적단정함": 0.66,
+        "눈큼": 0.52,
+        "부드러운인상": 0.4,
+        "날카로운인상": 0.72,
+        "자연스러움": 0.57,
+        "화려함": 0.46
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차갑고 처연한 눈매",
+        "hair_style": "회갈색 중단발",
+        "makeup_or_grooming": "옅지만 정돈된 메이크업",
+        "clothing_style": "회색 재킷",
+        "overall_mood": "무심하고 시크한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": false,
+        "face_occluded": false,
+        "confidence": 0.74
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI21",
+      "subject_gender": "female",
+      "appearance_score_normalized": 81,
+      "score_confidence": 0.66,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.26,
+        "청순함": 0.43,
+        "시크함": 0.88,
+        "따뜻함": 0.33,
+        "스타일리시함": 0.75,
+        "건강함": 0.49,
+        "성숙함": 0.66,
+        "지적단정함": 0.6,
+        "눈큼": 0.52,
+        "부드러운인상": 0.35,
+        "날카로운인상": 0.77,
+        "자연스러움": 0.52,
+        "화려함": 0.55
+      },
+      "visible_features": {
+        "face_shape": "긴 계란형",
+        "eye_impression": "매우 날카로운 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "절제된 메이크업",
+        "clothing_style": "검은 셔츠",
+        "overall_mood": "강한 도도함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI22",
+      "subject_gender": "female",
+      "appearance_score_normalized": 80,
+      "score_confidence": 0.66,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.26,
+        "청순함": 0.46,
+        "시크함": 0.76,
+        "따뜻함": 0.35,
+        "스타일리시함": 0.74,
+        "건강함": 0.49,
+        "성숙함": 0.7,
+        "지적단정함": 0.61,
+        "눈큼": 0.53,
+        "부드러운인상": 0.37,
+        "날카로운인상": 0.7,
+        "자연스러움": 0.54,
+        "화려함": 0.53
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "긴 눈매",
+        "hair_style": "중단발",
+        "makeup_or_grooming": "세련된 메이크업",
+        "clothing_style": "회색 블레이저",
+        "overall_mood": "도시적인 시크함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI23",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.64,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "시크/도도형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.31,
+        "청순함": 0.45,
+        "시크함": 0.76,
+        "따뜻함": 0.38,
+        "스타일리시함": 0.83,
+        "건강함": 0.53,
+        "성숙함": 0.69,
+        "지적단정함": 0.58,
+        "눈큼": 0.59,
+        "부드러운인상": 0.44,
+        "날카로운인상": 0.6,
+        "자연스러움": 0.49,
+        "화려함": 0.72
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "또렷하고 날카로운 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "강한 립 메이크업",
+        "clothing_style": "검은 상의",
+        "overall_mood": "화려한 시크함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI24",
+      "subject_gender": "female",
+      "appearance_score_normalized": 85,
+      "score_confidence": 0.66,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "스타일리시/화려형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.26,
+        "청순함": 0.45,
+        "시크함": 0.77,
+        "따뜻함": 0.35,
+        "스타일리시함": 0.74,
+        "건강함": 0.5,
+        "성숙함": 0.72,
+        "지적단정함": 0.61,
+        "눈큼": 0.53,
+        "부드러운인상": 0.37,
+        "날카로운인상": 0.75,
+        "자연스러움": 0.53,
+        "화려함": 0.55
+      },
+      "visible_features": {
+        "face_shape": "각이 있는 타원형",
+        "eye_impression": "옆으로 긴 날카로운 눈매",
+        "hair_style": "묶은 머리",
+        "makeup_or_grooming": "선명한 메이크업",
+        "clothing_style": "검은 가죽 재킷",
+        "overall_mood": "강하고 차가운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI25",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.66,
+      "primary_type": "따뜻한/부드러운형",
+      "secondary_types": [
+        "귀여운/동안형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.66,
+        "청순함": 0.71,
+        "시크함": 0.2,
+        "따뜻함": 0.88,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.4,
+        "지적단정함": 0.58,
+        "눈큼": 0.64,
+        "부드러운인상": 0.88,
+        "날카로운인상": 0.18,
+        "자연스러움": 0.76,
+        "화려함": 0.28
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "웃는 부드러운 눈매",
+        "hair_style": "중단발 웨이브",
+        "makeup_or_grooming": "밝은 자연 메이크업",
+        "clothing_style": "베이지 니트",
+        "overall_mood": "따뜻하고 친근한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI26",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.66,
+      "primary_type": "따뜻한/부드러운형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.61,
+        "청순함": 0.73,
+        "시크함": 0.21,
+        "따뜻함": 0.82,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.43,
+        "지적단정함": 0.6,
+        "눈큼": 0.62,
+        "부드러운인상": 0.83,
+        "날카로운인상": 0.19,
+        "자연스러움": 0.82,
+        "화려함": 0.22
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "순하고 차분한 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "낮은 화장",
+        "clothing_style": "아이보리 니트",
+        "overall_mood": "편안하고 부드러운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI27",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.66,
+      "primary_type": "귀여운/동안형",
+      "secondary_types": [
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.82,
+        "청순함": 0.68,
+        "시크함": 0.18,
+        "따뜻함": 0.82,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.32,
+        "지적단정함": 0.56,
+        "눈큼": 0.72,
+        "부드러운인상": 0.83,
+        "날카로운인상": 0.18,
+        "자연스러움": 0.71,
+        "화려함": 0.28
+      },
+      "visible_features": {
+        "face_shape": "작은 둥근형",
+        "eye_impression": "둥글고 밝은 눈매",
+        "hair_style": "묶은 머리",
+        "makeup_or_grooming": "밝은 피부 표현",
+        "clothing_style": "분홍 카디건",
+        "overall_mood": "귀엽고 따뜻한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI28",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.64,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "따뜻한/부드러운형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.37,
+        "청순함": 0.64,
+        "시크함": 0.44,
+        "따뜻함": 0.7,
+        "스타일리시함": 0.61,
+        "건강함": 0.54,
+        "성숙함": 0.7,
+        "지적단정함": 0.65,
+        "눈큼": 0.59,
+        "부드러운인상": 0.62,
+        "날카로운인상": 0.38,
+        "자연스러움": 0.64,
+        "화려함": 0.49
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분하고 성숙한 눈매",
+        "hair_style": "짧은 웨이브 단발",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "베이지 랩 블라우스",
+        "overall_mood": "성숙하고 부드러운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI29",
+      "subject_gender": "female",
+      "appearance_score_normalized": 81,
+      "score_confidence": 0.66,
+      "primary_type": "따뜻한/부드러운형",
+      "secondary_types": [
+        "귀여운/동안형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.72,
+        "청순함": 0.71,
+        "시크함": 0.2,
+        "따뜻함": 0.81,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.4,
+        "지적단정함": 0.58,
+        "눈큼": 0.64,
+        "부드러운인상": 0.86,
+        "날카로운인상": 0.18,
+        "자연스러움": 0.76,
+        "화려함": 0.28
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "큰 부드러운 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "밝은 자연 메이크업",
+        "clothing_style": "흰 가디건",
+        "overall_mood": "사근사근한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI30",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.66,
+      "primary_type": "따뜻한/부드러운형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.61,
+        "청순함": 0.73,
+        "시크함": 0.21,
+        "따뜻함": 0.83,
+        "스타일리시함": 0.48,
+        "건강함": 0.58,
+        "성숙함": 0.43,
+        "지적단정함": 0.6,
+        "눈큼": 0.62,
+        "부드러운인상": 0.83,
+        "날카로운인상": 0.19,
+        "자연스러움": 0.8,
+        "화려함": 0.27
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "순하고 작은 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "연한 메이크업",
+        "clothing_style": "베이지 니트",
+        "overall_mood": "현실적인 따뜻함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI31",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.64,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "건강/활동형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.37,
+        "청순함": 0.48,
+        "시크함": 0.54,
+        "따뜻함": 0.44,
+        "스타일리시함": 0.8,
+        "건강함": 0.72,
+        "성숙함": 0.65,
+        "지적단정함": 0.56,
+        "눈큼": 0.61,
+        "부드러운인상": 0.51,
+        "날카로운인상": 0.51,
+        "자연스러움": 0.53,
+        "화려함": 0.63
+      },
+      "visible_features": {
+        "face_shape": "갸름한 타원형",
+        "eye_impression": "또렷하고 세련된 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "피트니스풍 정돈감",
+        "clothing_style": "검은 스포츠 탑과 흰 재킷",
+        "overall_mood": "건강하고 스타일리시한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI32",
+      "subject_gender": "female",
+      "appearance_score_normalized": 86,
+      "score_confidence": 0.62,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.32,
+        "청순함": 0.46,
+        "시크함": 0.6,
+        "따뜻함": 0.4,
+        "스타일리시함": 0.84,
+        "건강함": 0.54,
+        "성숙함": 0.72,
+        "지적단정함": 0.58,
+        "눈큼": 0.61,
+        "부드러운인상": 0.47,
+        "날카로운인상": 0.55,
+        "자연스러움": 0.48,
+        "화려함": 0.86
+      },
+      "visible_features": {
+        "face_shape": "작은 계란형",
+        "eye_impression": "크고 선명한 눈매",
+        "hair_style": "붉은 갈색 웨이브",
+        "makeup_or_grooming": "화려한 메이크업",
+        "clothing_style": "플로럴 블라우스",
+        "overall_mood": "화려하고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.66
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI33",
+      "subject_gender": "female",
+      "appearance_score_normalized": 83,
+      "score_confidence": 0.64,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "시크/도도형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.31,
+        "청순함": 0.45,
+        "시크함": 0.72,
+        "따뜻함": 0.38,
+        "스타일리시함": 0.83,
+        "건강함": 0.53,
+        "성숙함": 0.69,
+        "지적단정함": 0.58,
+        "눈큼": 0.59,
+        "부드러운인상": 0.44,
+        "날카로운인상": 0.6,
+        "자연스러움": 0.49,
+        "화려함": 0.7
+      },
+      "visible_features": {
+        "face_shape": "긴 계란형",
+        "eye_impression": "긴 시크 눈매",
+        "hair_style": "애쉬 브라운 긴 머리",
+        "makeup_or_grooming": "선명한 메이크업",
+        "clothing_style": "검은 가죽 재킷",
+        "overall_mood": "도시적 스타일"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI34",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.66,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.26,
+        "청순함": 0.43,
+        "시크함": 0.76,
+        "따뜻함": 0.33,
+        "스타일리시함": 0.78,
+        "건강함": 0.49,
+        "성숙함": 0.66,
+        "지적단정함": 0.6,
+        "눈큼": 0.52,
+        "부드러운인상": 0.35,
+        "날카로운인상": 0.74,
+        "자연스러움": 0.52,
+        "화려함": 0.55
+      },
+      "visible_features": {
+        "face_shape": "짧은 타원형",
+        "eye_impression": "무심한 반쯤 감긴 눈매",
+        "hair_style": "짧은 보브컷",
+        "makeup_or_grooming": "패션 화보형 정돈감",
+        "clothing_style": "검은 니트",
+        "overall_mood": "개성 있는 스타일"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI35",
+      "subject_gender": "female",
+      "appearance_score_normalized": 87,
+      "score_confidence": 0.62,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "시크/도도형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.31,
+        "청순함": 0.46,
+        "시크함": 0.62,
+        "따뜻함": 0.39,
+        "스타일리시함": 0.9,
+        "건강함": 0.54,
+        "성숙함": 0.71,
+        "지적단정함": 0.58,
+        "눈큼": 0.6,
+        "부드러운인상": 0.46,
+        "날카로운인상": 0.58,
+        "자연스러움": 0.49,
+        "화려함": 0.92
+      },
+      "visible_features": {
+        "face_shape": "갸름한 계란형",
+        "eye_impression": "화려하고 또렷한 눈매",
+        "hair_style": "밝은 갈색 긴 웨이브",
+        "makeup_or_grooming": "강한 메이크업",
+        "clothing_style": "스팽글 블랙 상의",
+        "overall_mood": "매우 화려한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.66
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI36",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.64,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "청순/자연형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.36,
+        "청순함": 0.62,
+        "시크함": 0.54,
+        "따뜻함": 0.44,
+        "스타일리시함": 0.79,
+        "건강함": 0.55,
+        "성숙함": 0.66,
+        "지적단정함": 0.59,
+        "눈큼": 0.62,
+        "부드러운인상": 0.51,
+        "날카로운인상": 0.51,
+        "자연스러움": 0.54,
+        "화려함": 0.68
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "밝고 세련된 눈매",
+        "hair_style": "붉은 갈색 웨이브",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "흰 셔츠",
+        "overall_mood": "세련되고 여성스러운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI37",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.64,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.37,
+        "청순함": 0.51,
+        "시크함": 0.55,
+        "따뜻함": 0.43,
+        "스타일리시함": 0.76,
+        "건강함": 0.55,
+        "성숙함": 0.63,
+        "지적단정함": 0.58,
+        "눈큼": 0.62,
+        "부드러운인상": 0.5,
+        "날카로운인상": 0.52,
+        "자연스러움": 0.53,
+        "화려함": 0.52
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "또렷하고 부드러운 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "깔끔한 메이크업",
+        "clothing_style": "베이지 셔츠",
+        "overall_mood": "미니멀한 세련미"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI38",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.66,
+      "primary_type": "시크/도도형",
+      "secondary_types": [
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.26,
+        "청순함": 0.43,
+        "시크함": 0.8,
+        "따뜻함": 0.33,
+        "스타일리시함": 0.82,
+        "건강함": 0.49,
+        "성숙함": 0.66,
+        "지적단정함": 0.6,
+        "눈큼": 0.52,
+        "부드러운인상": 0.35,
+        "날카로운인상": 0.76,
+        "자연스러움": 0.52,
+        "화려함": 0.55
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "날카로운 눈매",
+        "hair_style": "레이어드 중단발",
+        "makeup_or_grooming": "강한 아이 메이크업",
+        "clothing_style": "오버핏 재킷",
+        "overall_mood": "패션 중심의 시크함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI39",
+      "subject_gender": "female",
+      "appearance_score_normalized": 90,
+      "score_confidence": 0.62,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.32,
+        "청순함": 0.46,
+        "시크함": 0.6,
+        "따뜻함": 0.4,
+        "스타일리시함": 0.84,
+        "건강함": 0.54,
+        "성숙함": 0.72,
+        "지적단정함": 0.58,
+        "눈큼": 0.76,
+        "부드러운인상": 0.47,
+        "날카로운인상": 0.55,
+        "자연스러움": 0.48,
+        "화려함": 0.94
+      },
+      "visible_features": {
+        "face_shape": "작은 계란형",
+        "eye_impression": "크고 화려한 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "화려한 메이크업",
+        "clothing_style": "반짝이는 드레스풍 상의",
+        "overall_mood": "상위권 화려함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.66
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI40",
+      "subject_gender": "female",
+      "appearance_score_normalized": 88,
+      "score_confidence": 0.62,
+      "primary_type": "스타일리시/화려형",
+      "secondary_types": [
+        "청순/자연형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.36,
+        "청순함": 0.52,
+        "시크함": 0.54,
+        "따뜻함": 0.44,
+        "스타일리시함": 0.79,
+        "건강함": 0.55,
+        "성숙함": 0.66,
+        "지적단정함": 0.59,
+        "눈큼": 0.62,
+        "부드러운인상": 0.66,
+        "날카로운인상": 0.46,
+        "자연스러움": 0.54,
+        "화려함": 0.76
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "큰 부드러운 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "밝은 메이크업",
+        "clothing_style": "흰 브이넥 니트",
+        "overall_mood": "화려하지만 부드러운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.66
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI41",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "귀여운/동안형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.62,
+        "청순함": 0.65,
+        "시크함": 0.24,
+        "따뜻함": 0.69,
+        "스타일리시함": 0.53,
+        "건강함": 0.86,
+        "성숙함": 0.38,
+        "지적단정함": 0.54,
+        "눈큼": 0.63,
+        "부드러운인상": 0.72,
+        "날카로운인상": 0.24,
+        "자연스러움": 0.8,
+        "화려함": 0.3
+      },
+      "visible_features": {
+        "face_shape": "작은 둥근형",
+        "eye_impression": "밝고 순한 눈매",
+        "hair_style": "운동용 묶은 머리",
+        "makeup_or_grooming": "맑은 피부 표현",
+        "clothing_style": "흰 테니스 셔츠",
+        "overall_mood": "활동적이고 밝은 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI42",
+      "subject_gender": "female",
+      "appearance_score_normalized": 79,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "따뜻한/부드러운형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.58,
+        "청순함": 0.66,
+        "시크함": 0.24,
+        "따뜻함": 0.76,
+        "스타일리시함": 0.53,
+        "건강함": 0.82,
+        "성숙함": 0.4,
+        "지적단정함": 0.55,
+        "눈큼": 0.61,
+        "부드러운인상": 0.73,
+        "날카로운인상": 0.24,
+        "자연스러움": 0.78,
+        "화려함": 0.3
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "부드러운 웃는 눈매",
+        "hair_style": "업스타일",
+        "makeup_or_grooming": "자연스러운 메이크업",
+        "clothing_style": "회색 후드",
+        "overall_mood": "건강하고 편안한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI43",
+      "subject_gender": "female",
+      "appearance_score_normalized": 79,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "귀여운/동안형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.72,
+        "청순함": 0.63,
+        "시크함": 0.24,
+        "따뜻함": 0.7,
+        "스타일리시함": 0.54,
+        "건강함": 0.84,
+        "성숙함": 0.37,
+        "지적단정함": 0.53,
+        "눈큼": 0.64,
+        "부드러운인상": 0.72,
+        "날카로운인상": 0.24,
+        "자연스러움": 0.76,
+        "화려함": 0.3
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "큰 밝은 눈매",
+        "hair_style": "양갈래 땋은 머리",
+        "makeup_or_grooming": "밝은 메이크업",
+        "clothing_style": "노란 셔츠",
+        "overall_mood": "야외 활동형 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI44",
+      "subject_gender": "female",
+      "appearance_score_normalized": 83,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.52,
+        "청순함": 0.58,
+        "시크함": 0.32,
+        "따뜻함": 0.63,
+        "스타일리시함": 0.68,
+        "건강함": 0.9,
+        "성숙함": 0.45,
+        "지적단정함": 0.53,
+        "눈큼": 0.61,
+        "부드러운인상": 0.65,
+        "날카로운인상": 0.32,
+        "자연스러움": 0.72,
+        "화려함": 0.42
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분하고 또렷한 눈매",
+        "hair_style": "묶은 머리",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "민트 운동복",
+        "overall_mood": "피트니스형 건강미"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI45",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "귀여운/동안형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.74,
+        "청순함": 0.64,
+        "시크함": 0.23,
+        "따뜻함": 0.71,
+        "스타일리시함": 0.53,
+        "건강함": 0.84,
+        "성숙함": 0.38,
+        "지적단정함": 0.53,
+        "눈큼": 0.63,
+        "부드러운인상": 0.74,
+        "날카로운인상": 0.23,
+        "자연스러움": 0.76,
+        "화려함": 0.3
+      },
+      "visible_features": {
+        "face_shape": "작은 둥근형",
+        "eye_impression": "큰 밝은 눈매",
+        "hair_style": "포니테일",
+        "makeup_or_grooming": "밝은 메이크업",
+        "clothing_style": "파란 집업",
+        "overall_mood": "스포티하고 귀여운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI46",
+      "subject_gender": "female",
+      "appearance_score_normalized": 80,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.58,
+        "청순함": 0.64,
+        "시크함": 0.24,
+        "따뜻함": 0.72,
+        "스타일리시함": 0.54,
+        "건강함": 0.8,
+        "성숙함": 0.4,
+        "지적단정함": 0.53,
+        "눈큼": 0.61,
+        "부드러운인상": 0.73,
+        "날카로운인상": 0.23,
+        "자연스러움": 0.82,
+        "화려함": 0.3
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "웃는 부드러운 눈매",
+        "hair_style": "짧은 단발",
+        "makeup_or_grooming": "자연스러운 메이크업",
+        "clothing_style": "남색 티셔츠",
+        "overall_mood": "밝고 현실적인 활동형"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI47",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.51,
+        "청순함": 0.62,
+        "시크함": 0.3,
+        "따뜻함": 0.65,
+        "스타일리시함": 0.57,
+        "건강함": 0.9,
+        "성숙함": 0.58,
+        "지적단정함": 0.55,
+        "눈큼": 0.6,
+        "부드러운인상": 0.67,
+        "날카로운인상": 0.29,
+        "자연스러움": 0.74,
+        "화려함": 0.36
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "또렷하고 차분한 눈매",
+        "hair_style": "높게 묶은 머리",
+        "makeup_or_grooming": "깨끗한 피부 표현",
+        "clothing_style": "라벤더 운동복",
+        "overall_mood": "탄탄하고 건강한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI48",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.66,
+      "primary_type": "건강/활동형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.49,
+        "청순함": 0.6,
+        "시크함": 0.34,
+        "따뜻함": 0.62,
+        "스타일리시함": 0.6,
+        "건강함": 0.82,
+        "성숙함": 0.62,
+        "지적단정함": 0.55,
+        "눈큼": 0.61,
+        "부드러운인상": 0.65,
+        "날카로운인상": 0.32,
+        "자연스러움": 0.71,
+        "화려함": 0.41
+      },
+      "visible_features": {
+        "face_shape": "갸름한 타원형",
+        "eye_impression": "옆으로 긴 눈매",
+        "hair_style": "높은 포니테일",
+        "makeup_or_grooming": "세련된 메이크업",
+        "clothing_style": "흰 후드 집업",
+        "overall_mood": "건강하고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI49",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.64,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "지적/단정형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.33,
+        "청순함": 0.64,
+        "시크함": 0.47,
+        "따뜻함": 0.5,
+        "스타일리시함": 0.63,
+        "건강함": 0.52,
+        "성숙함": 0.74,
+        "지적단정함": 0.7,
+        "눈큼": 0.58,
+        "부드러운인상": 0.58,
+        "날카로운인상": 0.42,
+        "자연스러움": 0.63,
+        "화려함": 0.28
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분하고 깊은 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "낮은 채도의 메이크업",
+        "clothing_style": "검은 니트",
+        "overall_mood": "성숙하고 조용한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI50",
+      "subject_gender": "female",
+      "appearance_score_normalized": 80,
+      "score_confidence": 0.64,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "시크/도도형",
+        "지적/단정형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.29,
+        "청순함": 0.58,
+        "시크함": 0.58,
+        "따뜻함": 0.45,
+        "스타일리시함": 0.66,
+        "건강함": 0.51,
+        "성숙함": 0.78,
+        "지적단정함": 0.67,
+        "눈큼": 0.56,
+        "부드러운인상": 0.52,
+        "날카로운인상": 0.5,
+        "자연스러움": 0.58,
+        "화려함": 0.53
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차갑고 긴 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "절제된 메이크업",
+        "clothing_style": "베이지 코트",
+        "overall_mood": "도시적이고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI51",
+      "subject_gender": "female",
+      "appearance_score_normalized": 79,
+      "score_confidence": 0.64,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "지적/단정형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.31,
+        "청순함": 0.62,
+        "시크함": 0.49,
+        "따뜻함": 0.49,
+        "스타일리시함": 0.64,
+        "건강함": 0.52,
+        "성숙함": 0.76,
+        "지적단정함": 0.72,
+        "눈큼": 0.58,
+        "부드러운인상": 0.56,
+        "날카로운인상": 0.44,
+        "자연스러움": 0.6,
+        "화려함": 0.52
+      },
+      "visible_features": {
+        "face_shape": "작은 계란형",
+        "eye_impression": "크고 차분한 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "검은 터틀넥",
+        "overall_mood": "단아하고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI52",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.64,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "시크/도도형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.27,
+        "청순함": 0.57,
+        "시크함": 0.58,
+        "따뜻함": 0.44,
+        "스타일리시함": 0.67,
+        "건강함": 0.51,
+        "성숙함": 0.82,
+        "지적단정함": 0.65,
+        "눈큼": 0.56,
+        "부드러운인상": 0.5,
+        "날카로운인상": 0.55,
+        "자연스러움": 0.57,
+        "화려함": 0.55
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "그늘진 깊은 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "무드 있는 메이크업",
+        "clothing_style": "어두운 재킷",
+        "overall_mood": "분위기 강한 성숙함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.68
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI53",
+      "subject_gender": "female",
+      "appearance_score_normalized": 86,
+      "score_confidence": 0.62,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.29,
+        "청순함": 0.57,
+        "시크함": 0.54,
+        "따뜻함": 0.45,
+        "스타일리시함": 0.7,
+        "건강함": 0.53,
+        "성숙함": 0.86,
+        "지적단정함": 0.64,
+        "눈큼": 0.59,
+        "부드러운인상": 0.53,
+        "날카로운인상": 0.48,
+        "자연스러움": 0.56,
+        "화려함": 0.76
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "또렷하고 화려한 눈매",
+        "hair_style": "볼륨 있는 업스타일",
+        "makeup_or_grooming": "화려한 메이크업",
+        "clothing_style": "실크 블라우스",
+        "overall_mood": "고급스럽고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.66
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI54",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.42,
+        "청순함": 0.67,
+        "시크함": 0.39,
+        "따뜻함": 0.57,
+        "스타일리시함": 0.58,
+        "건강함": 0.51,
+        "성숙함": 0.61,
+        "지적단정함": 0.78,
+        "눈큼": 0.58,
+        "부드러운인상": 0.7,
+        "날카로운인상": 0.37,
+        "자연스러움": 0.68,
+        "화려함": 0.38
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "부드럽고 또렷한 눈매",
+        "hair_style": "중단발",
+        "makeup_or_grooming": "깔끔한 메이크업",
+        "clothing_style": "남색 카디건",
+        "overall_mood": "차분하고 단정한 성숙함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI55",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.4,
+        "청순함": 0.66,
+        "시크함": 0.41,
+        "따뜻함": 0.54,
+        "스타일리시함": 0.6,
+        "건강함": 0.5,
+        "성숙함": 0.68,
+        "지적단정함": 0.84,
+        "눈큼": 0.57,
+        "부드러운인상": 0.61,
+        "날카로운인상": 0.39,
+        "자연스러움": 0.68,
+        "화려함": 0.39
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "부드럽고 안정적인 눈매",
+        "hair_style": "단정한 묶은 머리",
+        "makeup_or_grooming": "자연스러운 메이크업",
+        "clothing_style": "회색 수트",
+        "overall_mood": "직장인풍 단정함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI56",
+      "subject_gender": "female",
+      "appearance_score_normalized": 87,
+      "score_confidence": 0.62,
+      "primary_type": "성숙/분위기형",
+      "secondary_types": [
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.29,
+        "청순함": 0.57,
+        "시크함": 0.54,
+        "따뜻함": 0.45,
+        "스타일리시함": 0.7,
+        "건강함": 0.53,
+        "성숙함": 0.86,
+        "지적단정함": 0.64,
+        "눈큼": 0.59,
+        "부드러운인상": 0.53,
+        "날카로운인상": 0.48,
+        "자연스러움": 0.56,
+        "화려함": 0.78
+      },
+      "visible_features": {
+        "face_shape": "긴 계란형",
+        "eye_impression": "깊고 선명한 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "화려한 메이크업",
+        "clothing_style": "검은 민소매 상의",
+        "overall_mood": "성숙하고 화려한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.66
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI57",
+      "subject_gender": "female",
+      "appearance_score_normalized": 74,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.45,
+        "청순함": 0.71,
+        "시크함": 0.35,
+        "따뜻함": 0.58,
+        "스타일리시함": 0.56,
+        "건강함": 0.51,
+        "성숙함": 0.55,
+        "지적단정함": 0.86,
+        "눈큼": 0.58,
+        "부드러운인상": 0.64,
+        "날카로운인상": 0.36,
+        "자연스러움": 0.72,
+        "화려함": 0.18
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "작고 차분한 눈매",
+        "hair_style": "중단발, 앞머리, 안경",
+        "makeup_or_grooming": "낮은 화장",
+        "clothing_style": "네이비 카디건과 셔츠",
+        "overall_mood": "지적이고 학생 같은 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI58",
+      "subject_gender": "female",
+      "appearance_score_normalized": 76,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "청순/자연형",
+        "따뜻한/부드러운형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.47,
+        "청순함": 0.76,
+        "시크함": 0.34,
+        "따뜻함": 0.6,
+        "스타일리시함": 0.56,
+        "건강함": 0.52,
+        "성숙함": 0.54,
+        "지적단정함": 0.78,
+        "눈큼": 0.58,
+        "부드러운인상": 0.66,
+        "날카로운인상": 0.34,
+        "자연스러움": 0.73,
+        "화려함": 0.32
+      },
+      "visible_features": {
+        "face_shape": "타원형",
+        "eye_impression": "부드럽고 차분한 눈매",
+        "hair_style": "묶은 머리",
+        "makeup_or_grooming": "깔끔한 메이크업",
+        "clothing_style": "하늘색 셔츠",
+        "overall_mood": "단정하고 청순한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI59",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "스타일리시/화려형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.39,
+        "청순함": 0.64,
+        "시크함": 0.43,
+        "따뜻함": 0.53,
+        "스타일리시함": 0.68,
+        "건강함": 0.51,
+        "성숙함": 0.64,
+        "지적단정함": 0.8,
+        "눈큼": 0.58,
+        "부드러운인상": 0.59,
+        "날카로운인상": 0.41,
+        "자연스러움": 0.65,
+        "화려함": 0.43
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "또렷하고 부드러운 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "베이지 블레이저",
+        "overall_mood": "세련된 단정함"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI60",
+      "subject_gender": "female",
+      "appearance_score_normalized": 78,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.45,
+        "청순함": 0.71,
+        "시크함": 0.35,
+        "따뜻함": 0.58,
+        "스타일리시함": 0.56,
+        "건강함": 0.51,
+        "성숙함": 0.55,
+        "지적단정함": 0.82,
+        "눈큼": 0.58,
+        "부드러운인상": 0.64,
+        "날카로운인상": 0.36,
+        "자연스러움": 0.78,
+        "화려함": 0.32
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "순하고 집중된 눈매",
+        "hair_style": "묶은 머리",
+        "makeup_or_grooming": "낮은 화장",
+        "clothing_style": "흰 셔츠",
+        "overall_mood": "깨끗한 지적 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI61",
+      "subject_gender": "female",
+      "appearance_score_normalized": 79,
+      "score_confidence": 0.66,
+      "primary_type": "따뜻한/부드러운형",
+      "secondary_types": [
+        "지적/단정형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.59,
+        "청순함": 0.71,
+        "시크함": 0.24,
+        "따뜻함": 0.8,
+        "스타일리시함": 0.5,
+        "건강함": 0.56,
+        "성숙함": 0.45,
+        "지적단정함": 0.64,
+        "눈큼": 0.61,
+        "부드러운인상": 0.82,
+        "날카로운인상": 0.22,
+        "자연스러움": 0.76,
+        "화려함": 0.29
+      },
+      "visible_features": {
+        "face_shape": "둥근 타원형",
+        "eye_impression": "큰 부드러운 눈매",
+        "hair_style": "긴 생머리",
+        "makeup_or_grooming": "자연스러운 메이크업",
+        "clothing_style": "민트 니트",
+        "overall_mood": "부드럽고 단정한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI62",
+      "subject_gender": "female",
+      "appearance_score_normalized": 82,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.41,
+        "청순함": 0.68,
+        "시크함": 0.39,
+        "따뜻함": 0.55,
+        "스타일리시함": 0.59,
+        "건강함": 0.51,
+        "성숙함": 0.62,
+        "지적단정함": 0.84,
+        "눈큼": 0.58,
+        "부드러운인상": 0.62,
+        "날카로운인상": 0.38,
+        "자연스러움": 0.69,
+        "화려함": 0.37
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "차분하고 또렷한 눈매",
+        "hair_style": "중단발 웨이브",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "아이보리 블라우스",
+        "overall_mood": "세련된 지적 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI63",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "스타일리시/화려형",
+        "성숙/분위기형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.4,
+        "청순함": 0.63,
+        "시크함": 0.44,
+        "따뜻함": 0.52,
+        "스타일리시함": 0.7,
+        "건강함": 0.51,
+        "성숙함": 0.63,
+        "지적단정함": 0.82,
+        "눈큼": 0.58,
+        "부드러운인상": 0.58,
+        "날카로운인상": 0.42,
+        "자연스러움": 0.64,
+        "화려함": 0.46
+      },
+      "visible_features": {
+        "face_shape": "작은 타원형",
+        "eye_impression": "선명하고 부드러운 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "깔끔한 메이크업",
+        "clothing_style": "검은 블레이저",
+        "overall_mood": "단정하고 고급스러운 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    },
+    {
+      "image_id": "FI64",
+      "subject_gender": "female",
+      "appearance_score_normalized": 84,
+      "score_confidence": 0.66,
+      "primary_type": "지적/단정형",
+      "secondary_types": [
+        "성숙/분위기형",
+        "청순/자연형"
+      ],
+      "appearance_vector": {
+        "귀여움": 0.41,
+        "청순함": 0.68,
+        "시크함": 0.39,
+        "따뜻함": 0.55,
+        "스타일리시함": 0.59,
+        "건강함": 0.51,
+        "성숙함": 0.66,
+        "지적단정함": 0.8,
+        "눈큼": 0.58,
+        "부드러운인상": 0.62,
+        "날카로운인상": 0.38,
+        "자연스러움": 0.69,
+        "화려함": 0.37
+      },
+      "visible_features": {
+        "face_shape": "긴 타원형",
+        "eye_impression": "차분하고 긴 눈매",
+        "hair_style": "긴 웨이브",
+        "makeup_or_grooming": "정돈된 메이크업",
+        "clothing_style": "하늘색 셔츠",
+        "overall_mood": "지적이고 성숙한 분위기"
+      },
+      "photo_quality": {
+        "single_person": true,
+        "face_visible": true,
+        "lighting_ok": true,
+        "blurred": false,
+        "heavy_filter_suspected": true,
+        "face_occluded": false,
+        "confidence": 0.7
+      },
+      "internal_notes": "codex_gpt_visual_pass_from_contact_sheet_not_external_api"
+    }
+  ],
+  "ranking_by_photo_impact": [
+    "FI39",
+    "FI40",
+    "FI35",
+    "FI56",
+    "FI32",
+    "FI53",
+    "FI24",
+    "FI23",
+    "FI31",
+    "FI36",
+    "FI38",
+    "FI47",
+    "FI55",
+    "FI63",
+    "FI64",
+    "FI33",
+    "FI44",
+    "FI04",
+    "FI28",
+    "FI34",
+    "FI37",
+    "FI45",
+    "FI48",
+    "FI52",
+    "FI54",
+    "FI59",
+    "FI62",
+    "FI08",
+    "FI21",
+    "FI29",
+    "FI06",
+    "FI22",
+    "FI46",
+    "FI50",
+    "FI07",
+    "FI14",
+    "FI42",
+    "FI43",
+    "FI51",
+    "FI61",
+    "FI05",
+    "FI12",
+    "FI15",
+    "FI25",
+    "FI27",
+    "FI41",
+    "FI60",
+    "FI16",
+    "FI02",
+    "FI10",
+    "FI13",
+    "FI19",
+    "FI20",
+    "FI26",
+    "FI30",
+    "FI49",
+    "FI58",
+    "FI03",
+    "FI09",
+    "FI57",
+    "FI11",
+    "FI18",
+    "FI01",
+    "FI17"
+  ]
+}

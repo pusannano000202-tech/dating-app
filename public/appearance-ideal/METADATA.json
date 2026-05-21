@@ -1,252 +1,4574 @@
 {
   "_meta": {
-    "version": 2,
-    "generated_at": "2026-05-18T00:00:00Z",
+    "version": 3,
+    "generated_at": "2026-05-20T15:02:50.134385+00:00",
     "design_doc": "docs/IDEAL_WORLDCUP_64_DESIGN.md",
     "plan_doc": "docs/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md",
     "schema_doc": "docs/APPEARANCE_ANALYSIS_SCHEMA.md",
     "codex_prompt_doc": "docs/handoff/CODEX_FEMALE_64_IMAGE_GENERATION_PROMPT.md",
     "notes": [
-      "이 파일은 Codex가 이미지 GPT 재분석 후 채운다.",
-      "target = 생성 의도. measured = GPT 재분석 결과. 매칭에는 measured만 사용한다.",
-      "final_bucket 은 measured 기준이며 target_type 과 다를 수 있다.",
-      "status: active = 월드컵에 사용. 그 외 (candidate/rejected/regenerate)는 사용 안 함.",
-      "file 경로는 'public/appearance-ideal/...' 형식. lib/appearance/metadata.ts 의 publicImageUrl 이 public/ 를 자동으로 잘라냄.",
-      "현재는 fixture(샘플 8개)만 들어있다. Codex의 실제 분석 결과로 교체되어야 한다."
+      "Female ideal worldcup pool replaced with Codex final 64 selected set.",
+      "Female pool uses only appearance_score_normalized <= 77 images.",
+      "Female pool is balanced as 8 buckets x 8 images.",
+      "Matching uses measured.appearance_vector only; target fields are descriptive."
     ]
   },
   "female_pool_mean_vector": null,
   "male_pool_mean_vector": null,
   "items": [
     {
-      "id": "FI01",
+      "id": "NEW_FI02",
       "gender": "female",
-      "file": "public/appearance-ideal/female-64/FI01.jpg",
+      "file": "public/appearance-ideal/female-64/NEW_FI02.jpg",
       "status": "active",
-      "generation_round": 1,
+      "generation_round": 2,
       "target": {
-        "score": 62,
+        "score": 70,
         "type": "귀여운/동안형",
-        "subtype": "둥근 얼굴 귀여움",
-        "prompt": "둥근 얼굴형, 보통보다 큰 눈, 부드러운 미소, 밝은 니트, 귀여움은 있지만 상위권 미녀 느낌은 약한 현실 호감형"
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
       },
       "measured": {
         "subject_gender": "female",
-        "appearance_score_normalized": 60,
-        "score_confidence": 0.72,
+        "appearance_score_normalized": 70,
+        "score_confidence": 0.68,
         "primary_type": "귀여운/동안형",
-        "secondary_types": ["따뜻한/부드러운형"],
+        "secondary_types": [],
         "appearance_vector": {
-          "귀여움": 0.80,
-          "청순함": 0.48,
-          "시크함": 0.10,
-          "따뜻함": 0.62,
-          "스타일리시함": 0.30,
-          "건강함": 0.38,
-          "성숙함": 0.18,
-          "지적단정함": 0.32,
-          "눈큼": 0.72,
-          "부드러운인상": 0.74,
-          "날카로운인상": 0.10,
-          "자연스러움": 0.58,
-          "화려함": 0.18
-        }
+          "귀여움": 0.84,
+          "청순함": 0.67,
+          "시크함": 0.18,
+          "따뜻함": 0.73,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.29,
+          "지적단정함": 0.55,
+          "눈큼": 0.74,
+          "부드러운인상": 0.82,
+          "날카로운인상": 0.18,
+          "자연스러움": 0.7,
+          "화려함": 0.28
+        },
+        "visible_features": {
+          "face_shape": "작은 둥근형",
+          "eye_impression": "장난기 있는 눈매",
+          "hair_style": "높게 묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 티셔츠",
+          "overall_mood": "귀엽고 장난스러운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
       },
       "bucket_scores": {
-        "귀여운/동안형": 0.0,
-        "청순/자연형": 0.0,
-        "시크/도도형": 0.0,
-        "따뜻한/부드러운형": 0.0,
-        "스타일리시/화려형": 0.0,
-        "건강/활동형": 0.0,
-        "성숙/분위기형": 0.0,
-        "지적/단정형": 0.0
+        "귀여운/동안형": 0.793,
+        "청순/자연형": 0.691,
+        "시크/도도형": 0.241,
+        "따뜻한/부드러운형": 0.751,
+        "스타일리시/화려형": 0.361,
+        "건강/활동형": 0.623,
+        "성숙/분위기형": 0.362,
+        "지적/단정형": 0.619
       },
       "final_bucket": "귀여운/동안형",
       "matching_vector_source": "measured.appearance_vector",
       "visual_review": {
         "duplicate_risk": "pass",
         "similar_to": [],
-        "difference_notes": "fixture sample"
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
       },
       "review": {
         "target_measured_mismatch": false,
         "decision": "active",
-        "accepted_reason": "fixture sample",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
         "rejection_reason": ""
       }
     },
     {
-      "id": "FI06",
+      "id": "FI94",
       "gender": "female",
-      "file": "public/appearance-ideal/female-64/FI06.jpg",
+      "file": "public/appearance-ideal/female-64/FI94.jpg",
       "status": "active",
-      "generation_round": 2,
+      "generation_round": 94,
       "target": {
-        "score": 80,
+        "score": 66,
         "type": "귀여운/동안형",
-        "subtype": "단정한 귀여움",
-        "prompt": "단정한 니트, 자연스러운 긴 머리, 큰 눈, 동안 인상, 깔끔하고 안정적인 상위권 귀여움"
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
       },
       "measured": {
         "subject_gender": "female",
-        "appearance_score_normalized": 80,
-        "score_confidence": 0.66,
-        "primary_type": "성숙/분위기형",
-        "secondary_types": ["청순/자연형", "지적/단정형"],
+        "appearance_score_normalized": 66,
+        "score_confidence": 0.7,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
         "appearance_vector": {
-          "귀여움": 0.43,
-          "청순함": 0.76,
-          "시크함": 0.37,
-          "따뜻함": 0.55,
-          "스타일리시함": 0.63,
-          "건강함": 0.55,
-          "성숙함": 0.73,
-          "지적단정함": 0.72,
-          "눈큼": 0.60,
-          "부드러운인상": 0.61,
-          "날카로운인상": 0.39,
-          "자연스러움": 0.73,
-          "화려함": 0.34
+          "귀여움": 0.84,
+          "청순함": 0.66,
+          "시크함": 0.19,
+          "따뜻함": 0.71,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.32,
+          "지적단정함": 0.58,
+          "눈큼": 0.72,
+          "부드러운인상": 0.8,
+          "날카로운인상": 0.2,
+          "자연스러움": 0.72,
+          "화려함": 0.27
         }
       },
       "bucket_scores": {
-        "귀여운/동안형": 0.0,
-        "청순/자연형": 0.0,
-        "시크/도도형": 0.0,
-        "따뜻한/부드러운형": 0.0,
-        "스타일리시/화려형": 0.0,
-        "건강/활동형": 0.0,
-        "성숙/분위기형": 0.0,
-        "지적/단정형": 0.0
+        "귀여운/동안형": 0.781,
+        "청순/자연형": 0.692,
+        "시크/도도형": 0.255,
+        "따뜻한/부드러운형": 0.738,
+        "스타일리시/화려형": 0.363,
+        "건강/활동형": 0.626,
+        "성숙/분위기형": 0.378,
+        "지적/단정형": 0.633
       },
-      "final_bucket": "성숙/분위기형",
+      "final_bucket": "귀여운/동안형",
       "matching_vector_source": "measured.appearance_vector",
       "visual_review": {
         "duplicate_risk": "pass",
         "similar_to": [],
-        "difference_notes": "fixture sample — target vs measured mismatch 예시"
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
       },
       "review": {
-        "target_measured_mismatch": true,
+        "target_measured_mismatch": false,
         "decision": "active",
-        "accepted_reason": "귀여운 슬롯에서는 제외하지만 성숙/청순/지적 선호 측정용으로 유효함",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
         "rejection_reason": ""
       }
     },
     {
-      "id": "FI17",
+      "id": "FI95",
       "gender": "female",
-      "file": "public/appearance-ideal/female-64/FI17.jpg",
+      "file": "public/appearance-ideal/female-64/FI95.jpg",
       "status": "active",
-      "generation_round": 1,
+      "generation_round": 95,
       "target": {
-        "score": 63,
-        "type": "시크/도도형",
-        "subtype": "차분한 무표정",
-        "prompt": "갸름한 얼굴, 차분한 무표정, 검은 셔츠, 선명하지만 과하지 않은 눈매, 현실 호감형"
+        "score": 68,
+        "type": "귀여운/동안형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
       },
       "measured": {
         "subject_gender": "female",
-        "appearance_score_normalized": 65,
-        "score_confidence": 0.75,
-        "primary_type": "시크/도도형",
-        "secondary_types": ["성숙/분위기형"],
+        "appearance_score_normalized": 68,
+        "score_confidence": 0.7,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
         "appearance_vector": {
-          "귀여움": 0.18,
-          "청순함": 0.30,
-          "시크함": 0.78,
-          "따뜻함": 0.20,
-          "스타일리시함": 0.55,
-          "건강함": 0.35,
-          "성숙함": 0.62,
-          "지적단정함": 0.45,
-          "눈큼": 0.42,
-          "부드러운인상": 0.22,
-          "날카로운인상": 0.72,
-          "자연스러움": 0.50,
-          "화려함": 0.42
+          "귀여움": 0.81,
+          "청순함": 0.68,
+          "시크함": 0.18,
+          "따뜻함": 0.7,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.32,
+          "지적단정함": 0.56,
+          "눈큼": 0.72,
+          "부드러운인상": 0.83,
+          "날카로운인상": 0.18,
+          "자연스러움": 0.71,
+          "화려함": 0.28
         }
       },
       "bucket_scores": {
-        "귀여운/동안형": 0.0,
-        "청순/자연형": 0.0,
-        "시크/도도형": 0.0,
-        "따뜻한/부드러운형": 0.0,
-        "스타일리시/화려형": 0.0,
-        "건강/활동형": 0.0,
-        "성숙/분위기형": 0.0,
-        "지적/단정형": 0.0
+        "귀여운/동안형": 0.771,
+        "청순/자연형": 0.7,
+        "시크/도도형": 0.245,
+        "따뜻한/부드러운형": 0.745,
+        "스타일리시/화려형": 0.364,
+        "건강/활동형": 0.622,
+        "성숙/분위기형": 0.379,
+        "지적/단정형": 0.628
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI101",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI101.jpg",
+      "status": "active",
+      "generation_round": 101,
+      "target": {
+        "score": 69,
+        "type": "귀여운/동안형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 69,
+        "score_confidence": 0.7,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.8,
+          "청순함": 0.67,
+          "시크함": 0.22,
+          "따뜻함": 0.7,
+          "스타일리시함": 0.5,
+          "건강함": 0.56,
+          "성숙함": 0.35,
+          "지적단정함": 0.62,
+          "눈큼": 0.71,
+          "부드러운인상": 0.78,
+          "날카로운인상": 0.22,
+          "자연스러움": 0.7,
+          "화려함": 0.29
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.754,
+        "청순/자연형": 0.691,
+        "시크/도도형": 0.279,
+        "따뜻한/부드러운형": 0.725,
+        "스타일리시/화려형": 0.383,
+        "건강/활동형": 0.611,
+        "성숙/분위기형": 0.405,
+        "지적/단정형": 0.648
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI04",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI04.jpg",
+      "status": "active",
+      "generation_round": 4,
+      "target": {
+        "score": 74,
+        "type": "귀여운/동안형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 74,
+        "score_confidence": 0.68,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "건강/활동형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.79,
+          "청순함": 0.66,
+          "시크함": 0.19,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.49,
+          "건강함": 0.64,
+          "성숙함": 0.31,
+          "지적단정함": 0.54,
+          "눈큼": 0.71,
+          "부드러운인상": 0.8,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.72,
+          "화려함": 0.29
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "웃는 큰 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "스트라이프 티셔츠",
+          "overall_mood": "활발하고 귀여운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.758,
+        "청순/자연형": 0.686,
+        "시크/도도형": 0.252,
+        "따뜻한/부드러운형": 0.742,
+        "스타일리시/화려형": 0.375,
+        "건강/활동형": 0.656,
+        "성숙/분위기형": 0.372,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI12",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI12.jpg",
+      "status": "active",
+      "generation_round": 12,
+      "target": {
+        "score": 66,
+        "type": "귀여운/동안형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 66,
+        "score_confidence": 0.7,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "건강/활동형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.79,
+          "청순함": 0.66,
+          "시크함": 0.19,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.49,
+          "건강함": 0.64,
+          "성숙함": 0.31,
+          "지적단정함": 0.54,
+          "눈큼": 0.71,
+          "부드러운인상": 0.8,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.72,
+          "화려함": 0.29
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "작고 순한 눈매",
+          "hair_style": "묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 후드",
+          "overall_mood": "수수하고 어린 느낌"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.74
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.758,
+        "청순/자연형": 0.686,
+        "시크/도도형": 0.252,
+        "따뜻한/부드러운형": 0.742,
+        "스타일리시/화려형": 0.375,
+        "건강/활동형": 0.656,
+        "성숙/분위기형": 0.372,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI07",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI07.jpg",
+      "status": "active",
+      "generation_round": 7,
+      "target": {
+        "score": 73,
+        "type": "귀여운/동안형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 73,
+        "score_confidence": 0.68,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.78,
+          "청순함": 0.7,
+          "시크함": 0.19,
+          "따뜻함": 0.71,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.32,
+          "지적단정함": 0.58,
+          "눈큼": 0.72,
+          "부드러운인상": 0.8,
+          "날카로운인상": 0.2,
+          "자연스러움": 0.72,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "작은 둥근형",
+          "eye_impression": "큰 순한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "하늘색 니트",
+          "overall_mood": "귀엽고 부드러운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.754,
+        "청순/자연형": 0.71,
+        "시크/도도형": 0.255,
+        "따뜻한/부드러운형": 0.742,
+        "스타일리시/화려형": 0.363,
+        "건강/활동형": 0.626,
+        "성숙/분위기형": 0.386,
+        "지적/단정형": 0.639
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI13",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI13.jpg",
+      "status": "active",
+      "generation_round": 13,
+      "target": {
+        "score": 72,
+        "type": "귀여운/동안형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.68,
+        "primary_type": "귀여운/동안형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.78,
+          "청순함": 0.7,
+          "시크함": 0.19,
+          "따뜻함": 0.71,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.32,
+          "지적단정함": 0.58,
+          "눈큼": 0.72,
+          "부드러운인상": 0.8,
+          "날카로운인상": 0.2,
+          "자연스러움": 0.72,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "짧은 둥근형",
+          "eye_impression": "큰 둥근 눈매",
+          "hair_style": "짧은 단발",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "분홍 폴로 셔츠",
+          "overall_mood": "단정한 귀여움"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.754,
+        "청순/자연형": 0.71,
+        "시크/도도형": 0.255,
+        "따뜻한/부드러운형": 0.742,
+        "스타일리시/화려형": 0.363,
+        "건강/활동형": 0.626,
+        "성숙/분위기형": 0.386,
+        "지적/단정형": 0.639
+      },
+      "final_bucket": "귀여운/동안형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI96",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI96.jpg",
+      "status": "active",
+      "generation_round": 96,
+      "target": {
+        "score": 70,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 70,
+        "score_confidence": 0.7,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.57,
+          "청순함": 0.82,
+          "시크함": 0.24,
+          "따뜻함": 0.68,
+          "스타일리시함": 0.5,
+          "건강함": 0.57,
+          "성숙함": 0.44,
+          "지적단정함": 0.66,
+          "눈큼": 0.62,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.26,
+          "자연스러움": 0.81,
+          "화려함": 0.26
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.614,
+        "청순/자연형": 0.784,
+        "시크/도도형": 0.309,
+        "따뜻한/부드러운형": 0.732,
+        "스타일리시/화려형": 0.386,
+        "건강/활동형": 0.639,
+        "성숙/분위기형": 0.481,
+        "지적/단정형": 0.702
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI102",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI102.jpg",
+      "status": "active",
+      "generation_round": 102,
+      "target": {
+        "score": 72,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.7,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.53,
+          "청순함": 0.81,
+          "시크함": 0.28,
+          "따뜻함": 0.62,
+          "스타일리시함": 0.52,
+          "건강함": 0.56,
+          "성숙함": 0.48,
+          "지적단정함": 0.67,
+          "눈큼": 0.61,
+          "부드러운인상": 0.68,
+          "날카로운인상": 0.3,
+          "자연스러움": 0.8,
+          "화려함": 0.27
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.577,
+        "청순/자연형": 0.77,
+        "시크/도도형": 0.347,
+        "따뜻한/부드러운형": 0.688,
+        "스타일리시/화려형": 0.407,
+        "건강/활동형": 0.627,
+        "성숙/분위기형": 0.506,
+        "지적/단정형": 0.7
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI08",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI08.jpg",
+      "status": "active",
+      "generation_round": 8,
+      "target": {
+        "score": 76,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.57,
+          "청순함": 0.8,
+          "시크함": 0.24,
+          "따뜻함": 0.68,
+          "스타일리시함": 0.5,
+          "건강함": 0.57,
+          "성숙함": 0.44,
+          "지적단정함": 0.66,
+          "눈큼": 0.62,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.26,
+          "자연스러움": 0.81,
+          "화려함": 0.26
+        },
+        "visible_features": {
+          "face_shape": "타원형",
+          "eye_impression": "부드럽고 차분한 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "데님 재킷",
+          "overall_mood": "청순하고 편안한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.614,
+        "청순/자연형": 0.775,
+        "시크/도도형": 0.309,
+        "따뜻한/부드러운형": 0.73,
+        "스타일리시/화려형": 0.386,
+        "건강/활동형": 0.639,
+        "성숙/분위기형": 0.479,
+        "지적/단정형": 0.699
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI54",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI54.jpg",
+      "status": "active",
+      "generation_round": 54,
+      "target": {
+        "score": 70,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 70,
+        "score_confidence": 0.68,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.53,
+          "청순함": 0.8,
+          "시크함": 0.28,
+          "따뜻함": 0.62,
+          "스타일리시함": 0.52,
+          "건강함": 0.56,
+          "성숙함": 0.48,
+          "지적단정함": 0.72,
+          "눈큼": 0.61,
+          "부드러운인상": 0.68,
+          "날카로운인상": 0.3,
+          "자연스러움": 0.8,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "작고 조용한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "베이지 니트",
+          "overall_mood": "수수하고 자연스러운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.577,
+        "청순/자연형": 0.77,
+        "시크/도도형": 0.347,
+        "따뜻한/부드러운형": 0.687,
+        "스타일리시/화려형": 0.407,
+        "건강/활동형": 0.627,
+        "성숙/분위기형": 0.512,
+        "지적/단정형": 0.721
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI65",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI65.jpg",
+      "status": "active",
+      "generation_round": 65,
+      "target": {
+        "score": 68,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 68,
+        "score_confidence": 0.72,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.53,
+          "청순함": 0.8,
+          "시크함": 0.28,
+          "따뜻함": 0.62,
+          "스타일리시함": 0.52,
+          "건강함": 0.56,
+          "성숙함": 0.48,
+          "지적단정함": 0.72,
+          "눈큼": 0.61,
+          "부드러운인상": 0.68,
+          "날카로운인상": 0.3,
+          "자연스러움": 0.8,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "보통 타원형",
+          "eye_impression": "작고 차분한 눈매",
+          "hair_style": "중단발 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 티셔츠",
+          "overall_mood": "수수한 자연형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.577,
+        "청순/자연형": 0.77,
+        "시크/도도형": 0.347,
+        "따뜻한/부드러운형": 0.687,
+        "스타일리시/화려형": 0.407,
+        "건강/활동형": 0.627,
+        "성숙/분위기형": 0.512,
+        "지적/단정형": 0.721
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI70",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI70.jpg",
+      "status": "active",
+      "generation_round": 70,
+      "target": {
+        "score": 58,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 58,
+        "score_confidence": 0.74,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.53,
+          "청순함": 0.8,
+          "시크함": 0.28,
+          "따뜻함": 0.62,
+          "스타일리시함": 0.52,
+          "건강함": 0.56,
+          "성숙함": 0.48,
+          "지적단정함": 0.72,
+          "눈큼": 0.61,
+          "부드러운인상": 0.68,
+          "날카로운인상": 0.3,
+          "자연스러움": 0.8,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "보통 타원형",
+          "eye_impression": "작고 차분한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "회색 니트",
+          "overall_mood": "평균권 자연형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.78
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.577,
+        "청순/자연형": 0.77,
+        "시크/도도형": 0.347,
+        "따뜻한/부드러운형": 0.687,
+        "스타일리시/화려형": 0.407,
+        "건강/활동형": 0.627,
+        "성숙/분위기형": 0.512,
+        "지적/단정형": 0.721
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI80",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI80.jpg",
+      "status": "active",
+      "generation_round": 80,
+      "target": {
+        "score": 62,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 62,
+        "score_confidence": 0.74,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.53,
+          "청순함": 0.8,
+          "시크함": 0.28,
+          "따뜻함": 0.62,
+          "스타일리시함": 0.52,
+          "건강함": 0.56,
+          "성숙함": 0.48,
+          "지적단정함": 0.72,
+          "눈큼": 0.61,
+          "부드러운인상": 0.68,
+          "날카로운인상": 0.3,
+          "자연스러움": 0.8,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "작고 무표정 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "회색 니트",
+          "overall_mood": "평균권 자연형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.78
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.577,
+        "청순/자연형": 0.77,
+        "시크/도도형": 0.347,
+        "따뜻한/부드러운형": 0.687,
+        "스타일리시/화려형": 0.407,
+        "건강/활동형": 0.627,
+        "성숙/분위기형": 0.512,
+        "지적/단정형": 0.721
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI97",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI97.jpg",
+      "status": "active",
+      "generation_round": 97,
+      "target": {
+        "score": 73,
+        "type": "청순/자연형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 73,
+        "score_confidence": 0.7,
+        "primary_type": "청순/자연형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.5,
+          "청순함": 0.8,
+          "시크함": 0.3,
+          "따뜻함": 0.61,
+          "스타일리시함": 0.53,
+          "건강함": 0.56,
+          "성숙함": 0.61,
+          "지적단정함": 0.68,
+          "눈큼": 0.61,
+          "부드러운인상": 0.67,
+          "날카로운인상": 0.31,
+          "자연스러움": 0.77,
+          "화려함": 0.31
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.547,
+        "청순/자연형": 0.756,
+        "시크/도도형": 0.373,
+        "따뜻한/부드러운형": 0.675,
+        "스타일리시/화려형": 0.439,
+        "건강/활동형": 0.617,
+        "성숙/분위기형": 0.567,
+        "지적/단정형": 0.696
+      },
+      "final_bucket": "청순/자연형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI22",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI22.jpg",
+      "status": "active",
+      "generation_round": 22,
+      "target": {
+        "score": 76,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "스타일리시/화려형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.26,
+          "청순함": 0.43,
+          "시크함": 0.8,
+          "따뜻함": 0.33,
+          "스타일리시함": 0.75,
+          "건강함": 0.49,
+          "성숙함": 0.66,
+          "지적단정함": 0.6,
+          "눈큼": 0.52,
+          "부드러운인상": 0.35,
+          "날카로운인상": 0.74,
+          "자연스러움": 0.52,
+          "화려함": 0.55
+        },
+        "visible_features": {
+          "face_shape": "타원형",
+          "eye_impression": "무심한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "데님 재킷",
+          "overall_mood": "거리감 있는 도시적 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.34,
+        "청순/자연형": 0.459,
+        "시크/도도형": 0.754,
+        "따뜻한/부드러운형": 0.371,
+        "스타일리시/화려형": 0.675,
+        "건강/활동형": 0.502,
+        "성숙/분위기형": 0.631,
+        "지적/단정형": 0.545
       },
       "final_bucket": "시크/도도형",
       "matching_vector_source": "measured.appearance_vector",
       "visual_review": {
         "duplicate_risk": "pass",
         "similar_to": [],
-        "difference_notes": "fixture sample"
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
       },
       "review": {
         "target_measured_mismatch": false,
         "decision": "active",
-        "accepted_reason": "fixture sample",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
         "rejection_reason": ""
       }
     },
     {
-      "id": "FI41",
+      "id": "FI91",
       "gender": "female",
-      "file": "public/appearance-ideal/female-64/FI41.jpg",
+      "file": "public/appearance-ideal/female-64/FI91.jpg",
       "status": "active",
-      "generation_round": 1,
+      "generation_round": 91,
       "target": {
-        "score": 61,
-        "type": "건강/활동형",
-        "subtype": "밝은 활동형",
-        "prompt": "묶은 머리, 스포티한 집업, 밝은 표정, 피부 현실 질감, 건강한 현실 호감형"
+        "score": 76,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
       },
       "measured": {
         "subject_gender": "female",
-        "appearance_score_normalized": 62,
-        "score_confidence": 0.78,
-        "primary_type": "건강/활동형",
-        "secondary_types": ["따뜻한/부드러운형"],
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
         "appearance_vector": {
-          "귀여움": 0.45,
-          "청순함": 0.40,
-          "시크함": 0.18,
-          "따뜻함": 0.58,
-          "스타일리시함": 0.40,
-          "건강함": 0.82,
-          "성숙함": 0.30,
-          "지적단정함": 0.30,
-          "눈큼": 0.55,
-          "부드러운인상": 0.50,
-          "날카로운인상": 0.25,
-          "자연스러움": 0.72,
-          "화려함": 0.22
+          "귀여움": 0.28,
+          "청순함": 0.48,
+          "시크함": 0.8,
+          "따뜻함": 0.37,
+          "스타일리시함": 0.69,
+          "건강함": 0.48,
+          "성숙함": 0.64,
+          "지적단정함": 0.7,
+          "눈큼": 0.51,
+          "부드러운인상": 0.38,
+          "날카로운인상": 0.7,
+          "자연스러움": 0.57,
+          "화려함": 0.44
         }
       },
       "bucket_scores": {
-        "귀여운/동안형": 0.0,
-        "청순/자연형": 0.0,
-        "시크/도도형": 0.0,
-        "따뜻한/부드러운형": 0.0,
-        "스타일리시/화려형": 0.0,
-        "건강/활동형": 0.0,
-        "성숙/분위기형": 0.0,
-        "지적/단정형": 0.0
+        "귀여운/동안형": 0.358,
+        "청순/자연형": 0.513,
+        "시크/도도형": 0.729,
+        "따뜻한/부드러운형": 0.411,
+        "스타일리시/화려형": 0.616,
+        "건강/활동형": 0.516,
+        "성숙/분위기형": 0.633,
+        "지적/단정형": 0.608
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI111",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI111.jpg",
+      "status": "active",
+      "generation_round": 111,
+      "target": {
+        "score": 77,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.7,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.25,
+          "청순함": 0.46,
+          "시크함": 0.8,
+          "따뜻함": 0.35,
+          "스타일리시함": 0.71,
+          "건강함": 0.49,
+          "성숙함": 0.69,
+          "지적단정함": 0.62,
+          "눈큼": 0.52,
+          "부드러운인상": 0.37,
+          "날카로운인상": 0.71,
+          "자연스러움": 0.55,
+          "화려함": 0.49
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.338,
+        "청순/자연형": 0.488,
+        "시크/도도형": 0.741,
+        "따뜻한/부드러운형": 0.394,
+        "스타일리시/화려형": 0.644,
+        "건강/활동형": 0.512,
+        "성숙/분위기형": 0.644,
+        "지적/단정형": 0.564
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI113",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI113.jpg",
+      "status": "active",
+      "generation_round": 113,
+      "target": {
+        "score": 77,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.7,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.25,
+          "청순함": 0.46,
+          "시크함": 0.8,
+          "따뜻함": 0.35,
+          "스타일리시함": 0.71,
+          "건강함": 0.49,
+          "성숙함": 0.7,
+          "지적단정함": 0.62,
+          "눈큼": 0.52,
+          "부드러운인상": 0.37,
+          "날카로운인상": 0.71,
+          "자연스러움": 0.55,
+          "화려함": 0.49
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.337,
+        "청순/자연형": 0.488,
+        "시크/도도형": 0.742,
+        "따뜻한/부드러운형": 0.394,
+        "스타일리시/화려형": 0.645,
+        "건강/활동형": 0.512,
+        "성숙/분위기형": 0.648,
+        "지적/단정형": 0.564
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI112",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI112.jpg",
+      "status": "active",
+      "generation_round": 112,
+      "target": {
+        "score": 76,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.28,
+          "청순함": 0.48,
+          "시크함": 0.79,
+          "따뜻함": 0.37,
+          "스타일리시함": 0.69,
+          "건강함": 0.48,
+          "성숙함": 0.64,
+          "지적단정함": 0.72,
+          "눈큼": 0.51,
+          "부드러운인상": 0.38,
+          "날카로운인상": 0.7,
+          "자연스러움": 0.57,
+          "화려함": 0.44
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.358,
+        "청순/자연형": 0.515,
+        "시크/도도형": 0.725,
+        "따뜻한/부드러운형": 0.411,
+        "스타일리시/화려형": 0.615,
+        "건강/활동형": 0.516,
+        "성숙/분위기형": 0.635,
+        "지적/단정형": 0.617
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI18",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI18.jpg",
+      "status": "active",
+      "generation_round": 18,
+      "target": {
+        "score": 76,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.25,
+          "청순함": 0.46,
+          "시크함": 0.78,
+          "따뜻함": 0.35,
+          "스타일리시함": 0.71,
+          "건강함": 0.49,
+          "성숙함": 0.7,
+          "지적단정함": 0.62,
+          "눈큼": 0.52,
+          "부드러운인상": 0.37,
+          "날카로운인상": 0.71,
+          "자연스러움": 0.55,
+          "화려함": 0.49
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "긴 무표정 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "검은 가죽 재킷",
+          "overall_mood": "야간 도시 시크함"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.337,
+        "청순/자연형": 0.488,
+        "시크/도도형": 0.734,
+        "따뜻한/부드러운형": 0.394,
+        "스타일리시/화려형": 0.642,
+        "건강/활동형": 0.512,
+        "성숙/분위기형": 0.645,
+        "지적/단정형": 0.564
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI92",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI92.jpg",
+      "status": "active",
+      "generation_round": 92,
+      "target": {
+        "score": 77,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.7,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.25,
+          "청순함": 0.46,
+          "시크함": 0.78,
+          "따뜻함": 0.35,
+          "스타일리시함": 0.71,
+          "건강함": 0.49,
+          "성숙함": 0.68,
+          "지적단정함": 0.62,
+          "눈큼": 0.52,
+          "부드러운인상": 0.37,
+          "날카로운인상": 0.71,
+          "자연스러움": 0.55,
+          "화려함": 0.49
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.339,
+        "청순/자연형": 0.488,
+        "시크/도도형": 0.732,
+        "따뜻한/부드러운형": 0.394,
+        "스타일리시/화려형": 0.64,
+        "건강/활동형": 0.512,
+        "성숙/분위기형": 0.638,
+        "지적/단정형": 0.564
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI79",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI79.jpg",
+      "status": "active",
+      "generation_round": 79,
+      "target": {
+        "score": 70,
+        "type": "시크/도도형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 70,
+        "score_confidence": 0.72,
+        "primary_type": "시크/도도형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.25,
+          "청순함": 0.46,
+          "시크함": 0.78,
+          "따뜻함": 0.35,
+          "스타일리시함": 0.71,
+          "건강함": 0.49,
+          "성숙함": 0.7,
+          "지적단정함": 0.62,
+          "눈큼": 0.52,
+          "부드러운인상": 0.37,
+          "날카로운인상": 0.71,
+          "자연스러움": 0.55,
+          "화려함": 0.49
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "차분하고 긴 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "트렌치 코트",
+          "overall_mood": "차분한 도시형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.337,
+        "청순/자연형": 0.488,
+        "시크/도도형": 0.734,
+        "따뜻한/부드러운형": 0.394,
+        "스타일리시/화려형": 0.642,
+        "건강/활동형": 0.512,
+        "성숙/분위기형": 0.645,
+        "지적/단정형": 0.564
+      },
+      "final_bucket": "시크/도도형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI01",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI01.jpg",
+      "status": "active",
+      "generation_round": 1,
+      "target": {
+        "score": 72,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.68,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "귀여운/동안형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.67,
+          "청순함": 0.69,
+          "시크함": 0.2,
+          "따뜻함": 0.83,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.39,
+          "지적단정함": 0.57,
+          "눈큼": 0.64,
+          "부드러운인상": 0.85,
+          "날카로운인상": 0.17,
+          "자연스러움": 0.75,
+          "화려함": 0.28
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "웃는 순한 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "노란 니트",
+          "overall_mood": "밝고 따뜻한 현실 호감형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.701,
+        "청순/자연형": 0.718,
+        "시크/도도형": 0.251,
+        "따뜻한/부드러운형": 0.81,
+        "스타일리시/화려형": 0.374,
+        "건강/활동형": 0.643,
+        "성숙/분위기형": 0.42,
+        "지적/단정형": 0.641
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI71",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI71.jpg",
+      "status": "active",
+      "generation_round": 71,
+      "target": {
+        "score": 74,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 74,
+        "score_confidence": 0.72,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "귀여운/동안형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.67,
+          "청순함": 0.69,
+          "시크함": 0.2,
+          "따뜻함": 0.83,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.39,
+          "지적단정함": 0.57,
+          "눈큼": 0.64,
+          "부드러운인상": 0.85,
+          "날카로운인상": 0.17,
+          "자연스러움": 0.75,
+          "화려함": 0.28
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "웃는 부드러운 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "베이지 후드",
+          "overall_mood": "밝고 부드러운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.701,
+        "청순/자연형": 0.718,
+        "시크/도도형": 0.251,
+        "따뜻한/부드러운형": 0.81,
+        "스타일리시/화려형": 0.374,
+        "건강/활동형": 0.643,
+        "성숙/분위기형": 0.42,
+        "지적/단정형": 0.641
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI11",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI11.jpg",
+      "status": "active",
+      "generation_round": 11,
+      "target": {
+        "score": 77,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.68,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.61,
+          "청순함": 0.73,
+          "시크함": 0.21,
+          "따뜻함": 0.82,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.43,
+          "지적단정함": 0.6,
+          "눈큼": 0.62,
+          "부드러운인상": 0.83,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.77,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "타원형",
+          "eye_impression": "순하고 또렷한 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "베이지 니트",
+          "overall_mood": "카페 자연광의 따뜻함"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.662,
+        "청순/자연형": 0.742,
+        "시크/도도형": 0.265,
+        "따뜻한/부드러운형": 0.806,
+        "스타일리시/화려형": 0.376,
+        "건강/활동형": 0.647,
+        "성숙/분위기형": 0.45,
+        "지적/단정형": 0.662
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI61",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI61.jpg",
+      "status": "active",
+      "generation_round": 61,
+      "target": {
+        "score": 76,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.61,
+          "청순함": 0.73,
+          "시크함": 0.21,
+          "따뜻함": 0.82,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.43,
+          "지적단정함": 0.6,
+          "눈큼": 0.62,
+          "부드러운인상": 0.83,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.77,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "부드러운 눈매",
+          "hair_style": "묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 블라우스",
+          "overall_mood": "따뜻하고 자연스러운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.662,
+        "청순/자연형": 0.742,
+        "시크/도도형": 0.265,
+        "따뜻한/부드러운형": 0.806,
+        "스타일리시/화려형": 0.376,
+        "건강/활동형": 0.647,
+        "성숙/분위기형": 0.45,
+        "지적/단정형": 0.662
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI66",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI66.jpg",
+      "status": "active",
+      "generation_round": 66,
+      "target": {
+        "score": 66,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 66,
+        "score_confidence": 0.74,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.61,
+          "청순함": 0.73,
+          "시크함": 0.21,
+          "따뜻함": 0.82,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.43,
+          "지적단정함": 0.6,
+          "눈큼": 0.62,
+          "부드러운인상": 0.83,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.77,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "순한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "회색 후드",
+          "overall_mood": "평범하고 부드러운 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.78
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.662,
+        "청순/자연형": 0.742,
+        "시크/도도형": 0.265,
+        "따뜻한/부드러운형": 0.806,
+        "스타일리시/화려형": 0.376,
+        "건강/활동형": 0.647,
+        "성숙/분위기형": 0.45,
+        "지적/단정형": 0.662
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI67",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI67.jpg",
+      "status": "active",
+      "generation_round": 67,
+      "target": {
+        "score": 70,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 70,
+        "score_confidence": 0.72,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.61,
+          "청순함": 0.73,
+          "시크함": 0.21,
+          "따뜻함": 0.82,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.43,
+          "지적단정함": 0.6,
+          "눈큼": 0.62,
+          "부드러운인상": 0.83,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.77,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "타원형",
+          "eye_impression": "작고 웃는 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "아이보리 상의",
+          "overall_mood": "편안한 현실 호감형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.662,
+        "청순/자연형": 0.742,
+        "시크/도도형": 0.265,
+        "따뜻한/부드러운형": 0.806,
+        "스타일리시/화려형": 0.376,
+        "건강/활동형": 0.647,
+        "성숙/분위기형": 0.45,
+        "지적/단정형": 0.662
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI73",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI73.jpg",
+      "status": "active",
+      "generation_round": 73,
+      "target": {
+        "score": 72,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.72,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.61,
+          "청순함": 0.73,
+          "시크함": 0.21,
+          "따뜻함": 0.82,
+          "스타일리시함": 0.48,
+          "건강함": 0.58,
+          "성숙함": 0.43,
+          "지적단정함": 0.6,
+          "눈큼": 0.62,
+          "부드러운인상": 0.83,
+          "날카로운인상": 0.19,
+          "자연스러움": 0.77,
+          "화려함": 0.27
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "순한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 블라우스",
+          "overall_mood": "카페형 따뜻함"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.662,
+        "청순/자연형": 0.742,
+        "시크/도도형": 0.265,
+        "따뜻한/부드러운형": 0.806,
+        "스타일리시/화려형": 0.376,
+        "건강/활동형": 0.647,
+        "성숙/분위기형": 0.45,
+        "지적/단정형": 0.662
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI72",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI72.jpg",
+      "status": "active",
+      "generation_round": 72,
+      "target": {
+        "score": 76,
+        "type": "따뜻한/부드러운형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.72,
+        "primary_type": "따뜻한/부드러운형",
+        "secondary_types": [
+          "스타일리시/화려형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.57,
+          "청순함": 0.65,
+          "시크함": 0.28,
+          "따뜻함": 0.76,
+          "스타일리시함": 0.56,
+          "건강함": 0.57,
+          "성숙함": 0.47,
+          "지적단정함": 0.58,
+          "눈큼": 0.62,
+          "부드러운인상": 0.78,
+          "날카로운인상": 0.25,
+          "자연스러움": 0.7,
+          "화려함": 0.4
+        },
+        "visible_features": {
+          "face_shape": "작은 타원형",
+          "eye_impression": "또렷하고 부드러운 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "데님 셔츠",
+          "overall_mood": "부드럽고 세련된 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.627,
+        "청순/자연형": 0.673,
+        "시크/도도형": 0.33,
+        "따뜻한/부드러운형": 0.745,
+        "스타일리시/화려형": 0.462,
+        "건강/활동형": 0.617,
+        "성숙/분위기형": 0.476,
+        "지적/단정형": 0.628
+      },
+      "final_bucket": "따뜻한/부드러운형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI81",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI81.jpg",
+      "status": "active",
+      "generation_round": 81,
+      "target": {
+        "score": 77,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.32,
+          "청순함": 0.46,
+          "시크함": 0.6,
+          "따뜻함": 0.4,
+          "스타일리시함": 0.8,
+          "건강함": 0.54,
+          "성숙함": 0.66,
+          "지적단정함": 0.58,
+          "눈큼": 0.61,
+          "부드러운인상": 0.47,
+          "날카로운인상": 0.55,
+          "자연스러움": 0.48,
+          "화려함": 0.8
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.411,
+        "청순/자연형": 0.466,
+        "시크/도도형": 0.621,
+        "따뜻한/부드러운형": 0.442,
+        "스타일리시/화려형": 0.743,
+        "건강/활동형": 0.506,
+        "성숙/분위기형": 0.624,
+        "지적/단정형": 0.539
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI88",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI88.jpg",
+      "status": "active",
+      "generation_round": 88,
+      "target": {
+        "score": 77,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.32,
+          "청순함": 0.46,
+          "시크함": 0.6,
+          "따뜻함": 0.4,
+          "스타일리시함": 0.79,
+          "건강함": 0.54,
+          "성숙함": 0.67,
+          "지적단정함": 0.58,
+          "눈큼": 0.61,
+          "부드러운인상": 0.47,
+          "날카로운인상": 0.55,
+          "자연스러움": 0.48,
+          "화려함": 0.8
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.41,
+        "청순/자연형": 0.466,
+        "시크/도도형": 0.621,
+        "따뜻한/부드러운형": 0.442,
+        "스타일리시/화려형": 0.74,
+        "건강/활동형": 0.505,
+        "성숙/분위기형": 0.628,
+        "지적/단정형": 0.538
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI82",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI82.jpg",
+      "status": "active",
+      "generation_round": 82,
+      "target": {
+        "score": 76,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "건강/활동형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.38,
+          "청순함": 0.47,
+          "시크함": 0.55,
+          "따뜻함": 0.44,
+          "스타일리시함": 0.78,
+          "건강함": 0.73,
+          "성숙함": 0.62,
+          "지적단정함": 0.55,
+          "눈큼": 0.62,
+          "부드러운인상": 0.5,
+          "날카로운인상": 0.51,
+          "자연스러움": 0.52,
+          "화려함": 0.75
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.452,
+        "청순/자연형": 0.484,
+        "시크/도도형": 0.58,
+        "따뜻한/부드러운형": 0.476,
+        "스타일리시/화려형": 0.718,
+        "건강/활동형": 0.616,
+        "성숙/분위기형": 0.59,
+        "지적/단정형": 0.536
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI116",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI116.jpg",
+      "status": "active",
+      "generation_round": 116,
+      "target": {
+        "score": 76,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "시크/도도형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.31,
+          "청순함": 0.43,
+          "시크함": 0.68,
+          "따뜻함": 0.37,
+          "스타일리시함": 0.78,
+          "건강함": 0.54,
+          "성숙함": 0.68,
+          "지적단정함": 0.57,
+          "눈큼": 0.6,
+          "부드러운인상": 0.42,
+          "날카로운인상": 0.62,
+          "자연스러움": 0.48,
+          "화려함": 0.78
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.391,
+        "청순/자연형": 0.445,
+        "시크/도도형": 0.674,
+        "따뜻한/부드러운형": 0.408,
+        "스타일리시/화려형": 0.743,
+        "건강/활동형": 0.503,
+        "성숙/분위기형": 0.637,
+        "지적/단정형": 0.524
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI104",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI104.jpg",
+      "status": "active",
+      "generation_round": 104,
+      "target": {
+        "score": 75,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 75,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "건강/활동형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.38,
+          "청순함": 0.47,
+          "시크함": 0.55,
+          "따뜻함": 0.44,
+          "스타일리시함": 0.77,
+          "건강함": 0.64,
+          "성숙함": 0.62,
+          "지적단정함": 0.55,
+          "눈큼": 0.62,
+          "부드러운인상": 0.5,
+          "날카로운인상": 0.51,
+          "자연스러움": 0.52,
+          "화려함": 0.75
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.452,
+        "청순/자연형": 0.484,
+        "시크/도도형": 0.579,
+        "따뜻한/부드러운형": 0.476,
+        "스타일리시/화려형": 0.71,
+        "건강/활동형": 0.57,
+        "성숙/분위기형": 0.59,
+        "지적/단정형": 0.535
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI107",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI107.jpg",
+      "status": "active",
+      "generation_round": 107,
+      "target": {
+        "score": 75,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 75,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.37,
+          "청순함": 0.67,
+          "시크함": 0.55,
+          "따뜻함": 0.43,
+          "스타일리시함": 0.77,
+          "건강함": 0.55,
+          "성숙함": 0.63,
+          "지적단정함": 0.58,
+          "눈큼": 0.62,
+          "부드러운인상": 0.5,
+          "날카로운인상": 0.52,
+          "자연스러움": 0.53,
+          "화려함": 0.74
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.445,
+        "청순/자연형": 0.58,
+        "시크/도도형": 0.583,
+        "따뜻한/부드러운형": 0.493,
+        "스타일리시/화려형": 0.703,
+        "건강/활동형": 0.527,
+        "성숙/분위기형": 0.627,
+        "지적/단정형": 0.581
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI105",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI105.jpg",
+      "status": "active",
+      "generation_round": 105,
+      "target": {
+        "score": 76,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.39,
+          "청순함": 0.48,
+          "시크함": 0.54,
+          "따뜻함": 0.7,
+          "스타일리시함": 0.76,
+          "건강함": 0.56,
+          "성숙함": 0.63,
+          "지적단정함": 0.56,
+          "눈큼": 0.62,
+          "부드러운인상": 0.53,
+          "날카로운인상": 0.5,
+          "자연스러움": 0.52,
+          "화려함": 0.74
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.486,
+        "청순/자연형": 0.494,
+        "시크/도도형": 0.558,
+        "따뜻한/부드러운형": 0.59,
+        "스타일리시/화려형": 0.698,
+        "건강/활동형": 0.556,
+        "성숙/분위기형": 0.594,
+        "지적/단정형": 0.544
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI106",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI106.jpg",
+      "status": "active",
+      "generation_round": 106,
+      "target": {
+        "score": 68,
+        "type": "스타일리시/화려형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 68,
+        "score_confidence": 0.7,
+        "primary_type": "스타일리시/화려형",
+        "secondary_types": [
+          "건강/활동형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.38,
+          "청순함": 0.47,
+          "시크함": 0.55,
+          "따뜻함": 0.44,
+          "스타일리시함": 0.74,
+          "건강함": 0.68,
+          "성숙함": 0.62,
+          "지적단정함": 0.55,
+          "눈큼": 0.62,
+          "부드러운인상": 0.5,
+          "날카로운인상": 0.51,
+          "자연스러움": 0.52,
+          "화려함": 0.75
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.452,
+        "청순/자연형": 0.484,
+        "시크/도도형": 0.574,
+        "따뜻한/부드러운형": 0.476,
+        "스타일리시/화려형": 0.7,
+        "건강/활동형": 0.587,
+        "성숙/분위기형": 0.59,
+        "지적/단정형": 0.532
+      },
+      "final_bucket": "스타일리시/화려형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI33",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI33.jpg",
+      "status": "active",
+      "generation_round": 33,
+      "target": {
+        "score": 68,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 68,
+        "score_confidence": 0.68,
+        "primary_type": "건강/활동형",
+        "secondary_types": [],
+        "appearance_vector": {
+          "귀여움": 0.57,
+          "청순함": 0.62,
+          "시크함": 0.25,
+          "따뜻함": 0.69,
+          "스타일리시함": 0.55,
+          "건강함": 0.88,
+          "성숙함": 0.39,
+          "지적단정함": 0.52,
+          "눈큼": 0.61,
+          "부드러운인상": 0.7,
+          "날카로운인상": 0.25,
+          "자연스러움": 0.78,
+          "화려함": 0.31
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "작고 웃는 눈매",
+          "hair_style": "헤어밴드",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "등산복",
+          "overall_mood": "현실적인 활동형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.613,
+        "청순/자연형": 0.666,
+        "시크/도도형": 0.312,
+        "따뜻한/부드러운형": 0.703,
+        "스타일리시/화려형": 0.434,
+        "건강/활동형": 0.789,
+        "성숙/분위기형": 0.417,
+        "지적/단정형": 0.603
       },
       "final_bucket": "건강/활동형",
       "matching_vector_source": "measured.appearance_vector",
       "visual_review": {
         "duplicate_risk": "pass",
         "similar_to": [],
-        "difference_notes": "fixture sample"
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
       },
       "review": {
         "target_measured_mismatch": false,
         "decision": "active",
-        "accepted_reason": "fixture sample",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI15",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI15.jpg",
+      "status": "active",
+      "generation_round": 15,
+      "target": {
+        "score": 76,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.58,
+          "청순함": 0.64,
+          "시크함": 0.24,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.4,
+          "지적단정함": 0.53,
+          "눈큼": 0.61,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.23,
+          "자연스러움": 0.78,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "웃는 밝은 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 민소매",
+          "overall_mood": "밝고 건강한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.625,
+        "청순/자연형": 0.681,
+        "시크/도도형": 0.3,
+        "따뜻한/부드러운형": 0.726,
+        "스타일리시/화려형": 0.423,
+        "건강/활동형": 0.762,
+        "성숙/분위기형": 0.422,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI31",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI31.jpg",
+      "status": "active",
+      "generation_round": 31,
+      "target": {
+        "score": 72,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.68,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.58,
+          "청순함": 0.64,
+          "시크함": 0.24,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.4,
+          "지적단정함": 0.53,
+          "눈큼": 0.61,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.23,
+          "자연스러움": 0.78,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "웃는 순한 눈매",
+          "hair_style": "묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 폴로 셔츠",
+          "overall_mood": "밝은 운동장 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.625,
+        "청순/자연형": 0.681,
+        "시크/도도형": 0.3,
+        "따뜻한/부드러운형": 0.726,
+        "스타일리시/화려형": 0.423,
+        "건강/활동형": 0.762,
+        "성숙/분위기형": 0.422,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI35",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI35.jpg",
+      "status": "active",
+      "generation_round": 35,
+      "target": {
+        "score": 74,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 74,
+        "score_confidence": 0.68,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "귀여운/동안형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.62,
+          "청순함": 0.63,
+          "시크함": 0.24,
+          "따뜻함": 0.7,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.37,
+          "지적단정함": 0.53,
+          "눈큼": 0.64,
+          "부드러운인상": 0.72,
+          "날카로운인상": 0.24,
+          "자연스러움": 0.76,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "작은 둥근형",
+          "eye_impression": "큰 순한 눈매",
+          "hair_style": "묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "농구 유니폼",
+          "overall_mood": "스포티한 귀여움"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.648,
+        "청순/자연형": 0.67,
+        "시크/도도형": 0.301,
+        "따뜻한/부드러운형": 0.711,
+        "스타일리시/화려형": 0.42,
+        "건강/활동형": 0.756,
+        "성숙/분위기형": 0.407,
+        "지적/단정형": 0.608
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI37",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI37.jpg",
+      "status": "active",
+      "generation_round": 37,
+      "target": {
+        "score": 75,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 75,
+        "score_confidence": 0.68,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "귀여운/동안형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.62,
+          "청순함": 0.63,
+          "시크함": 0.24,
+          "따뜻함": 0.7,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.37,
+          "지적단정함": 0.53,
+          "눈큼": 0.64,
+          "부드러운인상": 0.72,
+          "날카로운인상": 0.24,
+          "자연스러움": 0.76,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "작고 밝은 눈매",
+          "hair_style": "묶은 머리와 선캡",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "골프웨어",
+          "overall_mood": "밝은 스포츠형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.648,
+        "청순/자연형": 0.67,
+        "시크/도도형": 0.301,
+        "따뜻한/부드러운형": 0.711,
+        "스타일리시/화려형": 0.42,
+        "건강/활동형": 0.756,
+        "성숙/분위기형": 0.407,
+        "지적/단정형": 0.608
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI68",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI68.jpg",
+      "status": "active",
+      "generation_round": 68,
+      "target": {
+        "score": 72,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.72,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.58,
+          "청순함": 0.64,
+          "시크함": 0.24,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.4,
+          "지적단정함": 0.53,
+          "눈큼": 0.61,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.23,
+          "자연스러움": 0.78,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "웃는 밝은 눈매",
+          "hair_style": "묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "네이비 폴로 셔츠",
+          "overall_mood": "밝은 야외 활동형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.625,
+        "청순/자연형": 0.681,
+        "시크/도도형": 0.3,
+        "따뜻한/부드러운형": 0.726,
+        "스타일리시/화려형": 0.423,
+        "건강/활동형": 0.762,
+        "성숙/분위기형": 0.422,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI74",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI74.jpg",
+      "status": "active",
+      "generation_round": 74,
+      "target": {
+        "score": 67,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 67,
+        "score_confidence": 0.72,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.58,
+          "청순함": 0.64,
+          "시크함": 0.24,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.4,
+          "지적단정함": 0.53,
+          "눈큼": 0.61,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.23,
+          "자연스러움": 0.78,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "웃는 작은 눈매",
+          "hair_style": "묶은 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "남색 티셔츠",
+          "overall_mood": "현실적인 운동형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.625,
+        "청순/자연형": 0.681,
+        "시크/도도형": 0.3,
+        "따뜻한/부드러운형": 0.726,
+        "스타일리시/화려형": 0.423,
+        "건강/활동형": 0.762,
+        "성숙/분위기형": 0.422,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI77",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI77.jpg",
+      "status": "active",
+      "generation_round": 77,
+      "target": {
+        "score": 73,
+        "type": "건강/활동형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 73,
+        "score_confidence": 0.72,
+        "primary_type": "건강/활동형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.58,
+          "청순함": 0.64,
+          "시크함": 0.24,
+          "따뜻함": 0.72,
+          "스타일리시함": 0.54,
+          "건강함": 0.82,
+          "성숙함": 0.4,
+          "지적단정함": 0.53,
+          "눈큼": 0.61,
+          "부드러운인상": 0.73,
+          "날카로운인상": 0.23,
+          "자연스러움": 0.78,
+          "화려함": 0.3
+        },
+        "visible_features": {
+          "face_shape": "둥근형",
+          "eye_impression": "웃는 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 민소매",
+          "overall_mood": "자연광 건강형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.76
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.625,
+        "청순/자연형": 0.681,
+        "시크/도도형": 0.3,
+        "따뜻한/부드러운형": 0.726,
+        "스타일리시/화려형": 0.423,
+        "건강/활동형": 0.762,
+        "성숙/분위기형": 0.422,
+        "지적/단정형": 0.614
+      },
+      "final_bucket": "건강/활동형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI24",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI24.jpg",
+      "status": "active",
+      "generation_round": 24,
+      "target": {
+        "score": 76,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "시크/도도형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.27,
+          "청순함": 0.57,
+          "시크함": 0.58,
+          "따뜻함": 0.44,
+          "스타일리시함": 0.67,
+          "건강함": 0.51,
+          "성숙함": 0.82,
+          "지적단정함": 0.65,
+          "눈큼": 0.56,
+          "부드러운인상": 0.5,
+          "날카로운인상": 0.52,
+          "자연스러움": 0.57,
+          "화려함": 0.55
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "깊고 무심한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "검은 민소매",
+          "overall_mood": "성숙하고 차분한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.371,
+        "청순/자연형": 0.561,
+        "시크/도도형": 0.599,
+        "따뜻한/부드러운형": 0.492,
+        "스타일리시/화려형": 0.627,
+        "건강/활동형": 0.525,
+        "성숙/분위기형": 0.69,
+        "지적/단정형": 0.603
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI98",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI98.jpg",
+      "status": "active",
+      "generation_round": 98,
+      "target": {
+        "score": 76,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.31,
+          "청순함": 0.62,
+          "시크함": 0.49,
+          "따뜻함": 0.49,
+          "스타일리시함": 0.64,
+          "건강함": 0.52,
+          "성숙함": 0.82,
+          "지적단정함": 0.68,
+          "눈큼": 0.58,
+          "부드러운인상": 0.56,
+          "날카로운인상": 0.44,
+          "자연스러움": 0.6,
+          "화려함": 0.52
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.407,
+        "청순/자연형": 0.605,
+        "시크/도도형": 0.531,
+        "따뜻한/부드러운형": 0.544,
+        "스타일리시/화려형": 0.594,
+        "건강/활동형": 0.541,
+        "성숙/분위기형": 0.683,
+        "지적/단정형": 0.633
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI99",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI99.jpg",
+      "status": "active",
+      "generation_round": 99,
+      "target": {
+        "score": 77,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 77,
+        "score_confidence": 0.7,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "시크/도도형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.27,
+          "청순함": 0.57,
+          "시크함": 0.64,
+          "따뜻함": 0.44,
+          "스타일리시함": 0.67,
+          "건강함": 0.51,
+          "성숙함": 0.8,
+          "지적단정함": 0.65,
+          "눈큼": 0.56,
+          "부드러운인상": 0.5,
+          "날카로운인상": 0.52,
+          "자연스러움": 0.57,
+          "화려함": 0.55
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.373,
+        "청순/자연형": 0.561,
+        "시크/도도형": 0.621,
+        "따뜻한/부드러운형": 0.492,
+        "스타일리시/화려형": 0.634,
+        "건강/활동형": 0.525,
+        "성숙/분위기형": 0.691,
+        "지적/단정형": 0.603
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI103",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI103.jpg",
+      "status": "active",
+      "generation_round": 103,
+      "target": {
+        "score": 76,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.7,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "지적/단정형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.31,
+          "청순함": 0.62,
+          "시크함": 0.49,
+          "따뜻함": 0.49,
+          "스타일리시함": 0.64,
+          "건강함": 0.52,
+          "성숙함": 0.8,
+          "지적단정함": 0.69,
+          "눈큼": 0.58,
+          "부드러운인상": 0.56,
+          "날카로운인상": 0.44,
+          "자연스러움": 0.6,
+          "화려함": 0.52
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.409,
+        "청순/자연형": 0.606,
+        "시크/도도형": 0.529,
+        "따뜻한/부드러운형": 0.544,
+        "스타일리시/화려형": 0.592,
+        "건강/활동형": 0.541,
+        "성숙/분위기형": 0.677,
+        "지적/단정형": 0.637
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI40",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI40.jpg",
+      "status": "active",
+      "generation_round": 40,
+      "target": {
+        "score": 76,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.33,
+          "청순함": 0.65,
+          "시크함": 0.47,
+          "따뜻함": 0.5,
+          "스타일리시함": 0.63,
+          "건강함": 0.53,
+          "성숙함": 0.78,
+          "지적단정함": 0.66,
+          "눈큼": 0.59,
+          "부드러운인상": 0.58,
+          "날카로운인상": 0.42,
+          "자연스러움": 0.63,
+          "화려함": 0.51
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "처연하고 차분한 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "베이지 터틀넥",
+          "overall_mood": "조용하고 성숙한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.426,
+        "청순/자연형": 0.627,
+        "시크/도도형": 0.511,
+        "따뜻한/부드러운형": 0.563,
+        "스타일리시/화려형": 0.58,
+        "건강/활동형": 0.553,
+        "성숙/분위기형": 0.664,
+        "지적/단정형": 0.635
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI42",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI42.jpg",
+      "status": "active",
+      "generation_round": 42,
+      "target": {
+        "score": 74,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 74,
+        "score_confidence": 0.68,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.33,
+          "청순함": 0.65,
+          "시크함": 0.47,
+          "따뜻함": 0.5,
+          "스타일리시함": 0.63,
+          "건강함": 0.53,
+          "성숙함": 0.78,
+          "지적단정함": 0.66,
+          "눈큼": 0.59,
+          "부드러운인상": 0.58,
+          "날카로운인상": 0.42,
+          "자연스러움": 0.63,
+          "화려함": 0.51
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "깊고 차분한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "브라운 니트",
+          "overall_mood": "가을빛 성숙함"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.426,
+        "청순/자연형": 0.627,
+        "시크/도도형": 0.511,
+        "따뜻한/부드러운형": 0.563,
+        "스타일리시/화려형": 0.58,
+        "건강/활동형": 0.553,
+        "성숙/분위기형": 0.664,
+        "지적/단정형": 0.635
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI100",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI100.jpg",
+      "status": "active",
+      "generation_round": 100,
+      "target": {
+        "score": 74,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 74,
+        "score_confidence": 0.7,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "따뜻한/부드러운형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.35,
+          "청순함": 0.62,
+          "시크함": 0.46,
+          "따뜻함": 0.67,
+          "스타일리시함": 0.62,
+          "건강함": 0.53,
+          "성숙함": 0.78,
+          "지적단정함": 0.64,
+          "눈큼": 0.59,
+          "부드러운인상": 0.61,
+          "날카로운인상": 0.39,
+          "자연스러움": 0.62,
+          "화려함": 0.51
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.456,
+        "청순/자연형": 0.614,
+        "시크/도도형": 0.489,
+        "따뜻한/부드러운형": 0.637,
+        "스타일리시/화려형": 0.575,
+        "건강/활동형": 0.567,
+        "성숙/분위기형": 0.654,
+        "지적/단정형": 0.621
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI60",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI60.jpg",
+      "status": "active",
+      "generation_round": 60,
+      "target": {
+        "score": 72,
+        "type": "성숙/분위기형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.68,
+        "primary_type": "성숙/분위기형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.33,
+          "청순함": 0.65,
+          "시크함": 0.47,
+          "따뜻함": 0.5,
+          "스타일리시함": 0.63,
+          "건강함": 0.53,
+          "성숙함": 0.78,
+          "지적단정함": 0.66,
+          "눈큼": 0.59,
+          "부드러운인상": 0.58,
+          "날카로운인상": 0.42,
+          "자연스러움": 0.63,
+          "화려함": 0.51
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "무표정의 깊은 눈매",
+          "hair_style": "긴 웨이브",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "베이지 터틀넥",
+          "overall_mood": "조용하고 우울한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.426,
+        "청순/자연형": 0.627,
+        "시크/도도형": 0.511,
+        "따뜻한/부드러운형": 0.563,
+        "스타일리시/화려형": 0.58,
+        "건강/활동형": 0.553,
+        "성숙/분위기형": 0.664,
+        "지적/단정형": 0.635
+      },
+      "final_bucket": "성숙/분위기형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI49",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI49.jpg",
+      "status": "active",
+      "generation_round": 49,
+      "target": {
+        "score": 76,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_1",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.45,
+          "청순함": 0.71,
+          "시크함": 0.35,
+          "따뜻함": 0.58,
+          "스타일리시함": 0.56,
+          "건강함": 0.51,
+          "성숙함": 0.55,
+          "지적단정함": 0.82,
+          "눈큼": 0.58,
+          "부드러운인상": 0.64,
+          "날카로운인상": 0.36,
+          "자연스러움": 0.72,
+          "화려함": 0.32
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "순하고 차분한 눈매",
+          "hair_style": "긴 생머리와 안경",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 셔츠",
+          "overall_mood": "도서관형 지적 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.517,
+        "청순/자연형": 0.712,
+        "시크/도도형": 0.408,
+        "따뜻한/부드러운형": 0.635,
+        "스타일리시/화려형": 0.453,
+        "건강/활동형": 0.581,
+        "성숙/분위기형": 0.561,
+        "지적/단정형": 0.738
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI52",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI52.jpg",
+      "status": "active",
+      "generation_round": 52,
+      "target": {
+        "score": 72,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_2",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.68,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.45,
+          "청순함": 0.71,
+          "시크함": 0.35,
+          "따뜻함": 0.58,
+          "스타일리시함": 0.56,
+          "건강함": 0.51,
+          "성숙함": 0.55,
+          "지적단정함": 0.82,
+          "눈큼": 0.58,
+          "부드러운인상": 0.64,
+          "날카로운인상": 0.36,
+          "자연스러움": 0.72,
+          "화려함": 0.32
+        },
+        "visible_features": {
+          "face_shape": "타원형",
+          "eye_impression": "내려보는 차분한 눈매",
+          "hair_style": "땋은 머리와 안경",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "셔츠와 카디건",
+          "overall_mood": "학생 같은 지적 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.517,
+        "청순/자연형": 0.712,
+        "시크/도도형": 0.408,
+        "따뜻한/부드러운형": 0.635,
+        "스타일리시/화려형": 0.453,
+        "건강/활동형": 0.581,
+        "성숙/분위기형": 0.561,
+        "지적/단정형": 0.738
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI53",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI53.jpg",
+      "status": "active",
+      "generation_round": 53,
+      "target": {
+        "score": 74,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_3",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 74,
+        "score_confidence": 0.68,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "성숙/분위기형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.4,
+          "청순함": 0.66,
+          "시크함": 0.41,
+          "따뜻함": 0.54,
+          "스타일리시함": 0.6,
+          "건강함": 0.5,
+          "성숙함": 0.64,
+          "지적단정함": 0.82,
+          "눈큼": 0.57,
+          "부드러운인상": 0.61,
+          "날카로운인상": 0.39,
+          "자연스러움": 0.68,
+          "화려함": 0.39
+        },
+        "visible_features": {
+          "face_shape": "짧은 타원형",
+          "eye_impression": "작고 차분한 눈매",
+          "hair_style": "짧은 단발",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "회색 재킷",
+          "overall_mood": "단정하지만 무심한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.476,
+        "청순/자연형": 0.671,
+        "시크/도도형": 0.458,
+        "따뜻한/부드러운형": 0.597,
+        "스타일리시/화려형": 0.507,
+        "건강/활동형": 0.561,
+        "성숙/분위기형": 0.609,
+        "지적/단정형": 0.721
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI55",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI55.jpg",
+      "status": "active",
+      "generation_round": 55,
+      "target": {
+        "score": 76,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_4",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 76,
+        "score_confidence": 0.68,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.45,
+          "청순함": 0.71,
+          "시크함": 0.35,
+          "따뜻함": 0.58,
+          "스타일리시함": 0.56,
+          "건강함": 0.51,
+          "성숙함": 0.55,
+          "지적단정함": 0.82,
+          "눈큼": 0.58,
+          "부드러운인상": 0.64,
+          "날카로운인상": 0.36,
+          "자연스러움": 0.72,
+          "화려함": 0.32
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "차분한 눈매",
+          "hair_style": "긴 생머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "흰 셔츠",
+          "overall_mood": "학생풍 단정함"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.517,
+        "청순/자연형": 0.712,
+        "시크/도도형": 0.408,
+        "따뜻한/부드러운형": 0.635,
+        "스타일리시/화려형": 0.453,
+        "건강/활동형": 0.581,
+        "성숙/분위기형": 0.561,
+        "지적/단정형": 0.738
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI57",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI57.jpg",
+      "status": "active",
+      "generation_round": 57,
+      "target": {
+        "score": 72,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_5",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 72,
+        "score_confidence": 0.68,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.45,
+          "청순함": 0.71,
+          "시크함": 0.35,
+          "따뜻함": 0.58,
+          "스타일리시함": 0.56,
+          "건강함": 0.51,
+          "성숙함": 0.55,
+          "지적단정함": 0.82,
+          "눈큼": 0.58,
+          "부드러운인상": 0.64,
+          "날카로운인상": 0.36,
+          "자연스러움": 0.72,
+          "화려함": 0.32
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "작고 순한 눈매",
+          "hair_style": "안경과 긴 머리",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "회색 카디건",
+          "overall_mood": "조용한 도서관형"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.517,
+        "청순/자연형": 0.712,
+        "시크/도도형": 0.408,
+        "따뜻한/부드러운형": 0.635,
+        "스타일리시/화려형": 0.453,
+        "건강/활동형": 0.581,
+        "성숙/분위기형": 0.561,
+        "지적/단정형": 0.738
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI69",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI69.jpg",
+      "status": "active",
+      "generation_round": 69,
+      "target": {
+        "score": 64,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_6",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 64,
+        "score_confidence": 0.74,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "청순/자연형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.45,
+          "청순함": 0.71,
+          "시크함": 0.35,
+          "따뜻함": 0.58,
+          "스타일리시함": 0.56,
+          "건강함": 0.51,
+          "성숙함": 0.55,
+          "지적단정함": 0.82,
+          "눈큼": 0.58,
+          "부드러운인상": 0.64,
+          "날카로운인상": 0.36,
+          "자연스러움": 0.72,
+          "화려함": 0.32
+        },
+        "visible_features": {
+          "face_shape": "둥근 타원형",
+          "eye_impression": "작고 무표정 눈매",
+          "hair_style": "단발",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "베이지 셔츠",
+          "overall_mood": "수수한 단정함"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": false,
+          "face_occluded": false,
+          "confidence": 0.78
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.517,
+        "청순/자연형": 0.712,
+        "시크/도도형": 0.408,
+        "따뜻한/부드러운형": 0.635,
+        "스타일리시/화려형": 0.453,
+        "건강/활동형": 0.581,
+        "성숙/분위기형": 0.561,
+        "지적/단정형": 0.738
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "NEW_FI64",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/NEW_FI64.jpg",
+      "status": "active",
+      "generation_round": 64,
+      "target": {
+        "score": 68,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_7",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 68,
+        "score_confidence": 0.68,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "시크/도도형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.39,
+          "청순함": 0.63,
+          "시크함": 0.47,
+          "따뜻함": 0.51,
+          "스타일리시함": 0.61,
+          "건강함": 0.5,
+          "성숙함": 0.6,
+          "지적단정함": 0.81,
+          "눈큼": 0.56,
+          "부드러운인상": 0.56,
+          "날카로운인상": 0.46,
+          "자연스러움": 0.67,
+          "화려함": 0.37
+        },
+        "visible_features": {
+          "face_shape": "긴 타원형",
+          "eye_impression": "작고 날카로운 눈매",
+          "hair_style": "긴 생머리와 안경",
+          "makeup_or_grooming": "접촉시트 기준 자연~정돈 메이크업",
+          "clothing_style": "네이비 수트",
+          "overall_mood": "차갑고 단정한 분위기"
+        },
+        "photo_quality": {
+          "single_person": true,
+          "face_visible": true,
+          "lighting_ok": true,
+          "blurred": false,
+          "heavy_filter_suspected": true,
+          "face_occluded": false,
+          "confidence": 0.72
+        },
+        "internal_notes": "codex_gpt_visual_pass_for_manus_new_images_not_external_api"
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.463,
+        "청순/자연형": 0.648,
+        "시크/도도형": 0.502,
+        "따뜻한/부드러운형": 0.563,
+        "스타일리시/화려형": 0.51,
+        "건강/활동형": 0.559,
+        "성숙/분위기형": 0.594,
+        "지적/단정형": 0.708
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
+        "rejection_reason": ""
+      }
+    },
+    {
+      "id": "FI86",
+      "gender": "female",
+      "file": "public/appearance-ideal/female-64/FI86.jpg",
+      "status": "active",
+      "generation_round": 86,
+      "target": {
+        "score": 71,
+        "type": "지적/단정형",
+        "subtype": "final_64_rank_8",
+        "prompt": "selected final 64 female ideal worldcup image"
+      },
+      "measured": {
+        "subject_gender": "female",
+        "appearance_score_normalized": 71,
+        "score_confidence": 0.7,
+        "primary_type": "지적/단정형",
+        "secondary_types": [
+          "스타일리시/화려형"
+        ],
+        "appearance_vector": {
+          "귀여움": 0.41,
+          "청순함": 0.63,
+          "시크함": 0.43,
+          "따뜻함": 0.52,
+          "스타일리시함": 0.6,
+          "건강함": 0.51,
+          "성숙함": 0.6,
+          "지적단정함": 0.8,
+          "눈큼": 0.58,
+          "부드러운인상": 0.59,
+          "날카로운인상": 0.42,
+          "자연스러움": 0.65,
+          "화려함": 0.44
+        }
+      },
+      "bucket_scores": {
+        "귀여운/동안형": 0.481,
+        "청순/자연형": 0.643,
+        "시크/도도형": 0.472,
+        "따뜻한/부드러운형": 0.575,
+        "스타일리시/화려형": 0.522,
+        "건강/활동형": 0.553,
+        "성숙/분위기형": 0.593,
+        "지적/단정형": 0.699
+      },
+      "final_bucket": "지적/단정형",
+      "matching_vector_source": "measured.appearance_vector",
+      "visual_review": {
+        "duplicate_risk": "pass",
+        "similar_to": [],
+        "difference_notes": "selected for balanced final 64 female ideal worldcup pool"
+      },
+      "review": {
+        "target_measured_mismatch": false,
+        "decision": "active",
+        "accepted_reason": "absolute score <= 77 and balanced 8-per-type final pool",
         "rejection_reason": ""
       }
     },
@@ -272,14 +4594,14 @@
           "훈훈함": 0.78,
           "댄디함": 0.42,
           "시크함": 0.18,
-          "소년미": 0.40,
+          "소년미": 0.4,
           "건강함": 0.45,
           "지적단정함": 0.38,
           "남성미": 0.25,
           "스타일리시함": 0.32,
           "부드러운인상": 0.74,
           "날카로운인상": 0.16,
-          "체형탄탄함": 0.30,
+          "체형탄탄함": 0.3,
           "자연스러움": 0.66
         }
       },
@@ -324,17 +4646,19 @@
         "appearance_score_normalized": 64,
         "score_confidence": 0.76,
         "primary_type": "시크/날카로운형",
-        "secondary_types": ["스타일리시/개성형"],
+        "secondary_types": [
+          "스타일리시/개성형"
+        ],
         "appearance_vector": {
           "훈훈함": 0.22,
-          "댄디함": 0.40,
+          "댄디함": 0.4,
           "시크함": 0.76,
           "소년미": 0.15,
-          "건강함": 0.30,
+          "건강함": 0.3,
           "지적단정함": 0.42,
           "남성미": 0.45,
           "스타일리시함": 0.55,
-          "부드러운인상": 0.20,
+          "부드러운인상": 0.2,
           "날카로운인상": 0.72,
           "체형탄탄함": 0.32,
           "자연스러움": 0.52
@@ -379,19 +4703,21 @@
       "measured": {
         "subject_gender": "male",
         "appearance_score_normalized": 64,
-        "score_confidence": 0.80,
+        "score_confidence": 0.8,
         "primary_type": "운동/건강형",
-        "secondary_types": ["강한 인상/남성미형"],
+        "secondary_types": [
+          "강한 인상/남성미형"
+        ],
         "appearance_vector": {
           "훈훈함": 0.45,
-          "댄디함": 0.30,
+          "댄디함": 0.3,
           "시크함": 0.25,
-          "소년미": 0.20,
+          "소년미": 0.2,
           "건강함": 0.82,
           "지적단정함": 0.28,
           "남성미": 0.58,
-          "스타일리시함": 0.40,
-          "부드러운인상": 0.40,
+          "스타일리시함": 0.4,
+          "부드러운인상": 0.4,
           "날카로운인상": 0.35,
           "체형탄탄함": 0.76,
           "자연스러움": 0.68
@@ -438,20 +4764,22 @@
         "appearance_score_normalized": 63,
         "score_confidence": 0.78,
         "primary_type": "지적/안경형",
-        "secondary_types": ["댄디/단정형"],
+        "secondary_types": [
+          "댄디/단정형"
+        ],
         "appearance_vector": {
           "훈훈함": 0.45,
-          "댄디함": 0.60,
+          "댄디함": 0.6,
           "시크함": 0.32,
           "소년미": 0.25,
           "건강함": 0.32,
           "지적단정함": 0.82,
           "남성미": 0.28,
-          "스타일리시함": 0.40,
+          "스타일리시함": 0.4,
           "부드러운인상": 0.55,
-          "날카로운인상": 0.30,
+          "날카로운인상": 0.3,
           "체형탄탄함": 0.28,
-          "자연스러움": 0.60
+          "자연스러움": 0.6
         }
       },
       "bucket_scores": {

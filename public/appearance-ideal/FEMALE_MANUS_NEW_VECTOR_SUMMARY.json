@@ -1,0 +1,147 @@
+{
+  "created_at": "2026-05-18T18:08:24.515010+00:00",
+  "analysis_method": "codex_gpt_visual_pass_from_new_manus_contact_sheets",
+  "external_api_called": false,
+  "image_count": 80,
+  "measured_primary_counts": {
+    "따뜻한/부드러운형": 12,
+    "귀여운/동안형": 6,
+    "청순/자연형": 7,
+    "지적/단정형": 16,
+    "시크/도도형": 9,
+    "건강/활동형": 13,
+    "성숙/분위기형": 11,
+    "스타일리시/화려형": 6
+  },
+  "final_bucket_counts": {
+    "따뜻한/부드러운형": 12,
+    "귀여운/동안형": 6,
+    "청순/자연형": 7,
+    "지적/단정형": 16,
+    "시크/도도형": 9,
+    "건강/활동형": 13,
+    "성숙/분위기형": 11,
+    "스타일리시/화려형": 6
+  },
+  "score_bands": {
+    "70점대": 52,
+    "60점대": 10,
+    "80점대": 17,
+    "50점대": 1
+  },
+  "top_candidates_by_final_bucket": {
+    "귀여운/동안형": [
+      "NEW_FI04",
+      "NEW_FI07",
+      "NEW_FI13",
+      "NEW_FI02",
+      "NEW_FI16",
+      "NEW_FI12"
+    ],
+    "청순/자연형": [
+      "NEW_FI09",
+      "NEW_FI08",
+      "NEW_FI54",
+      "FI65",
+      "NEW_FI03",
+      "FI80",
+      "FI70"
+    ],
+    "시크/도도형": [
+      "NEW_FI17",
+      "NEW_FI23",
+      "NEW_FI30",
+      "NEW_FI20",
+      "NEW_FI14",
+      "NEW_FI21",
+      "NEW_FI18",
+      "NEW_FI22"
+    ],
+    "따뜻한/부드러운형": [
+      "NEW_FI45",
+      "NEW_FI06",
+      "NEW_FI10",
+      "NEW_FI48",
+      "NEW_FI11",
+      "NEW_FI61",
+      "FI72",
+      "FI71"
+    ],
+    "스타일리시/화려형": [
+      "NEW_FI28",
+      "NEW_FI29",
+      "NEW_FI25",
+      "NEW_FI39",
+      "NEW_FI59",
+      "NEW_FI26"
+    ],
+    "건강/활동형": [
+      "NEW_FI38",
+      "NEW_FI15",
+      "NEW_FI32",
+      "NEW_FI34",
+      "NEW_FI36",
+      "FI75",
+      "NEW_FI37",
+      "NEW_FI35"
+    ],
+    "성숙/분위기형": [
+      "NEW_FI19",
+      "NEW_FI27",
+      "NEW_FI47",
+      "NEW_FI41",
+      "NEW_FI44",
+      "NEW_FI24",
+      "NEW_FI40",
+      "NEW_FI46"
+    ],
+    "지적/단정형": [
+      "NEW_FI43",
+      "NEW_FI50",
+      "NEW_FI51",
+      "NEW_FI56",
+      "FI78",
+      "NEW_FI49",
+      "NEW_FI55",
+      "NEW_FI63"
+    ]
+  },
+  "shortage_fill_priority_for_previous_set": {
+    "귀여운/동안형": [
+      "NEW_FI02",
+      "NEW_FI04",
+      "NEW_FI07",
+      "NEW_FI12",
+      "NEW_FI13",
+      "NEW_FI16"
+    ],
+    "따뜻한/부드러운형": [
+      "NEW_FI01",
+      "NEW_FI06",
+      "NEW_FI10",
+      "NEW_FI11",
+      "NEW_FI45",
+      "NEW_FI48",
+      "NEW_FI61",
+      "FI66",
+      "FI67",
+      "FI71",
+      "FI72",
+      "FI73"
+    ],
+    "성숙/분위기형": [
+      "NEW_FI19",
+      "NEW_FI24",
+      "NEW_FI27",
+      "NEW_FI40",
+      "NEW_FI41",
+      "NEW_FI42",
+      "NEW_FI44",
+      "NEW_FI46",
+      "NEW_FI47",
+      "NEW_FI60",
+      "NEW_FI62"
+    ]
+  },
+  "recommendation": "기존 FI01~FI64에서 부족했던 귀여운/동안형, 성숙/분위기형, 따뜻한/부드러운형을 우선 보강하고, 청순/지적 과잉 후보는 압축한다."
+}

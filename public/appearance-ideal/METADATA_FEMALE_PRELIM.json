@@ -1,0 +1,1834 @@
+[
+  {
+    "id": "FI01",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI01.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 62,
+      "type": "귀여운/동안형",
+      "subtype": "둥근 얼굴 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI01. Target score sense: 62, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 귀여운/동안형. Subtype: 둥근 얼굴 귀여움. Core intent: 둥근 얼굴형, 보통보다 큰 눈, 부드러운 미소, 밝은 니트, 귀여움은 있지만 상위권 미녀 느낌은 약한 현실 호감형.\n\nRequired visual anchors: face shape: 둥근 얼굴; eye impression: 큰 둥근 눈; hair: 짧은 앞머리 단발; clothing: 밝은 니트; expression: 부드러운 미소; background/lighting: 실내 자연광.\n\nPrecise facial and style details: eyes: 큰 둥근 눈, 눈꼬리 살짝 내려감, 얇은 속쌍, 눈 사이 약간 넓음. Brows/nose: 짧고 부드러운 일자 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 작은 입, 얇은 입술, 부드러운 미소, 귀 대부분 가림. Hair details: 자연 흑발, 턱선 단발, 짧은 앞머리 끝이 고르지 않음. Neck/shoulders/outfit silhouette: 짧은 목선, 둥근 어깨, 높은 니트 네크라인.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI03"
+      ],
+      "notes": "??? ?? ? ?? ?? ??. ?? ??/?? ??? ??? ?????? ?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI02",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI02.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "귀여운/동안형",
+      "subtype": "작은 키 느낌 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI02. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 귀여운/동안형. Subtype: 작은 키 느낌 귀여움. Core intent: 작은 체구 느낌, 둥근 인상, 자연스러운 앞머리, 밝은 후드, 장난기 있는 표정, 70점대 현실 상위 호감형.\n\nRequired visual anchors: face shape: 작은 얼굴; eye impression: 순한 눈; hair: 반묶음 머리; clothing: 밝은 후드; expression: 장난기; background/lighting: 캠퍼스.\n\nPrecise facial and style details: eyes: 중간보다 큰 순한 눈, 눈꼬리 수평, 속쌍, 눈 사이 보통. Brows/nose: 옅은 곡선 눈썹, 낮은 콧대, 작은 코폭. Mouth/ears: 중간 입, 입꼬리 살짝 올라감, 왼쪽 귀만 조금 보임. Hair details: 다크브라운, 반묶음, 잔머리 많음. Neck/shoulders/outfit silhouette: 좁은 어깨, 후드가 목선을 일부 가림.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI03",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI03.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "귀여운/동안형",
+      "subtype": "큰 눈 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI03. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 귀여운/동안형. Subtype: 큰 눈 귀여움. Core intent: 큰 눈, 짧은 앞머리, 작은 얼굴, 크림색 니트, 미소가 귀여운 상위 호감형, 과한 보정 금지.\n\nRequired visual anchors: face shape: 짧은 얼굴; eye impression: 큰 눈; hair: 턱선 단발; clothing: 크림 니트; expression: 환한 미소; background/lighting: 카페 창가.\n\nPrecise facial and style details: eyes: 큰 둥근 눈, 눈꼬리 내려감, 선명한 쌍꺼풀, 눈 사이 보통. Brows/nose: 부드러운 아치 눈썹, 중간 콧대, 둥근 코끝. Mouth/ears: 작은 입, 도톰한 아랫입술, 환한 미소, 양쪽 귀 가림. Hair details: 자연 흑발, 턱선 단발, 앞머리 가볍게 갈라짐. Neck/shoulders/outfit silhouette: 짧은 목, 크림 니트, 쇄골 노출 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI01"
+      ],
+      "notes": "FI01? ??/??/?? ?? ??? ???."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI04",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI04.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 73,
+      "type": "귀여운/동안형",
+      "subtype": "밝은 미소 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI04. Target score sense: 73, clearly attractive but still realistic, everyday college profile quality. Target type: 귀여운/동안형. Subtype: 밝은 미소 귀여움. Core intent: 환한 미소, 둥근 볼, 따뜻한 눈매, 캐주얼 카디건, 친근하고 사랑스러운 인상.\n\nRequired visual anchors: face shape: 둥근 볼; eye impression: 웃는 눈; hair: 낮은 포니테일; clothing: 카디건; expression: 활짝 웃음; background/lighting: 밝은 스튜디오.\n\nPrecise facial and style details: eyes: 웃을 때 접히는 눈, 눈꼬리 내려감, 얇은 속쌍. Brows/nose: 둥근 눈썹, 낮은 콧대, 부드러운 코끝. Mouth/ears: 넓은 미소, 중간 입술, 오른쪽 귀와 작은 귀걸이 보임. Hair details: 흑갈색, 낮은 포니테일, 이마 잔머리. Neck/shoulders/outfit silhouette: 보통 목선, 카디건, 둥근 어깨선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI05",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI05.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 76,
+      "type": "귀여운/동안형",
+      "subtype": "청순 섞인 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI05. Target score sense: 76, clearly attractive but still realistic, everyday college profile quality. Target type: 귀여운/동안형. Subtype: 청순 섞인 귀여움. Core intent: 큰 눈과 낮은 화장, 흰 블라우스, 맑은 피부 질감, 귀여움과 청순함이 섞인 상위 호감형.\n\nRequired visual anchors: face shape: 달걀형; eye impression: 맑은 큰 눈; hair: 긴 생머리; clothing: 흰 블라우스; expression: 수줍은 미소; background/lighting: 흰 벽 자연광.\n\nPrecise facial and style details: eyes: 맑은 큰 눈, 눈꼬리 수평, 얇은 쌍꺼풀, 눈 사이 약간 좁음. Brows/nose: 가는 일자 눈썹, 중간 콧대, 좁은 코폭. Mouth/ears: 작은 입, 얇은 윗입술, 수줍은 미소, 귀 가림. Hair details: 자연 흑발, 긴 생머리, 중앙 가르마. Neck/shoulders/outfit silhouette: 긴 목선, 흰 블라우스, 쇄골 거의 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI06",
+        "FI12",
+        "FI13",
+        "FI16"
+      ],
+      "notes": "?? ???/??/?? ???? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI06",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI06.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 80,
+      "type": "귀여운/동안형",
+      "subtype": "단정한 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI06. Target score sense: 80, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 귀여운/동안형. Subtype: 단정한 귀여움. Core intent: 단정한 니트, 자연스러운 긴 머리, 큰 눈, 동안 인상, 깔끔하고 안정적인 상위권 귀여움.\n\nRequired visual anchors: face shape: 작은 턱선; eye impression: 또렷한 눈; hair: 긴 웨이브; clothing: 단정한 니트; expression: 차분한 미소; background/lighting: 베이지 실내.\n\nPrecise facial and style details: eyes: 또렷한 중대형 눈, 눈꼬리 수평, 속쌍. Brows/nose: 정돈된 곡선 눈썹, 중간 콧대, 작은 코끝. Mouth/ears: 중간 입, 자연스러운 미소, 왼쪽 귀 살짝 보임. Hair details: 다크브라운, 긴 웨이브, 6:4 가르마. Neck/shoulders/outfit silhouette: 보통 목선, 단정한 니트, 어깨선 좁음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI05",
+        "FI12",
+        "FI16"
+      ],
+      "notes": "??? ?? ??? target ??? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI07",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI07.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 84,
+      "type": "귀여운/동안형",
+      "subtype": "상위권 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI07. Target score sense: 84, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 귀여운/동안형. Subtype: 상위권 귀여움. Core intent: 작은 얼굴, 큰 눈, 밝은 미소, 피부 깨끗하지만 실제 질감 유지, 매우 매력적인 귀여움.\n\nRequired visual anchors: face shape: 작은 둥근형; eye impression: 큰 눈; hair: 앞머리 있는 긴 머리; clothing: 파스텔 셔츠; expression: 밝은 미소; background/lighting: 깨끗한 회색 배경.\n\nPrecise facial and style details: eyes: 큰 눈, 눈꼬리 살짝 올라감, 선명한 쌍꺼풀. Brows/nose: 짧은 아치 눈썹, 중간 콧대, 코끝 작음. Mouth/ears: 작은 입, 입꼬리 올라간 밝은 미소, 귀 가림. Hair details: 자연 흑발, 앞머리 있는 긴 머리, 끝은 약한 웨이브. Neck/shoulders/outfit silhouette: 긴 목선, 파스텔 셔츠, 쇄골 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "C",
+      "similar_to": [
+        "FI15"
+      ],
+      "notes": "?? ??/?? ??? ?? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI08",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI08.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 90,
+      "type": "귀여운/동안형",
+      "subtype": "최상위 귀여움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI08. Target score sense: 90, top reference point, extremely attractive yet still realistic, no celebrity or AI doll polish. Target type: 귀여운/동안형. Subtype: 최상위 귀여움. Core intent: 최상위권 귀여운 외모, 큰 눈과 높은 얼굴 조화, 밝고 사랑스러운 미소, 연예인 닮음 금지.\n\nRequired visual anchors: face shape: 짧은 계란형; eye impression: 크고 선명한 눈; hair: 윤기 있는 중간 길이; clothing: 밝은 니트; expression: 사랑스러운 미소; background/lighting: 고급 자연광.\n\nPrecise facial and style details: eyes: 매우 큰 맑은 눈, 눈꼬리 내려감, 얇은 쌍꺼풀, 눈 사이 보통. Brows/nose: 부드러운 일자 눈썹, 높은 편의 콧대, 둥근 코끝. Mouth/ears: 중간 입, 도톰한 입술, 사랑스러운 미소, 오른쪽 귀 보임. Hair details: 라이트브라운 기운, 중간 길이, 끝 C컬. Neck/shoulders/outfit silhouette: 긴 목, 밝은 니트, 어깨선 부드러움.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid mature styling, long serene first-love look, sharp jawline, fashion editorial lighting, and adult glamorous mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI09",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI09.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 61,
+      "type": "청순/자연형",
+      "subtype": "낮은 화장 자연형",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI09. Target score sense: 61, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 청순/자연형. Subtype: 낮은 화장 자연형. Core intent: 낮은 화장, 자연스러운 생머리, 흰 티, 보통 이상 눈매, 현실적 피부 질감, 편안한 호감형.\n\nRequired visual anchors: face shape: 보통 얼굴형; eye impression: 자연스러운 눈; hair: 긴 생머리; clothing: 흰 티; expression: 편안한 표정; background/lighting: 캠퍼스 벤치.\n\nPrecise facial and style details: eyes: 보통 크기의 자연스러운 눈, 무쌍에 가까운 속쌍, 눈 사이 보통. Brows/nose: 옅고 자연스러운 눈썹, 낮은 콧대, 코폭 보통. Mouth/ears: 중간 입, 입꼬리 거의 수평, 왼쪽 귀 머리로 가림. Hair details: 자연 흑발, 긴 생머리, 정돈 덜 된 끝. Neck/shoulders/outfit silhouette: 보통 목선, 흰 티, 현실적인 옷 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI10",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI10.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "청순/자연형",
+      "subtype": "깨끗한 단아함",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI10. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 청순/자연형. Subtype: 깨끗한 단아함. Core intent: 단아한 표정, 차분한 눈, 연한 셔츠, 자연광, 청순하지만 최상위권은 아닌 70점대 호감형.\n\nRequired visual anchors: face shape: 긴 달걀형; eye impression: 차분한 눈; hair: 낮은 묶음 머리; clothing: 연한 셔츠; expression: 단아한 미소; background/lighting: 도서관 자연광.\n\nPrecise facial and style details: eyes: 길고 차분한 눈, 얇은 속쌍, 눈꼬리 수평. Brows/nose: 가는 일자 눈썹, 중간 콧대, 좁은 코끝. Mouth/ears: 작은 입, 얇은 입술, 단아한 미소, 양쪽 귀 가림. Hair details: 흑갈색, 낮은 묶음, 옆머리 흘러내림. Neck/shoulders/outfit silhouette: 긴 목선, 연한 셔츠, 단정한 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI11",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI11.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 69,
+      "type": "청순/자연형",
+      "subtype": "맑은 인상",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI11. Target score sense: 69, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 청순/자연형. Subtype: 맑은 인상. Core intent: 맑은 눈, 낮은 화장, 긴 생머리, 깨끗한 흰 상의, 자연스럽고 청순한 분위기.\n\nRequired visual anchors: face shape: 계란형; eye impression: 맑은 눈; hair: 중간 길이 생머리; clothing: 흰 상의; expression: 조용한 미소; background/lighting: 창가.\n\nPrecise facial and style details: eyes: 맑은 중간 눈, 눈꼬리 살짝 내려감, 속쌍. Brows/nose: 자연 곡선 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 작은 입, 입술 얇은 편, 조용한 미소, 오른쪽 귀 조금 보임. Hair details: 자연 흑발, 중간 길이 생머리, 옆가르마. Neck/shoulders/outfit silhouette: 짧은 목선, 흰 상의, 쇄골 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI12",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI12.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 72,
+      "type": "청순/자연형",
+      "subtype": "차분한 청순",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI12. Target score sense: 72, clearly attractive but still realistic, everyday college profile quality. Target type: 청순/자연형. Subtype: 차분한 청순. Core intent: 차분한 표정, 부드러운 얼굴선, 밝은 카디건, 조용하고 단아한 이미지.\n\nRequired visual anchors: face shape: 부드러운 얼굴선; eye impression: 처진 눈매; hair: 옆가르마 긴 머리; clothing: 밝은 카디건; expression: 차분함; background/lighting: 따뜻한 실내.\n\nPrecise facial and style details: eyes: 처진 눈매, 눈 크기 중간, 얇은 속쌍. Brows/nose: 낮은 아치 눈썹, 중간 콧대, 코폭 보통. Mouth/ears: 중간 입, 아랫입술 약간 도톰, 차분한 입꼬리, 귀 가림. Hair details: 다크브라운, 옆가르마 긴 머리, 부드러운 웨이브. Neck/shoulders/outfit silhouette: 보통 목, 카디건, 어깨선 둥글음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI05",
+        "FI06",
+        "FI13",
+        "FI16"
+      ],
+      "notes": "?? ??? ??? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI13",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI13.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 75,
+      "type": "청순/자연형",
+      "subtype": "학교 첫사랑 느낌",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI13. Target score sense: 75, clearly attractive but still realistic, everyday college profile quality. Target type: 청순/자연형. Subtype: 학교 첫사랑 느낌. Core intent: 자연스러운 미소, 흰 셔츠, 깨끗한 배경, 순한 눈매, 청순하고 기억에 남는 호감형.\n\nRequired visual anchors: face shape: 작은 하트형; eye impression: 순한 눈; hair: 자연스러운 긴 머리; clothing: 흰 셔츠; expression: 기억에 남는 미소; background/lighting: 학교 복도.\n\nPrecise facial and style details: eyes: 순한 중간 눈, 눈꼬리 내려감, 눈 사이 약간 넓음. Brows/nose: 부드러운 일자 눈썹, 낮은 콧대, 작은 코끝. Mouth/ears: 작은 입, 낮은 미소, 왼쪽 귀 살짝 보임. Hair details: 자연 흑발, 긴 머리, 한쪽을 귀 뒤로 넘김. Neck/shoulders/outfit silhouette: 긴 목, 흰 셔츠, 쇄골 아주 약하게.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI05",
+        "FI12",
+        "FI16"
+      ],
+      "notes": "? ??/???/?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI14",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI14.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 79,
+      "type": "청순/자연형",
+      "subtype": "맑은 상위 호감",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI14. Target score sense: 79, clearly attractive but still realistic, everyday college profile quality. Target type: 청순/자연형. Subtype: 맑은 상위 호감. Core intent: 피부 깨끗한 편, 큰 눈은 아니지만 얼굴 조화 좋음, 자연스러운 긴 머리, 청순 상위권.\n\nRequired visual anchors: face shape: 갸름한 얼굴; eye impression: 작고 맑은 눈; hair: 낮은 묶음 생머리; clothing: 연청 셔츠; expression: 낮은 미소; background/lighting: 야외 자연광.\n\nPrecise facial and style details: eyes: 작고 맑은 눈, 눈꼬리 수평, 무쌍에 가까움. Brows/nose: 가는 직선 눈썹, 중간 콧대, 좁은 코폭. Mouth/ears: 중간 입, 얇은 입술, 낮은 미소, 왼쪽 귀와 귀 뒤로 넘긴 머리. Hair details: 흑갈색, 낮은 묶음 생머리, 앞머리 없음. Neck/shoulders/outfit silhouette: 보통 목, 연청 셔츠, 자연스러운 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI15",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI15.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 83,
+      "type": "청순/자연형",
+      "subtype": "상위 청순",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI15. Target score sense: 83, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 청순/자연형. Subtype: 상위 청순. Core intent: 맑고 큰 눈, 단정한 흰 블라우스, 낮은 화장, 차분하고 높은 조화의 청순미.\n\nRequired visual anchors: face shape: 작은 계란형; eye impression: 큰 맑은 눈; hair: 반묶음 중간 길이; clothing: 흰 블라우스; expression: 단정한 미소; background/lighting: 밝은 스튜디오.\n\nPrecise facial and style details: eyes: 큰 맑은 눈, 선명한 쌍꺼풀, 눈 사이 좁은 편. Brows/nose: 정돈된 아치 눈썹, 높은 편의 콧대, 작은 코끝. Mouth/ears: 작은 입, 입꼬리 살짝 올라감, 오른쪽 귀와 작은 진주 귀걸이. Hair details: 자연 흑발, 반묶음 중간 길이, 5:5 가르마. Neck/shoulders/outfit silhouette: 긴 목, 흰 블라우스, 낮은 네크라인 금지.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "C",
+      "similar_to": [
+        "FI07"
+      ],
+      "notes": "?? ?? ?? ??? ???? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI16",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI16.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 88,
+      "type": "청순/자연형",
+      "subtype": "최상위 청순",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI16. Target score sense: 88, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 청순/자연형. Subtype: 최상위 청순. Core intent: 매우 균형 잡힌 청순형, 맑은 눈과 깨끗한 분위기, 비현실적 인형 피부 금지.\n\nRequired visual anchors: face shape: 부드러운 계란형; eye impression: 투명한 눈매; hair: 자연 웨이브; clothing: 아이보리 셔츠; expression: 고요한 미소; background/lighting: 깨끗한 자연광.\n\nPrecise facial and style details: eyes: 투명한 중대형 눈, 눈꼬리 내려감, 얇은 쌍꺼풀. Brows/nose: 옅은 곡선 눈썹, 중간 콧대, 코끝 둥근 편. Mouth/ears: 중간 입, 부드러운 미소, 귀 가림. Hair details: 애쉬브라운 기운, 자연 웨이브, 이마 일부 노출. Neck/shoulders/outfit silhouette: 긴 목선, 아이보리 셔츠, 어깨선 좁음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid heavy makeup, flashy accessories, luxury fashion styling, strong seductive gaze, and plastic doll skin.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [
+        "FI05",
+        "FI06",
+        "FI12",
+        "FI13"
+      ],
+      "notes": "?? ??? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI17",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI17.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 63,
+      "type": "시크/도도형",
+      "subtype": "차분한 무표정",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI17. Target score sense: 63, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 시크/도도형. Subtype: 차분한 무표정. Core intent: 갸름한 얼굴, 차분한 무표정, 검은 셔츠, 선명하지만 과하지 않은 눈매, 현실 호감형.\n\nRequired visual anchors: face shape: 갸름한 긴 얼굴; eye impression: 긴 눈매; hair: 검은 단발; clothing: 검은 셔츠; expression: 무표정; background/lighting: 회색 배경.\n\nPrecise facial and style details: eyes: 긴 아몬드형 눈, 눈꼬리 올라감, 얇은 속쌍. Brows/nose: 낮은 직선 눈썹, 중간 이상 콧대, 좁은 코폭. Mouth/ears: 작은 입, 얇은 입술, 무표정, 양쪽 귀 드러난 짧은 단발. Hair details: 자연 흑발, 검은 단발, 귀 뒤로 넘김. Neck/shoulders/outfit silhouette: 긴 목, 검은 셔츠, 쇄골 노출 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI18",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI18.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "시크/도도형",
+      "subtype": "날카로운 눈매",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI18. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 시크/도도형. Subtype: 날카로운 눈매. Core intent: 약간 날카로운 눈매, 낮은 미소, 어두운 니트, 차갑지만 부담스럽지 않은 70점대 시크함.\n\nRequired visual anchors: face shape: 긴 얼굴형; eye impression: 약간 날카로운 눈; hair: 어깨선 중단발; clothing: 어두운 니트; expression: 낮은 미소; background/lighting: 도시 카페.\n\nPrecise facial and style details: eyes: 약간 날카로운 중간 눈, 눈꼬리 올라감, 속쌍. Brows/nose: 각도 낮은 일자 눈썹, 높은 콧대, 코끝 정돈. Mouth/ears: 중간 입, 입꼬리 거의 수평, 오른쪽 귀만 보임. Hair details: 다크브라운, 어깨선 중단발, 6:4 가르마. Neck/shoulders/outfit silhouette: 보통 목, 어두운 니트, 어깨선 직선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI19",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI19.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 71,
+      "type": "시크/도도형",
+      "subtype": "도시적 시크",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI19. Target score sense: 71, clearly attractive but still realistic, everyday college profile quality. Target type: 시크/도도형. Subtype: 도시적 시크. Core intent: 세련된 블랙 상의, 긴 생머리, 선명한 이목구비, 도도한 표정.\n\nRequired visual anchors: face shape: 갸름한 턱선; eye impression: 선명한 눈; hair: 귀 뒤로 넘긴 단발; clothing: 블랙 상의; expression: 도도함; background/lighting: 야간 실내 조명.\n\nPrecise facial and style details: eyes: 선명한 긴 눈, 눈꼬리 위로 올라감, 얇은 쌍꺼풀. Brows/nose: 짙은 직선 눈썹, 높은 콧대, 좁은 코폭. Mouth/ears: 작은 입, 얇은 입술, 도도한 표정, 양쪽 귀와 작은 실버 귀걸이. Hair details: 자연 흑발, 귀 뒤로 넘긴 단발, 턱선 노출. Neck/shoulders/outfit silhouette: 긴 목, 블랙 상의, 각진 어깨선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI20",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI20.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 74,
+      "type": "시크/도도형",
+      "subtype": "무심한 분위기",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI20. Target score sense: 74, clearly attractive but still realistic, everyday college profile quality. Target type: 시크/도도형. Subtype: 무심한 분위기. Core intent: 자연스러운 무표정, 갸름한 얼굴, 회색 재킷, 과하게 꾸미지 않은 도시적 분위기.\n\nRequired visual anchors: face shape: 좁은 얼굴; eye impression: 차가운 눈매; hair: 중단발; clothing: 회색 재킷; expression: 무심함; background/lighting: 콘크리트 배경.\n\nPrecise facial and style details: eyes: 차가운 중간 눈, 눈꼬리 수평, 무쌍 느낌. Brows/nose: 낮고 긴 눈썹, 중간 콧대, 코폭 좁음. Mouth/ears: 작은 입, 입꼬리 내려간 무심함, 귀 가림. Hair details: 애쉬브라운 기운의 중단발, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 회색 재킷, 쇄골 거의 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI21",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI21.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 77,
+      "type": "시크/도도형",
+      "subtype": "선명한 이목구비",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI21. Target score sense: 77, clearly attractive but still realistic, everyday college profile quality. Target type: 시크/도도형. Subtype: 선명한 이목구비. Core intent: 눈매와 코 라인이 선명한 편, 블랙 재킷, 차분하고 강한 인상.\n\nRequired visual anchors: face shape: 선명한 턱선; eye impression: 또렷한 눈매; hair: 깔끔한 포니테일; clothing: 블랙 재킷; expression: 차분함; background/lighting: 어두운 스튜디오.\n\nPrecise facial and style details: eyes: 또렷한 중대형 눈, 눈꼬리 살짝 올라감, 속쌍. Brows/nose: 짙고 정돈된 눈썹, 높은 콧대, 코끝 작음. Mouth/ears: 중간 입, 절제된 표정, 양쪽 귀 보임. Hair details: 자연 흑발, 깔끔한 포니테일, 잔머리 없음. Neck/shoulders/outfit silhouette: 보통 목, 블랙 재킷, 직선 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI22",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI22.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 81,
+      "type": "시크/도도형",
+      "subtype": "상위 시크",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI22. Target score sense: 81, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 시크/도도형. Subtype: 상위 시크. Core intent: 얼굴 조화 좋고 날카로운 눈매, 세련된 스타일, 차갑고 매력적인 상위권.\n\nRequired visual anchors: face shape: 작은 역삼각형 얼굴; eye impression: 날카로운 눈; hair: 긴 웨이브; clothing: 세련된 블랙 니트; expression: 자신감; background/lighting: 도시 창가.\n\nPrecise facial and style details: eyes: 날카로운 큰 눈, 눈꼬리 올라감, 선명한 쌍꺼풀. Brows/nose: 각진 아치 눈썹, 높은 콧대, 좁은 코. Mouth/ears: 작은 입, 얇은 입술, 자신감 있는 낮은 미소, 오른쪽 귀 보임. Hair details: 다크브라운 긴 웨이브, 7:3 가르마. Neck/shoulders/outfit silhouette: 긴 목, 블랙 니트, 상반신 실루엣 슬림.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI23",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI23.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 85,
+      "type": "시크/도도형",
+      "subtype": "도도한 상위권",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI23. Target score sense: 85, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 시크/도도형. Subtype: 도도한 상위권. Core intent: 매우 선명한 눈매, 갸름한 얼굴, 블랙 스타일, 도도하고 강한 매력.\n\nRequired visual anchors: face shape: 긴 갸름형; eye impression: 강한 눈매; hair: 매끈한 생머리; clothing: 블랙 셔츠; expression: 도도함; background/lighting: 고급 회색 배경.\n\nPrecise facial and style details: eyes: 강한 긴 눈, 눈꼬리 많이 올라감, 얇은 쌍꺼풀. Brows/nose: 짙은 직선 눈썹, 높은 콧대, 코끝 날렵. Mouth/ears: 중간 입, 입술 얇은 편, 도도함, 귀 가림. Hair details: 자연 흑발, 매끈한 생머리, 중앙 가르마. Neck/shoulders/outfit silhouette: 긴 목선, 블랙 셔츠, 어깨선 좁음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI24",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI24.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 89,
+      "type": "시크/도도형",
+      "subtype": "최상위 시크",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI24. Target score sense: 89, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 시크/도도형. Subtype: 최상위 시크. Core intent: 최상위권 시크형, 높은 얼굴 조화와 세련된 분위기, 연예인 닮음 금지.\n\nRequired visual anchors: face shape: 긴 역삼각형 얼굴; eye impression: 선명하고 긴 눈; hair: 턱 아래 중단발; clothing: 블랙 재킷; expression: 절제된 표정; background/lighting: 고급 스튜디오.\n\nPrecise facial and style details: eyes: 선명하고 긴 눈, 눈꼬리 올라감, 속쌍. Brows/nose: 정돈된 일자 눈썹, 높은 콧대, 좁은 코폭. Mouth/ears: 작은 입, 입꼬리 수평, 절제된 표정, 양쪽 귀와 작은 귀걸이. Hair details: 톤다운 브라운, 턱 아래 중단발, 얼굴선 노출. Neck/shoulders/outfit silhouette: 긴 목, 블랙 재킷, 고급스러운 직선 실루엣.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid round cute eyes, bubbly smile, cozy pastel knit, innocent school-first-love mood, and warm cute styling.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI25",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI25.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 60,
+      "type": "따뜻한/부드러운형",
+      "subtype": "친근한 미소",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI25. Target score sense: 60, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 따뜻한/부드러운형. Subtype: 친근한 미소. Core intent: 보통 얼굴형, 웃는 눈, 편한 니트, 따뜻하고 친근한 분위기, 현실적 호감형.\n\nRequired visual anchors: face shape: 보통 얼굴형; eye impression: 웃는 눈; hair: 자연스러운 단발; clothing: 편한 니트; expression: 친근한 미소; background/lighting: 집 같은 실내.\n\nPrecise facial and style details: eyes: 보통 눈 크기, 웃는 눈, 얇은 속쌍. Brows/nose: 부드러운 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 넓은 미소, 중간 입술, 귀 대부분 가림. Hair details: 자연 흑발, 자연 단발, 살짝 흐트러짐. Neck/shoulders/outfit silhouette: 짧은 목, 편한 니트, 포근한 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI26",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI26.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "따뜻한/부드러운형",
+      "subtype": "부드러운 눈매",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI26. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 따뜻한/부드러운형. Subtype: 부드러운 눈매. Core intent: 둥근 얼굴선, 부드러운 눈매, 카디건, 자연스러운 미소, 친근한 70점대 호감형.\n\nRequired visual anchors: face shape: 둥근 얼굴선; eye impression: 부드러운 눈매; hair: 옆가르마 중간 머리; clothing: 카디건; expression: 따뜻한 미소; background/lighting: 카페 자연광.\n\nPrecise facial and style details: eyes: 부드러운 중간 눈, 눈꼬리 내려감, 속쌍. Brows/nose: 옅은 곡선 눈썹, 중간 콧대, 코끝 둥근 편. Mouth/ears: 작은 입, 입꼬리 살짝 올라감, 왼쪽 귀 보임. Hair details: 다크브라운, 옆가르마 중간 머리. Neck/shoulders/outfit silhouette: 보통 목, 카디건, 둥근 어깨선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI27",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI27.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 68,
+      "type": "따뜻한/부드러운형",
+      "subtype": "다정한 인상",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI27. Target score sense: 68, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 따뜻한/부드러운형. Subtype: 다정한 인상. Core intent: 편안한 표정, 따뜻한 조명, 크림색 옷, 다정하고 안정적인 분위기.\n\nRequired visual anchors: face shape: 넓은 이마; eye impression: 편안한 눈; hair: 낮은 묶음 머리; clothing: 크림색 옷; expression: 안정적 표정; background/lighting: 따뜻한 조명.\n\nPrecise facial and style details: eyes: 편안한 눈, 눈 크기 보통, 무쌍에 가까움. Brows/nose: 옅은 일자 눈썹, 낮은 콧대, 코폭 보통. Mouth/ears: 중간 입, 자연스러운 입술, 안정적 표정, 귀 가림. Hair details: 자연 흑발, 낮은 묶음, 잔머리. Neck/shoulders/outfit silhouette: 보통 목, 크림색 옷, 편한 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI28",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI28.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 72,
+      "type": "따뜻한/부드러운형",
+      "subtype": "웃는 눈",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI28. Target score sense: 72, clearly attractive but still realistic, everyday college profile quality. Target type: 따뜻한/부드러운형. Subtype: 웃는 눈. Core intent: 웃는 눈이 뚜렷함, 부드러운 미소, 포근한 니트, 친근한 상위 호감.\n\nRequired visual anchors: face shape: 둥근 볼; eye impression: 웃는 눈; hair: 어깨 길이 머리; clothing: 포근한 니트; expression: 눈웃음; background/lighting: 베이지 배경.\n\nPrecise facial and style details: eyes: 웃는 눈, 눈꼬리 내려감, 얇은 쌍꺼풀. Brows/nose: 둥근 눈썹, 낮은 콧대, 작은 코. Mouth/ears: 중간 입, 부드러운 미소, 오른쪽 귀와 작은 귀걸이. Hair details: 라이트브라운, 어깨 길이 머리, 끝 C컬. Neck/shoulders/outfit silhouette: 짧은 목선, 포근한 니트, 쇄골 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI29",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI29.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 90,
+      "type": "따뜻한/부드러운형",
+      "subtype": "최상위 포근함",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI29. Target score sense: 90, top reference point, extremely attractive yet still realistic, no celebrity or AI doll polish. Target type: 따뜻한/부드러운형. Subtype: 최상위 포근함. Core intent: 둥근 얼굴형, 자연스러운 긴 머리, 밝은 배경, 포근하고 편한 매력이 매우 강한 최상위 기준점.\n\nRequired visual anchors: face shape: 둥근 계란형; eye impression: 부드러운 큰 눈; hair: 긴 웨이브; clothing: 연한 카디건; expression: 편안한 미소; background/lighting: 밝은 창가.\n\nPrecise facial and style details: eyes: 부드러운 큰 눈, 눈꼬리 내려감, 선명한 쌍꺼풀. Brows/nose: 부드러운 아치 눈썹, 중간 콧대, 둥근 코끝. Mouth/ears: 도톰한 입술, 편안한 미소, 귀 가림. Hair details: 자연 흑발, 긴 웨이브, 옆머리 풍성. Neck/shoulders/outfit silhouette: 긴 목, 연한 카디건, 부드러운 실루엣.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI30",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI30.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 80,
+      "type": "따뜻한/부드러운형",
+      "subtype": "상위 부드러움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI30. Target score sense: 80, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 따뜻한/부드러운형. Subtype: 상위 부드러움. Core intent: 큰 눈보다 부드러운 조화 중심, 피부 깨끗한 편, 따뜻한 상위권.\n\nRequired visual anchors: face shape: 부드러운 얼굴형; eye impression: 중간 크기 눈; hair: 자연 단발; clothing: 연갈색 니트; expression: 온화함; background/lighting: 실내 자연광.\n\nPrecise facial and style details: eyes: 중간 크기 눈, 눈꼬리 수평, 속쌍. Brows/nose: 짧은 곡선 눈썹, 낮은 콧대, 코폭 보통. Mouth/ears: 작은 입, 낮은 온화한 미소, 왼쪽 귀 보임. Hair details: 다크브라운 자연 단발, 앞머리 없음. Neck/shoulders/outfit silhouette: 보통 목, 연갈색 니트, 자연스러운 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI31",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI31.jpg",
+    "status": "regenerate",
+    "generation_round": 1,
+    "target": {
+      "score": 84,
+      "type": "따뜻한/부드러운형",
+      "subtype": "안정적인 상위권",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI31. Target score sense: 84, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 따뜻한/부드러운형. Subtype: 안정적인 상위권. Core intent: 얼굴 조화 높고 편안한 미소, 카디건, 누구나 부담 없이 호감 느끼는 이미지.\n\nRequired visual anchors: face shape: 안정적 얼굴형; eye impression: 순한 눈; hair: 반묶음 머리; clothing: 카디건; expression: 편안한 웃음; background/lighting: 카페.\n\nPrecise facial and style details: eyes: 순한 눈, 눈꼬리 내려감, 눈 사이 약간 넓음. Brows/nose: 옅은 일자 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 중간 입, 편안한 웃음, 귀 가림. Hair details: 흑갈색, 반묶음, 잔머리. Neck/shoulders/outfit silhouette: 짧은 목, 카디건, 편안한 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "A",
+      "similar_to": [],
+      "notes": "??? ??/??? ?? ??? ?? ??? ??? ?? ?? ?? ???? ?."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "regenerate",
+      "accepted_reason": "",
+      "rejection_reason": "??? ??/??? ?? ??? ?? ??? ??? ?? ?? ?? ???? ?."
+    }
+  },
+  {
+    "id": "FI32",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI32.jpg",
+    "status": "regenerate",
+    "generation_round": 1,
+    "target": {
+      "score": 87,
+      "type": "따뜻한/부드러운형",
+      "subtype": "최상위 부드러움",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI32. Target score sense: 87, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 따뜻한/부드러운형. Subtype: 최상위 부드러움. Core intent: 매우 부드럽고 따뜻한 인상, 높은 조화, 자연스러운 매력.\n\nRequired visual anchors: face shape: 부드러운 하트형; eye impression: 따뜻한 눈; hair: 긴 웨이브; clothing: 아이보리 니트; expression: 깊은 미소; background/lighting: 밝은 스튜디오.\n\nPrecise facial and style details: eyes: 따뜻한 중대형 눈, 눈꼬리 내려감, 쌍꺼풀. Brows/nose: 부드러운 아치 눈썹, 중간 콧대, 코끝 작음. Mouth/ears: 도톰한 입술, 깊은 미소, 작은 귀걸이. Hair details: 애쉬브라운 기운, 긴 웨이브. Neck/shoulders/outfit silhouette: 긴 목, 아이보리 니트, 쇄골 거의 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid sharp cold expression, black fashion editorial styling, angular jaw emphasis, intimidating gaze, and chic luxury mood.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "A",
+      "similar_to": [],
+      "notes": "??/???/?? ???? ??. ???/????? ???? ???."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "regenerate",
+      "accepted_reason": "",
+      "rejection_reason": "??/???/?? ???? ??. ???/????? ???? ???."
+    }
+  },
+  {
+    "id": "FI33",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI33.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 62,
+      "type": "스타일리시/화려형",
+      "subtype": "약한 트렌디",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI33. Target score sense: 62, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 스타일리시/화려형. Subtype: 약한 트렌디. Core intent: 평범보다 살짝 트렌디한 옷, 자연스러운 메이크업, 세련됨은 약하지만 스타일 신호 있음.\n\nRequired visual anchors: face shape: 보통 얼굴형; eye impression: 또렷한 눈; hair: 짧은 레이어드; clothing: 컬러 니트; expression: 담백한 표정; background/lighting: 도시 거리.\n\nPrecise facial and style details: eyes: 또렷한 보통 눈, 눈꼬리 수평, 속쌍. Brows/nose: 개성 있는 짙은 눈썹, 중간 콧대, 코끝 둥근 편. Mouth/ears: 작은 입, 담백한 표정, 오른쪽 귀 보임. Hair details: 라이트브라운 짧은 레이어드, 불규칙한 끝. Neck/shoulders/outfit silhouette: 보통 목, 컬러 니트, 캐주얼 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI34",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI34.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "스타일리시/화려형",
+      "subtype": "캐주얼 개성",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI34. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 스타일리시/화려형. Subtype: 캐주얼 개성. Core intent: 독특한 색상의 상의, 개성 있는 헤어, 부담스럽지 않은 트렌디함, 70점대 스타일 호감형.\n\nRequired visual anchors: face shape: 긴 얼굴형; eye impression: 개성 있는 눈; hair: 중단발 염색 느낌; clothing: 독특한 상의; expression: 자신감; background/lighting: 편집숍 배경.\n\nPrecise facial and style details: eyes: 개성 있는 긴 눈, 눈꼬리 살짝 올라감, 무쌍 느낌. Brows/nose: 얇고 긴 눈썹, 중간 콧대, 코폭 좁음. Mouth/ears: 중간 입, 자신감 있는 미소, 양쪽 귀와 작은 귀걸이. Hair details: 애쉬브라운 중단발 염색, 사이드뱅. Neck/shoulders/outfit silhouette: 긴 목, 독특한 상의, 어깨선 직선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI35",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI35.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "스타일리시/화려형",
+      "subtype": "도시적 스타일",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI35. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 스타일리시/화려형. Subtype: 도시적 스타일. Core intent: 짧은 재킷, 세련된 귀걸이, 도시적 표정, 스타일 중심 호감형.\n\nRequired visual anchors: face shape: 좁은 계란형; eye impression: 선명한 눈; hair: 짧은 단발; clothing: 짧은 재킷; expression: 도시적 표정; background/lighting: 회색 벽.\n\nPrecise facial and style details: eyes: 선명한 눈, 눈꼬리 올라감, 속쌍. Brows/nose: 정돈된 직선 눈썹, 높은 콧대, 좁은 코. Mouth/ears: 작은 입, 낮은 도시적 미소, 귀 가림. Hair details: 자연 흑발, 짧은 단발, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 짧은 재킷, 세련된 상반신.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [],
+      "notes": "????? ??? ??? ?? ??/AI ??? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI36",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI36.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 73,
+      "type": "스타일리시/화려형",
+      "subtype": "패션감 있는 타입",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI36. Target score sense: 73, clearly attractive but still realistic, everyday college profile quality. Target type: 스타일리시/화려형. Subtype: 패션감 있는 타입. Core intent: 옷 조합이 눈에 띄고 헤어 정돈감 좋음, 얼굴은 상위권 초입.\n\nRequired visual anchors: face shape: 작은 턱의 얼굴; eye impression: 또렷한 눈; hair: 웨이브 단발; clothing: 패턴 블라우스; expression: 세련된 미소; background/lighting: 스튜디오.\n\nPrecise facial and style details: eyes: 또렷한 큰 눈, 눈꼬리 수평, 쌍꺼풀. Brows/nose: 아치 눈썹, 중간 콧대, 작은 코끝. Mouth/ears: 중간 입, 세련된 미소, 왼쪽 귀와 귀걸이. Hair details: 다크브라운 웨이브 단발, 볼륨 있음. Neck/shoulders/outfit silhouette: 보통 목, 패턴 블라우스, 정돈된 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI37",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI37.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 77,
+      "type": "스타일리시/화려형",
+      "subtype": "화려한 세련미",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI37. Target score sense: 77, clearly attractive but still realistic, everyday college profile quality. Target type: 스타일리시/화려형. Subtype: 화려한 세련미. Core intent: 선명한 이목구비, 세련된 옷, 자신감 있는 표정, 화려하지만 과하지 않음.\n\nRequired visual anchors: face shape: 선명한 얼굴선; eye impression: 긴 눈매; hair: 긴 웨이브; clothing: 포인트 재킷; expression: 자신감; background/lighting: 도시 카페.\n\nPrecise facial and style details: eyes: 긴 눈매, 눈꼬리 올라감, 얇은 쌍꺼풀. Brows/nose: 짙은 눈썹, 높은 콧대, 코끝 날렵. Mouth/ears: 작은 입, 자신감 있는 표정, 귀 한쪽 보임. Hair details: 톤다운 브라운 긴 웨이브, 7:3 가르마. Neck/shoulders/outfit silhouette: 긴 목, 포인트 재킷, 직선 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI38",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI38.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 81,
+      "type": "스타일리시/화려형",
+      "subtype": "상위 스타일",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI38. Target score sense: 81, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 스타일리시/화려형. Subtype: 상위 스타일. Core intent: 얼굴 조화와 스타일이 모두 좋음, 트렌디한 재킷, 도시적 매력.\n\nRequired visual anchors: face shape: 높은 광대의 계란형; eye impression: 선명한 눈; hair: 낮은 포니테일; clothing: 트렌디 재킷; expression: 낮은 미소; background/lighting: 고급 실내.\n\nPrecise facial and style details: eyes: 선명한 중대형 눈, 눈꼬리 수평, 속쌍. Brows/nose: 정돈된 눈썹, 높은 편의 콧대, 코폭 좁음. Mouth/ears: 중간 입, 낮은 미소, 오른쪽 귀와 귀 뒤로 넘긴 옆머리. Hair details: 자연 흑발, 낮은 포니테일, 얼굴선 노출. Neck/shoulders/outfit silhouette: 긴 목, 트렌디 재킷, 고급스러운 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI39",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI39.jpg",
+    "status": "regenerate",
+    "generation_round": 1,
+    "target": {
+      "score": 85,
+      "type": "스타일리시/화려형",
+      "subtype": "강한 스타일",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI39. Target score sense: 85, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 스타일리시/화려형. Subtype: 강한 스타일. Core intent: 패션과 얼굴 조화가 강함, 화려한 상위권 이미지, 과한 노출 금지.\n\nRequired visual anchors: face shape: 날렵한 계란형; eye impression: 강한 눈매; hair: 볼륨 있는 웨이브; clothing: 화려한 상의; expression: 당당함; background/lighting: 패션 스튜디오.\n\nPrecise facial and style details: eyes: 강한 눈매, 눈꼬리 위로 올라감, 선명한 쌍꺼풀. Brows/nose: 짙은 아치 눈썹, 높은 콧대, 좁은 코. Mouth/ears: 도톰한 입술, 당당한 표정, 양쪽 귀걸이. Hair details: 라이트브라운 볼륨 웨이브, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 화려한 상의, 어깨선 또렷.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "A",
+      "similar_to": [],
+      "notes": "?? ???? ??, ?? ?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "regenerate",
+      "accepted_reason": "",
+      "rejection_reason": "?? ???? ??, ?? ?? ??? ??."
+    }
+  },
+  {
+    "id": "FI40",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI40.jpg",
+    "status": "regenerate",
+    "generation_round": 1,
+    "target": {
+      "score": 91,
+      "type": "스타일리시/화려형",
+      "subtype": "최상위 스타일",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI40. Target score sense: 91, top reference point, extremely attractive yet still realistic, no celebrity or AI doll polish. Target type: 스타일리시/화려형. Subtype: 최상위 스타일. Core intent: 최상위권 세련미, 강한 존재감, 고급 캐주얼, 연예인 닮음 금지.\n\nRequired visual anchors: face shape: 작은 V라인 얼굴; eye impression: 매우 선명한 눈; hair: 세련된 긴 머리; clothing: 고급 캐주얼; expression: 존재감; background/lighting: 고급 스튜디오.\n\nPrecise facial and style details: eyes: 매우 선명한 눈, 눈꼬리 수평, 쌍꺼풀. Brows/nose: 정교한 눈썹, 높은 콧대, 작은 코끝. Mouth/ears: 중간 입, 존재감 있는 미소, 작은 귀걸이. Hair details: 애쉬브라운 긴 머리, 고급 스타일링. Neck/shoulders/outfit silhouette: 긴 목, 고급 캐주얼, 깔끔한 네크라인.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid plain knit, plain cafe profile, innocent natural styling, all-white minimal outfit, and timid expression.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "A",
+      "similar_to": [],
+      "notes": "??? ?????? AI ??/??/?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "regenerate",
+      "accepted_reason": "",
+      "rejection_reason": "??? ?????? AI ??/??/?? ??? ??."
+    }
+  },
+  {
+    "id": "FI41",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI41.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 61,
+      "type": "건강/활동형",
+      "subtype": "밝은 활동형",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI41. Target score sense: 61, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 건강/활동형. Subtype: 밝은 활동형. Core intent: 묶은 머리, 스포티한 집업, 밝은 표정, 피부 현실 질감, 건강한 현실 호감형.\n\nRequired visual anchors: face shape: 보통 얼굴형; eye impression: 밝은 눈; hair: 묶은 머리; clothing: 스포티 집업; expression: 활기찬 표정; background/lighting: 야외 운동장.\n\nPrecise facial and style details: eyes: 밝은 보통 눈, 눈꼬리 내려감, 속쌍. Brows/nose: 자연 눈썹, 낮은 콧대, 코폭 보통. Mouth/ears: 넓은 미소, 중간 입술, 귀 가림. Hair details: 자연 흑발, 묶은 머리, 운동 후 잔머리. Neck/shoulders/outfit silhouette: 보통 목, 스포티 집업, 쇄골 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI42",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI42.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "건강/활동형",
+      "subtype": "자연스러운 생기",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI42. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 건강/활동형. Subtype: 자연스러운 생기. Core intent: 활동적인 표정, 운동감 약간, 캐주얼 운동복, 생기 있는 70점대 건강형.\n\nRequired visual anchors: face shape: 둥근 얼굴; eye impression: 생기 있는 눈; hair: 포니테일; clothing: 운동복; expression: 밝은 미소; background/lighting: 공원.\n\nPrecise facial and style details: eyes: 생기 있는 눈, 눈꼬리 수평, 얇은 쌍꺼풀. Brows/nose: 짧은 눈썹, 중간 콧대, 둥근 코끝. Mouth/ears: 중간 입, 밝은 미소, 양쪽 귀 보임. Hair details: 다크브라운 포니테일, 이마 노출. Neck/shoulders/outfit silhouette: 긴 목, 운동복, 활동적인 어깨선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI43",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI43.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 69,
+      "type": "건강/활동형",
+      "subtype": "스포티 호감",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI43. Target score sense: 69, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 건강/활동형. Subtype: 스포티 호감. Core intent: 산뜻한 운동 상의, 밝은 눈매, 깨끗한 피부, 평균 이상 건강미.\n\nRequired visual anchors: face shape: 계란형; eye impression: 산뜻한 눈; hair: 짧은 묶음 머리; clothing: 스포츠 상의; expression: 자연스러운 웃음; background/lighting: 체육관 자연광.\n\nPrecise facial and style details: eyes: 산뜻한 눈, 중간 크기, 속쌍. Brows/nose: 옅은 곡선 눈썹, 낮은 콧대, 작은 코. Mouth/ears: 작은 입, 자연스러운 웃음, 오른쪽 귀 보임. Hair details: 자연 흑발 짧은 묶음, 옆머리 짧음. Neck/shoulders/outfit silhouette: 보통 목, 스포츠 상의, 편한 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI44",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI44.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 72,
+      "type": "건강/활동형",
+      "subtype": "활기찬 미소",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI44. Target score sense: 72, clearly attractive but still realistic, everyday college profile quality. Target type: 건강/활동형. Subtype: 활기찬 미소. Core intent: 환한 미소, 묶은 머리, 스포티하지만 단정한 스타일.\n\nRequired visual anchors: face shape: 작은 둥근 계란형; eye impression: 웃는 눈; hair: 높은 포니테일; clothing: 스포티 티셔츠; expression: 환한 미소; background/lighting: 캠퍼스 운동장.\n\nPrecise facial and style details: eyes: 웃는 눈, 눈꼬리 내려감, 쌍꺼풀. Brows/nose: 부드러운 눈썹, 중간 콧대, 코끝 둥근 편. Mouth/ears: 넓은 미소, 도톰한 입술, 귀 가림. Hair details: 흑갈색 높은 포니테일, 잔머리. Neck/shoulders/outfit silhouette: 긴 목, 스포티 티셔츠, 어깨선 건강함.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [],
+      "notes": "?????? ?? ??? ?? ?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI45",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI45.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 76,
+      "type": "건강/활동형",
+      "subtype": "균형 잡힌 건강미",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI45. Target score sense: 76, clearly attractive but still realistic, everyday college profile quality. Target type: 건강/활동형. Subtype: 균형 잡힌 건강미. Core intent: 운동감 있는 체형, 밝은 표정, 얼굴 조화 좋음.\n\nRequired visual anchors: face shape: 탄탄한 턱선의 계란형; eye impression: 건강한 눈매; hair: 묶은 긴 머리; clothing: 트레이닝 집업; expression: 자신감; background/lighting: 야외 햇빛.\n\nPrecise facial and style details: eyes: 건강한 중대형 눈, 눈꼬리 수평, 속쌍. Brows/nose: 정돈된 눈썹, 중간 콧대, 코폭 보통. Mouth/ears: 중간 입, 자신감 있는 미소, 왼쪽 귀 보임. Hair details: 자연 흑발 묶은 긴 머리, 이마 일부 노출. Neck/shoulders/outfit silhouette: 긴 목, 트레이닝 집업, 탄탄한 자세.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI46",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI46.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 80,
+      "type": "건강/활동형",
+      "subtype": "상위 건강미",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI46. Target score sense: 80, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 건강/활동형. Subtype: 상위 건강미. Core intent: 피부 깨끗하고 생기 있음, 건강하고 눈에 띄는 호감형.\n\nRequired visual anchors: face shape: 탄탄한 갸름형; eye impression: 밝고 또렷한 눈; hair: 단정한 포니테일; clothing: 깔끔한 운동복; expression: 생기 있는 미소; background/lighting: 밝은 스튜디오.\n\nPrecise facial and style details: eyes: 밝고 또렷한 눈, 눈꼬리 수평, 쌍꺼풀. Brows/nose: 짧은 아치 눈썹, 중간 이상 콧대, 작은 코끝. Mouth/ears: 작은 입, 생기 있는 미소, 귀 가림. Hair details: 다크브라운 포니테일, 깔끔하게 묶음. Neck/shoulders/outfit silhouette: 보통 목, 운동복, 단정한 상반신.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI47",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI47.jpg",
+    "status": "regenerate",
+    "generation_round": 1,
+    "target": {
+      "score": 83,
+      "type": "건강/활동형",
+      "subtype": "밝은 상위권",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI47. Target score sense: 83, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 건강/활동형. Subtype: 밝은 상위권. Core intent: 매우 밝은 에너지와 좋은 얼굴 조화, 스포티한 매력.\n\nRequired visual anchors: face shape: 짧은 하트형; eye impression: 에너지 있는 눈; hair: 반묶음 머리; clothing: 스포츠 캐주얼; expression: 활짝 웃음; background/lighting: 공원 산책로.\n\nPrecise facial and style details: eyes: 에너지 있는 큰 눈, 눈꼬리 내려감, 속쌍. Brows/nose: 자연 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 넓은 미소, 중간 입술, 양쪽 귀 보임. Hair details: 라이트브라운 반묶음, 움직임 있는 머리. Neck/shoulders/outfit silhouette: 긴 목, 스포츠 캐주얼, 활기찬 자세.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "A",
+      "similar_to": [],
+      "notes": "??? ?? ??? ?? ?? ?? ?? ???? ?."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "regenerate",
+      "accepted_reason": "",
+      "rejection_reason": "??? ?? ??? ?? ?? ?? ?? ???? ?."
+    }
+  },
+  {
+    "id": "FI48",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI48.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 86,
+      "type": "건강/활동형",
+      "subtype": "최상위 건강미",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI48. Target score sense: 86, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 건강/활동형. Subtype: 최상위 건강미. Core intent: 상위권 건강미, 활동적인 분위기와 높은 조화, 과한 섹시함 금지.\n\nRequired visual anchors: face shape: 작은 광대의 긴 얼굴; eye impression: 선명한 눈; hair: 긴 포니테일; clothing: 고급 스포츠웨어; expression: 밝은 자신감; background/lighting: 야외 자연광.\n\nPrecise facial and style details: eyes: 선명한 눈, 눈꼬리 살짝 올라감, 쌍꺼풀. Brows/nose: 정돈된 직선 눈썹, 높은 콧대, 좁은 코. Mouth/ears: 중간 입, 밝은 자신감, 작은 귀걸이. Hair details: 자연 흑발 긴 포니테일, 잔머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 고급 스포츠웨어, 직선 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid white blouse, long loose innocent hair, cafe window background, glamorous pose, and sexualized sportswear.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "C",
+      "similar_to": [],
+      "notes": "????? ? ? ??? ????? ??? ??? ?? ???."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI49",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI49.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 63,
+      "type": "성숙/분위기형",
+      "subtype": "차분한 성숙",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI49. Target score sense: 63, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 성숙/분위기형. Subtype: 차분한 성숙. Core intent: 긴 얼굴, 어두운 니트, 차분한 표정, 성숙하지만 부담 없는 현실 호감형.\n\nRequired visual anchors: face shape: 긴 얼굴형; eye impression: 깊은 눈매; hair: 어깨 길이 생머리; clothing: 어두운 니트; expression: 차분함; background/lighting: 낮은 조명.\n\nPrecise facial and style details: eyes: 깊은 중간 눈, 눈꼬리 수평, 얇은 속쌍. Brows/nose: 긴 일자 눈썹, 중간 콧대, 코끝 정돈. Mouth/ears: 작은 입, 얇은 입술, 차분함, 왼쪽 귀만 희미하게 보임. Hair details: 자연 흑발 어깨 길이 생머리, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 어두운 니트, 낮은 조명에 어울리는 실루엣.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI50",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI50.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "성숙/분위기형",
+      "subtype": "분위기 있는 눈",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI50. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 성숙/분위기형. Subtype: 분위기 있는 눈. Core intent: 깊은 눈매, 낮은 미소, 단정한 재킷, 성숙한 70점대 분위기형.\n\nRequired visual anchors: face shape: 갸름한 계란형; eye impression: 분위기 있는 눈; hair: 중간 길이 웨이브; clothing: 단정한 재킷; expression: 낮은 미소; background/lighting: 조용한 카페.\n\nPrecise facial and style details: eyes: 분위기 있는 눈, 눈꼬리 내려감, 속쌍. Brows/nose: 부드러운 아치 눈썹, 중간 콧대, 코폭 좁음. Mouth/ears: 중간 입, 낮은 미소, 오른쪽 귀 보임. Hair details: 다크브라운 중간 웨이브, 6:4 가르마. Neck/shoulders/outfit silhouette: 보통 목, 단정한 재킷, 어깨선 부드러움.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI51",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI51.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 71,
+      "type": "성숙/분위기형",
+      "subtype": "잔잔한 매력",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI51. Target score sense: 71, clearly attractive but still realistic, everyday college profile quality. Target type: 성숙/분위기형. Subtype: 잔잔한 매력. Core intent: 화려하지 않지만 오래 보이는 매력, 어두운 카디건, 차분한 눈.\n\nRequired visual anchors: face shape: 부드러운 긴 얼굴; eye impression: 잔잔한 눈; hair: 긴 웨이브; clothing: 어두운 카디건; expression: 고요함; background/lighting: 따뜻한 실내.\n\nPrecise facial and style details: eyes: 잔잔한 눈, 눈 크기 보통, 무쌍 느낌. Brows/nose: 옅은 직선 눈썹, 낮은 콧대, 둥근 코끝. Mouth/ears: 작은 입, 입꼬리 수평, 고요함, 귀 가림. Hair details: 흑갈색 긴 웨이브, 느슨한 질감. Neck/shoulders/outfit silhouette: 긴 목, 어두운 카디건, 포근한 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI52",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI52.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 74,
+      "type": "성숙/분위기형",
+      "subtype": "고요한 분위기",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI52. Target score sense: 74, clearly attractive but still realistic, everyday college profile quality. Target type: 성숙/분위기형. Subtype: 고요한 분위기. Core intent: 성숙한 얼굴선, 피부 양호, 낮은 채도의 옷, 분위기 중심.\n\nRequired visual anchors: face shape: 성숙한 얼굴선; eye impression: 차분한 눈; hair: 낮은 번 헤어; clothing: 낮은 채도 셔츠; expression: 무심한 미소; background/lighting: 회색 배경.\n\nPrecise facial and style details: eyes: 차분한 중간 눈, 눈꼬리 수평, 속쌍. Brows/nose: 낮은 일자 눈썹, 중간 콧대, 코폭 보통. Mouth/ears: 중간 입, 무심한 미소, 양쪽 귀와 낮은 번 헤어 라인 보임. Hair details: 자연 흑발 낮은 번 헤어, 옆가르마. Neck/shoulders/outfit silhouette: 긴 목, 낮은 채도 셔츠, 쇄골 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI53",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI53.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 78,
+      "type": "성숙/분위기형",
+      "subtype": "세련된 성숙",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI53. Target score sense: 78, clearly attractive but still realistic, everyday college profile quality. Target type: 성숙/분위기형. Subtype: 세련된 성숙. Core intent: 단정한 재킷, 선명한 눈매, 성숙하고 세련된 호감형.\n\nRequired visual anchors: face shape: 선명한 얼굴형; eye impression: 깊은 눈매; hair: 정돈된 중단발; clothing: 재킷; expression: 세련된 표정; background/lighting: 도시 실내.\n\nPrecise facial and style details: eyes: 깊은 눈매, 눈꼬리 살짝 올라감, 얇은 쌍꺼풀. Brows/nose: 짙은 눈썹, 높은 콧대, 코끝 작음. Mouth/ears: 작은 입, 세련된 표정, 작은 귀걸이. Hair details: 다크브라운 정돈 중단발, 턱선 노출. Neck/shoulders/outfit silhouette: 긴 목, 재킷, 직선 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "B",
+      "similar_to": [],
+      "notes": "???/??? ???? ??/?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI54",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI54.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 82,
+      "type": "성숙/분위기형",
+      "subtype": "상위 분위기",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI54. Target score sense: 82, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 성숙/분위기형. Subtype: 상위 분위기. Core intent: 높은 얼굴 조화, 차분하고 깊은 인상, 분위기 있는 상위권.\n\nRequired visual anchors: face shape: 성숙한 계란형; eye impression: 깊고 선명한 눈; hair: 중간 길이 웨이브; clothing: 차분한 블라우스; expression: 분위기 있음; background/lighting: 어두운 스튜디오.\n\nPrecise facial and style details: eyes: 깊고 선명한 눈, 눈꼬리 수평, 쌍꺼풀. Brows/nose: 정돈된 아치 눈썹, 높은 콧대, 좁은 코. Mouth/ears: 중간 입, 분위기 있는 낮은 미소, 왼쪽 귀와 작은 귀걸이. Hair details: 톤다운 브라운 중간 길이 웨이브. Neck/shoulders/outfit silhouette: 긴 목, 차분한 블라우스, 고급 핏.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI55",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI55.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 86,
+      "type": "성숙/분위기형",
+      "subtype": "강한 분위기",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI55. Target score sense: 86, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 성숙/분위기형. Subtype: 강한 분위기. Core intent: 도도함보다 깊은 분위기, 선명한 이목구비, 상위권 성숙미.\n\nRequired visual anchors: face shape: 긴 V라인 얼굴; eye impression: 또렷하고 깊은 눈; hair: 블런트 롱보브; clothing: 고급 니트; expression: 낮은 자신감; background/lighting: 고급 카페.\n\nPrecise facial and style details: eyes: 또렷하고 깊은 눈, 눈꼬리 올라감, 얇은 쌍꺼풀. Brows/nose: 짙은 직선 눈썹, 높은 콧대, 코끝 날렵. Mouth/ears: 작은 입, 얇은 입술, 낮은 자신감, 오른쪽 귀 보임. Hair details: 자연 흑발 블런트 롱보브, 끝선 일자. Neck/shoulders/outfit silhouette: 긴 목, 고급 니트, 절제된 네크라인.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI56",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI56.jpg",
+    "status": "regenerate",
+    "generation_round": 1,
+    "target": {
+      "score": 90,
+      "type": "성숙/분위기형",
+      "subtype": "최상위 분위기",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI56. Target score sense: 90, top reference point, extremely attractive yet still realistic, no celebrity or AI doll polish. Target type: 성숙/분위기형. Subtype: 최상위 분위기. Core intent: 최상위권 분위기형, 고급스럽고 깊은 인상, 연예인 닮음 금지.\n\nRequired visual anchors: face shape: 균형 잡힌 긴 얼굴; eye impression: 깊은 눈매; hair: 자연 웨이브; clothing: 고급 재킷; expression: 절제된 미소; background/lighting: 고급 실내.\n\nPrecise facial and style details: eyes: 깊은 눈매, 눈꼬리 내려감, 속쌍. Brows/nose: 부드러운 긴 눈썹, 중간 이상 콧대, 작은 코. Mouth/ears: 중간 입, 절제된 미소, 작은 귀걸이. Hair details: 애쉬브라운 자연 웨이브, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 고급 재킷, 차분한 상반신.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid baby-face cheeks, hoodie, oversized round cute eyes, childish playful expression, and bubbly smile.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "A",
+      "similar_to": [],
+      "notes": "?? ???/?? ?? ???? ??? ??? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "regenerate",
+      "accepted_reason": "",
+      "rejection_reason": "?? ???/?? ?? ???? ??? ??? ??? ??."
+    }
+  },
+  {
+    "id": "FI57",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI57.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 60,
+      "type": "지적/단정형",
+      "subtype": "안경 단정",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI57. Target score sense: 60, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 지적/단정형. Subtype: 안경 단정. Core intent: 얇은 안경, 단정한 셔츠, 차분한 표정, 얼굴은 현실 호감형.\n\nRequired visual anchors: face shape: 보통 얼굴형; eye impression: 차분한 눈; hair: 단정한 묶음 머리; clothing: 셔츠; expression: 조용함; background/lighting: 도서관.\n\nPrecise facial and style details: eyes: 차분한 보통 눈, 눈꼬리 수평, 무쌍에 가까움. Brows/nose: 옅은 일자 눈썹, 낮은 콧대, 코폭 보통. Mouth/ears: 작은 입, 조용한 표정, 귀 가림. Hair details: 자연 흑발 단정한 묶음, 잔머리 없음. Neck/shoulders/outfit silhouette: 보통 목, 셔츠, 단정한 어깨선.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI58",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI58.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 70,
+      "type": "지적/단정형",
+      "subtype": "조용한 모범생",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI58. Target score sense: 70, clearly attractive but still realistic, everyday college profile quality. Target type: 지적/단정형. Subtype: 조용한 모범생. Core intent: 낮은 화장, 단정한 머리, 흰 셔츠, 조용하고 지적인 70점대 단정형.\n\nRequired visual anchors: face shape: 계란형; eye impression: 안정적인 눈; hair: 단정한 중단발; clothing: 흰 셔츠; expression: 낮은 미소; background/lighting: 책장 배경.\n\nPrecise facial and style details: eyes: 안정적인 눈, 눈꼬리 내려감, 얇은 속쌍. Brows/nose: 부드러운 눈썹, 중간 콧대, 둥근 코끝. Mouth/ears: 중간 입, 낮은 미소, 왼쪽 귀와 얇은 안경 다리. Hair details: 흑갈색 단정 중단발, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 흰 셔츠, 책장 배경에 맞는 단정함.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI59",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI59.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 68,
+      "type": "지적/단정형",
+      "subtype": "깔끔한 단정",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI59. Target score sense: 68, realistic approachable attractive, not model-perfect, deliberately ordinary profile-photo realism. Target type: 지적/단정형. Subtype: 깔끔한 단정. Core intent: 단정한 니트, 차분한 눈, 피부 양호, 안정적인 인상.\n\nRequired visual anchors: face shape: 부드러운 얼굴; eye impression: 차분한 눈매; hair: 깔끔한 단발; clothing: 단정한 니트; expression: 안정감; background/lighting: 흰 벽.\n\nPrecise facial and style details: eyes: 차분한 눈매, 눈 크기 보통, 속쌍. Brows/nose: 자연 일자 눈썹, 낮은 콧대, 코끝 둥근 편. Mouth/ears: 작은 입, 안정감 있는 표정, 귀 가림. Hair details: 자연 흑발 깔끔한 단발. Neck/shoulders/outfit silhouette: 짧은 목, 단정한 니트, 쇄골 없음.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI60",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI60.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 72,
+      "type": "지적/단정형",
+      "subtype": "안경 호감형",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI60. Target score sense: 72, clearly attractive but still realistic, everyday college profile quality. Target type: 지적/단정형. Subtype: 안경 호감형. Core intent: 안경과 얼굴 조화 좋음, 셔츠, 조용하지만 호감 있는 표정.\n\nRequired visual anchors: face shape: 작은 계란형 얼굴; eye impression: 안경 너머 또렷한 눈; hair: 낮은 묶음; clothing: 셔츠; expression: 지적인 미소; background/lighting: 도서관 창가.\n\nPrecise facial and style details: eyes: 안경 너머 또렷한 눈, 눈꼬리 수평, 속쌍. Brows/nose: 정돈된 눈썹, 중간 콧대, 작은 코. Mouth/ears: 중간 입, 지적인 미소, 양쪽 귀와 얇은 안경 다리 보임. Hair details: 다크브라운 낮은 묶음, 귀 뒤로 넘김. Neck/shoulders/outfit silhouette: 긴 목, 셔츠, 낮은 네크라인 금지.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "C",
+      "similar_to": [
+        "FI63",
+        "FI64"
+      ],
+      "notes": "??/?? ?? ? ? ??/??/??? ??? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI61",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI61.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 76,
+      "type": "지적/단정형",
+      "subtype": "단정 상위 호감",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI61. Target score sense: 76, clearly attractive but still realistic, everyday college profile quality. Target type: 지적/단정형. Subtype: 단정 상위 호감. Core intent: 깔끔한 셔츠, 자연스러운 미소, 지적이고 단정한 상위 호감.\n\nRequired visual anchors: face shape: 낮은 광대의 계란형; eye impression: 맑은 눈; hair: 단정한 낮은 묶음; clothing: 깔끔한 셔츠; expression: 자연스러운 미소; background/lighting: 스터디룸.\n\nPrecise facial and style details: eyes: 맑은 눈, 눈꼬리 내려감, 얇은 쌍꺼풀. Brows/nose: 부드러운 아치 눈썹, 중간 콧대, 코폭 좁음. Mouth/ears: 작은 입, 자연스러운 미소, 양쪽 귀와 낮은 묶음 라인 보임. Hair details: 자연 흑발 단정한 낮은 묶음, 5:5 가르마. Neck/shoulders/outfit silhouette: 보통 목, 깔끔한 셔츠, 단정한 자세.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI62",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI62.jpg",
+    "status": "active_candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 80,
+      "type": "지적/단정형",
+      "subtype": "상위 지적형",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI62. Target score sense: 80, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 지적/단정형. Subtype: 상위 지적형. Core intent: 얼굴 조화 좋고 차분함, 안경 또는 단정한 헤어, 상위권.\n\nRequired visual anchors: face shape: 긴 갸름한 얼굴; eye impression: 차분하고 선명한 눈; hair: 정돈된 중단발; clothing: 단정한 재킷; expression: 차분함; background/lighting: 회의실 자연광.\n\nPrecise facial and style details: eyes: 차분하고 선명한 눈, 눈꼬리 수평, 속쌍. Brows/nose: 낮은 일자 눈썹, 중간 이상 콧대, 코끝 작음. Mouth/ears: 중간 입, 차분한 입꼬리, 귀 가림. Hair details: 흑갈색 정돈 중단발, 옆머리 깔끔. Neck/shoulders/outfit silhouette: 긴 목, 단정한 재킷, 직선 어깨.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "pass",
+      "similar_to": [],
+      "notes": "???? 1? ?? ?? ?? ?? ?? ??. GPT measured ??? ? ?? ?? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "active_candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI63",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI63.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 84,
+      "type": "지적/단정형",
+      "subtype": "세련된 지적형",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI63. Target score sense: 84, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 지적/단정형. Subtype: 세련된 지적형. Core intent: 단정한 재킷, 선명한 눈매, 지적이고 세련된 상위권.\n\nRequired visual anchors: face shape: 선명한 얼굴형; eye impression: 또렷한 눈; hair: 깔끔한 긴 머리; clothing: 단정한 재킷; expression: 세련된 미소; background/lighting: 고급 서재.\n\nPrecise facial and style details: eyes: 또렷한 눈, 눈꼬리 살짝 올라감, 쌍꺼풀. Brows/nose: 정돈된 직선 눈썹, 높은 콧대, 좁은 코. Mouth/ears: 작은 입, 세련된 미소, 작은 귀걸이. Hair details: 톤다운 브라운 긴 머리, 얼굴선 노출. Neck/shoulders/outfit silhouette: 긴 목, 단정한 재킷, 고급 서재 분위기.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "C",
+      "similar_to": [
+        "FI60",
+        "FI64"
+      ],
+      "notes": "??/?? ??? ?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  },
+  {
+    "id": "FI64",
+    "gender": "female",
+    "file": "public/appearance-ideal/female-64/FI64.jpg",
+    "status": "candidate",
+    "generation_round": 1,
+    "target": {
+      "score": 88,
+      "type": "지적/단정형",
+      "subtype": "최상위 단정형",
+      "prompt": "Use case: photorealistic-natural. Asset type: dating app ideal worldcup profile card. Create one completely fictional Korean woman in her early 20s, university student age range. Vertical 3:4 portrait, upper body from chest up, realistic dating-app profile photo taken with a normal phone camera. No real person resemblance, no celebrity resemblance, no influencer resemblance. Natural believable lighting, ordinary real location, no text, no logo, no watermark. Non-sexual, no revealing outfit, no glamour portrait. Keep realistic skin texture, subtle facial asymmetry, tiny skin imperfections, natural hair flyaways, ordinary fabric wrinkles, believable ears and hairline. Avoid plastic-smooth skin, glassy oversized eyes, perfectly symmetrical face, over-white teeth, heavy beauty filter, cinematic fashion editorial lighting.\n\nID: FI64. Target score sense: 88, very attractive upper range but not celebrity-like, still believable as a normal profile photo. Target type: 지적/단정형. Subtype: 최상위 단정형. Core intent: 최상위권 단정미, 고급스럽고 지적인 분위기, 과한 화려함 금지.\n\nRequired visual anchors: face shape: 긴 계란형; eye impression: 지적이고 선명한 눈; hair: 정돈된 웨이브; clothing: 고급 셔츠; expression: 절제된 미소; background/lighting: 밝은 서재.\n\nPrecise facial and style details: eyes: 지적이고 선명한 눈, 눈꼬리 수평, 얇은 쌍꺼풀. Brows/nose: 가는 일자 눈썹, 높은 콧대, 코끝 정돈. Mouth/ears: 중간 입, 절제된 미소, 양쪽 귀와 작은 귀걸이. Hair details: 애쉬브라운 정돈 웨이브, 앞머리 없음. Neck/shoulders/outfit silhouette: 긴 목, 고급 셔츠, 단정한 네크라인.\n\nDifferentiation requirement: this must look like a distinct person from every other FI image, not the same Korean AI face with different hair. Strongly preserve the specified face shape, eye shape, nose, mouth, ear visibility, hairstyle, clothing, expression, and background. Avoid flashy makeup, large accessories, sporty background, sensual styling, and messy fashion editorial look.\n\nNo text, no watermark, no logo. No celebrity likeness. No sexualized pose. No AI glamour look."
+    },
+    "measured": null,
+    "bucket_scores": null,
+    "final_bucket": null,
+    "matching_vector_source": "measured.appearance_vector_after_gpt_analysis",
+    "visual_review": {
+      "duplicate_risk": "C",
+      "similar_to": [
+        "FI60",
+        "FI63"
+      ],
+      "notes": "??/?? ??? ?? ??? ??."
+    },
+    "review": {
+      "target_measured_mismatch": null,
+      "decision": "candidate",
+      "accepted_reason": "",
+      "rejection_reason": ""
+    }
+  }
+]
