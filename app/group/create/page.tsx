@@ -410,8 +410,16 @@ export default function GroupCreatePage() {
               </div>
 
               {state.friends.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5 text-sm text-gray-500">
-                  아직 등록된 친구가 없어요. 전화번호나 초대 링크로 먼저 초대해줘.
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5">
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    아직 등록된 친구가 없어요. 친구를 먼저 추가해야 그룹을 꾸릴 수 있어요.
+                  </p>
+                  <Link
+                    href="/friends"
+                    className="mt-3 inline-block px-4 py-2 rounded-xl text-xs font-bold border border-violet-400/30 bg-violet-400/10 text-violet-200"
+                  >
+                    친구 추가하러 가기 →
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-2">
