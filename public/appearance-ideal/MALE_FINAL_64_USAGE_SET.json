@@ -1,0 +1,653 @@
+{
+  "_meta": {
+    "generated_at": "2026-05-21T21:08:05.760Z",
+    "source_commit": "086a76a5c04e85f20d1238b72a9fdaf5dd007755",
+    "review_doc": "docs/handoff/MALE_IDEAL_WORLDCUP_MI01_MI96_CODEX_REVIEW_2026-05-22.md",
+    "notes": [
+      "Codex first-pass balanced 64 from Manus MI01-MI96.",
+      "Final product gate remains measured visual/API scoring <= 77 when external scorer is available."
+    ]
+  },
+  "items": [
+    {
+      "id": "MI01",
+      "file": "public/appearance-ideal/male-64/MI01.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 73,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "청순/내추럴"
+      ]
+    },
+    {
+      "id": "MI03",
+      "file": "public/appearance-ideal/male-64/MI03.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 69,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "소년미/귀여운형"
+      ]
+    },
+    {
+      "id": "MI04",
+      "file": "public/appearance-ideal/male-64/MI04.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 74,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI05",
+      "file": "public/appearance-ideal/male-64/MI05.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 72,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI06",
+      "file": "public/appearance-ideal/male-64/MI06.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 70,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "청순/내추럴"
+      ]
+    },
+    {
+      "id": "MI08",
+      "file": "public/appearance-ideal/male-64/MI08.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 74,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI09",
+      "file": "public/appearance-ideal/male-64/MI09.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 69,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI11",
+      "file": "public/appearance-ideal/male-64/MI11.jpg",
+      "final_bucket": "훈훈/부드러운형",
+      "score": 71,
+      "primary_type": "훈훈/부드러운형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI13",
+      "file": "public/appearance-ideal/male-64/MI13.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 75,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI14",
+      "file": "public/appearance-ideal/male-64/MI14.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 73,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI15",
+      "file": "public/appearance-ideal/male-64/MI15.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 74,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "시크/날카로운형"
+      ]
+    },
+    {
+      "id": "MI16",
+      "file": "public/appearance-ideal/male-64/MI16.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 72,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI17",
+      "file": "public/appearance-ideal/male-64/MI17.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 75,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI18",
+      "file": "public/appearance-ideal/male-64/MI18.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 71,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI19",
+      "file": "public/appearance-ideal/male-64/MI19.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 73,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI20",
+      "file": "public/appearance-ideal/male-64/MI20.jpg",
+      "final_bucket": "댄디/단정형",
+      "score": 70,
+      "primary_type": "댄디/단정형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI25",
+      "file": "public/appearance-ideal/male-64/MI25.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 75,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "강한 인상/남성미형"
+      ]
+    },
+    {
+      "id": "MI26",
+      "file": "public/appearance-ideal/male-64/MI26.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 74,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI27",
+      "file": "public/appearance-ideal/male-64/MI27.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 73,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI28",
+      "file": "public/appearance-ideal/male-64/MI28.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 72,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "강한 인상/남성미형"
+      ]
+    },
+    {
+      "id": "MI29",
+      "file": "public/appearance-ideal/male-64/MI29.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 75,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI31",
+      "file": "public/appearance-ideal/male-64/MI31.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 72,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI32",
+      "file": "public/appearance-ideal/male-64/MI32.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 74,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "강한 인상/남성미형"
+      ]
+    },
+    {
+      "id": "MI35",
+      "file": "public/appearance-ideal/male-64/MI35.jpg",
+      "final_bucket": "시크/날카로운형",
+      "score": 72,
+      "primary_type": "시크/날카로운형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI37",
+      "file": "public/appearance-ideal/male-64/MI37.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 71,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI38",
+      "file": "public/appearance-ideal/male-64/MI38.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 73,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "청순/내추럴"
+      ]
+    },
+    {
+      "id": "MI39",
+      "file": "public/appearance-ideal/male-64/MI39.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 69,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI41",
+      "file": "public/appearance-ideal/male-64/MI41.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 72,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "운동/건강형"
+      ]
+    },
+    {
+      "id": "MI42",
+      "file": "public/appearance-ideal/male-64/MI42.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 70,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "청순/내추럴"
+      ]
+    },
+    {
+      "id": "MI43",
+      "file": "public/appearance-ideal/male-64/MI43.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 75,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI44",
+      "file": "public/appearance-ideal/male-64/MI44.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 72,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI48",
+      "file": "public/appearance-ideal/male-64/MI48.jpg",
+      "final_bucket": "소년미/귀여운형",
+      "score": 72,
+      "primary_type": "소년미/귀여운형",
+      "secondary_types": [
+        "운동/건강형"
+      ]
+    },
+    {
+      "id": "MI49",
+      "file": "public/appearance-ideal/male-64/MI49.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 75,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "강한 인상/남성미형"
+      ]
+    },
+    {
+      "id": "MI50",
+      "file": "public/appearance-ideal/male-64/MI50.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 73,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI51",
+      "file": "public/appearance-ideal/male-64/MI51.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 71,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI52",
+      "file": "public/appearance-ideal/male-64/MI52.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 74,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "강한 인상/남성미형"
+      ]
+    },
+    {
+      "id": "MI53",
+      "file": "public/appearance-ideal/male-64/MI53.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 70,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "소년미/귀여운형"
+      ]
+    },
+    {
+      "id": "MI55",
+      "file": "public/appearance-ideal/male-64/MI55.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 72,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI56",
+      "file": "public/appearance-ideal/male-64/MI56.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 72,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "강한 인상/남성미형"
+      ]
+    },
+    {
+      "id": "MI57",
+      "file": "public/appearance-ideal/male-64/MI57.jpg",
+      "final_bucket": "운동/건강형",
+      "score": 69,
+      "primary_type": "운동/건강형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI61",
+      "file": "public/appearance-ideal/male-64/MI61.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 73,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI62",
+      "file": "public/appearance-ideal/male-64/MI62.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 75,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI63",
+      "file": "public/appearance-ideal/male-64/MI63.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 71,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI64",
+      "file": "public/appearance-ideal/male-64/MI64.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 74,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI66",
+      "file": "public/appearance-ideal/male-64/MI66.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 70,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI67",
+      "file": "public/appearance-ideal/male-64/MI67.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 75,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI68",
+      "file": "public/appearance-ideal/male-64/MI68.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 72,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI69",
+      "file": "public/appearance-ideal/male-64/MI69.jpg",
+      "final_bucket": "지적/안경형",
+      "score": 68,
+      "primary_type": "지적/안경형",
+      "secondary_types": [
+        "시크/날카로운형"
+      ]
+    },
+    {
+      "id": "MI73",
+      "file": "public/appearance-ideal/male-64/MI73.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 74,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "시크/날카로운형"
+      ]
+    },
+    {
+      "id": "MI75",
+      "file": "public/appearance-ideal/male-64/MI75.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 72,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI76",
+      "file": "public/appearance-ideal/male-64/MI76.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 74,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "시크/날카로운형"
+      ]
+    },
+    {
+      "id": "MI78",
+      "file": "public/appearance-ideal/male-64/MI78.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 73,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "운동/건강형"
+      ]
+    },
+    {
+      "id": "MI79",
+      "file": "public/appearance-ideal/male-64/MI79.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 70,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "스타일리시/개성형"
+      ]
+    },
+    {
+      "id": "MI80",
+      "file": "public/appearance-ideal/male-64/MI80.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 74,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "시크/날카로운형"
+      ]
+    },
+    {
+      "id": "MI81",
+      "file": "public/appearance-ideal/male-64/MI81.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 73,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "운동/건강형"
+      ]
+    },
+    {
+      "id": "MI84",
+      "file": "public/appearance-ideal/male-64/MI84.jpg",
+      "final_bucket": "강한 인상/남성미형",
+      "score": 74,
+      "primary_type": "강한 인상/남성미형",
+      "secondary_types": [
+        "운동/건강형"
+      ]
+    },
+    {
+      "id": "MI85",
+      "file": "public/appearance-ideal/male-64/MI85.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 73,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    },
+    {
+      "id": "MI86",
+      "file": "public/appearance-ideal/male-64/MI86.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 71,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "시크/날카로운형"
+      ]
+    },
+    {
+      "id": "MI87",
+      "file": "public/appearance-ideal/male-64/MI87.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 73,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "댄디/단정형"
+      ]
+    },
+    {
+      "id": "MI88",
+      "file": "public/appearance-ideal/male-64/MI88.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 69,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "소년미/귀여운형"
+      ]
+    },
+    {
+      "id": "MI90",
+      "file": "public/appearance-ideal/male-64/MI90.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 73,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "지적/안경형"
+      ]
+    },
+    {
+      "id": "MI91",
+      "file": "public/appearance-ideal/male-64/MI91.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 71,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "운동/건강형"
+      ]
+    },
+    {
+      "id": "MI92",
+      "file": "public/appearance-ideal/male-64/MI92.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 68,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "소년미/귀여운형"
+      ]
+    },
+    {
+      "id": "MI94",
+      "file": "public/appearance-ideal/male-64/MI94.jpg",
+      "final_bucket": "스타일리시/개성형",
+      "score": 70,
+      "primary_type": "스타일리시/개성형",
+      "secondary_types": [
+        "훈훈/부드러운형"
+      ]
+    }
+  ]
+}
