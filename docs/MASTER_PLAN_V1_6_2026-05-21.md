@@ -514,14 +514,18 @@ supabase db reset
 
 본 master plan 7절 그대로 유지. 충현 단독 진입 X. 성준 ping 필요.
 
-### 12.E z12 BYPASSRLS 안전 패턴 통일 (Low)
+### 12.E z12 BYPASSRLS 안전 패턴 통일 ✅ 완료 (2026-05-22)
 
-12.A 검증이 통과해도, 코드 명시성을 위해 모든 SECURITY DEFINER 함수 안의 INSERT/UPDATE 가 `app.bypass_*_guard` 패턴을 일관되게 쓰도록 갱신 가능. 현재는 group_invites 만 사용 중.
+`supabase/migrations/20260521_z22_rpc_bypass_guards.sql` 로 완료.
 
-대상:
-- `group_members_strict_insert` 정책에 bypass 추가 + `accept_group_invite_by_token` RPC 내부 set_config
-- `match_pool_member_insert` 정책에 bypass + `enter_match_pool` RPC 내부 set_config
-- `match_pool_member_cancel_update` 정책에 bypass + `cancel_match_pool` RPC 내부 set_config
+적용된 항목:
+- `group_members_strict_insert` 정책에 `app.bypass_group_members_guard` 경로 추가
+- `match_pool_member_insert` / `match_pool_member_cancel_update` 정책에 `app.bypass_match_pool_guard`
+- `groups_leader_write` 정책에 `app.bypass_groups_guard`
+- `guard_match_pool_update` trigger 에 bypass 분기
+- `accept_group_invite_by_token` / `enter_match_pool` / `cancel_match_pool` RPC 본문에서 `set_config(..., 'on', TRUE)` 호출 (트랜잭션 종료 시 auto reset)
+
+friendships INSERT 정책에 bypass 추가는 12.B (friend RPC) 작업 시 같이 적용 예정.
 
 ### 12.F UI 잔여 (Low)
 

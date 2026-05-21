@@ -73,6 +73,10 @@ f47a788 feat(matching-pool): connect MatchingPool to real DB stats via RPC
 46e318d feat(invite): allow anonymous invite token preview
 0199a08 feat(profile): add display_name + friend summary RPC
 2ee36ac chore(invite): drop link-phone hack via invite_kind column
+0456075 docs: handoff Claude -> Codex 2026-05-22
+7572322 feat(groups): show real member display_name in group card
+8436abc docs(master-plan): mark Task D/E done + add 12.A~12.G next tracks
+4d6fae5 fix(db): explicit RPC bypass guard for group/match_pool RLS
 ```
 
 (앞서 작업한 d8d1412 / 94956d5 / 7f0b96a / e1a4aef 은 Codex 세션 산출물 — 변경 없이 유지)
@@ -182,6 +186,8 @@ ASCII 정렬 기준 적용 순서:
 20260521_z18_profile_display_name.sql
 20260521_z19_friend_summaries_rpc.sql
 20260521_z20_group_invite_kind.sql
+20260521_z21_group_member_summaries_rpc.sql
+20260521_z22_rpc_bypass_guards.sql
 ```
 
 `z` prefix 덕분에 모든 후속 마이그레이션이 의존 테이블 생성 이후에 적용됨 (Codex 가 이전 세션에 지적한 Critical 이슈는 해결됨).
@@ -190,17 +196,18 @@ ASCII 정렬 기준 적용 순서:
 
 ## 7. Known limitations / risks
 
-### 7-A. SECURITY DEFINER RPC + RLS 가정
+### 7-A. SECURITY DEFINER RPC + RLS 가정 → **해소됨 (z22)**
 
-본 세션의 RPC들 (`accept_group_invite_by_token`, `enter_match_pool`, `cancel_match_pool` 등) 은 SECURITY DEFINER 함수 안에서 `group_members` / `match_pool` 등에 INSERT/UPDATE 함.
+본 세션 중간에 `supabase/migrations/20260521_z22_rpc_bypass_guards.sql` 에서 명시적 bypass guard 패턴으로 통일.
 
-가정: Supabase 의 `postgres` owner 가 BYPASSRLS 이므로 SECURITY DEFINER 내부 query 가 RLS 우회. 일부 (group_invites guard) 만 명시적 `set_config('app.bypass_*_guard', ...)` 패턴 사용.
+적용 후 RPC 들이 BYPASSRLS attribute 환경 의존 없이 동작:
+- `accept_group_invite_by_token`: group_members INSERT 시 `app.bypass_group_members_guard` 사용
+- `enter_match_pool`: groups UPDATE + match_pool INSERT 시 각각 bypass
+- `cancel_match_pool`: groups UPDATE + match_pool UPDATE 시 각각 bypass
 
-**검증 필요**: 실제 Supabase 환경에서 fresh DB apply 후 다음 케이스 동작 확인
-- 사용자가 invite 토큰을 통해 group_members 에 자기 자신 insert 가능?
-- 리더가 enter_match_pool 호출 시 match_pool insert + groups.status 변경 가능?
+검증 필요 항목은 fresh DB apply 만 남음 (12-A 참고).
 
-만약 실패하면 모든 RPC 에 명시적 bypass guard 패턴 추가 필요.
+friendships INSERT 는 다음 세션 friend RPC 작업 시 같이 정리 예정.
 
 ### 7-B. 보증금 흐름 미통합
 
@@ -216,18 +223,9 @@ UI 에 명시 메시지 있음: "보증금 결제는 곧 연결돼요. 지금은
 
 UI 에 별도 onboarding 강제 없음 — 사용자 자율.
 
-### 7-D. group_members + match_pool RLS bypass guard 미정의
+### 7-D. group_members + match_pool RLS bypass guard → **해소됨 (z22)**
 
-z12 의 `group_members_strict_insert` 정책 / `match_pool_member_insert` 정책에 `app.bypass_*_guard` 우회 경로 없음. 따라서 RPC 내부 INSERT 가 owner BYPASSRLS 에 의존.
-
-만약 7-A 케이스에서 실패하면, 다음 마이그레이션 추가 필요:
-```sql
-ALTER POLICY "group_members_strict_insert" ON group_members WITH CHECK (
-  current_setting('app.bypass_group_members_guard', TRUE) = 'on'
-  OR (... 기존 조건 ...)
-);
-```
-+ RPC 안에서 `PERFORM set_config('app.bypass_group_members_guard', 'on', TRUE);` 호출.
+z22 마이그레이션에서 모든 정책에 bypass 경로 추가 + RPC 본문에 set_config 호출. 7-A 와 같이 통합 해소.
 
 ### 7-E. dev server 브라우저 검증 미수행
 
@@ -304,11 +302,9 @@ supabase db reset
 
 D-06 결정. Manus 작업. 외부 트랙. `docs/handoff/MANUS_MALE_64_HANDOFF.md` 참고. 마감 기한 없으면 master plan 에 명시 필요.
 
-### 8-6. (Low) z12 BYPASSRLS 안전 패턴 통일
+### 8-6. z12 BYPASSRLS 안전 패턴 통일 → **완료 (z22)**
 
-7-A 와 무관하게, 코드 명시성을 위해 group_members / match_pool / friendships INSERT 정책에 일관된 bypass guard 패턴 도입 (group_invites 가 이미 사용 중인 형식).
-
-장점: SECURITY DEFINER + BYPASSRLS 환경 차이에 무관한 명시적 우회. 단점: 마이그 추가 + RPC 갱신.
+본 세션 z22 에서 group_members / match_pool / groups 정책 + 관련 RPC 통일. friendships INSERT 정책 bypass 는 friend RPC 작성 시 12.B 에서 마저 처리.
 
 ### 8-7. (Low) UI 잔여 정리
 
