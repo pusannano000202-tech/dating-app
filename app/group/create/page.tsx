@@ -638,6 +638,12 @@ export default function GroupCreatePage() {
                     토요일 14:00 매칭 결과를 기다려주세요.
                   </p>
                 </div>
+                <Link
+                  href="/match"
+                  className="mb-2 w-full block text-center py-3 rounded-2xl text-sm font-bold border border-violet-400/30 bg-violet-400/10 text-violet-200"
+                >
+                  매칭 결과 확인하기
+                </Link>
                 <button
                   type="button"
                   disabled={saving || !canCancelQueue}
