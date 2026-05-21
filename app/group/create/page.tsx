@@ -81,6 +81,20 @@ interface MyDeposit {
   amount: number
 }
 
+interface DepositSummaryRow {
+  user_id: string
+  display_name: string | null
+  role: string
+  deposit_status: string
+}
+
+interface DepositSummary {
+  rows: DepositSummaryRow[]
+  total_active: number
+  paid_count: number
+  all_paid: boolean
+}
+
 export default function GroupCreatePage() {
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [phone, setPhone] = useState('')
@@ -89,6 +103,7 @@ export default function GroupCreatePage() {
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [myDeposit, setMyDeposit] = useState<MyDeposit | null>(null)
+  const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
 
   const group = state.group
   const members = state.members
@@ -157,10 +172,18 @@ export default function GroupCreatePage() {
 
   async function refreshDeposit(groupId: string) {
     try {
-      const res = await fetch(`/api/deposits?group_id=${encodeURIComponent(groupId)}`)
-      if (!res.ok) return
-      const data = await res.json() as { my_deposit: MyDeposit | null }
-      setMyDeposit(data.my_deposit)
+      const [own, summary] = await Promise.all([
+        fetch(`/api/deposits?group_id=${encodeURIComponent(groupId)}`),
+        fetch(`/api/deposits/summary?group_id=${encodeURIComponent(groupId)}`),
+      ])
+      if (own.ok) {
+        const data = await own.json() as { my_deposit: MyDeposit | null }
+        setMyDeposit(data.my_deposit)
+      }
+      if (summary.ok) {
+        const data = await summary.json() as DepositSummary
+        setDepositSummary(data)
+      }
     } catch {
       // ignore
     }
@@ -585,6 +608,35 @@ export default function GroupCreatePage() {
                       </button>
                     )}
                   </div>
+                  {/* 그룹 전체 결제 현황 */}
+                  {depositSummary && depositSummary.total_active > 0 && (
+                    <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-[11px] text-gray-500">그룹 전체</p>
+                        <p className="text-[11px] font-bold text-gray-400">
+                          {depositSummary.paid_count}/{depositSummary.total_active} 결제 완료
+                        </p>
+                      </div>
+                      <div className="flex gap-1.5">
+                        {depositSummary.rows.map((row) => {
+                          const paid = row.deposit_status === 'paid' || row.deposit_status === 'held'
+                          return (
+                            <div
+                              key={row.user_id}
+                              className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg text-[10px] truncate text-center ${
+                                paid
+                                  ? 'bg-emerald-400/10 border border-emerald-400/20 text-emerald-200'
+                                  : 'bg-white/[0.04] border border-white/10 text-gray-500'
+                              }`}
+                              title={row.display_name ?? row.user_id.slice(0, 8)}
+                            >
+                              {row.display_name ?? `친구 ${row.user_id.slice(0, 4)}`}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button
