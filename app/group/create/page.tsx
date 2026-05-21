@@ -10,8 +10,10 @@ import {
   Link as LinkIcon,
   Loader2,
   LockKeyhole,
+  LogOut,
   Send,
   ShieldCheck,
+  Trash2,
   UserPlus,
   Users,
   Wallet,
@@ -353,6 +355,70 @@ export default function GroupCreatePage() {
     }
   }
 
+  async function leaveGroup() {
+    if (!group || saving || isLeader) return
+    if (!window.confirm('그룹에서 나갈까요?')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/groups/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+      setState(EMPTY_STATE)
+      setMyDeposit(null)
+      setDepositSummary(null)
+      await ensureGroup()
+    } catch {
+      setError('그룹을 나가지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function disbandGroup() {
+    if (!group || saving || !isLeader) return
+    if (!window.confirm('그룹을 해체할까요? 모든 멤버가 빠지게 돼요.')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/groups/disband', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+      setState(EMPTY_STATE)
+      setMyDeposit(null)
+      setDepositSummary(null)
+      await ensureGroup()
+    } catch {
+      setError('그룹 해체에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function translateGroupError(code?: string) {
+    switch (code) {
+      case 'not_group_leader':   return '리더만 해체할 수 있어요.'
+      case 'leader_cannot_leave': return '리더는 떠날 수 없어요. 해체하거나 리더 위임 먼저 해야 해요.'
+      case 'not_active_member':  return '이미 이 그룹의 활성 멤버가 아니에요.'
+      case 'group_locked':       return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
+      default:                    return '처리에 실패했어요. 잠시 후 다시 시도해줘.'
+    }
+  }
+
   const myDepositPaid = myDeposit?.status === 'paid' || myDeposit?.status === 'held'
 
   return (
@@ -669,6 +735,33 @@ export default function GroupCreatePage() {
               </>
             )}
           </>
+        )}
+
+        {/* 그룹 관리 (떠나기 / 해체) */}
+        {group && !inQueue && (
+          <div className="mt-4 flex gap-2">
+            {isLeader ? (
+              <button
+                type="button"
+                onClick={disbandGroup}
+                disabled={saving}
+                className="flex-1 py-3 rounded-2xl text-xs text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 flex items-center justify-center gap-1.5 disabled:opacity-40"
+              >
+                <Trash2 size={13} />
+                그룹 해체
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={leaveGroup}
+                disabled={saving}
+                className="flex-1 py-3 rounded-2xl text-xs text-gray-400 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 disabled:opacity-40"
+              >
+                <LogOut size={13} />
+                그룹 나가기
+              </button>
+            )}
+          </div>
         )}
 
         <Link
