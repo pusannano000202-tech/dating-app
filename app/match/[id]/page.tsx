@@ -22,6 +22,7 @@ export default function MatchDetailPage() {
   const matchId = params.id
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
@@ -53,6 +54,54 @@ export default function MatchDetailPage() {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  async function confirmMatch() {
+    if (saving) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/confirm`, { method: 'POST' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateMatchError(data.error))
+        return
+      }
+      await refresh()
+    } catch {
+      setError('확정에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function cancelMatch() {
+    if (saving) return
+    if (!window.confirm('매칭을 취소할까요?')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/cancel`, { method: 'POST' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateMatchError(data.error))
+        return
+      }
+      await refresh()
+    } catch {
+      setError('취소에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function translateMatchError(code?: string) {
+    switch (code) {
+      case 'not_match_leader':    return '리더만 확정/취소할 수 있어요.'
+      case 'match_not_pending':   return '이미 처리된 매칭이에요.'
+      case 'match_not_cancelable': return '취소할 수 없는 매칭이에요.'
+      default:                     return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
+    }
+  }
 
   return (
     <main className="min-h-screen px-5 pb-10">
@@ -117,7 +166,7 @@ export default function MatchDetailPage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] px-4 py-3 flex items-start gap-3">
+            <section className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] px-4 py-3 flex items-start gap-3 mb-4">
               <LockKeyhole size={16} className="text-emerald-300 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs font-bold text-emerald-200">상대 사진은 만남 시점에 공개</p>
@@ -126,6 +175,38 @@ export default function MatchDetailPage() {
                 </p>
               </div>
             </section>
+
+            {/* 매칭 액션: pending 일 때 confirm/cancel, confirmed 일 때 cancel 만 */}
+            {match.match_status === 'pending' && (
+              <div className="flex gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={confirmMatch}
+                  disabled={saving}
+                  className="btn-gradient flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40"
+                >
+                  매칭 확정 (리더)
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelMatch}
+                  disabled={saving}
+                  className="flex-1 py-3 rounded-2xl text-sm text-gray-300 border border-white/15 hover:border-white/25 disabled:opacity-40"
+                >
+                  거절
+                </button>
+              </div>
+            )}
+            {match.match_status === 'confirmed' && (
+              <button
+                type="button"
+                onClick={cancelMatch}
+                disabled={saving}
+                className="w-full py-3 rounded-2xl text-sm text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 disabled:opacity-40"
+              >
+                매칭 취소
+              </button>
+            )}
           </>
         ) : (
           <section className="glass rounded-3xl p-5">
