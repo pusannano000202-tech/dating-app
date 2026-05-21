@@ -47,7 +47,10 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         self.assertIn("친구 목록", page)
         self.assertIn("그룹 멤버", page)
         self.assertIn("우리 그룹", page)
-        self.assertIn("보증금 결제하고 이번 주 매칭 큐에 들어가기", page)
+        # 2026-05-22: 보증금 결제 카드가 큐 진입 버튼과 분리됨. 큐 버튼은 단순화됨.
+        # 결제 카드 + 큐 버튼이 각각 존재해야 함.
+        self.assertIn("이번 주 매칭 큐에 들어가기", page)
+        self.assertIn("내 보증금", page)
         self.assertNotIn("개발 중", page)
 
     def test_matching_pool_uses_weekly_queue_not_orbs_or_dots(self):
