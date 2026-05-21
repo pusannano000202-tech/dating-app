@@ -15,6 +15,8 @@ interface MatchDetail {
   matched_at: string
   confirmed_at: string | null
   completed_at: string | null
+  my_confirmed_at: string | null
+  opp_confirmed_at: string | null
 }
 
 export default function MatchDetailPage() {
@@ -144,8 +146,18 @@ export default function MatchDetailPage() {
 
               <div className="space-y-2 text-sm">
                 <Row label="매칭 시각" value={formatDateTime(match.matched_at)} />
+                <Row
+                  label="내 측 확정"
+                  value={match.my_confirmed_at ? formatDateTime(match.my_confirmed_at) : '대기'}
+                  highlight={!!match.my_confirmed_at}
+                />
+                <Row
+                  label="상대 측 확정"
+                  value={match.opp_confirmed_at ? formatDateTime(match.opp_confirmed_at) : '대기'}
+                  highlight={!!match.opp_confirmed_at}
+                />
                 {match.confirmed_at && (
-                  <Row label="확정 시각" value={formatDateTime(match.confirmed_at)} />
+                  <Row label="양측 확정 시각" value={formatDateTime(match.confirmed_at)} />
                 )}
                 {match.completed_at && (
                   <Row label="완료 시각" value={formatDateTime(match.completed_at)} />
@@ -177,7 +189,7 @@ export default function MatchDetailPage() {
             </section>
 
             {/* 매칭 액션: pending 일 때 confirm/cancel, confirmed 일 때 cancel 만 */}
-            {match.match_status === 'pending' && (
+            {match.match_status === 'pending' && !match.my_confirmed_at && (
               <div className="flex gap-2 mb-2">
                 <button
                   type="button"
@@ -195,6 +207,11 @@ export default function MatchDetailPage() {
                 >
                   거절
                 </button>
+              </div>
+            )}
+            {match.match_status === 'pending' && match.my_confirmed_at && !match.opp_confirmed_at && (
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-200 mb-2">
+                내 측은 확정 완료. 상대 그룹 리더의 확정을 기다리는 중이에요.
               </div>
             )}
             {match.match_status === 'confirmed' && (
