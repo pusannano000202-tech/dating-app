@@ -15,6 +15,8 @@ interface FriendRequestRow {
   expires_at: string
   responded_at: string | null
   created_at: string
+  sender_display_name?: string | null
+  receiver_display_name?: string | null
 }
 
 interface FriendSummary {
@@ -222,13 +224,15 @@ export default function FriendsPage() {
               <section className="mb-5">
                 <h2 className="text-sm font-black mb-2 px-1">받은 요청 {pendingReceived.length}</h2>
                 <div className="space-y-2">
-                  {pendingReceived.map((req) => (
+                  {pendingReceived.map((req) => {
+                    const senderName = req.sender_display_name ?? `친구 ${req.sender_user_id.slice(0, 8)}`
+                    return (
                     <div key={req.id} className="glass rounded-2xl px-4 py-3 flex items-center gap-3">
                       <div className="h-10 w-10 rounded-2xl bg-violet-500/10 flex items-center justify-center text-sm font-black text-violet-200">
-                        {req.sender_user_id.slice(0, 1).toUpperCase()}
+                        {senderName.slice(0, 1).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold truncate">친구 {req.sender_user_id.slice(0, 8)}</p>
+                        <p className="text-sm font-bold truncate">{senderName}</p>
                         {req.message && (
                           <p className="text-xs text-gray-500 truncate mt-0.5">{req.message}</p>
                         )}
@@ -251,7 +255,8 @@ export default function FriendsPage() {
                         <UserX size={16} />
                       </button>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </section>
             )}
@@ -289,17 +294,16 @@ export default function FriendsPage() {
               <section className="mb-5">
                 <h2 className="text-sm font-black mb-2 px-1">보낸 요청 {pendingSent.length}</h2>
                 <div className="space-y-2">
-                  {pendingSent.map((req) => (
+                  {pendingSent.map((req) => {
+                    const receiverName = req.receiver_display_name
+                      ?? (req.receiver_user_id ? `친구 ${req.receiver_user_id.slice(0, 8)}` : req.receiver_phone ?? '대상 없음')
+                    return (
                     <div key={req.id} className="glass rounded-2xl px-4 py-3 flex items-center gap-3">
                       <div className="h-10 w-10 rounded-2xl bg-amber-400/10 flex items-center justify-center text-sm font-black text-amber-200">
                         ?
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold truncate">
-                          {req.receiver_user_id
-                            ? `친구 ${req.receiver_user_id.slice(0, 8)}`
-                            : req.receiver_phone ?? '대상 없음'}
-                        </p>
+                        <p className="text-sm font-bold truncate">{receiverName}</p>
                         <p className="text-[10px] text-amber-300">수락 대기</p>
                       </div>
                       <button
@@ -311,7 +315,8 @@ export default function FriendsPage() {
                         취소
                       </button>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </section>
             )}

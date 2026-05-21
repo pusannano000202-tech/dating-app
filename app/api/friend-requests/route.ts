@@ -28,18 +28,45 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { data, error } = await supabase
-    .from('friend_requests')
-    .select('id,sender_user_id,receiver_user_id,receiver_phone,token,status,message,expires_at,responded_at,created_at')
-    .order('created_at', { ascending: false })
+  const { data, error } = await supabase.rpc('get_friend_request_summaries')
 
   if (error) {
     return NextResponse.json({ error: 'list_failed' }, { status: 500 })
   }
 
-  const rows = (data ?? []) as FriendRequestRow[]
-  const sent = rows.filter((r) => r.sender_user_id === user.id)
-  const received = rows.filter((r) => r.sender_user_id !== user.id)
+  type Row = {
+    request_id: string
+    sender_user_id: string
+    receiver_user_id: string | null
+    receiver_phone: string | null
+    sender_display_name: string | null
+    receiver_display_name: string | null
+    status: string
+    message: string | null
+    expires_at: string
+    responded_at: string | null
+    created_at: string
+    is_sender: boolean
+    is_receiver: boolean
+  }
+
+  const rows = (data ?? []) as Row[]
+  const toClientRow = (r: Row): FriendRequestRow & { sender_display_name: string | null; receiver_display_name: string | null } => ({
+    id: r.request_id,
+    sender_user_id: r.sender_user_id,
+    receiver_user_id: r.receiver_user_id,
+    receiver_phone: r.receiver_phone,
+    token: '',
+    status: r.status,
+    message: r.message,
+    expires_at: r.expires_at,
+    responded_at: r.responded_at,
+    created_at: r.created_at,
+    sender_display_name: r.sender_display_name,
+    receiver_display_name: r.receiver_display_name,
+  })
+  const sent = rows.filter((r) => r.is_sender).map(toClientRow)
+  const received = rows.filter((r) => r.is_receiver && !r.is_sender).map(toClientRow)
 
   const { data: friendData } = await supabase.rpc('get_friend_summaries')
 
