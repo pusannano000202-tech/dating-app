@@ -5,21 +5,30 @@
 
 ---
 
-## 📊 전체 진행률 — **약 92%** (Master Plan v1.6 기준)
+## 📊 전체 진행률 — **약 95%** (Master Plan v1.6 기준)
 
 ```
-████████████████████████████████████░░░░  92%
+██████████████████████████████████████░░  95%
 ```
 
 | 분류 | 진행 |
 |---|---|
 | Task A/B/C/D/E 핵심 트랙 | ✅ 5/5 완료 |
 | 12.A~G 후속 트랙 | ✅ 6/7 완료 (12.D 만 미진행) |
-| 추가 트랙 | ✅ 큐/그룹/매칭/보증금/UI 모두 완료 |
+| 추가 트랙 (큐/그룹/매칭/보증금/UI) | ✅ 모두 완료 |
+| 알려진 한계 (양방향 confirm / 리더 위임 / friend expire / review) | ✅ 모두 해소 (z30~z33) |
 | 미완 | ❌ Task F (Python 헝가리안) — **성준 영역** |
 | 운영 차단 | ⚠️ 토스 실결제 / fresh DB apply 실 검증 |
 
 **즉**: v1 출시까지 남은 핵심 작업은 **Task F (성준)** 1개 + **fresh DB apply 실 검증** (충현) 1개 + **토스 실결제** (충현, sandbox 키 필요).
+
+### 🌅 2026-05-22 후반 세션 (claude-opus-4-7) 후속 작업
+
+기존 92% → 95% 까지 끌어올린 작업:
+- `5dda0b8` z30 — 양방향 match confirm 추적 (group_a/b_confirmed_at, lazy transition)
+- `42e92b1` z31 — friend_request lazy expire + admin/cron bulk expire RPC
+- `d8e9631` z32 — transfer_group_leadership RPC + Crown UI in /group/create
+- `f1873a1` z33 — submit_review / get_my_reviews + /match/[id]/review composer
 
 ---
 
@@ -94,7 +103,7 @@
 
 ## 📁 본 세션 산출물
 
-### 신규 마이그 (z14~z29 — 16개)
+### 신규 마이그 (z14~z33 — 20개)
 ```
 z14 group_invite_token_acceptance
 z15 match_pool_stats_rpc
@@ -104,23 +113,27 @@ z18 profile_display_name
 z19 friend_summaries_rpc
 z20 group_invite_kind
 z21 group_member_summaries_rpc
-z22 rpc_bypass_guards          ← 모든 RPC RLS bypass 통일
-z23 friend_request_flow         ← accept_friend_request + auto-match trigger
+z22 rpc_bypass_guards            ← 모든 RPC RLS bypass 통일
+z23 friend_request_flow           ← accept_friend_request + auto-match trigger
 z24 deposit_check_in_enter_match_pool
 z25 group_deposit_summary_rpc
 z26 friend_request_summaries_rpc
 z27 group_leave_disband_rpc
 z28 my_matches_rpc
 z29 match_confirm_rpc
+z30 match_two_sided_confirm       ← 후반: 양방향 confirm 추적
+z31 friend_request_lazy_expire    ← 후반: 만료 lazy + bulk RPC
+z32 transfer_group_leadership     ← 후반: 리더 위임
+z33 review_rpc                    ← 후반: 만남 평가 submit/get
 ```
 
 ### 신규 API routes
 ```
 /api/groups (GET/POST)
-/api/groups/leave + /disband
+/api/groups/leave + /disband + /transfer-leadership
 /api/group-invites + /accept
 /api/match-pool/stats + /enter + /cancel
-/api/matches + /[id] + /[id]/confirm + /[id]/cancel
+/api/matches + /[id] + /[id]/confirm + /[id]/cancel + /[id]/review
 /api/friend-requests + /[id]/accept + /decline + /cancel
 /api/deposits + /summary
 ```
@@ -131,6 +144,7 @@ z29 match_confirm_rpc
 /friends
 /match
 /match/[id]
+/match/[id]/review
 ```
 
 ### 검증 도구
@@ -150,22 +164,23 @@ z29 match_confirm_rpc
 
 ### v1.1 이후로 미룰 수 있는 것
 
-- 매칭 후 review (만남 평가)
+- ~~매칭 후 review (만남 평가)~~ ✅ 본 세션 (z33)
 - connection (1:1 연결 동의)
 - attendance (GPS 체크인)
-- 리더 위임 (현재 리더는 떠날 수 없음)
-- friend_request 만료 자동 정리 cron
+- ~~리더 위임~~ ✅ 본 세션 (z32)
+- ~~friend_request 만료 자동 정리~~ ✅ 본 세션 (z31, lazy + bulk RPC)
 - admin 페이지 (운영자 점수 보정 / 강제 disband / 매칭 강제)
 - 매칭 결과 SMS / push 알림
-- 매칭 양방향 confirm 추적 (group_a/b_confirmed_at)
+- ~~매칭 양방향 confirm 추적~~ ✅ 본 세션 (z30)
 
 ---
 
 ## 🟢 워킹트리 상태
 
 - 브랜치: `profile/post-worldcup-decisions-2026-05-21`
-- HEAD: `e6b0cf0 feat(match): leader confirm/cancel actions on match detail`
-- 모든 변경 origin push 완료
+- HEAD (전반 세션 종료 시점): `27b1b66 docs: session progress 2026-05-22 (token 90%)`
+- HEAD (후반 세션): `f1873a1 feat(review): submit/list review RPC + /match/[id]/review (z33)` 또는 그 이후 docs commit
+- 후반 세션 4개 commit 모두 origin push 완료
 - 미커밋 변경: 없음
 - main 직접 push 없음 (CLAUDE.md 절대 규칙 준수)
 
@@ -175,9 +190,12 @@ z29 match_confirm_rpc
 
 1. **Supabase 마이그 실 적용 미수행** — 정적 검증만 PASS. staging 에서 1회 검증 필수.
 2. **토스페이먼츠 미통합** — `enter_match_pool` 이 mock 보증금만 검증. webhook 검증 없음.
-3. **양방향 match confirm 추적 없음** — 한 쪽 리더 confirm 으로 status='confirmed'. v1.1 후속.
-4. **리더 위임 미구현** — 리더는 떠날 수 없음. disband 만 가능.
-5. **friend_request 만료 자동 정리 없음** — 14일 expires_at 지나도 status='pending' 유지 (RPC 호출 시 자동 expire 처리는 invite RPC 에만 있음).
+3. ~~양방향 match confirm 추적 없음~~ ✅ 해소 (z30 group_a/b_confirmed_at + lazy transition)
+4. ~~리더 위임 미구현~~ ✅ 해소 (z32 transfer_group_leadership + UI)
+5. ~~friend_request 만료 자동 정리 없음~~ ✅ 해소 (z31 lazy + bulk expire RPC)
+6. **connections (1:1 연결 동의) UI 미구현** — 테이블/스키마는 정의됨. completed 후속.
+7. **attendances GPS 체크인 미구현** — 테이블 정의 only.
+8. **매칭 결과 통보 (SMS/push) 미구현** — 외부 연동 필요.
 
 ---
 
