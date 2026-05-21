@@ -5,7 +5,9 @@ import Link from 'next/link'
 import {
   CalendarClock,
   Check,
+  ChevronRight,
   Copy,
+  Crown,
   CreditCard,
   Link as LinkIcon,
   Loader2,
@@ -106,6 +108,7 @@ export default function GroupCreatePage() {
   const [error, setError] = useState<string | null>(null)
   const [myDeposit, setMyDeposit] = useState<MyDeposit | null>(null)
   const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
+  const [showTransferPanel, setShowTransferPanel] = useState(false)
 
   const group = state.group
   const members = state.members
@@ -409,12 +412,40 @@ export default function GroupCreatePage() {
     }
   }
 
+  async function transferLeadership(newLeaderUserId: string) {
+    if (!group || saving || !isLeader) return
+    if (!window.confirm('이 멤버에게 리더를 위임할까요? 위임 후엔 본인이 비-리더가 돼요.')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/groups/transfer-leadership', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id, new_leader_user_id: newLeaderUserId }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+      setShowTransferPanel(false)
+      await ensureGroup()
+    } catch {
+      setError('리더 위임에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   function translateGroupError(code?: string) {
     switch (code) {
       case 'not_group_leader':   return '리더만 해체할 수 있어요.'
       case 'leader_cannot_leave': return '리더는 떠날 수 없어요. 해체하거나 리더 위임 먼저 해야 해요.'
       case 'not_active_member':  return '이미 이 그룹의 활성 멤버가 아니에요.'
       case 'group_locked':       return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
+      case 'new_leader_required': return '새 리더를 선택해야 해요.'
+      case 'new_leader_is_caller': return '본인을 새 리더로 지정할 수 없어요.'
+      case 'new_leader_not_member': return '선택한 멤버가 이 그룹의 활성 멤버가 아니에요.'
       default:                    return '처리에 실패했어요. 잠시 후 다시 시도해줘.'
     }
   }
@@ -743,31 +774,73 @@ export default function GroupCreatePage() {
           </>
         )}
 
-        {/* 그룹 관리 (떠나기 / 해체) */}
+        {/* 그룹 관리 (떠나기 / 해체 / 리더 위임) */}
         {group && !inQueue && (
-          <div className="mt-4 flex gap-2">
-            {isLeader ? (
-              <button
-                type="button"
-                onClick={disbandGroup}
-                disabled={saving}
-                className="flex-1 py-3 rounded-2xl text-xs text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 flex items-center justify-center gap-1.5 disabled:opacity-40"
-              >
-                <Trash2 size={13} />
-                그룹 해체
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={leaveGroup}
-                disabled={saving}
-                className="flex-1 py-3 rounded-2xl text-xs text-gray-400 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 disabled:opacity-40"
-              >
-                <LogOut size={13} />
-                그룹 나가기
-              </button>
+          <>
+            <div className="mt-4 flex gap-2">
+              {isLeader ? (
+                <>
+                  {members.filter(m => m.user_id !== currentUserId && !m.left_at).length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowTransferPanel(prev => !prev)}
+                      disabled={saving}
+                      className="flex-1 py-3 rounded-2xl text-xs text-amber-200/80 border border-amber-300/15 hover:border-amber-300/30 hover:bg-amber-500/5 flex items-center justify-center gap-1.5 disabled:opacity-40"
+                    >
+                      <Crown size={13} />
+                      리더 위임
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={disbandGroup}
+                    disabled={saving}
+                    className="flex-1 py-3 rounded-2xl text-xs text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 flex items-center justify-center gap-1.5 disabled:opacity-40"
+                  >
+                    <Trash2 size={13} />
+                    그룹 해체
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={leaveGroup}
+                  disabled={saving}
+                  className="flex-1 py-3 rounded-2xl text-xs text-gray-400 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 disabled:opacity-40"
+                >
+                  <LogOut size={13} />
+                  그룹 나가기
+                </button>
+              )}
+            </div>
+
+            {showTransferPanel && isLeader && (
+              <section className="glass-card mt-3 rounded-2xl p-4">
+                <p className="text-xs font-bold text-amber-200 mb-2">새 리더를 선택해주세요</p>
+                <p className="text-[11px] text-gray-500 mb-3">
+                  위임 후엔 본인이 비-리더로 전환돼요. 다음부터는 그룹 나가기도 가능해요.
+                </p>
+                <div className="flex flex-col gap-1.5">
+                  {members
+                    .filter(m => m.user_id !== currentUserId && !m.left_at)
+                    .map(m => (
+                      <button
+                        key={m.user_id}
+                        type="button"
+                        onClick={() => transferLeadership(m.user_id)}
+                        disabled={saving}
+                        className="flex items-center justify-between gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm hover:border-amber-300/30 hover:bg-amber-500/5 disabled:opacity-40"
+                      >
+                        <span className="text-gray-100">
+                          {m.display_name ?? '이름 미설정'}
+                        </span>
+                        <ChevronRight size={14} className="text-gray-500" />
+                      </button>
+                    ))}
+                </div>
+              </section>
             )}
-          </div>
+          </>
         )}
 
         <Link
