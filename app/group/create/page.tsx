@@ -14,7 +14,9 @@ import {
   ShieldCheck,
   UserPlus,
   Users,
+  Wallet,
 } from 'lucide-react'
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 type GroupRole = 'leader' | 'member'
@@ -73,6 +75,12 @@ const EMPTY_STATE: GroupState = {
   friends: [],
 }
 
+interface MyDeposit {
+  id: string
+  status: string
+  amount: number
+}
+
 export default function GroupCreatePage() {
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [phone, setPhone] = useState('')
@@ -80,6 +88,7 @@ export default function GroupCreatePage() {
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [myDeposit, setMyDeposit] = useState<MyDeposit | null>(null)
 
   const group = state.group
   const members = state.members
@@ -100,6 +109,7 @@ export default function GroupCreatePage() {
 
   useEffect(() => {
     ensureGroup()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function ensureGroup() {
@@ -125,6 +135,9 @@ export default function GroupCreatePage() {
 
       const data = await res.json() as GroupState
       setState(data)
+      if (data.group?.id) {
+        await refreshDeposit(data.group.id)
+      }
     } catch {
       setError('그룹 정보를 불러오지 못했어요.')
     } finally {
@@ -137,6 +150,52 @@ export default function GroupCreatePage() {
     if (!res.ok) return
     const data = await res.json() as GroupState
     setState(data)
+    if (data.group?.id) {
+      await refreshDeposit(data.group.id)
+    }
+  }
+
+  async function refreshDeposit(groupId: string) {
+    try {
+      const res = await fetch(`/api/deposits?group_id=${encodeURIComponent(groupId)}`)
+      if (!res.ok) return
+      const data = await res.json() as { my_deposit: MyDeposit | null }
+      setMyDeposit(data.my_deposit)
+    } catch {
+      // ignore
+    }
+  }
+
+  async function payDeposit() {
+    if (!group || saving) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/deposits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateDepositError(data.error))
+        return
+      }
+      await refreshDeposit(group.id)
+    } catch {
+      setError('보증금 결제에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function translateDepositError(code?: string) {
+    switch (code) {
+      case 'deposit_already_exists': return '이미 결제한 보증금이 있어요.'
+      case 'not_group_member':       return '그룹 멤버만 결제할 수 있어요.'
+      case 'invalid_amount':         return '결제 금액이 올바르지 않아요.'
+      default:                        return '결제에 실패했어요. 잠시 후 다시 시도해주세요.'
+    }
   }
 
   async function inviteByPhone() {
@@ -266,9 +325,12 @@ export default function GroupCreatePage() {
       case 'not_group_leader':   return '리더만 큐 진입/취소를 할 수 있어요.'
       case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
+      case 'deposit_not_paid':   return '모든 멤버가 보증금을 결제해야 큐에 들어갈 수 있어요.'
       default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해줘.'
     }
   }
+
+  const myDepositPaid = myDeposit?.status === 'paid' || myDeposit?.status === 'held'
 
   return (
     <main className="min-h-screen px-5 pb-10">
@@ -498,9 +560,36 @@ export default function GroupCreatePage() {
               </>
             ) : (
               <>
+                {/* 내 보증금 결제 상태 */}
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 mb-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Wallet size={16} className={myDepositPaid ? 'text-emerald-300' : 'text-amber-300'} />
+                      <div>
+                        <p className="text-xs font-bold">내 보증금</p>
+                        <p className="text-[11px] text-gray-500">
+                          {DEPOSIT_AMOUNT.toLocaleString()}원 · 출석 시 환불
+                        </p>
+                      </div>
+                    </div>
+                    {myDepositPaid ? (
+                      <span className="text-[11px] font-bold text-emerald-300">결제 완료</span>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={saving}
+                        onClick={payDeposit}
+                        className="px-3 py-2 rounded-xl text-xs font-bold bg-violet-400/15 border border-violet-400/30 text-violet-200 disabled:opacity-40"
+                      >
+                        결제하기 (mock)
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <button
                   type="button"
-                  disabled={saving || !canEnterQueue}
+                  disabled={saving || !canEnterQueue || !myDepositPaid}
                   onClick={enterQueue}
                   className="btn-gradient w-full py-4 rounded-2xl font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
@@ -517,8 +606,13 @@ export default function GroupCreatePage() {
                         : '큐 진입 조건을 만족하면 버튼이 활성화돼요.'}
                   </p>
                 )}
+                {canEnterQueue && !myDepositPaid && (
+                  <p className="mt-3 text-center text-xs text-amber-300/80">
+                    내 보증금부터 결제하면 큐에 들어갈 수 있어요.
+                  </p>
+                )}
                 <p className="mt-2 text-center text-[10px] text-gray-700">
-                  보증금 결제는 곧 연결돼요. 지금은 미리 큐에만 들어가요.
+                  현재는 mock 결제예요. 토스페이먼츠 연동 후 실제 결제로 교체돼요.
                 </p>
               </>
             )}
