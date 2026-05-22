@@ -31,6 +31,8 @@
 - `f1873a1` z33 — submit_review / get_my_reviews + /match/[id]/review composer
 - `621a2a9` z34 — preferred_age_min/max + age_fit 매칭 가중치 (사용자 ±3 기본, 결정 8-13)
 - `554c1ba` z35 — connection 양방향 동의 RPC + /match/[id] 1:1 연결 패널
+- `[새]` z36 — **핸드폰 자동공개 정책** (결정 8-18). 약속 시간 도달 시 phone 자동 공개. agree/cancel RPC 폐기. status=confirmed 부터 노출
+- `[새]` TIME_FIT 매칭 가중치 0.10 추가 (결정 8-19). APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20 으로 양보
 
 ---
 
@@ -129,6 +131,7 @@ z32 transfer_group_leadership     ← 후반: 리더 위임
 z33 review_rpc                    ← 후반: 만남 평가 submit/get
 z34 profile_preferred_age_range   ← 후반: 선호 나이 범위 + 매칭 age_fit
 z35 connection_rpc                ← 후반: 1:1 연결 동의 + phone 노출
+z36 connection_auto_reveal_on_meeting ← 후반: 약속 시간 도달 자동공개 (z35 양방향 동의 폐기, 결정 8-18)
 ```
 
 ### 신규 API routes
