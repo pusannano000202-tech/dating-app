@@ -309,12 +309,20 @@ export default function MatchDetailPage() {
               </button>
             )}
             {match.match_status === 'completed' && (
-              <Link
-                href={`/match/${encodeURIComponent(matchId)}/review`}
-                className="btn-gradient w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 mb-4"
-              >
-                만남 평가 작성
-              </Link>
+              <div className="flex flex-col gap-2 mb-4">
+                <Link
+                  href={`/match/${encodeURIComponent(matchId)}/continuation`}
+                  className="btn-gradient w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
+                >
+                  이어갈지 선택하기
+                </Link>
+                <Link
+                  href={`/match/${encodeURIComponent(matchId)}/review`}
+                  className="w-full py-3 rounded-2xl text-sm border border-white/15 text-gray-300 hover:border-white/30 text-center"
+                >
+                  만남 평가 작성
+                </Link>
+              </div>
             )}
 
             {/* 자동 핸드폰 공개 패널 — status=confirmed 부터 노출 */}

@@ -118,7 +118,11 @@ export default function NotificationsPage() {
               const href = matchId
                 ? n.kind === 'review_request'
                   ? `/match/${encodeURIComponent(matchId)}/review`
-                  : `/match/${encodeURIComponent(matchId)}`
+                  : n.kind === 'continuation_choice_request'
+                    ? `/match/${encodeURIComponent(matchId)}/continuation`
+                    : n.kind === 'refund_processed' || n.kind === 'partner_paid_zero'
+                      ? `/match/${encodeURIComponent(matchId)}`
+                      : `/match/${encodeURIComponent(matchId)}`
                 : '/match'
               return (
                 <Link
@@ -180,6 +184,10 @@ function kindLabel(kind: string): string {
     case 'review_request':  return '평가를 작성해주세요'
     case 'friend_request_received': return '친구 요청이 도착했어요'
     case 'meeting_reminder': return '약속이 다가오고 있어요'
+    case 'continuation_choice_request': return '이 만남, 이어가실래요?'
+    case 'both_continue':   return '💜 양쪽 모두 이어가기 선택'
+    case 'partner_paid_zero': return '😢 상대방이 0원 지불 선택'
+    case 'refund_processed': return '보증금 환불 처리 완료'
     default:                  return '알림'
   }
 }
@@ -197,6 +205,16 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
     case 'review_request':  return '5점 별점 + 이슈 chip + 코멘트.'
     case 'friend_request_received': return '받은 요청을 친구 목록에서 확인하세요.'
     case 'meeting_reminder': return '약속 시간을 다시 확인해주세요.'
+    case 'continuation_choice_request': return '양쪽 모두 ‘이어간다’ 시 전액 자동 환불.'
+    case 'both_continue': return '보증금 전액 환불 + 핸드폰 자동 공개.'
+    case 'partner_paid_zero': {
+      const reasons = Array.isArray(payload?.reasons) ? payload.reasons.join(', ') : ''
+      return reasons ? `사유: ${reasons}` : '운영자에게 신고됐어요.'
+    }
+    case 'refund_processed': {
+      const amt = typeof payload?.refund_amount === 'number' ? payload.refund_amount : 0
+      return `${amt.toLocaleString()}원 환불 완료.`
+    }
     default:                  return ''
   }
 }
