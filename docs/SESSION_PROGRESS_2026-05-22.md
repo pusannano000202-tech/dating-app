@@ -5,10 +5,10 @@
 
 ---
 
-## 📊 전체 진행률 — **약 95%** (Master Plan v1.6 기준)
+## 📊 전체 진행률 — **약 97%** (Master Plan v1.6 기준)
 
 ```
-██████████████████████████████████████░░  95%
+███████████████████████████████████████░  97%
 ```
 
 | 분류 | 진행 |
@@ -24,11 +24,13 @@
 
 ### 🌅 2026-05-22 후반 세션 (claude-opus-4-7) 후속 작업
 
-기존 92% → 95% 까지 끌어올린 작업:
+기존 92% → 97% 까지 끌어올린 작업:
 - `5dda0b8` z30 — 양방향 match confirm 추적 (group_a/b_confirmed_at, lazy transition)
 - `42e92b1` z31 — friend_request lazy expire + admin/cron bulk expire RPC
 - `d8e9631` z32 — transfer_group_leadership RPC + Crown UI in /group/create
 - `f1873a1` z33 — submit_review / get_my_reviews + /match/[id]/review composer
+- `621a2a9` z34 — preferred_age_min/max + age_fit 매칭 가중치 (사용자 ±3 기본, 결정 8-13)
+- `554c1ba` z35 — connection 양방향 동의 RPC + /match/[id] 1:1 연결 패널
 
 ---
 
@@ -125,6 +127,8 @@ z30 match_two_sided_confirm       ← 후반: 양방향 confirm 추적
 z31 friend_request_lazy_expire    ← 후반: 만료 lazy + bulk RPC
 z32 transfer_group_leadership     ← 후반: 리더 위임
 z33 review_rpc                    ← 후반: 만남 평가 submit/get
+z34 profile_preferred_age_range   ← 후반: 선호 나이 범위 + 매칭 age_fit
+z35 connection_rpc                ← 후반: 1:1 연결 동의 + phone 노출
 ```
 
 ### 신규 API routes
@@ -133,7 +137,7 @@ z33 review_rpc                    ← 후반: 만남 평가 submit/get
 /api/groups/leave + /disband + /transfer-leadership
 /api/group-invites + /accept
 /api/match-pool/stats + /enter + /cancel
-/api/matches + /[id] + /[id]/confirm + /[id]/cancel + /[id]/review
+/api/matches + /[id] + /[id]/confirm + /[id]/cancel + /[id]/review + /[id]/connections
 /api/friend-requests + /[id]/accept + /decline + /cancel
 /api/deposits + /summary
 ```
@@ -165,13 +169,14 @@ z33 review_rpc                    ← 후반: 만남 평가 submit/get
 ### v1.1 이후로 미룰 수 있는 것
 
 - ~~매칭 후 review (만남 평가)~~ ✅ 본 세션 (z33)
-- connection (1:1 연결 동의)
+- ~~connection (1:1 연결 동의)~~ ✅ 본 세션 (z35)
 - attendance (GPS 체크인)
 - ~~리더 위임~~ ✅ 본 세션 (z32)
 - ~~friend_request 만료 자동 정리~~ ✅ 본 세션 (z31, lazy + bulk RPC)
 - admin 페이지 (운영자 점수 보정 / 강제 disband / 매칭 강제)
 - 매칭 결과 SMS / push 알림
 - ~~매칭 양방향 confirm 추적~~ ✅ 본 세션 (z30)
+- 노쇼 페널티 분배 (deposits.distribution_to)
 
 ---
 
@@ -193,9 +198,10 @@ z33 review_rpc                    ← 후반: 만남 평가 submit/get
 3. ~~양방향 match confirm 추적 없음~~ ✅ 해소 (z30 group_a/b_confirmed_at + lazy transition)
 4. ~~리더 위임 미구현~~ ✅ 해소 (z32 transfer_group_leadership + UI)
 5. ~~friend_request 만료 자동 정리 없음~~ ✅ 해소 (z31 lazy + bulk expire RPC)
-6. **connections (1:1 연결 동의) UI 미구현** — 테이블/스키마는 정의됨. completed 후속.
-7. **attendances GPS 체크인 미구현** — 테이블 정의 only.
+6. ~~connections (1:1 연결 동의) UI 미구현~~ ✅ z35 (양방향 동의 시 phone 노출)
+7. **attendances GPS 체크인 미구현** — 테이블 정의 only. venues 좌표 비교는 성준 영역.
 8. **매칭 결과 통보 (SMS/push) 미구현** — 외부 연동 필요.
+9. **노쇼 페널티 자동 분배 미구현** — DISPUTE_CONFIG.NO_SHOW_DISTRIBUTION 정책 정의됨 but RPC 없음.
 
 ---
 
