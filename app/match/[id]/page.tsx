@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { CalendarClock, ChevronLeft, Heart, Loader2, LockKeyhole, Phone, Users } from 'lucide-react'
+import { CalendarClock, ChevronLeft, Loader2, LockKeyhole, Phone, Users } from 'lucide-react'
 
 interface MatchDetail {
   match_id: string
@@ -22,9 +22,8 @@ interface MatchDetail {
 interface ConnectionRow {
   target_user_id: string
   target_display_name: string | null
-  caller_agreed: boolean
-  opp_agreed: boolean
   contact_revealed_at: string | null
+  scheduled_reveal_at: string | null
   target_phone: string | null
 }
 
@@ -84,48 +83,12 @@ export default function MatchDetailPage() {
   }, [matchId])
 
   useEffect(() => {
-    if (match?.match_status === 'completed') {
+    if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {
       refreshConnections()
     } else {
       setConnections([])
     }
   }, [match?.match_status, refreshConnections])
-
-  async function toggleConnection(targetUserId: string, action: 'agree' | 'cancel') {
-    if (saving) return
-    setSaving(true)
-    setError(null)
-    try {
-      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/connections`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_user_id: targetUserId, action }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        setError(translateConnectionError(data.error))
-        return
-      }
-      await refreshConnections()
-    } catch {
-      setError('처리에 실패했어요.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  function translateConnectionError(code?: string) {
-    switch (code) {
-      case 'match_not_completed':       return '아직 완료된 매칭이 아니에요.'
-      case 'caller_not_match_participant':
-      case 'not_match_participant':     return '본인이 참여한 매칭만 처리할 수 있어요.'
-      case 'target_not_opp_member':     return '상대 그룹 멤버가 아니에요.'
-      case 'invalid_target':            return '잘못된 대상이에요.'
-      case 'already_revealed':          return '이미 연락처가 공개된 상태라 철회할 수 없어요.'
-      case 'connection_not_found':      return '연결 정보를 찾을 수 없어요.'
-      default:                           return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
-    }
-  }
 
   async function confirmMatch() {
     if (saving) return
@@ -289,105 +252,87 @@ export default function MatchDetailPage() {
                 type="button"
                 onClick={cancelMatch}
                 disabled={saving}
-                className="w-full py-3 rounded-2xl text-sm text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 disabled:opacity-40"
+                className="w-full py-3 rounded-2xl text-sm text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 disabled:opacity-40 mb-4"
               >
                 매칭 취소
               </button>
             )}
             {match.match_status === 'completed' && (
-              <>
-                <Link
-                  href={`/match/${encodeURIComponent(matchId)}/review`}
-                  className="btn-gradient w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
-                >
-                  만남 평가 작성
-                </Link>
+              <Link
+                href={`/match/${encodeURIComponent(matchId)}/review`}
+                className="btn-gradient w-full py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 mb-4"
+              >
+                만남 평가 작성
+              </Link>
+            )}
 
-                <section className="glass-card mt-4 rounded-3xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Heart size={16} className="text-rose-300" />
-                    <h3 className="text-sm font-bold">1:1 연결</h3>
+            {/* 자동 핸드폰 공개 패널 — status=confirmed 부터 노출 */}
+            {(match.match_status === 'confirmed' || match.match_status === 'completed') && (
+              <section className="glass-card rounded-3xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Phone size={16} className="text-emerald-300" />
+                  <h3 className="text-sm font-bold">상대 핸드폰 (약속 시간 자동 공개)</h3>
+                </div>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+                  배정된 약속 시간이 되면 상대 그룹 멤버의 핸드폰 번호가 자동으로 공개돼요.
+                  당일 늦거나 못 찾을 때 바로 연락할 수 있어요.
+                </p>
+
+                {connectionsLoading && connections.length === 0 ? (
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <Loader2 size={14} className="animate-spin" />
+                    불러오는 중
                   </div>
-                  <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                    상대 멤버에게 연락하고 싶으면 동의. 양쪽 모두 동의하면 연락처가 공개돼요.
-                  </p>
-
-                  {connectionsLoading && connections.length === 0 ? (
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Loader2 size={14} className="animate-spin" />
-                      불러오는 중
-                    </div>
-                  ) : connections.length === 0 ? (
-                    <p className="text-xs text-gray-600">상대 그룹 멤버 정보를 불러올 수 없어요.</p>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      {connections.map((c) => {
-                        const revealed = !!c.contact_revealed_at
-                        return (
-                          <div
-                            key={c.target_user_id}
-                            className={`rounded-2xl border px-3 py-3 ${
-                              revealed
-                                ? 'border-emerald-400/30 bg-emerald-500/5'
-                                : c.caller_agreed
-                                  ? 'border-rose-400/20 bg-rose-500/5'
-                                  : 'border-white/10'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="min-w-0">
-                                <p className="text-sm font-bold truncate">
-                                  {c.target_display_name ?? '이름 미설정'}
-                                </p>
+                ) : connections.length === 0 ? (
+                  <p className="text-xs text-gray-600">상대 그룹 멤버 정보를 불러올 수 없어요.</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {connections.map((c) => {
+                      const revealed = !!c.contact_revealed_at && !!c.target_phone
+                      const scheduledFuture = !revealed && c.scheduled_reveal_at
+                      return (
+                        <div
+                          key={c.target_user_id}
+                          className={`rounded-2xl border px-3 py-3 ${
+                            revealed
+                              ? 'border-emerald-400/30 bg-emerald-500/5'
+                              : 'border-white/10'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-bold truncate">
+                                {c.target_display_name ?? '이름 미설정'}
+                              </p>
+                              {revealed && c.target_phone ? (
+                                <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-200">
+                                  <Phone size={12} />
+                                  <a href={`tel:${c.target_phone}`} className="font-bold tracking-wider">
+                                    {c.target_phone}
+                                  </a>
+                                </div>
+                              ) : scheduledFuture ? (
                                 <p className="text-[11px] text-gray-500 mt-0.5">
-                                  {revealed
-                                    ? '양쪽 동의 완료'
-                                    : c.caller_agreed && c.opp_agreed
-                                      ? '양쪽 동의 완료'
-                                      : c.caller_agreed
-                                        ? '상대 동의 대기 중'
-                                        : c.opp_agreed
-                                          ? '상대가 먼저 동의했어요'
-                                          : '아직 진행 안 됨'}
+                                  {formatDateTime(c.scheduled_reveal_at!)} 자동 공개
                                 </p>
-                                {revealed && c.target_phone && (
-                                  <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-200">
-                                    <Phone size={12} />
-                                    <a href={`tel:${c.target_phone}`} className="font-bold tracking-wider">
-                                      {c.target_phone}
-                                    </a>
-                                  </div>
-                                )}
-                              </div>
-                              {!revealed && (
-                                c.caller_agreed ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleConnection(c.target_user_id, 'cancel')}
-                                    disabled={saving}
-                                    className="text-[11px] px-3 py-1.5 rounded-xl border border-white/10 hover:border-white/25 text-gray-300 disabled:opacity-40"
-                                  >
-                                    철회
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleConnection(c.target_user_id, 'agree')}
-                                    disabled={saving}
-                                    className="text-[11px] px-3 py-1.5 rounded-xl bg-rose-500/15 border border-rose-400/30 text-rose-200 hover:bg-rose-500/25 disabled:opacity-40"
-                                  >
-                                    연결 동의
-                                  </button>
-                                )
+                              ) : (
+                                <p className="text-[11px] text-gray-500 mt-0.5">
+                                  약속 시간 배정 전 (매칭 엔진 대기 중)
+                                </p>
                               )}
                             </div>
+                            {revealed && (
+                              <span className="text-[10px] px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-200 border border-emerald-400/30 flex-shrink-0">
+                                공개됨
+                              </span>
+                            )}
                           </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </section>
-              </>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </section>
             )}
           </>
         ) : (

@@ -49,6 +49,11 @@ BASELINE_RELATIONS = {
     'public.pg_attribute',
     'public.pg_proc',
     'public.pg_class',
+    # cross-branch (성준 영역 matching/group-engine):
+    # 20260516_matching_add_venues_and_match_meetings.sql 에서 추가됨.
+    # 본 브랜치 z36 의 get_match_scheduled_reveal_at 가 참조함.
+    'public.match_meetings',
+    'public.venues',
 }
 
 # Names that our naive regex picks up but are not real relations

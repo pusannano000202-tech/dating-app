@@ -72,6 +72,15 @@ CREATE TABLE profiles (
 );
 ```
 
+### `connections` 테이블 (핸드폰 자동공개 정책 — z36 / 결정 8-18)
+
+```sql
+-- z35 의 양방향 동의(a_agreed, b_agreed) 모델은 폐기됨.
+-- 약속 시간(match_meetings.scheduled_start) 도달 시 양쪽 그룹 멤버의 phone 이 자동 공개됨.
+-- a_agreed / b_agreed 컬럼은 보존하지만 자동공개 시점에 TRUE 로 set 될 뿐 의미 없음. v1.1 에서 drop 가능.
+-- get_match_connections(match_id) RPC 가 호출 시점에 lazy upsert + contact_revealed_at 채움.
+```
+
 **주의:** `appearance_score_normalized`는 AI가 산출한 0~100 절대점수를 0~1로 정규화한 값이다.
 원본 절대점수(`appearance_score_raw`)는 `appearance_scores` 테이블에만 저장하고 외부에 절대 노출하지 않는다.
 
