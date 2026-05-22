@@ -60,7 +60,8 @@ export function pairScore(
       config.weights.PERSONALITY * personality +
       config.weights.SCORE_BAND_PROXIMITY * scoreBand +
       config.weights.PREFERENCE_WEIGHT_ALIGN * weightAlignment +
-      config.weights.AGE_FIT * ageFit,
+      config.weights.AGE_FIT * ageFit +
+      config.weights.TIME_FIT * time,
   )
 
   return {

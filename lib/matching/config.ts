@@ -65,15 +65,21 @@ export const HARD_FILTER_CONFIG = {
 
 export const SCORE_WEIGHTS = {
   /** 외모 양방향 적합도 가중치 */
-  APPEARANCE: 0.45,
+  APPEARANCE: 0.40,
   /** 성격(Big5) 호환성 가중치 */
-  PERSONALITY: 0.25,
+  PERSONALITY: 0.20,
   /** 외모 점수대 근접성 가중치 (이미 ±15 안이지만 가까울수록 가점) */
   SCORE_BAND_PROXIMITY: 0.10,
   /** 이상형 가중치 정합 (사용자가 외모/성격 중 무엇 중시) */
   PREFERENCE_WEIGHT_ALIGN: 0.10,
   /** 나이 적합도 (그룹 평균 나이 차이 + 사용자 선호 범위). 결정 8-13 (2026-05-22). */
   AGE_FIT: 0.10,
+  /**
+   * 시간 적합도 (양 그룹 available_timeslots 교집합 요일 수 / 7).
+   * 결정 8-19 (2026-05-22): 자동 시간 배정 정책 이후 시간 유연성이 핵심.
+   * Hard filter (MIN_TIME_OVERLAP_DAYS) 와 별개로 부드러운 가점.
+   */
+  TIME_FIT: 0.10,
 } as const
 
 // 합이 1.0 인지 컴파일 타임 보장은 못 하니 런타임 sanity check
@@ -82,7 +88,8 @@ const _weightSum =
   SCORE_WEIGHTS.PERSONALITY +
   SCORE_WEIGHTS.SCORE_BAND_PROXIMITY +
   SCORE_WEIGHTS.PREFERENCE_WEIGHT_ALIGN +
-  SCORE_WEIGHTS.AGE_FIT
+  SCORE_WEIGHTS.AGE_FIT +
+  SCORE_WEIGHTS.TIME_FIT
 if (Math.abs(_weightSum - 1.0) > 1e-6) {
   // eslint-disable-next-line no-console
   console.warn(

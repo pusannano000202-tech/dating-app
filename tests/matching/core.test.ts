@@ -283,6 +283,47 @@ test('summarizeGroup averages member scores and intersects availability', () => 
   assert.equal(summary.preferredAgeMax, 25)
 })
 
+test('pairScore reflects time fit: more shared days → higher score', () => {
+  const wideAvail: WeekdayAvailability = {
+    monday: [{ start: '18:00', end: '22:00' }],
+    tuesday: [{ start: '18:00', end: '22:00' }],
+    wednesday: [{ start: '18:00', end: '22:00' }],
+    thursday: [{ start: '18:00', end: '22:00' }],
+    friday: [{ start: '18:00', end: '22:00' }],
+    saturday: [{ start: '14:00', end: '22:00' }],
+    sunday: [{ start: '14:00', end: '22:00' }],
+  }
+  const narrowAvail: WeekdayAvailability = {
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [{ start: '14:00', end: '18:00' }],
+    sunday: [],
+  }
+
+  const a = group({ gender: 'male', availability: wideAvail })
+  const bWide = group({
+    groupId: 'female-w',
+    gender: 'female',
+    departmentCodes: ['design'],
+    availability: wideAvail,
+  })
+  const bNarrow = group({
+    groupId: 'female-n',
+    gender: 'female',
+    departmentCodes: ['design'],
+    availability: narrowAvail,
+  })
+
+  const wide = pairScore(a, bWide, MATCHING_CONFIG)
+  const narrow = pairScore(a, bNarrow, MATCHING_CONFIG)
+
+  assert.ok(wide.breakdown.time > narrow.breakdown.time)
+  assert.ok(wide.score > narrow.score)
+})
+
 test('pairScore reflects age fit: same-age boost vs out-of-range decay', () => {
   const a = group({ gender: 'male', avgAge: 22, preferredAgeMin: 19, preferredAgeMax: 25 })
   const bSameAge = group({
