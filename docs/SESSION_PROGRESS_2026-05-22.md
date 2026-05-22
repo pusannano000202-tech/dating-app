@@ -37,7 +37,9 @@
 - `7a39d22` docs z37 반영 (98→99%)
 - `6501de9` z38 — matches.status → groups.status 동기화 트리거
 - `[새]` z39 — **in-app 알림 시스템** (결정 8-21). notifications 테이블 + 매칭 이벤트 트리거 + RPC 4종 (get/mark-read/mark-all/count)
-- `[새]` /notifications 페이지 + NotificationBell 컴포넌트 (/match, /group/create 헤더 배지)
+- `34f4d17` /notifications 페이지 + NotificationBell 컴포넌트 (/match, /group/create 헤더 배지)
+- `[새]` z40 — 친구 요청 알림 자동 (receiver_user_id 있을 때) + enqueue_meeting_reminders RPC (D-1/30분 전, 멱등)
+- `[새]` z41 — distribute_no_show_penalty RPC (8-9 attendees_equal 정책 자동화). v1 수동, v1.1 GPS 자동
 
 ---
 
@@ -140,6 +142,8 @@ z36 connection_auto_reveal_on_meeting ← 후반: 약속 시간 도달 자동공
 z37 match_meeting_info_and_lazy_complete ← 후반: 매칭 자동 완료 + venue 정보 노출 (결정 8-20)
 z38 match_status_to_group_status_trigger ← 후반: matches.status → groups.status 동기화
 z39 notifications_system               ← 후반: in-app 알림 (테이블/트리거/RPC, 결정 8-21)
+z40 friend_request_and_reminder_notifications ← 후반: 친구 요청 알림 + 약속 D-1/30분 전 리마인더 RPC
+z41 no_show_penalty_distribution       ← 후반: 노쇼 페널티 자동 분배 RPC (8-9)
 ```
 
 ### 신규 API routes

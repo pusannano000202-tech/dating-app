@@ -110,8 +110,9 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 29b1127 z37  feat(match)         자동 완료 + match_meetings 정보 노출 RPC (결정 8-20)
 7a39d22 docs                     z37 반영 (98→99%)
 6501de9 z38  feat(match)         matches.status → groups.status 동기화 트리거
-[새] z39  feat(notifications) in-app 알림 시스템 (테이블 + 트리거 + RPC, 결정 8-21)
-[새] feat(notifications)     /notifications 페이지 + NotificationBell 배지 (/match, /group/create)
+34f4d17 z39  feat(notifications) in-app 알림 시스템 (테이블 + 트리거 + RPC, 결정 8-21)
+[새] z40  feat(notifications) friend_request 알림 트리거 + enqueue_meeting_reminders RPC
+[새] z41  feat(deposits)     distribute_no_show_penalty RPC (8-9 정책 자동화)
 ```
 
 **브랜치**: `profile/post-worldcup-decisions-2026-05-21`
@@ -126,7 +127,7 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 |---|---|
 | TypeScript typecheck | ✅ PASS |
 | ESLint | ✅ PASS (0 warnings/errors) |
-| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 37 files / 192 defs / 667 refs / **0 issues** |
+| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 39 files / 196 defs / 693 refs / **0 issues** |
 | node:test matching 코어 | ✅ 10/10 (ageFit + TIME_FIT 포함) |
 | python static (이미지/그룹/친구) | ✅ 11/11 |
 
