@@ -45,6 +45,9 @@
 - `[새]` /match/[id]/continuation 페이지 (이어갈래요/충분 2-choice)
 - `[새]` /match/[id]/refund 페이지 (슬라이더 + 3단계 구걸 + 0원 사유 입력)
 - `[새]` /notifications 페이지 신규 kind 4종 라벨/요약 추가
+- `[새]` z44 — **운영자 인프라** (결정 8-23). admins 테이블 + is_admin() 헬퍼 + 모든 핵심 테이블 RLS 에 admin bypass + grant/revoke_admin RPC + admin_revenue_summary view
+- `[새]` `docs/PROJECT_OVERVIEW_2026-05-22.md` 마스터 인수서 (Codex 입맞춤용 전체 정보)
+- `[새]` `docs/ADMIN_OPERATIONS_PLAN.md` 운영자 관리 계획서
 
 ---
 
@@ -151,6 +154,7 @@ z40 friend_request_and_reminder_notifications ← 후반: 친구 요청 알림 +
 z41 no_show_penalty_distribution       ← 후반: 노쇼 페널티 자동 분배 RPC (8-9)
 z42 continuation_choice_and_refund_request ← 후반: 만남 지속 의사 + 자발적 환불 (구걸 UX, 결정 8-22)
 z43 continuation_trigger_update_and_expire ← 후반: z39 트리거 갱신 + 7일/14일 만료
+z44 admin_role_and_helpers             ← 후반: 운영자 인프라 + RLS 확장 (결정 8-23)
 ```
 
 ### 신규 API routes
