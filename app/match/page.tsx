@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { CalendarClock, ChevronLeft, ChevronRight, Loader2, Users } from 'lucide-react'
+import NotificationBell from '@/components/NotificationBell'
 
 interface MatchRow {
   match_id: string
@@ -55,10 +56,11 @@ export default function MatchesPage() {
           <Link href="/group/create" className="p-2 glass rounded-xl">
             <ChevronLeft size={18} />
           </Link>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-black">매칭 결과</h1>
             <p className="text-xs text-gray-500 mt-0.5">토요일 14:00 이후에 결과가 도착해요.</p>
           </div>
+          <NotificationBell />
         </header>
 
         {error && (
