@@ -1,0 +1,142 @@
+# 부산대 과팅앱 — 2026-05-22 후반 세션 종료 시점 계획서
+
+> 충현이 한눈에 보는 용도. 토큰 90% 시점에 작성. **97% 진행, v1 출시 차단 3개만 남음.**
+
+---
+
+## 🎯 한 줄 정리
+
+매칭 흐름의 **모든 사용자 경로**가 코드 레벨에서 완성됐다.
+남은 건 **외부 의존(매칭 엔진 · 토스 · 운영 환경)** 뿐이고, 그건 다른 사람/세션이 처리해야 한다.
+
+---
+
+## 📊 전체 진행률
+
+```
+███████████████████████████████████████░  97%
+```
+
+| 영역 | 상태 | 비고 |
+|---|---|---|
+| 가입 · 프로필 7단계 | ✅ | display_name + age range 포함 |
+| 친구 추가 · 그룹 만들기 · 초대 | ✅ | in-app / phone / 공개 링크 |
+| 보증금 (mock) | ✅ | 토스 실결제만 남음 |
+| 매칭 큐 진입 · 취소 | ✅ | 리더 권한 |
+| 매칭 양방향 확정 | ✅ | z30 양쪽 리더 모두 confirm |
+| 매칭 거절 · 취소 | ✅ | |
+| 만남 평가 (review) | ✅ | z33 5-star + 이슈 chip + comment |
+| 1:1 연결 동의 (connections) | ✅ | z35 양방향 동의 시 phone 노출 |
+| 그룹 떠나기 · 해체 · **리더 위임** | ✅ | z32 |
+| 친구 요청 만료 자동 정리 | ✅ | z31 lazy + bulk RPC |
+| 나이 선호 범위 + 매칭 가중치 | ✅ | z34 ±3 기본, 결정 8-13 |
+| Python 헝가리안 매칭 | ❌ | **성준 영역** |
+| 토스페이먼츠 실결제 | ❌ | sandbox 키 필요 |
+| Fresh DB Apply 실 검증 | 🟡 | 정적 검증만 PASS, staging 필요 |
+| attendance GPS · 노쇼 분배 · SMS · admin | 🌿 | v1.1 |
+
+---
+
+## ✅ 지금 코드로 굴러가는 사용자 흐름
+
+```
+가입 → 프로필 7단계 (display_name + age + age range ±3 기본)
+  ↓
+친구 추가 (전화번호 → 가입 후 자동 매칭)
+  ↓
+그룹 만들기 → 멤버 초대 → 보증금 mock 결제 → 큐 진입
+  ↓ (Task F 매칭 엔진 대기)
+매칭 결과 (양방향 확정 — 한쪽만 누르면 '상대 확정 대기' 표시)
+  ↓
+만남
+  ↓
+평가 작성 (5-star + 이슈 + 코멘트, 1회 멱등)
+  ↓
+1:1 연결 (양쪽 동의 시 phone 자동 공개)
+```
+
+리더가 떠나려면? → **리더 위임** (Crown 버튼)
+그룹 해체하려면? → 리더만 가능 → 멤버 자동 정리
+큐 진입 후 멤버 빠지면? → 큐 자동 cancel + 그룹 status=forming 복귀
+
+---
+
+## ❌ v1 출시 차단 (외부 의존, 본 세션 처리 불가)
+
+### 1. Task F · Python 헝가리안 매칭 엔진
+- **누가**: 성준
+- **왜 차단**: 토요일 14:00 매칭 자체가 안 굴러감
+- **현재**: match_pool 에 그룹들이 쌓이지만, matches row 를 생성하는 배치가 없음
+
+### 2. 토스페이먼츠 실결제
+- **누가**: 충현 (Toss 콘솔 가입 + sandbox 키 필요)
+- **왜 차단**: 운영 출시 X (현재 mock_pay_deposit 으로 동작)
+- **무엇을**: webhook 라우트 + 결제 실패/환불 흐름 + `mock_pay_deposit` → 실 트리거로 교체
+
+### 3. Fresh DB Apply 실 검증
+- **누가**: 충현 (Supabase CLI / Docker / 별도 dev 프로젝트)
+- **왜 차단**: 정적 검증만 PASS (`scripts/verify-migrations.py` 33 files / 0 issue). 실 RPC 동작 검증 안 됨
+- **무엇을**: staging 또는 Supabase 대시보드 SQL Editor 로 22개 마이그 순서대로 적용 후 핵심 흐름 수동 검증
+
+---
+
+## 🌿 v1.1 후속 (필요 시 우선순위 결정)
+
+| 항목 | 영향 | 난이도 |
+|---|---|---|
+| attendance GPS 체크인 | 노쇼 검증 자동화 | 중 (모바일 navigator.geolocation + venues 좌표) |
+| 노쇼 페널티 분배 (`deposits.distribution_to`) | 정책 자동화 | 중 (RPC 만 추가하면 됨, UI v1.1) |
+| 매칭 결과 SMS/push 알림 | 사용자 도달률 | 중 (외부 알림 서비스 통합) |
+| admin 페이지 | 운영자 도구 (점수 보정 / 강제 disband / 매칭 강제) | 큼 (별도 인수서 `ADMIN_APPEARANCE_SCORE_OVERRIDE.md` 참고) |
+
+---
+
+## 📁 본 후반 세션 commit 9개 (origin push 완료)
+
+```
+5dda0b8 z30  feat(match)        양방향 confirm 추적 (group_a/b_confirmed_at)
+42e92b1 z31  feat(friends)      friend_request lazy expire + bulk RPC
+d8e9631 z32  feat(groups)       리더 위임 RPC + Crown UI
+f1873a1 z33  feat(review)       만남 평가 submit/get + /match/[id]/review
+87de557 docs                     STATUS / SESSION_PROGRESS 92→95%
+9357855 docs(handoff)            CLAUDE_TO_CODEX_HANDOFF_2026-05-22_LATE.md
+621a2a9 z34  feat(matching)     선호 나이 범위 + age_fit 매칭 가중치 (결정 8-13)
+554c1ba z35  feat(connections)  1:1 양방향 동의 + phone 노출
+f35724e docs                     STATUS / SESSION_PROGRESS 95→97%
+```
+
+**브랜치**: `profile/post-worldcup-decisions-2026-05-21` HEAD `f35724e`
+**main 직접 push 없음** (CLAUDE.md 절대 규칙 준수)
+**워킹트리**: clean
+
+---
+
+## 🧪 검증 상태
+
+| 검증 | 결과 |
+|---|---|
+| TypeScript typecheck | ✅ PASS |
+| ESLint | ✅ PASS (0 warnings/errors) |
+| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 33 files / 170 defs / 569 refs / **0 issues** |
+| node:test matching 코어 | ✅ 9/9 (ageFit 신규 1개 포함) |
+| python static (이미지/그룹/친구) | ✅ 11/11 |
+
+---
+
+## 🟢 다음 세션 진입 한 줄
+
+> `git pull origin profile/post-worldcup-decisions-2026-05-21` →
+> `cat docs/handoff/CLAUDE_TO_CODEX_HANDOFF_2026-05-22_LATE.md` →
+> v1 차단 3개 (Task F · 토스 · Fresh DB) 중 본인 영역 진입.
+
+---
+
+## 🎤 결정 기록 추가 (2026-05-22 후반)
+
+| ID | 결정 | 이유 |
+|---|---|---|
+| 8-13 | 매칭 가중치에 `AGE_FIT 0.10` 추가, 기본 ±3, 밖이면 5살마다 점수 0 으로 부드럽게 감소 | 사용자 일반 선호 "같은 나이대". 외모 가중치 0.50→0.45 로 양보 |
+| 8-14 | 매칭 양방향 confirm 필수 | 한쪽만 누르면 confirmed 잘못 노출. 양쪽 모두 누르면 status 전이 |
+| 8-15 | 리더 위임 후 본인 leave 가능 | 리더가 떠날 수 없는 한계 해소 |
+| 8-16 | 1:1 connection 은 양쪽 동의 시점 자동 reveal | 한쪽만 cancel 가능 (reveal 이전), reveal 후 cancel 불가 |
+| 8-17 | review · connection 둘 다 `matches.status='completed'` 가 전제 | attendance/노쇼 흐름이 status 갱신 트리거 (v1.1) |
