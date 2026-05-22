@@ -29,7 +29,7 @@
 | **Manus** | 남자 64장 이상형 풀 (완료) | 외부 |
 
 **현재 브랜치**: `profile/post-worldcup-decisions-2026-05-21`
-**충현 영역 HEAD**: `e34db53` (z42/z43 구걸 환불 UX docs 반영)
+**충현 영역 HEAD**: `(z46 commit 직후 / 본 문서가 갱신된 시점의 origin 기준)` — `git log -1 --oneline` 로 확인. 본 문서 작성 시점 기준 마이그 z14~z46 까지 적용.
 **성준 영역 HEAD**: `origin/matching/group-engine e9c6637` (venues/match_meetings)
 
 ---
@@ -292,9 +292,10 @@ Storage:   Supabase Storage (사진)
 ─ z43 continuation_trigger_update_and_expire ★ 7일/14일 만료 + z39 트리거 갱신
 ─ z44 admin_role_and_helpers       ★ 운영자 권한 인프라 (결정 8-23)
 ─ z45 gps_checkin_and_finalize_no_show ★ GPS 노쇼 자동 확정 + 구걸 차단 (결정 8-24)
+─ z46 review_fixes_status_admin_view_guards ★ Codex 리뷰 반영 — status 전이, view security_invoker, admin/batch 가드, no_show_finalized 노출
 ```
 
-**정적 검증**: 43 files 통과 (z45 포함). cross-branch `match_meetings/venues` 는 dynamic SQL + to_regclass 우회.
+**정적 검증**: 44 files / 249 defs / 956 refs / 0 issues. cross-branch `match_meetings/venues` 는 dynamic SQL + to_regclass 우회.
 
 ---
 
@@ -415,6 +416,12 @@ cron 호출 권장 주기:
 - **8-22 ⭐**: **구걸 UX 환불 (z42)** — 자동 환불 폐기. 사용자 능동 선택. 양쪽 continue 면 자동 전액, 한쪽 end → 환불 선택. 전액 시 3000→2000→1000 구걸. 0원 시 상대편 자동 알림. **앱 수익 = deposit - 사용자 선택 환불액**
 - **8-23**: **운영자 권한 인프라 (z44)** — admins 테이블 + is_admin() + 모든 RLS USING 에 admin bypass + grant/revoke_admin RPC + revenue view. v1 1인 super_admin SQL Editor 운영. v1.1 페이지.
 - **8-24 ⭐**: **GPS 노쇼 자동 확정 (z45)** — 약속 시간 + 30분 후 finalize_no_show 호출 (출석자만). attendances within_radius=FALSE 거나 없는 사람 = 노쇼 확정. z41 자동 호출 + deposits forfeited 처리. 노쇼 발생 시 z42 구걸 UX 진입 차단 (구걸 멘트 없이 forfeit). batch_finalize_no_shows cron 자동화. **GPS 가 진실의 판단자**.
+- **8-25**: **z45 결함 수정 (z46, Codex 리뷰 반영)** —
+    (a) `distribute_no_show_penalty` 의 status 검사를 `confirmed/completed` 둘 다 허용 + caller 가 NULL(service_role)/admin 도 허용
+    (b) `finalize_no_show` 안에서 status='confirmed' 면 즉시 `completed` 로 전이 (lazy +4h 무시. 노쇼=만남 끝)
+    (c) `finalize_no_show_admin` / `batch_finalize_no_shows` 에 admin/service_role 가드 추가 (일반 사용자 호출 차단)
+    (d) `admin_revenue_summary` view `security_invoker=on` + `WHERE public.is_admin()` 이중 방어
+    (e) `get_match_attendance_state` 에 `no_show_finalized`, `caller_is_no_show` 컬럼 추가 → UI 가 노쇼 발생 시 continuation/refund/review CTA 자동 숨김
 
 ---
 
@@ -495,7 +502,7 @@ deposit (1인 20,000원) 의 운명:
 |---|---|
 | TypeScript typecheck | ✅ PASS |
 | ESLint | ✅ PASS (0 warnings) |
-| 마이그 정적 검증 | ✅ 42 files / ~220 defs / ~790 refs / **0 issues** |
+| 마이그 정적 검증 | ✅ 44 files / 249 defs / 956 refs / **0 issues** |
 | node:test matching | ✅ 10/10 (ageFit + TIME_FIT 포함) |
 | python static | ✅ 11/11 (3 ERROR 는 환경 supabase 모듈 누락, 무관) |
 

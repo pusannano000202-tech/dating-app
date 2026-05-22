@@ -78,6 +78,8 @@ SPURIOUS_NAMES = {
     'public.get_match_meeting_inf',  # function-call-in-FROM 오인식 (LATERAL 호출)
     'public.unnes',  # unnest() 함수 호출 in-FROM 오인식
     'public.distribute_no_show_penalt',  # 함수 호출 in-FROM (z45)
+    'public.authenticated',  # REVOKE ... FROM authenticated 오인식
+    'public.anon',           # REVOKE ... FROM anon 오인식
 }
 BASELINE_FUNCTIONS = {
     'auth.uid',

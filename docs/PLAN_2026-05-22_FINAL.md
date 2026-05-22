@@ -117,8 +117,9 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 e34db53 docs z42 z43 반영
 cda6caf z44 feat(admin) admins 테이블 + is_admin() + RLS 확장 + grant/revoke_admin RPC + revenue view
 cda6caf docs PROJECT_OVERVIEW + ADMIN_OPERATIONS_PLAN (Codex 입맞춤용 마스터)
-[새] z45 feat(gps) GPS 체크인 + 노쇼 자동 확정 + 알림 (결정 8-24)
-[새] feat(gps) /match/[id] GPS 패널 (체크인 / 노쇼 처리 버튼) + 알림 kind 2종 추가
+e342907 z45 feat(gps) GPS 체크인 + 노쇼 자동 확정 + 알림 (결정 8-24)
+e342907 feat(gps) /match/[id] GPS 패널 (체크인 / 노쇼 처리 버튼) + 알림 kind 2종 추가
+[새] z46 fix Codex 리뷰 반영 (결정 8-25): status 전이 + view security_invoker + admin 가드 + UI 노쇼 분기
 ```
 
 **브랜치**: `profile/post-worldcup-decisions-2026-05-21`
@@ -133,7 +134,7 @@ cda6caf docs PROJECT_OVERVIEW + ADMIN_OPERATIONS_PLAN (Codex 입맞춤용 마스
 |---|---|
 | TypeScript typecheck | ✅ PASS |
 | ESLint | ✅ PASS (0 warnings/errors) |
-| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 43 files / 243 defs / 890 refs / **0 issues** |
+| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 44 files / 249 defs / 956 refs / **0 issues** |
 | node:test matching 코어 | ✅ 10/10 (ageFit + TIME_FIT 포함) |
 | python static (이미지/그룹/친구) | ✅ 11/11 |
 
@@ -164,3 +165,4 @@ cda6caf docs PROJECT_OVERVIEW + ADMIN_OPERATIONS_PLAN (Codex 입맞춤용 마스
 | 8-22 | **구걸 UX 보증금 환불 (z42/z43)** — completed → 양쪽 "이어갈래요?" 양쪽 다 continue 면 자동 전액 환불 + 핸드폰 공개 강조. 누구라도 end → 리뷰 + 환불 선택 (0~전액 슬라이더). 전액 선택 시 3000→2000→1000 구걸 3단계, 0원 선택 시 사유 + 상대방 자동 알림. 노쇼는 z41 forfeit 유지, 환불 자체 차단. 7일/14일 만료. | **앱 수익 모델 핵심**. 자동 환불로는 앱이 못 번다. 사용자가 자발적으로 떼주는 차액 = 수익. 8-9 노쇼는 별개. |
 | 8-23 | **운영자(admin) 권한 인프라 (z44)** — admins 테이블 + `is_admin()` 헬퍼 + 모든 핵심 테이블 RLS 에 admin bypass 추가. v1 = 1인 super_admin (충현) SQL Editor 직접 운영. v1.1 /admin/* 페이지. grant_admin/revoke_admin RPC + admin_revenue_summary view. | 운영 책임자/도구 없이 출시 불가. 운영자 권한 검증 + 관찰성 인프라 선구축. |
 | 8-24 | **GPS 노쇼 자동 확정 + 구걸 UX 차단 (z45)** — 약속 시간 도달 후 `checkin_attendance(match_id, lat, lng)`. venues 좌표 기준 Haversine 거리 → within_radius 계산. 약속 + 30분 후 출석자가 `finalize_no_show(match_id)` 호출 → 노쇼 자동 확정 + z41 분배 자동 호출. 노쇼 발생 시 deposits.status='forfeited' → z42 continuation/refund 자체 진입 차단 (구걸 멘트 X). `batch_finalize_no_shows()` cron 자동화. | 노쇼는 명확한 잘못 → 구걸할 명분 없음. GPS 가 진실의 판단자. |
+| 8-25 | **z45 결함 수정 (z46)** — Codex 리뷰 반영. (a) distribute_no_show_penalty 가 confirmed/completed 둘 다 허용 + service_role/admin/참여자 호출 허용 (b) finalize_no_show 안에서 status='confirmed' 면 즉시 completed 전이 (lazy +4h 무시) (c) finalize_no_show_admin/batch admin·service_role 가드 (d) admin_revenue_summary view security_invoker=on + WHERE is_admin() (e) get_match_attendance_state 가 no_show_finalized + caller_is_no_show 노출 → UI 가 노쇼 발생 시 continuation/refund/review CTA 자동 숨김. | 정책끼리 상태 충돌 + RLS 우회 + admin 함수 일반 노출 + UI 분기 미흡 모두 해결. 출시 차단 클래스. |

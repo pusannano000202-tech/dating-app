@@ -39,6 +39,8 @@ interface AttendanceState {
   attendee_count: number
   scheduled_start: string | null
   finalize_available: boolean
+  no_show_finalized: boolean
+  caller_is_no_show: boolean
 }
 
 export default function MatchDetailPage() {
@@ -421,7 +423,28 @@ export default function MatchDetailPage() {
                 매칭 취소
               </button>
             )}
-            {match.match_status === 'completed' && (
+            {match.match_status === 'completed' && attendance?.no_show_finalized ? (
+              <section className="glass-card rounded-3xl p-5 mb-4 border border-rose-400/20 bg-rose-500/[0.04]">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={20} className="text-rose-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-rose-200">
+                      {attendance.caller_is_no_show
+                        ? '노쇼로 처리됐어요'
+                        : '이번 매칭에 노쇼가 발생했어요'}
+                    </p>
+                    <p className="mt-1.5 text-xs text-gray-400 leading-relaxed">
+                      {attendance.caller_is_no_show
+                        ? '약속 장소 GPS 체크인이 확인되지 않아 보증금이 forfeit 됐어요. 환불 / 이어가기 / 평가 흐름은 진입할 수 없어요.'
+                        : '약속 장소에 안 나타난 사람의 보증금이 forfeit 되어 출석자에게 균등 분배됐어요. 만남이 정상적으로 이어지지 않아 환불 선택 / 평가는 생략돼요.'}
+                    </p>
+                    <p className="mt-2 text-[11px] text-gray-500">
+                      자세한 내역은 알림에서 확인하세요.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            ) : match.match_status === 'completed' ? (
               <div className="flex flex-col gap-2 mb-4">
                 <Link
                   href={`/match/${encodeURIComponent(matchId)}/continuation`}
@@ -436,7 +459,7 @@ export default function MatchDetailPage() {
                   만남 평가 작성
                 </Link>
               </div>
-            )}
+            ) : null}
 
             {/* GPS 체크인 + 노쇼 처리 패널 — confirmed/completed + 약속 시간 도달 후 */}
             {(match.match_status === 'confirmed' || match.match_status === 'completed')
