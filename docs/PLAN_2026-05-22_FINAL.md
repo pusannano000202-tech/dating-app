@@ -107,8 +107,11 @@ f35724e docs                     STATUS / SESSION_PROGRESS 95→97%
 826c2f2 z36  feat(connections)   핸드폰 자동공개 정책 (시간 도달 reveal, 동의 모델 폐기, 결정 8-18)
 f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19), APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20
 3eb2821 docs                     STATUS/SESSION_PROGRESS 97→98%
-[새] z37  feat(match)         자동 완료 + match_meetings 정보 노출 RPC (결정 8-20)
-[새] feat(match)             /match/[id] 약속 시간/장소/카운트다운 UI + /match 목록 카드 갱신
+29b1127 z37  feat(match)         자동 완료 + match_meetings 정보 노출 RPC (결정 8-20)
+7a39d22 docs                     z37 반영 (98→99%)
+6501de9 z38  feat(match)         matches.status → groups.status 동기화 트리거
+[새] z39  feat(notifications) in-app 알림 시스템 (테이블 + 트리거 + RPC, 결정 8-21)
+[새] feat(notifications)     /notifications 페이지 + NotificationBell 배지 (/match, /group/create)
 ```
 
 **브랜치**: `profile/post-worldcup-decisions-2026-05-21`
@@ -123,7 +126,7 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 |---|---|
 | TypeScript typecheck | ✅ PASS |
 | ESLint | ✅ PASS (0 warnings/errors) |
-| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 35 files / 176 defs / 620 refs / **0 issues** |
+| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 37 files / 192 defs / 667 refs / **0 issues** |
 | node:test matching 코어 | ✅ 10/10 (ageFit + TIME_FIT 포함) |
 | python static (이미지/그룹/친구) | ✅ 11/11 |
 
@@ -149,3 +152,5 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 | 8-18 | **핸드폰 자동공개 정책 (z36)** — 약속 시간 도달 시 양쪽 그룹 멤버의 phone 자동 공개. 사용자 동의 불필요. status='confirmed' 부터 적용 (대기 단계에서도 비상연락 가능). 폭로 시점은 `match_meetings.scheduled_start`. | "시간/장소를 우리가 정해줘도 늦거나 못 만날 수 있으니 그 시간이 되면 서로 연락 가능해야 함" — 8-16 의 동의 모델은 불필요한 마찰. |
 | 8-19 | **TIME_FIT 매칭 가중치 0.10 추가** — 양 그룹 available_timeslots 교집합 요일 수 / 7 을 점수에 반영. APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20 으로 양보 (합 1.0 유지). | 자동 시간 배정 정책 (8-18) 이후 시간 유연성이 매칭 품질의 핵심. 하드 필터(MIN_TIME_OVERLAP_DAYS) 와 별개로 부드러운 가점. |
 | 8-20 | **매칭 자동 완료 (z37)** — `confirmed` 매칭이 `scheduled_start + 4h` 지나면 자동으로 `completed` 전이. lazy 패턴: get_match_detail/get_my_matches 호출 시 검사. | review/no-show 흐름의 트리거가 없으면 사용자는 평가를 작성할 수 없음. v1.1 에서 GPS 출석 기반 정확한 완료로 교체. |
+| (z38) | **그룹 상태 동기화 트리거** — matches.status → groups.status (confirmed=matched, completed=completed, cancelled=ready). disbanded 제외. | 그룹 카드 UI 일관성. 매칭 중인 그룹이 큐 진입 가능처럼 보이지 않도록. |
+| 8-21 | **in-app 알림 시스템 (z39)** — notifications 테이블 + 매칭 이벤트 자동 fan-out + `/notifications` 페이지 + 메인 페이지 배지. SMS/push 외부 통합은 v1.1. | 사용자가 페이지에 들어와야 결과 확인 가능한 흐름은 위험. 최소 in-app 알림 필수. |

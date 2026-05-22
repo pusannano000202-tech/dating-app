@@ -33,8 +33,11 @@
 - `554c1ba` z35 — connection 양방향 동의 RPC + /match/[id] 1:1 연결 패널
 - `826c2f2` z36 — **핸드폰 자동공개 정책** (결정 8-18). 약속 시간 도달 시 phone 자동 공개. agree/cancel RPC 폐기. status=confirmed 부터 노출
 - `f6153fb` TIME_FIT 매칭 가중치 0.10 추가 (결정 8-19). APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20 으로 양보
-- `[새]` z37 — **매칭 자동 완료** (결정 8-20). confirmed→completed lazy 전이 (scheduled_start + 4h). get_my_matches/get_match_detail 에 scheduled_start, venue_name, venue_address, venue_map_url 추가
-- `[새]` /match/[id] 약속 시간/장소/카운트다운 UI + /match 목록 카드에 미팅 시간 노출
+- `29b1127` z37 — **매칭 자동 완료** (결정 8-20). confirmed→completed lazy 전이 (scheduled_start + 4h). get_my_matches/get_match_detail 에 scheduled_start, venue_name, venue_address, venue_map_url 추가
+- `7a39d22` docs z37 반영 (98→99%)
+- `6501de9` z38 — matches.status → groups.status 동기화 트리거
+- `[새]` z39 — **in-app 알림 시스템** (결정 8-21). notifications 테이블 + 매칭 이벤트 트리거 + RPC 4종 (get/mark-read/mark-all/count)
+- `[새]` /notifications 페이지 + NotificationBell 컴포넌트 (/match, /group/create 헤더 배지)
 
 ---
 
@@ -135,6 +138,8 @@ z34 profile_preferred_age_range   ← 후반: 선호 나이 범위 + 매칭 age_
 z35 connection_rpc                ← 후반: 1:1 연결 동의 + phone 노출
 z36 connection_auto_reveal_on_meeting ← 후반: 약속 시간 도달 자동공개 (z35 양방향 동의 폐기, 결정 8-18)
 z37 match_meeting_info_and_lazy_complete ← 후반: 매칭 자동 완료 + venue 정보 노출 (결정 8-20)
+z38 match_status_to_group_status_trigger ← 후반: matches.status → groups.status 동기화
+z39 notifications_system               ← 후반: in-app 알림 (테이블/트리거/RPC, 결정 8-21)
 ```
 
 ### 신규 API routes
