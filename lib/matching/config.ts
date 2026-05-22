@@ -65,13 +65,15 @@ export const HARD_FILTER_CONFIG = {
 
 export const SCORE_WEIGHTS = {
   /** 외모 양방향 적합도 가중치 */
-  APPEARANCE: 0.50,
+  APPEARANCE: 0.45,
   /** 성격(Big5) 호환성 가중치 */
   PERSONALITY: 0.25,
   /** 외모 점수대 근접성 가중치 (이미 ±15 안이지만 가까울수록 가점) */
-  SCORE_BAND_PROXIMITY: 0.15,
+  SCORE_BAND_PROXIMITY: 0.10,
   /** 이상형 가중치 정합 (사용자가 외모/성격 중 무엇 중시) */
   PREFERENCE_WEIGHT_ALIGN: 0.10,
+  /** 나이 적합도 (그룹 평균 나이 차이 + 사용자 선호 범위). 결정 8-13 (2026-05-22). */
+  AGE_FIT: 0.10,
 } as const
 
 // 합이 1.0 인지 컴파일 타임 보장은 못 하니 런타임 sanity check
@@ -79,13 +81,34 @@ const _weightSum =
   SCORE_WEIGHTS.APPEARANCE +
   SCORE_WEIGHTS.PERSONALITY +
   SCORE_WEIGHTS.SCORE_BAND_PROXIMITY +
-  SCORE_WEIGHTS.PREFERENCE_WEIGHT_ALIGN
+  SCORE_WEIGHTS.PREFERENCE_WEIGHT_ALIGN +
+  SCORE_WEIGHTS.AGE_FIT
 if (Math.abs(_weightSum - 1.0) > 1e-6) {
   // eslint-disable-next-line no-console
   console.warn(
     `[matching/config] SCORE_WEIGHTS 합이 1.0 이 아닙니다: ${_weightSum.toFixed(4)}`,
   )
 }
+
+// ─────────────────────────────────────────────
+// 나이 매칭 파라미터 (결정 8-13, 2026-05-22)
+// 사용자가 명시한 선호 폭이 없으면 본인 나이 ±DEFAULT_AGE_TOLERANCE 안에서 1.0,
+// 밖이면 SOFT_AGE_DECAY 살마다 점수 1/0 으로 부드럽게 감소
+// ─────────────────────────────────────────────
+
+export const AGE_FIT_CONFIG = {
+  /** 사용자 명시 선호 폭이 없을 때 기본 허용 나이차 (양쪽). */
+  DEFAULT_AGE_TOLERANCE: 3,
+  /**
+   * 선호 폭 바깥일 때 감점 부드러움 (살). 큰 값일수록 너그러움.
+   * fit = max(0, 1 - excess/SOFT_AGE_DECAY)
+   */
+  SOFT_AGE_DECAY: 5,
+  /** 선호 나이 입력 시 사용자에게 노출되는 슬라이더 범위. */
+  USER_INPUT_MIN: 18,
+  USER_INPUT_MAX: 35,
+  USER_INPUT_DEFAULT_TOLERANCE: 3,
+} as const
 
 // ─────────────────────────────────────────────
 // 헝가리안 임계값 / 페널티
@@ -206,6 +229,7 @@ export const MATCHING_CONFIG = {
   attendance: ATTENDANCE_CONFIG,
   notification: NOTIFICATION_CONFIG,
   timeslot: TIMESLOT_DEFAULTS,
+  ageFit: AGE_FIT_CONFIG,
 } as const
 
 export type MatchingConfig = typeof MATCHING_CONFIG

@@ -58,6 +58,10 @@ export interface MatchingProfile extends PreferredAppearance {
   user_id: string
   gender: Gender
   age: number
+  /** 선호 상대 나이 하한 (포함, 18-60). 기본값 본인 나이 -3 (최소 18) */
+  preferred_age_min: number | null
+  /** 선호 상대 나이 상한 (포함, 18-60). 기본값 본인 나이 +3 (최대 60) */
+  preferred_age_max: number | null
   height: number | null
   body_type: BodyType | null
   appearance_score_normalized: number // 0~1, AI 외모 점수 정규화값

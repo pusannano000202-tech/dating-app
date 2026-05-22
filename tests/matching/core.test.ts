@@ -72,6 +72,9 @@ function group(overrides: Partial<GroupSummary>): GroupSummary {
       scoreBand: 0.05,
       weightAlignment: 0.05,
     },
+    avgAge: 22,
+    preferredAgeMin: 19,
+    preferredAgeMax: 25,
     ...overrides,
   }
 }
@@ -222,6 +225,9 @@ test('summarizeGroup averages member scores and intersects availability', () => 
         scoreBand: 0.1,
         weightAlignment: 0.1,
       },
+      age: 22,
+      preferredAgeMin: 19,
+      preferredAgeMax: 25,
     },
     {
       userId: 'user-b',
@@ -250,6 +256,9 @@ test('summarizeGroup averages member scores and intersects availability', () => 
         scoreBand: 0.1,
         weightAlignment: 0.1,
       },
+      age: 24,
+      preferredAgeMin: 21,
+      preferredAgeMax: 27,
     },
   ]
 
@@ -267,6 +276,39 @@ test('summarizeGroup averages member scores and intersects availability', () => 
   assert.deepEqual(summary.avgPreferredAxisZVector, { warm: 0.6, chic: 0.4 })
   assert.deepEqual(summary.availability.saturday, [{ start: '16:00', end: '18:00' }])
   assert.equal(summary.preferenceWeights.appearance, 0.4)
+  assert.equal(summary.avgAge, 23)
+  // 멤버 22 / 24 의 가장 엄격한 하한 = max(19, 21) = 21
+  // 멤버 25 / 27 의 가장 엄격한 상한 = min(25, 27) = 25
+  assert.equal(summary.preferredAgeMin, 21)
+  assert.equal(summary.preferredAgeMax, 25)
+})
+
+test('pairScore reflects age fit: same-age boost vs out-of-range decay', () => {
+  const a = group({ gender: 'male', avgAge: 22, preferredAgeMin: 19, preferredAgeMax: 25 })
+  const bSameAge = group({
+    groupId: 'female-a',
+    gender: 'female',
+    departmentCodes: ['design'],
+    avgAge: 22,
+    preferredAgeMin: 19,
+    preferredAgeMax: 25,
+  })
+  const bFarAge = group({
+    groupId: 'female-b',
+    gender: 'female',
+    departmentCodes: ['design'],
+    avgAge: 30,
+    preferredAgeMin: 27,
+    preferredAgeMax: 33,
+  })
+
+  const same = pairScore(a, bSameAge, MATCHING_CONFIG)
+  const far = pairScore(a, bFarAge, MATCHING_CONFIG)
+
+  assert.equal(same.breakdown.ageFit, 1)
+  assert.ok(far.breakdown.ageFit < 1)
+  assert.ok(far.breakdown.ageFit >= 0)
+  assert.ok(same.score > far.score)
 })
 
 test('simulateBatch scores only matchable pairs sorted by score descending', () => {

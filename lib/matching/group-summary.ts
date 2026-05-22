@@ -28,7 +28,23 @@ export function summarizeGroup(input: GroupSummaryInput): GroupSummary {
     availability: intersectAllAvailability(input.members),
     excludedGroupIds: input.excludedGroupIds,
     preferenceWeights: meanPreferenceWeights(input.members.map((member) => member.preferenceWeights)),
+    avgAge: mean(input.members.map((member) => member.age)),
+    // 그룹 전체를 만족시키려면 가장 엄격한 멤버 기준 (max of mins, min of maxes)
+    preferredAgeMin: aggregateAgePref(
+      input.members.map((member) => member.preferredAgeMin),
+      'max',
+    ),
+    preferredAgeMax: aggregateAgePref(
+      input.members.map((member) => member.preferredAgeMax),
+      'min',
+    ),
   }
+}
+
+function aggregateAgePref(values: (number | null)[], mode: 'max' | 'min'): number | null {
+  const present = values.filter((v): v is number => v != null)
+  if (present.length === 0) return null
+  return mode === 'max' ? Math.max(...present) : Math.min(...present)
 }
 
 function intersectAllAvailability(members: GroupMemberSummary[]): WeekdayAvailability {

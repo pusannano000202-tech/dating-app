@@ -19,6 +19,7 @@ const EMPTY_BREAKDOWN: PairScoreBreakdown = {
   scoreBand: 0,
   weightAlignment: 0,
   asymmetryPenalty: 0,
+  ageFit: 0,
 }
 
 export function pairScore(
@@ -52,12 +53,14 @@ export function pairScore(
         config.hardFilter.SCORE_BAND_WIDTH,
   )
   const weightAlignment = preferenceWeightAlignment(a.preferenceWeights, b.preferenceWeights)
+  const ageFit = ageFitScore(a, b, config)
 
   const score = clamp01(
     config.weights.APPEARANCE * appearance +
       config.weights.PERSONALITY * personality +
       config.weights.SCORE_BAND_PROXIMITY * scoreBand +
-      config.weights.PREFERENCE_WEIGHT_ALIGN * weightAlignment,
+      config.weights.PREFERENCE_WEIGHT_ALIGN * weightAlignment +
+      config.weights.AGE_FIT * ageFit,
   )
 
   return {
@@ -74,8 +77,52 @@ export function pairScore(
       scoreBand,
       weightAlignment,
       asymmetryPenalty,
+      ageFit,
     },
   }
+}
+
+/**
+ * 그룹 평균 나이 + 양 그룹이 명시한 선호 나이 범위로 적합도 산출.
+ *
+ * 1. 양 그룹 모두 avgAge 가 없으면 중립 1.0 (정보 부족 페널티 X)
+ * 2. 각 그룹의 effective tolerance = (preferredAgeMax - preferredAgeMin)/2,
+ *    명시 없으면 DEFAULT_AGE_TOLERANCE (3) 사용
+ * 3. fit_a = a 의 관점에서 b 의 평균 나이가 a 의 선호 범위 안인지
+ *      안: 1.0
+ *      밖: max(0, 1 - excess / SOFT_AGE_DECAY)
+ * 4. fit_b 동일하게 계산
+ * 5. 최종 ageFit = (fit_a + fit_b) / 2  (양방향 평균)
+ */
+function ageFitScore(
+  a: GroupSummary,
+  b: GroupSummary,
+  config: MatchingConfig,
+): number {
+  if (a.avgAge == null || b.avgAge == null) return 1.0
+  const tolDef = config.ageFit.DEFAULT_AGE_TOLERANCE
+  const decay = config.ageFit.SOFT_AGE_DECAY
+
+  const fitOneSide = (
+    self: GroupSummary,
+    opp: GroupSummary,
+  ): number => {
+    if (self.avgAge == null || opp.avgAge == null) return 1.0
+    let minPref = self.preferredAgeMin
+    let maxPref = self.preferredAgeMax
+    if (minPref == null) minPref = Math.round(self.avgAge) - tolDef
+    if (maxPref == null) maxPref = Math.round(self.avgAge) + tolDef
+    if (minPref > maxPref) {
+      const swap = minPref
+      minPref = maxPref
+      maxPref = swap
+    }
+    if (opp.avgAge >= minPref && opp.avgAge <= maxPref) return 1.0
+    const excess = opp.avgAge < minPref ? (minPref - opp.avgAge) : (opp.avgAge - maxPref)
+    return Math.max(0, 1 - excess / decay)
+  }
+
+  return clamp01((fitOneSide(a, b) + fitOneSide(b, a)) / 2)
 }
 
 export function cosineSimilarity(a: NumericVector, b: NumericVector): number {

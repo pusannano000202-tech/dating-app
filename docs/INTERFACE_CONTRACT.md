@@ -61,8 +61,14 @@ CREATE TABLE profiles (
   available_timeslots   JSONB,           -- 아래 3번 형식 참고
   -- 이상형 가중치: 성준의 점수 계산에 사용
   preference_weights    JSONB,           -- 아래 4번 형식 참고
+  -- 선호 상대 나이 범위 (양쪽 포함, 18-60). 결정 8-13 (2026-05-22).
+  -- 매칭 엔진은 양 그룹의 평균 나이를 비교, 본인 범위 안이면 ageFit=1.0
+  preferred_age_min     INT CHECK (preferred_age_min IS NULL OR preferred_age_min BETWEEN 18 AND 60),
+  preferred_age_max     INT CHECK (preferred_age_max IS NULL OR preferred_age_max BETWEEN 18 AND 60),
   is_profile_complete   BOOLEAN NOT NULL DEFAULT FALSE,
-  updated_at            TIMESTAMPTZ DEFAULT NOW()
+  updated_at            TIMESTAMPTZ DEFAULT NOW(),
+  CHECK (preferred_age_min IS NULL OR preferred_age_max IS NULL
+         OR preferred_age_min <= preferred_age_max)
 );
 ```
 
