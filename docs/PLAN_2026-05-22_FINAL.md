@@ -111,8 +111,11 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 7a39d22 docs                     z37 반영 (98→99%)
 6501de9 z38  feat(match)         matches.status → groups.status 동기화 트리거
 34f4d17 z39  feat(notifications) in-app 알림 시스템 (테이블 + 트리거 + RPC, 결정 8-21)
-[새] z40  feat(notifications) friend_request 알림 트리거 + enqueue_meeting_reminders RPC
-[새] z41  feat(deposits)     distribute_no_show_penalty RPC (8-9 정책 자동화)
+8fd9e31 z40  feat(notifications) friend_request 알림 트리거 + enqueue_meeting_reminders RPC
+8fd9e31 z41  feat(deposits)     distribute_no_show_penalty RPC (8-9 정책 자동화)
+[새] z42  feat(deposits)     **만남 지속 의사 + 자발적 환불 (구걸 UX 백엔드, 결정 8-22)**
+[새] z43  feat(deposits)     z39 트리거 갱신 + 7일/14일 만료 RPC
+[새] feat(deposits)         /continuation /refund 페이지 (구걸 3단계 UI + 0원 사유)
 ```
 
 **브랜치**: `profile/post-worldcup-decisions-2026-05-21`
@@ -127,7 +130,7 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 |---|---|
 | TypeScript typecheck | ✅ PASS |
 | ESLint | ✅ PASS (0 warnings/errors) |
-| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 39 files / 196 defs / 693 refs / **0 issues** |
+| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 41 files / 214 defs / 772 refs / **0 issues** |
 | node:test matching 코어 | ✅ 10/10 (ageFit + TIME_FIT 포함) |
 | python static (이미지/그룹/친구) | ✅ 11/11 |
 
@@ -155,3 +158,4 @@ f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19)
 | 8-20 | **매칭 자동 완료 (z37)** — `confirmed` 매칭이 `scheduled_start + 4h` 지나면 자동으로 `completed` 전이. lazy 패턴: get_match_detail/get_my_matches 호출 시 검사. | review/no-show 흐름의 트리거가 없으면 사용자는 평가를 작성할 수 없음. v1.1 에서 GPS 출석 기반 정확한 완료로 교체. |
 | (z38) | **그룹 상태 동기화 트리거** — matches.status → groups.status (confirmed=matched, completed=completed, cancelled=ready). disbanded 제외. | 그룹 카드 UI 일관성. 매칭 중인 그룹이 큐 진입 가능처럼 보이지 않도록. |
 | 8-21 | **in-app 알림 시스템 (z39)** — notifications 테이블 + 매칭 이벤트 자동 fan-out + `/notifications` 페이지 + 메인 페이지 배지. SMS/push 외부 통합은 v1.1. | 사용자가 페이지에 들어와야 결과 확인 가능한 흐름은 위험. 최소 in-app 알림 필수. |
+| 8-22 | **구걸 UX 보증금 환불 (z42/z43)** — completed → 양쪽 "이어갈래요?" 양쪽 다 continue 면 자동 전액 환불 + 핸드폰 공개 강조. 누구라도 end → 리뷰 + 환불 선택 (0~전액 슬라이더). 전액 선택 시 3000→2000→1000 구걸 3단계, 0원 선택 시 사유 + 상대방 자동 알림. 노쇼는 z41 forfeit 유지, 환불 자체 차단. 7일/14일 만료. | **앱 수익 모델 핵심**. 자동 환불로는 앱이 못 번다. 사용자가 자발적으로 떼주는 차액 = 수익. 8-9 노쇼는 별개. |

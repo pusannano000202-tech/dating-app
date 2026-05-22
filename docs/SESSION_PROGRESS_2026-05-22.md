@@ -39,7 +39,12 @@
 - `[새]` z39 — **in-app 알림 시스템** (결정 8-21). notifications 테이블 + 매칭 이벤트 트리거 + RPC 4종 (get/mark-read/mark-all/count)
 - `34f4d17` /notifications 페이지 + NotificationBell 컴포넌트 (/match, /group/create 헤더 배지)
 - `[새]` z40 — 친구 요청 알림 자동 (receiver_user_id 있을 때) + enqueue_meeting_reminders RPC (D-1/30분 전, 멱등)
-- `[새]` z41 — distribute_no_show_penalty RPC (8-9 attendees_equal 정책 자동화). v1 수동, v1.1 GPS 자동
+- `8fd9e31` z40 z41 — friend_request 알림 + meeting reminder + 노쇼 페널티 분배 (8-9)
+- `[새]` z42 — **구걸 UX 환불 백엔드** (결정 8-22). match_continuation_choices + deposit_refund_requests 테이블 + submit_continuation_choice / submit_refund_request RPC. 양쪽 continue → 자동 전액 환불, 한쪽 end → 환불 선택 진입
+- `[새]` z43 — z39 트리거 갱신 (review_request → continuation_choice_request) + expire RPCs (7일 → end 자동, 14일 → 전액 자동 환불)
+- `[새]` /match/[id]/continuation 페이지 (이어갈래요/충분 2-choice)
+- `[새]` /match/[id]/refund 페이지 (슬라이더 + 3단계 구걸 + 0원 사유 입력)
+- `[새]` /notifications 페이지 신규 kind 4종 라벨/요약 추가
 
 ---
 
@@ -144,6 +149,8 @@ z38 match_status_to_group_status_trigger ← 후반: matches.status → groups.s
 z39 notifications_system               ← 후반: in-app 알림 (테이블/트리거/RPC, 결정 8-21)
 z40 friend_request_and_reminder_notifications ← 후반: 친구 요청 알림 + 약속 D-1/30분 전 리마인더 RPC
 z41 no_show_penalty_distribution       ← 후반: 노쇼 페널티 자동 분배 RPC (8-9)
+z42 continuation_choice_and_refund_request ← 후반: 만남 지속 의사 + 자발적 환불 (구걸 UX, 결정 8-22)
+z43 continuation_trigger_update_and_expire ← 후반: z39 트리거 갱신 + 7일/14일 만료
 ```
 
 ### 신규 API routes
