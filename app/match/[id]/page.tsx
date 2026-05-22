@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { CalendarClock, ChevronLeft, Loader2, LockKeyhole, Phone, Users } from 'lucide-react'
+import { CalendarClock, ChevronLeft, Loader2, LockKeyhole, MapPin, Phone, Users } from 'lucide-react'
 
 interface MatchDetail {
   match_id: string
@@ -17,6 +17,11 @@ interface MatchDetail {
   completed_at: string | null
   my_confirmed_at: string | null
   opp_confirmed_at: string | null
+  scheduled_start: string | null
+  scheduled_end: string | null
+  venue_name: string | null
+  venue_address: string | null
+  venue_map_url: string | null
 }
 
 interface ConnectionRow {
@@ -200,15 +205,61 @@ export default function MatchDetailPage() {
             </section>
 
             <section className="glass rounded-3xl p-4 mb-4">
-              <div className="flex items-center gap-3">
-                <CalendarClock size={18} className="text-rose-200" />
-                <div>
-                  <p className="text-sm font-bold">만남 정보</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    시간·장소는 매칭 엔진이 자동 확정해요. 곧 알림으로 전달돼요.
-                  </p>
+              {match.scheduled_start ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-start gap-3">
+                    <CalendarClock size={18} className="text-rose-200 mt-0.5" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-gray-500">약속 시간</p>
+                      <p className="text-sm font-bold mt-0.5">
+                        {formatDateTime(match.scheduled_start)}
+                      </p>
+                      {match.scheduled_end && (
+                        <p className="text-[11px] text-gray-500 mt-0.5">
+                          ~ {formatDateTime(match.scheduled_end)}
+                        </p>
+                      )}
+                      <p className="text-[11px] text-rose-300 mt-1">
+                        {formatCountdown(match.scheduled_start)}
+                      </p>
+                    </div>
+                  </div>
+                  {match.venue_name && (
+                    <div className="flex items-start gap-3 pt-3 border-t border-white/10">
+                      <MapPin size={18} className="text-violet-200 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-gray-500">장소</p>
+                        <p className="text-sm font-bold mt-0.5 truncate">{match.venue_name}</p>
+                        {match.venue_address && (
+                          <p className="text-[11px] text-gray-500 mt-0.5 break-keep">
+                            {match.venue_address}
+                          </p>
+                        )}
+                        {match.venue_map_url && (
+                          <a
+                            href={match.venue_map_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block mt-1 text-[11px] px-2 py-1 rounded-lg border border-violet-400/30 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20"
+                          >
+                            지도로 열기
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <CalendarClock size={18} className="text-rose-200" />
+                  <div>
+                    <p className="text-sm font-bold">만남 정보</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      시간·장소는 매칭 엔진이 자동 확정해요. 곧 알림으로 전달돼요.
+                    </p>
+                  </div>
+                </div>
+              )}
             </section>
 
             <section className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] px-4 py-3 flex items-start gap-3 mb-4">
@@ -352,6 +403,28 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
       <span className={`text-xs font-bold ${highlight ? 'text-violet-200' : 'text-gray-300'}`}>{value}</span>
     </div>
   )
+}
+
+function formatCountdown(iso: string): string {
+  try {
+    const target = new Date(iso).getTime()
+    const now = Date.now()
+    const diffMs = target - now
+    if (diffMs <= 0) {
+      const elapsedHours = Math.floor(-diffMs / 3_600_000)
+      if (elapsedHours < 1) return '시작 시각 도달'
+      if (elapsedHours < 24) return `${elapsedHours}시간 경과`
+      return `${Math.floor(elapsedHours / 24)}일 경과`
+    }
+    const days = Math.floor(diffMs / 86_400_000)
+    const hours = Math.floor((diffMs % 86_400_000) / 3_600_000)
+    const minutes = Math.floor((diffMs % 3_600_000) / 60_000)
+    if (days >= 1) return `D-${days} (${hours}시간 후)`
+    if (hours >= 1) return `${hours}시간 ${minutes}분 후`
+    return `${minutes}분 후`
+  } catch {
+    return ''
+  }
 }
 
 function formatDateTime(iso: string): string {

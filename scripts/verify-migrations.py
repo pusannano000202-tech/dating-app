@@ -74,6 +74,8 @@ SPURIOUS_NAMES = {
     'public.when',
     'public.of',  # AFTER UPDATE OF column trigger syntax
     'auth.ui',  # auth.uid() partial match
+    'public.lateral',  # LEFT JOIN LATERAL ... 키워드 오인식
+    'public.get_match_meeting_inf',  # function-call-in-FROM 오인식 (LATERAL 호출)
 }
 BASELINE_FUNCTIONS = {
     'auth.uid',

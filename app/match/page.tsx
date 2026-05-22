@@ -13,6 +13,8 @@ interface MatchRow {
   match_status: string
   matched_at: string
   confirmed_at: string | null
+  scheduled_start: string | null
+  venue_name: string | null
 }
 
 export default function MatchesPage() {
@@ -104,6 +106,12 @@ export default function MatchesPage() {
                   <p className="mt-0.5 text-xs text-gray-500">
                     {formatDate(m.matched_at)} · {translateStatus(m.match_status)}
                   </p>
+                  {m.scheduled_start && (
+                    <p className="mt-1 text-[11px] text-rose-300 truncate">
+                      🕒 {formatDateTime(m.scheduled_start)}
+                      {m.venue_name ? ` · ${m.venue_name}` : ''}
+                    </p>
+                  )}
                 </div>
                 <ChevronRight size={16} className="text-gray-600" />
               </Link>
@@ -119,6 +127,19 @@ function formatDate(iso: string): string {
   try {
     const d = new Date(iso)
     return `${d.getFullYear()}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getDate().toString().padStart(2, '0')}`
+  } catch {
+    return iso
+  }
+}
+
+function formatDateTime(iso: string): string {
+  try {
+    const d = new Date(iso)
+    const mm = (d.getMonth() + 1).toString().padStart(2, '0')
+    const dd = d.getDate().toString().padStart(2, '0')
+    const hh = d.getHours().toString().padStart(2, '0')
+    const mi = d.getMinutes().toString().padStart(2, '0')
+    return `${mm}.${dd} ${hh}:${mi}`
   } catch {
     return iso
   }
