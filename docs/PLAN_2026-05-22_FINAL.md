@@ -104,8 +104,11 @@ f1873a1 z33  feat(review)       만남 평가 submit/get + /match/[id]/review
 554c1ba z35  feat(connections)  1:1 양방향 동의 + phone 노출
 f35724e docs                     STATUS / SESSION_PROGRESS 95→97%
 6045fe8 docs                     PLAN_2026-05-22_FINAL (97%)
-[새] z36  feat(connections)   핸드폰 자동공개 정책 (시간 도달 reveal, 동의 모델 폐기, 결정 8-18)
-[새] feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19), APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20
+826c2f2 z36  feat(connections)   핸드폰 자동공개 정책 (시간 도달 reveal, 동의 모델 폐기, 결정 8-18)
+f6153fb     feat(matching)          TIME_FIT 가중치 0.10 추가 (결정 8-19), APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20
+3eb2821 docs                     STATUS/SESSION_PROGRESS 97→98%
+[새] z37  feat(match)         자동 완료 + match_meetings 정보 노출 RPC (결정 8-20)
+[새] feat(match)             /match/[id] 약속 시간/장소/카운트다운 UI + /match 목록 카드 갱신
 ```
 
 **브랜치**: `profile/post-worldcup-decisions-2026-05-21`
@@ -120,7 +123,7 @@ f35724e docs                     STATUS / SESSION_PROGRESS 95→97%
 |---|---|
 | TypeScript typecheck | ✅ PASS |
 | ESLint | ✅ PASS (0 warnings/errors) |
-| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 34 files / 172 defs / 590 refs / **0 issues** |
+| 마이그 정적 검증 (`scripts/verify-migrations.py`) | ✅ 35 files / 176 defs / 620 refs / **0 issues** |
 | node:test matching 코어 | ✅ 10/10 (ageFit + TIME_FIT 포함) |
 | python static (이미지/그룹/친구) | ✅ 11/11 |
 
@@ -145,3 +148,4 @@ f35724e docs                     STATUS / SESSION_PROGRESS 95→97%
 | 8-17 | review 는 `matches.status='completed'` 가 전제 | attendance/노쇼 흐름이 status 갱신 트리거 (v1.1) |
 | 8-18 | **핸드폰 자동공개 정책 (z36)** — 약속 시간 도달 시 양쪽 그룹 멤버의 phone 자동 공개. 사용자 동의 불필요. status='confirmed' 부터 적용 (대기 단계에서도 비상연락 가능). 폭로 시점은 `match_meetings.scheduled_start`. | "시간/장소를 우리가 정해줘도 늦거나 못 만날 수 있으니 그 시간이 되면 서로 연락 가능해야 함" — 8-16 의 동의 모델은 불필요한 마찰. |
 | 8-19 | **TIME_FIT 매칭 가중치 0.10 추가** — 양 그룹 available_timeslots 교집합 요일 수 / 7 을 점수에 반영. APPEARANCE 0.45→0.40, PERSONALITY 0.25→0.20 으로 양보 (합 1.0 유지). | 자동 시간 배정 정책 (8-18) 이후 시간 유연성이 매칭 품질의 핵심. 하드 필터(MIN_TIME_OVERLAP_DAYS) 와 별개로 부드러운 가점. |
+| 8-20 | **매칭 자동 완료 (z37)** — `confirmed` 매칭이 `scheduled_start + 4h` 지나면 자동으로 `completed` 전이. lazy 패턴: get_match_detail/get_my_matches 호출 시 검사. | review/no-show 흐름의 트리거가 없으면 사용자는 평가를 작성할 수 없음. v1.1 에서 GPS 출석 기반 정확한 완료로 교체. |
