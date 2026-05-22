@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { CalendarClock, ChevronLeft, Loader2, LockKeyhole, MapPin, Phone, Users } from 'lucide-react'
+import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Loader2, LockKeyhole, MapPin, Navigation, Phone, Users } from 'lucide-react'
 
 interface MatchDetail {
   match_id: string
@@ -32,6 +32,15 @@ interface ConnectionRow {
   target_phone: string | null
 }
 
+interface AttendanceState {
+  my_checked_in: boolean
+  my_within_radius: boolean
+  total_participants: number
+  attendee_count: number
+  scheduled_start: string | null
+  finalize_available: boolean
+}
+
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
@@ -41,6 +50,9 @@ export default function MatchDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [connections, setConnections] = useState<ConnectionRow[]>([])
   const [connectionsLoading, setConnectionsLoading] = useState(false)
+  const [attendance, setAttendance] = useState<AttendanceState | null>(null)
+  const [gpsBusy, setGpsBusy] = useState(false)
+  const [gpsMessage, setGpsMessage] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -94,6 +106,107 @@ export default function MatchDetailPage() {
       setConnections([])
     }
   }, [match?.match_status, refreshConnections])
+
+  const refreshAttendance = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/attendance-state`)
+      if (res.ok) {
+        const data = await res.json() as { state: AttendanceState | null }
+        setAttendance(data.state)
+      }
+    } catch {
+      // ignore
+    }
+  }, [matchId])
+
+  useEffect(() => {
+    if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {
+      refreshAttendance()
+      const id = setInterval(refreshAttendance, 60_000)
+      return () => clearInterval(id)
+    }
+  }, [match?.match_status, refreshAttendance])
+
+  async function handleCheckin() {
+    if (gpsBusy) return
+    if (!navigator.geolocation) {
+      setGpsMessage('이 브라우저는 GPS 를 지원하지 않아요.')
+      return
+    }
+    setGpsBusy(true)
+    setGpsMessage(null)
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/checkin`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          })
+          const json = await res.json().catch(() => ({})) as { result?: { within_radius?: boolean; distance_m?: number }; error?: string }
+          if (!res.ok) {
+            setGpsMessage(translateGpsError(json.error))
+          } else if (json.result?.within_radius) {
+            const d = Math.round(json.result.distance_m ?? 0)
+            setGpsMessage(`✅ 체크인 완료 (장소에서 ${d}m)`)
+          } else {
+            const d = Math.round(json.result?.distance_m ?? 0)
+            setGpsMessage(`⚠️ 장소에서 ${d}m 떨어져 있어요. 더 가까이 가서 다시 시도해주세요.`)
+          }
+          await refreshAttendance()
+        } finally {
+          setGpsBusy(false)
+        }
+      },
+      (err) => {
+        setGpsBusy(false)
+        if (err.code === err.PERMISSION_DENIED) setGpsMessage('위치 권한이 거부됐어요.')
+        else if (err.code === err.POSITION_UNAVAILABLE) setGpsMessage('위치를 가져올 수 없어요.')
+        else setGpsMessage('GPS 오류가 발생했어요.')
+      },
+      { enableHighAccuracy: true, timeout: 10_000 }
+    )
+  }
+
+  async function handleFinalize() {
+    if (gpsBusy) return
+    if (!window.confirm('노쇼 처리하기? 현재 출석 안 된 사람의 보증금이 forfeit 됩니다.')) return
+    setGpsBusy(true)
+    setGpsMessage(null)
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/finalize-no-show`, { method: 'POST' })
+      const json = await res.json().catch(() => ({})) as { result?: { no_show_count?: number; attendee_count?: number; total_forfeited_amount?: number }; error?: string }
+      if (!res.ok) {
+        setGpsMessage(translateGpsError(json.error))
+      } else {
+        const ns = json.result?.no_show_count ?? 0
+        const at = json.result?.attendee_count ?? 0
+        const pool = json.result?.total_forfeited_amount ?? 0
+        if (ns === 0) {
+          setGpsMessage(`✅ 모두 출석. 노쇼 없음 (출석자 ${at}명).`)
+        } else {
+          setGpsMessage(`🚨 노쇼 ${ns}명 forfeit. 출석자 ${at}명에게 ${pool.toLocaleString()}원 분배됨.`)
+        }
+      }
+      await refreshAttendance()
+    } finally {
+      setGpsBusy(false)
+    }
+  }
+
+  function translateGpsError(code?: string): string {
+    switch (code) {
+      case 'gps_required':           return 'GPS 좌표가 필요해요.'
+      case 'match_not_active':       return '활성 매칭이 아니에요.'
+      case 'meeting_not_scheduled':  return '약속 시간/장소가 아직 배정되지 않았어요.'
+      case 'too_early_to_checkin':   return '아직 체크인할 시간이 아니에요 (약속 30분 전부터).'
+      case 'too_late_to_checkin':    return '체크인 가능 시간이 지났어요.'
+      case 'too_early_to_finalize':  return '약속 시간 + 30분 후에만 처리 가능.'
+      case 'caller_not_attendee':    return '출석자만 노쇼 처리할 수 있어요.'
+      case 'not_match_participant':  return '본인이 참여한 매칭만 가능.'
+      default:                         return code ?? '처리 실패'
+    }
+  }
 
   async function confirmMatch() {
     if (saving) return
@@ -323,6 +436,70 @@ export default function MatchDetailPage() {
                   만남 평가 작성
                 </Link>
               </div>
+            )}
+
+            {/* GPS 체크인 + 노쇼 처리 패널 — confirmed/completed + 약속 시간 도달 후 */}
+            {(match.match_status === 'confirmed' || match.match_status === 'completed')
+              && attendance?.scheduled_start
+              && new Date(attendance.scheduled_start).getTime() - 30 * 60_000 <= Date.now()
+              && (
+              <section className="glass-card rounded-3xl p-5 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Navigation size={16} className="text-emerald-300" />
+                  <h3 className="text-sm font-bold">출석 확인 (GPS)</h3>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                  <div className="rounded-2xl border border-white/10 px-3 py-2">
+                    <p className="text-gray-500">내 체크인</p>
+                    <p className="mt-0.5 font-bold">
+                      {attendance.my_checked_in
+                        ? attendance.my_within_radius
+                          ? <span className="text-emerald-300">✓ 출석 확인</span>
+                          : <span className="text-amber-300">⚠️ 범위 밖</span>
+                        : <span className="text-gray-400">미체크</span>}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 px-3 py-2">
+                    <p className="text-gray-500">출석률</p>
+                    <p className="mt-0.5 font-bold text-violet-200">
+                      {attendance.attendee_count} / {attendance.total_participants}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCheckin}
+                    disabled={gpsBusy}
+                    className="btn-gradient py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-40"
+                  >
+                    {gpsBusy ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                    {attendance.my_checked_in ? '다시 체크인' : '약속 장소 도착 → 체크인'}
+                  </button>
+
+                  {attendance.finalize_available && (
+                    <button
+                      type="button"
+                      onClick={handleFinalize}
+                      disabled={gpsBusy}
+                      className="py-3 rounded-2xl text-sm border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 flex items-center justify-center gap-2 disabled:opacity-40"
+                    >
+                      <AlertTriangle size={14} />
+                      🚨 안 나타난 사람 노쇼 처리
+                    </button>
+                  )}
+                </div>
+
+                {gpsMessage && (
+                  <p className="mt-3 text-xs text-gray-300 leading-relaxed text-center">{gpsMessage}</p>
+                )}
+
+                <p className="mt-3 text-[10px] text-gray-600 leading-relaxed">
+                  💡 양쪽 모두 출석 = 구걸 환불 흐름. 누군가 노쇼 = 노쇼 보증금 forfeit + 출석자 균등 분배.
+                </p>
+              </section>
             )}
 
             {/* 자동 핸드폰 공개 패널 — status=confirmed 부터 노출 */}

@@ -188,6 +188,8 @@ function kindLabel(kind: string): string {
     case 'both_continue':   return '💜 양쪽 모두 이어가기 선택'
     case 'partner_paid_zero': return '😢 상대방이 0원 지불 선택'
     case 'refund_processed': return '보증금 환불 처리 완료'
+    case 'attendance_confirmed': return '✅ 출석 확인됨'
+    case 'no_show_confirmed': return '🚨 노쇼 확정 (보증금 forfeit)'
     default:                  return '알림'
   }
 }
@@ -215,6 +217,15 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
       const amt = typeof payload?.refund_amount === 'number' ? payload.refund_amount : 0
       return `${amt.toLocaleString()}원 환불 완료.`
     }
+    case 'attendance_confirmed': {
+      const pool = typeof payload?.forfeited_pool === 'number' ? payload.forfeited_pool : 0
+      const ns = typeof payload?.no_show_count === 'number' ? payload.no_show_count : 0
+      return ns > 0
+        ? `노쇼 ${ns}명. ${pool.toLocaleString()}원 분배 받음.`
+        : '양쪽 모두 출석 확인.'
+    }
+    case 'no_show_confirmed':
+      return '약속 장소에 안 나타나서 보증금이 forfeit 됐어요.'
     default:                  return ''
   }
 }

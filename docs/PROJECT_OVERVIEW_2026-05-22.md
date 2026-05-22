@@ -4,7 +4,7 @@
 > 이 한 문서만 읽으면 어디까지 진행됐고 다음에 뭘 해야 하는지 알 수 있다.
 >
 > 더 자세한 결정 기록은 `docs/UNDERSTANDING_REVIEW_ROOM_2026-05-21.md` (D-01~D-12)
-> + `docs/PLAN_2026-05-22_FINAL.md` (결정 8-1~8-22).
+> + `docs/PLAN_2026-05-22_FINAL.md` (결정 8-1~8-24).
 
 ---
 
@@ -146,6 +146,13 @@ Storage:   Supabase Storage (사진)
   │   ├ 약속 시간/장소 표시 (z37 get_match_detail + match_meetings)
   │   ├ 카운트다운 (D-N / N시간 후 / 시작 시각 도달)
   │   ├ 핸드폰 자동 공개 패널: 약속 시간 도달 시 phone reveal (z36)
+  │   ├ GPS 체크인 (약속 30분 전 ~ +2시간, z45)
+  │   │   ├ within_radius=TRUE → 출석자
+  │   │   └ within_radius=FALSE → 범위 밖 (다시 시도 안내)
+  │   ├ 약속 + 30분 후 "노쇼 처리" 버튼 (출석자만)
+  │   │   → finalize_no_show RPC
+  │   │   → 노쇼 자동 forfeit + 출석자 균등 분배 (z41 자동 호출)
+  │   │   → ⚠️ 노쇼 발생 시 z42 구걸 UX 진입 차단
   │   └ "매칭 취소" 버튼 (리더만)
   ├ completed 상태 (z37 lazy: confirmed + scheduled_start + 4h):
   │   ├ groups.status=completed (z38 트리거)
@@ -232,6 +239,7 @@ Storage:   Supabase Storage (사진)
   - kind: match_created / match_confirmed / match_completed / phone_revealed / review_request / friend_request_received / meeting_reminder / **continuation_choice_request** / **both_continue** / **partner_paid_zero** / **refund_processed** (z42 확장)
 - **`match_continuation_choices`** (z42): match_id+user_id UNIQUE, choice(continue/end)
 - **`deposit_refund_requests`** (z42): match_id+user_id UNIQUE, requested_refund_amount, zero_refund_reasons[], zero_refund_comment, status
+- **`admins`** (z44): user_id PK, role(admin/super_admin), granted_by, granted_at, notes
 
 ---
 
@@ -282,10 +290,11 @@ Storage:   Supabase Storage (사진)
 ─ z41 no_show_penalty_distribution ★ 결정 8-9 자동화
 ─ z42 continuation_choice_and_refund_request ★ 결정 8-22 (구걸 UX 백엔드)
 ─ z43 continuation_trigger_update_and_expire ★ 7일/14일 만료 + z39 트리거 갱신
-─ z44 admin_role_and_helpers       ★ NEW: 운영자 권한 인프라
+─ z44 admin_role_and_helpers       ★ 운영자 권한 인프라 (결정 8-23)
+─ z45 gps_checkin_and_finalize_no_show ★ GPS 노쇼 자동 확정 + 구걸 차단 (결정 8-24)
 ```
 
-**정적 검증**: 42 files 통과 (z44 포함). cross-branch `match_meetings/venues` 는 dynamic SQL + to_regclass 우회.
+**정적 검증**: 43 files 통과 (z45 포함). cross-branch `match_meetings/venues` 는 dynamic SQL + to_regclass 우회.
 
 ---
 
@@ -319,7 +328,8 @@ PERFORM set_config('app.bypass_<table>_guard', 'off', TRUE);
 - `app.bypass_notifications_guard` (z39)
 - `app.bypass_mcc_guard` (z42 match_continuation_choices)
 - `app.bypass_drr_guard` (z42 deposit_refund_requests)
-- `app.bypass_admins_guard` (z44 NEW)
+- `app.bypass_admins_guard` (z44)
+- `app.bypass_attendances_guard` (z45)
 
 ---
 
@@ -358,6 +368,8 @@ PERFORM set_config('app.bypass_<table>_guard', 'off', TRUE);
 | `refund_processed` | submit_refund_request 처리 + 14일 만료 자동 환불 | /match/[id] |
 | `friend_request_received` | friend_requests INSERT (z40 트리거) | /friends |
 | `meeting_reminder` | enqueue_meeting_reminders() cron (z40) | /match/[id] |
+| `attendance_confirmed` | finalize_no_show 결과 출석자에게 (z45) | /match/[id] |
+| `no_show_confirmed` | finalize_no_show 결과 노쇼에게 (z45) | /match/[id] |
 
 cron 호출 권장 주기:
 - `enqueue_meeting_reminders()`: 5분 마다
@@ -369,7 +381,7 @@ cron 호출 권장 주기:
 
 ---
 
-## 11. 핵심 결정 기록 (D-01~D-12 + 8-1~8-22)
+## 11. 핵심 결정 기록 (D-01~D-12 + 8-1~8-24)
 
 ### D 결정 (앱 컨셉, 2026-05-21)
 - D-01~D-06: 프로필 7단계 구성
@@ -401,6 +413,8 @@ cron 호출 권장 주기:
 - **8-20**: **매칭 자동 완료** — confirmed → completed lazy (scheduled_start + 4h, z37)
 - **8-21**: **in-app 알림 시스템** (z39). 외부 SMS/push 는 v1.1
 - **8-22 ⭐**: **구걸 UX 환불 (z42)** — 자동 환불 폐기. 사용자 능동 선택. 양쪽 continue 면 자동 전액, 한쪽 end → 환불 선택. 전액 시 3000→2000→1000 구걸. 0원 시 상대편 자동 알림. **앱 수익 = deposit - 사용자 선택 환불액**
+- **8-23**: **운영자 권한 인프라 (z44)** — admins 테이블 + is_admin() + 모든 RLS USING 에 admin bypass + grant/revoke_admin RPC + revenue view. v1 1인 super_admin SQL Editor 운영. v1.1 페이지.
+- **8-24 ⭐**: **GPS 노쇼 자동 확정 (z45)** — 약속 시간 + 30분 후 finalize_no_show 호출 (출석자만). attendances within_radius=FALSE 거나 없는 사람 = 노쇼 확정. z41 자동 호출 + deposits forfeited 처리. 노쇼 발생 시 z42 구걸 UX 진입 차단 (구걸 멘트 없이 forfeit). batch_finalize_no_shows cron 자동화. **GPS 가 진실의 판단자**.
 
 ---
 
@@ -418,8 +432,9 @@ deposit (1인 20,000원) 의 운명:
         ├ 부분 선택: (deposit - 선택액) 앱 수익
         └ 0원 선택: 전액 앱 수익 + 상대편 자동 알림
 
-  CASE C 노쇼:
-    → forfeit, 출석자 균등 분배 (앱 수익 0)
+  CASE C 노쇼 (GPS finalize_no_show 로 판정, z45):
+    → 노쇼 deposit forfeit, 출석자 균등 분배 (앱 수익 0)
+    → 구걸 UX 진입 자체 차단 (continuation/refund RPC 에서 forfeited 검사)
 
   CASE D 7일 무응답 (continuation 미선택):
     → 자동 'end' → 14일 무응답 (refund 미선택)
