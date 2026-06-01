@@ -33,8 +33,8 @@ export default function WorldcupPage() {
           const meta = await loadIdealMetadata()
           if (cancelled) return
           setMetadata(meta)
-          // 개발 환경: 남성 유저가 여성 이상형 월드컵을 보는 상태로 기본 실행
-          setGender('male')
+          // 개발 환경: 여성 유저가 남성 이상형 월드컵을 보는 상태로 기본 실행
+          setGender('female')
           setLoaded(true)
           return
         }

@@ -54,7 +54,18 @@ export interface PreferredAppearance {
   worldcup_completed_at: string | null
 }
 
-export interface MatchingProfile extends PreferredAppearance {
+export interface PreferredPersonality {
+  preferred_personality_vector: Record<string, number> | null
+  preferred_personality_delta_vector: Record<string, number> | null
+  preferred_personality_type_weights: Record<string, number> | null
+  preferred_personality_primary_type: string | null
+  preferred_personality_secondary_type: string | null
+  personality_preference_answer_logs: unknown | null
+  personality_preference_confidence: number | null
+  personality_preference_completed_at: string | null
+}
+
+export interface MatchingProfile extends PreferredAppearance, PreferredPersonality {
   user_id: string
   gender: Gender
   age: number

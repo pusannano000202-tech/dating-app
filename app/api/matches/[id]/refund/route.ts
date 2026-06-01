@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import { appFeeToRefundAmount, normalizeAppFeeAmount } from '@/lib/refund/fee-flow'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -7,8 +9,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await readJson(req)
-  const refundAmount = typeof body.refund_amount === 'number' && body.refund_amount >= 0
-    ? Math.floor(body.refund_amount) : null
+  const appFeeAmount = typeof body.app_fee_amount === 'number'
+    ? normalizeAppFeeAmount(body.app_fee_amount, DEPOSIT_AMOUNT)
+    : null
+  const refundAmount = appFeeAmount !== null
+    ? appFeeToRefundAmount(appFeeAmount, DEPOSIT_AMOUNT)
+    : typeof body.refund_amount === 'number' && body.refund_amount >= 0
+      ? Math.floor(body.refund_amount)
+      : null
   if (refundAmount === null) {
     return NextResponse.json({ error: 'invalid_refund_amount' }, { status: 400 })
   }

@@ -57,10 +57,8 @@ export default function ContinuationPage() {
         return
       }
       await refresh()
-      if (choice === 'end') {
-        // 환불 선택 흐름으로 진입
-        router.push(`/match/${encodeURIComponent(matchId)}/refund`)
-      }
+      // 'end' 시: 자동 전액 환불 처리됨 (z47 트리거). 별도 페이지 진입 X.
+      // 'continue' 시: 양쪽 모두 continue 도달했는지 화면에서 확인 후 사용자가 /refund 진입.
     } finally {
       setBusy(false)
     }
@@ -75,7 +73,7 @@ export default function ContinuationPage() {
           </Link>
           <div>
             <h1 className="text-xl font-black">이 만남, 이어갈까요?</h1>
-            <p className="text-xs text-gray-500 mt-0.5">양쪽 모두 ‘이어간다’ 선택 시 보증금 전액 자동 환불</p>
+            <p className="text-xs text-gray-500 mt-0.5">이어가기 선택 시 매칭비 정산으로 이동</p>
           </div>
         </header>
 
@@ -95,24 +93,61 @@ export default function ContinuationPage() {
             {state.both_continue && (
               <section className="glass-card rounded-3xl p-6 text-center mb-4">
                 <Heart size={40} className="mx-auto mb-3 text-rose-400" />
-                <p className="text-lg font-black gradient-fate-text">양쪽 모두 이어가기로 했어요</p>
-                <p className="mt-2 text-xs text-gray-500">
-                  보증금 전액 자동 환불 + 핸드폰은 약속 시간 이후 자동 공개돼요.
+                <p className="text-lg font-black gradient-fate-text">양쪽 모두 이어가기로 했어요 💜</p>
+                <p className="mt-3 text-sm text-gray-300 leading-relaxed">
+                  우리 덕분에 잘 연결됐죠? 🥺<br />
+                  보증금 환불받기 전에 운영비 조금만 남겨주실래요?
+                </p>
+                <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
+                  보증금 20,000원 중 앱에게 줄 매칭비를 직접 선택할 수 있어요.<br />
+                  앱 운영 + 다음 매칭 풀 유지에 큰 도움이 돼요.
                 </p>
                 <Link
-                  href={`/match/${encodeURIComponent(matchId)}`}
+                  href={`/match/${encodeURIComponent(matchId)}/refund`}
                   className="btn-gradient w-full block py-3 rounded-2xl text-sm font-bold mt-5"
+                >
+                  환불 금액 선택하러 가기 →
+                </Link>
+                <p className="mt-2 text-[10px] text-gray-600">
+                  14일 안에 선택 안 하면 자동으로 전액 환불돼요.
+                </p>
+              </section>
+            )}
+
+            {/* any_end 도달 (one_or_more end) — 자동 환불 처리됨, 평가만 안내 */}
+            {state.any_end && !state.both_continue && (
+              <section className="glass-card rounded-3xl p-5 mb-4 border border-emerald-400/15 bg-emerald-500/[0.04]">
+                <HeartCrack size={28} className="mx-auto mb-2 text-gray-300" />
+                <p className="text-sm font-bold text-center text-gray-200">
+                  이 만남은 여기서 마무리됐어요
+                </p>
+                <p className="mt-2 text-xs text-gray-500 text-center leading-relaxed">
+                  한 명이라도 ‘충분’을 선택하면 모두 보증금이 자동 전액 환불돼요.<br />
+                  돈 떼지 않을게요. 좋은 만남 되시길.
+                </p>
+                <Link
+                  href={`/match/${encodeURIComponent(matchId)}/review`}
+                  className="block w-full py-3 rounded-2xl text-sm border border-white/15 text-gray-300 hover:border-white/30 text-center mt-4"
+                >
+                  만남 평가 작성 (선택)
+                </Link>
+                <Link
+                  href={`/match/${encodeURIComponent(matchId)}`}
+                  className="block w-full py-3 rounded-2xl text-sm text-center mt-2 text-gray-500"
                 >
                   매칭 상세로 돌아가기
                 </Link>
               </section>
             )}
 
-            {state.my_choice === null && !state.both_continue && (
+            {state.my_choice === null && !state.both_continue && !state.any_end && (
               <section className="glass-card rounded-3xl p-5 mb-4">
-                <p className="text-sm text-gray-300 mb-4 leading-relaxed">
-                  오늘 만남 어땠어요?<br />
-                  계속 이어갈 의사가 있다면 양쪽 모두 ‘이어갈래요’를 선택해주세요.
+                <p className="text-sm text-gray-300 mb-2 leading-relaxed">
+                  오늘 만남 어땠어요?
+                </p>
+                <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
+                  • 양쪽 모두 ‘이어갈래요’ → 매칭비 직접 선택 (앱에 얼마 줄지 결정)<br />
+                  • 한 명이라도 ‘충분’ → 모두 자동 전액 환불 (돈 안 떼요)
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -134,7 +169,7 @@ export default function ContinuationPage() {
                   >
                     <HeartCrack size={28} className="mx-auto mb-2 text-gray-400" />
                     <p className="text-sm font-bold">한 번이면 충분</p>
-                    <p className="text-[10px] text-gray-500 mt-1">평가 + 환불 선택</p>
+                    <p className="text-[10px] text-gray-500 mt-1">자동 전액 환불</p>
                   </button>
                 </div>
 
@@ -144,23 +179,19 @@ export default function ContinuationPage() {
               </section>
             )}
 
-            {state.my_choice && !state.both_continue && (
-              <section className="glass-card rounded-3xl p-5 mb-4">
-                <p className="text-sm font-bold mb-2">
-                  내 선택: {state.my_choice === 'continue' ? '이어갈래요 💜' : '한 번이면 충분'}
+            {/* 본인은 continue 선택했지만 아직 상대 응답 대기 */}
+            {state.my_choice === 'continue' && !state.both_continue && !state.any_end && (
+              <section className="glass-card rounded-3xl p-5 mb-4 border border-amber-400/20 bg-amber-500/[0.04]">
+                <p className="text-sm font-bold mb-1 text-amber-200">
+                  💜 이어갈래요 선택 완료
                 </p>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  현재 양쪽 그룹 응답 — {state.continue_count}/{state.total_participants} 이어가기,
-                  {' '}{state.end_count} 종료.
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  상대 응답 대기 중 — {state.continue_count}/{state.total_participants} 이어가기.
                 </p>
-                {state.any_end && state.my_choice === 'end' && (
-                  <Link
-                    href={`/match/${encodeURIComponent(matchId)}/refund`}
-                    className="btn-gradient w-full block mt-4 py-3 rounded-2xl text-sm font-bold"
-                  >
-                    보증금 환불 선택하러 가기
-                  </Link>
-                )}
+                <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
+                  양쪽 모두 이어가기 선택 시 매칭비를 선택할 수 있어요.<br />
+                  한 명이라도 ‘충분’ 누르면 자동 전액 환불.
+                </p>
               </section>
             )}
           </>

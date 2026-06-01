@@ -3,10 +3,12 @@
 import { usePathname } from 'next/navigation'
 
 const STEPS = [
+  { label: '학교인증', path: '/profile/school' },
   { label: '기본정보', path: '/profile/basic' },
   { label: '이상형', path: '/profile/worldcup' },
   { label: '사진',   path: '/profile/photos' },
   { label: '성격',   path: '/profile/survey' },
+  { label: '상대성격', path: '/profile/personality-preference' },
   { label: '시간대', path: '/profile/schedule' },
   { label: '가중치', path: '/profile/preferences' },
 ]

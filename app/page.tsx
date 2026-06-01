@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { isSupabaseConfigured } from '@/lib/utils'
 import DestinyLogo from '@/components/DestinyLogo'
 import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
-import { aggregate as aggregatePoolStats } from '@/app/api/match-pool/stats/route'
+import { aggregateMatchPoolStats, type MatchPoolStatsRow } from '@/lib/match-pool-stats'
 
 type ServerSupabaseClient = ReturnType<typeof createServerClient>
 
@@ -19,7 +19,7 @@ async function loadPoolStats(supabase: ServerSupabaseClient | null): Promise<Poo
   if (!supabase) return EMPTY_POOL
   const { data, error } = await supabase.rpc('get_match_pool_stats')
   if (error) return EMPTY_POOL
-  return aggregatePoolStats((data ?? []) as Parameters<typeof aggregatePoolStats>[0])
+  return aggregateMatchPoolStats((data ?? []) as MatchPoolStatsRow[])
 }
 
 function LandingPage({ poolStats }: { poolStats: PoolStats }) {
@@ -107,6 +107,14 @@ export default async function Home() {
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return <LandingPage poolStats={poolStats} />
+
+  const { data: appUser } = await supabase
+    .from('users')
+    .select('school_email_verified_at')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (!appUser?.school_email_verified_at) redirect('/profile/school')
 
   const { data: profile } = await supabase
     .from('profiles')

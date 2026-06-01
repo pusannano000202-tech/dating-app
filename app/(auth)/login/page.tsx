@@ -2,10 +2,13 @@
 
 import { Suspense, useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { CircleUserRound, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { getSupabaseConfigIssue } from '@/lib/utils'
 import DestinyLogo from '@/components/DestinyLogo'
 
 type Step = 'phone' | 'otp'
+type OAuthProvider = 'kakao' | 'google'
 
 function toE164(raw: string): string {
   const digits = raw.replace(/\D/g, '')
@@ -35,11 +38,13 @@ function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') ?? '/profile/basic'
+  const supabaseConfigIssue = getSupabaseConfigIssue()
 
   const [step, setStep] = useState<Step>('phone')
   const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [resendCooldown, setResendCooldown] = useState(0)
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -61,6 +66,10 @@ function LoginContent() {
 
   async function sendOtp() {
     setError(null)
+    if (supabaseConfigIssue) {
+      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
+      return
+    }
     if (!phone.trim()) { setError('번호를 입력해줘.'); return }
     setLoading(true)
     try {
@@ -76,8 +85,37 @@ function LoginContent() {
     }
   }
 
+  async function signInWithProvider(provider: OAuthProvider) {
+    setError(null)
+    if (supabaseConfigIssue) {
+      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
+      return
+    }
+
+    setOauthLoading(provider)
+    try {
+      const supabase = createClient()
+      const callback = new URL('/auth/callback', window.location.origin)
+      callback.searchParams.set('next', redirectTo)
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: callback.toString(),
+        },
+      })
+      if (err) throw err
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '소셜 로그인을 시작하지 못했어요.')
+      setOauthLoading(null)
+    }
+  }
+
   async function verifyOtp() {
     setError(null)
+    if (supabaseConfigIssue) {
+      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
+      return
+    }
     const token = otp.join('')
     if (token.length < 6) { setError('인증번호 6자리를 입력해줘.'); return }
     setLoading(true)
@@ -162,6 +200,34 @@ function LoginContent() {
 
         {/* ── 로그인 카드 ── */}
         <div className="glass-card rounded-3xl p-6">
+          {step === 'phone' && (
+            <div className="mb-5 space-y-2.5">
+              <button
+                type="button"
+                onClick={() => signInWithProvider('kakao')}
+                disabled={Boolean(oauthLoading)}
+                className="w-full rounded-xl bg-[#FEE500] px-4 py-3.5 text-sm font-black text-black flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                <MessageCircle className="w-4 h-4" strokeWidth={2.5} />
+                {oauthLoading === 'kakao' ? '카카오 연결 중...' : '카카오로 계속하기'}
+              </button>
+              <button
+                type="button"
+                onClick={() => signInWithProvider('google')}
+                disabled={Boolean(oauthLoading)}
+                className="w-full rounded-xl bg-white px-4 py-3.5 text-sm font-black text-gray-900 flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                <CircleUserRound className="w-4 h-4" strokeWidth={2.5} />
+                {oauthLoading === 'google' ? 'Google 연결 중...' : 'Google로 계속하기'}
+              </button>
+              <div className="flex items-center gap-3 py-1">
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-[11px] text-gray-600">또는</span>
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+            </div>
+          )}
+
           {step === 'phone' ? (
             <>
               <p className="text-base font-bold mb-0.5">휴대폰 번호로 시작하기</p>

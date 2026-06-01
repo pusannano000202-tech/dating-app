@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Crosshair, ClipboardList, Camera, Brain, CalendarDays, SlidersHorizontal, Check } from 'lucide-react'
+import { Crosshair, ClipboardList, Camera, Brain, CalendarDays, SlidersHorizontal, Check, Heart } from 'lucide-react'
 import DestinyLogo from '@/components/DestinyLogo'
 
 const CONFETTI = ['🎉', '✨', '🎊', '💜', '🌟', '💫', '🎈', '⭐']
@@ -15,6 +15,7 @@ const COMPLETED_STEPS = [
   { label: '이상형 월드컵', Icon: Crosshair,       color: 'text-violet-400' },
   { label: '프로필 사진',   Icon: Camera,          color: 'text-pink-400' },
   { label: '성격 분석',     Icon: Brain,           color: 'text-purple-400' },
+  { label: '상대 성격 취향', Icon: Heart,           color: 'text-rose-400' },
   { label: '가능 시간대',   Icon: CalendarDays,    color: 'text-violet-400' },
   { label: '이상형 가중치', Icon: SlidersHorizontal, color: 'text-fuchsia-400' },
 ]

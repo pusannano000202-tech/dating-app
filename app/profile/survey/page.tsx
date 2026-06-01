@@ -76,7 +76,7 @@ export default function SurveyPage() {
           { onConflict: 'user_id' }
         )
       if (dbErr) throw dbErr
-      router.push('/profile/schedule')
+      router.push('/profile/personality-preference')
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해줘.')
       setSaving(false)

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import {
   Crosshair, ClipboardList, Camera,
   Brain, CalendarDays, SlidersHorizontal, ChevronRight,
+  Heart,
   AlertTriangle, Pencil, Check,
 } from 'lucide-react'
 import DestinyLogo from '@/components/DestinyLogo'
@@ -41,6 +42,13 @@ const EDIT_SECTIONS = [
     iconBg: 'from-purple-600 to-fuchsia-700',
     title: '성격 테스트',
     desc: 'Big5 성격 테스트 다시 하기',
+  },
+  {
+    href: '/profile/personality-preference',
+    icon: Heart,
+    iconBg: 'from-rose-600 to-fuchsia-700',
+    title: '상대 성격 취향',
+    desc: '끌리는 상대 성격 다시 고르기',
   },
   {
     href: '/profile/schedule',
