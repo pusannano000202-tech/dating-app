@@ -5,6 +5,7 @@ This folder is the canonical entry point for active product and implementation p
 ## Quick Links
 
 - [Current Implementation Status](./CURRENT_IMPLEMENTATION_STATUS.md)
+- [Document Organization Plan](./DOCUMENT_ORGANIZATION_PLAN.md)
 - [Active Plan Index](./ACTIVE_PLAN_INDEX.md)
 - [Card-Then-Deposit Flow Design](./2026-06-02-proposed-match-card-deposit-flow.md)
 - [Card-Then-Deposit Implementation Plan](./2026-06-02-card-deposit-flow-implementation-plan.md)
