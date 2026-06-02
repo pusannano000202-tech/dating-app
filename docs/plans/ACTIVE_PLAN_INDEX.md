@@ -20,6 +20,7 @@
 |---|---|---|
 | [가매칭 카드-보증금 흐름 설계](../product/matching/2026-06-02-proposed-match-card-deposit-flow.md) | 보증금 선결제 제거, 카드 작성 후 보증금 결제, 익명 멤버 카드 공개 설계 | 진행 중 |
 | [구현 계획](../product/matching/2026-06-02-card-deposit-flow-implementation-plan.md) | 코드/DB/UI 변경 순서 | 진행 중 |
+| [운영자 콘솔 계획](./2026-06-02-operator-console-plan.md) | 매칭 승인 게이트 + 매칭 근거 보고 + 외모 점수 보정 | 설계 확정 대기 |
 
 ## 기존 참조 문서
 

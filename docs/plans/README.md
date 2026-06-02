@@ -11,6 +11,7 @@ This folder is the canonical entry point for active product and implementation p
 - [Card-Then-Deposit Flow Design](../product/matching/2026-06-02-proposed-match-card-deposit-flow.md)
 - [Card-Then-Deposit Implementation Plan](../product/matching/2026-06-02-card-deposit-flow-implementation-plan.md)
 - [Pre-Meeting Excitement Info Plan](./2026-06-02-pre-meeting-excitement-info-plan.md)
+- [Operator Console Plan (매칭 승인·근거 보고·외모 점수 보정)](./2026-06-02-operator-console-plan.md)
 
 ## Management Rules
 
