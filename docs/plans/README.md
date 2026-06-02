@@ -6,10 +6,11 @@ This folder is the canonical entry point for active product and implementation p
 
 - [Current Implementation Status](./CURRENT_IMPLEMENTATION_STATUS.md)
 - [Document Organization Plan](./DOCUMENT_ORGANIZATION_PLAN.md)
+- [Document Organization Result (Codex용 결과 보고서)](./DOCUMENT_ORGANIZATION_RESULT_2026-06-02.md)
 - [Active Plan Index](./ACTIVE_PLAN_INDEX.md)
 - [Card-Then-Deposit Flow Design](../product/matching/2026-06-02-proposed-match-card-deposit-flow.md)
 - [Card-Then-Deposit Implementation Plan](../product/matching/2026-06-02-card-deposit-flow-implementation-plan.md)
-- [Internet Debate Daily Card Plan](./2026-06-02-internet-debate-daily-card-plan.md)
+- [Pre-Meeting Excitement Info Plan](./2026-06-02-pre-meeting-excitement-info-plan.md)
 
 ## Management Rules
 
