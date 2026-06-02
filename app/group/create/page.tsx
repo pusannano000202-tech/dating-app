@@ -748,7 +748,7 @@ export default function GroupCreatePage() {
 
                 <button
                   type="button"
-                  disabled={saving || !canEnterQueue || !myDepositPaid}
+                  disabled={saving || !canEnterQueue}
                   onClick={enterQueue}
                   className="btn-gradient w-full py-4 rounded-2xl font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
@@ -767,7 +767,7 @@ export default function GroupCreatePage() {
                 )}
                 {canEnterQueue && !myDepositPaid && (
                   <p className="mt-3 text-center text-xs text-amber-300/80">
-                    내 보증금부터 결제하면 큐에 들어갈 수 있어요.
+                    보증금은 가매칭 후 카드 작성 단계에서 결제해요.
                   </p>
                 )}
                 <p className="mt-2 text-center text-[10px] text-gray-700">
