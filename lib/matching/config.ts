@@ -17,7 +17,7 @@
 
 export const OPERATIONS_CONFIG = {
   /** 보증금 1인당 금액 (KRW). 결정 8-1. */
-  DEPOSIT_AMOUNT_KRW: 20000,
+  DEPOSIT_AMOUNT_KRW: 10000,
 
   /** 매칭 배치 요일 (0=일, 1=월, ..., 6=토). 결정 2-0. */
   BATCH_WEEKDAY: 6,

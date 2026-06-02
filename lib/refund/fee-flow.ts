@@ -12,12 +12,12 @@ export type AppFeeFlowDecision =
       requiresPartnerZeroNotification: boolean
     }
 
-export function normalizeAppFeeAmount(appFee: number, depositAmount = 20000): number {
+export function normalizeAppFeeAmount(appFee: number, depositAmount = 10000): number {
   if (!Number.isFinite(appFee)) return 0
   return Math.min(depositAmount, Math.max(0, Math.floor(appFee)))
 }
 
-export function appFeeToRefundAmount(appFee: number, depositAmount = 20000): number {
+export function appFeeToRefundAmount(appFee: number, depositAmount = 10000): number {
   return depositAmount - normalizeAppFeeAmount(appFee, depositAmount)
 }
 

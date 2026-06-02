@@ -63,4 +63,4 @@ export const APPEARANCE_TYPE_INFO: Record<
   },
 }
 
-export const DEPOSIT_AMOUNT = 20000 // 원 (1인당 보증금)
+export const DEPOSIT_AMOUNT = 10000 // 원 (1인당 보증금)

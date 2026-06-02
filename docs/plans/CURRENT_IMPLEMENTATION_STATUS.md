@@ -5,6 +5,7 @@ Last updated: 2026-06-02
 ## Completed
 
 - Queue entry no longer requires a paid deposit.
+- Deposit amount is 10,000 KRW per person, so a 3-person group pays 30,000 KRW total.
 - Match detail now supports: card submission -> deposit payment -> leader confirmation.
 - Server confirmation is gated by all active members in the caller group having submitted cards and paid/held deposits.
 - Group anonymous alias schema/helper exists for the future daily reveal layer.

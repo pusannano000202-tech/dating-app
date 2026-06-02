@@ -8,10 +8,10 @@ import {
 } from '../../lib/refund/fee-flow'
 
 test('appFeeToRefundAmount converts user-facing app fee into backend refund amount', () => {
-  assert.equal(appFeeToRefundAmount(0, 20000), 20000)
-  assert.equal(appFeeToRefundAmount(1000, 20000), 19000)
-  assert.equal(appFeeToRefundAmount(3000, 20000), 17000)
-  assert.equal(appFeeToRefundAmount(20000, 20000), 0)
+  assert.equal(appFeeToRefundAmount(0, 10000), 10000)
+  assert.equal(appFeeToRefundAmount(1000, 10000), 9000)
+  assert.equal(appFeeToRefundAmount(3000, 10000), 7000)
+  assert.equal(appFeeToRefundAmount(10000, 10000), 0)
 })
 
 test('getAppFeeFlowDecision accepts 3000원 이상 without begging', () => {
