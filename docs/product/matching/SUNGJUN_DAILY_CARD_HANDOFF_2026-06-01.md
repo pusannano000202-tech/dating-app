@@ -4,7 +4,7 @@
 > **받는 사람**: 성준 (그룹/매칭 엔진 + 매칭 풀 흐름 담당)
 > **목적**: 데일리카드 기능이 **성준 영역(매칭 풀 진입 / 매칭 confirm / match_meetings)** 과 만나는 지점을 합의하기 위한 인수서.
 > **상태**: 스펙 초안만 존재, **코드 0줄**. 이 문서로 경계를 먼저 합의한 뒤 z50 마이그 착수.
-> **원본 스펙**: `docs/DAILY_CARD_SPEC_2026-05-28.md` (전체 설계 — 먼저 통독 권장)
+> **원본 스펙**: `docs/product/matching/DAILY_CARD_SPEC_2026-05-28.md` (전체 설계 — 먼저 통독 권장)
 
 ---
 
@@ -146,9 +146,9 @@
 
 | 문서 | 용도 |
 |---|---|
-| `docs/DAILY_CARD_SPEC_2026-05-28.md` | 데일리카드 전체 설계 (이 인수서의 원본) |
+| `docs/product/matching/DAILY_CARD_SPEC_2026-05-28.md` | 데일리카드 전체 설계 (이 인수서의 원본) |
 | `docs/CODEX_MASTER_2026-05-23.md` | 프로젝트 전체 마스터 (§3 진행률, §8 데이터모델, §10 bypass guard, §17 인터페이스 계약) |
-| `docs/INTERFACE_CONTRACT.md` | 충현/성준 경계 (필독) |
+| `docs/engineering/INTERFACE_CONTRACT.md` | 충현/성준 경계 (필독) |
 | `lib/types.ts` L41~66 | `PreferredAppearance`/`PreferredPersonality` — D-1 카드 데이터 출처 |
 | `supabase/migrations/20260525_z49_preferred_personality_vector.sql` | z49 — D-1 카드가 재활용하는 선호 벡터 |
 

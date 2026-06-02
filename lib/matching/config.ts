@@ -4,7 +4,7 @@
  * 모든 매칭 관련 상수는 이 파일에서만 관리한다.
  * 코드 본문에 매직 넘버를 박지 말 것 — 가상 데이터 실험 시 이 파일만 바꾸면 되도록.
  *
- * Ref: docs/MATCHING_SYSTEM_PLAN.md 8-X 결정 사항 (2026-05-21)
+ * Ref: docs/product/matching/MATCHING_SYSTEM_PLAN.md 8-X 결정 사항 (2026-05-21)
  *      lib/appearance/preference.ts, lib/appearance/vector.ts
  *
  * 변경 이력:

@@ -44,14 +44,16 @@
 ├── supabase/
 │   └── migrations/         # DB 마이그레이션 (변경 시 반드시 PR + 상대방 리뷰)
 └── docs/
-    ├── COLLABORATION.md    # 협업 규칙 (필독)
-    └── INTERFACE_CONTRACT.md  # 모듈 간 인터페이스 계약 (필독)
+    ├── README.md                      # 문서 인덱스 (영역별 분류 규칙)
+    └── engineering/
+        ├── COLLABORATION.md           # 협업 규칙 (필독)
+        └── INTERFACE_CONTRACT.md      # 모듈 간 인터페이스 계약 (필독)
 ```
 
 ## Claude Code가 작업 시작 전 반드시 읽어야 할 파일
 
-1. `docs/INTERFACE_CONTRACT.md` — 두 모듈의 경계와 계약
-2. `docs/COLLABORATION.md` — 브랜치 전략과 충돌 방지 규칙
+1. `docs/engineering/INTERFACE_CONTRACT.md` — 두 모듈의 경계와 계약
+2. `docs/engineering/COLLABORATION.md` — 브랜치 전략과 충돌 방지 규칙
 3. `supabase/migrations/` — 현재 DB 스키마 상태
 
 ## 절대 규칙 (Claude Code 포함)
@@ -59,4 +61,4 @@
 - `lib/types.ts` 수정 시 → 반드시 PR 열고 상대방 리뷰 받기
 - `supabase/migrations/` 신규 파일 추가 시 → 상대방 확인 없이 main 머지 금지
 - `main` 브랜치에 직접 push 금지
-- 인터페이스 계약(`docs/INTERFACE_CONTRACT.md`)에 정의된 타입/컬럼명 임의 변경 금지
+- 인터페이스 계약(`docs/engineering/INTERFACE_CONTRACT.md`)에 정의된 타입/컬럼명 임의 변경 금지

@@ -15,7 +15,7 @@ import type { IdealImageItem } from './metadata'
 
 export type RoundLabel = '64강' | '32강' | '16강' | '8강' | '4강' | '결승' | '최종우승'
 
-// docs/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md 10-2 표
+// docs/product/profile-worldcup/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md 10-2 표
 export const ROUND_WEIGHT: Record<RoundLabel, number> = {
   '64강': 1.00,
   '32강': 1.15,

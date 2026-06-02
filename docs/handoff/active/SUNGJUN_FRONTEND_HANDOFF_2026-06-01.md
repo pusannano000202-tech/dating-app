@@ -379,7 +379,7 @@ interface PreferredPersonality {
 
 1. 이 문서로 **프론트 컨벤션 숙지** (§3 흐름, §4 디자인, §5 route 템플릿)
 2. `SUNGJUN_DAILY_CARD_HANDOFF_2026-06-01.md` §7 **3문항 회신** (match_meetings 확정 시점 등)
-3. `docs/DAILY_CARD_SPEC_2026-05-28.md` — 카드 종류/협동 활동 상세
+3. `docs/product/matching/DAILY_CARD_SPEC_2026-05-28.md` — 카드 종류/협동 활동 상세
 4. 충현이 z50 마이그 + RPC 작성 → 성준은 §6 템플릿으로 화면 구현
 5. `npm run typecheck` + `npm run build` PASS 확인 후 PR
 
@@ -391,9 +391,9 @@ interface PreferredPersonality {
 |---|---|
 | **이 문서** | 프론트 전체 구조·컨벤션·디자인·템플릿 |
 | `SUNGJUN_DAILY_CARD_HANDOFF_2026-06-01.md` | 데일리카드가 성준 매칭 흐름과 만나는 3접점 합의 |
-| `docs/DAILY_CARD_SPEC_2026-05-28.md` | 데일리카드 기능 전체 설계 |
+| `docs/product/matching/DAILY_CARD_SPEC_2026-05-28.md` | 데일리카드 기능 전체 설계 |
 | `docs/CODEX_MASTER_2026-05-23.md` | 프로젝트 마스터 (DB모델 §8, bypass guard §10, E2E §6) |
-| `docs/INTERFACE_CONTRACT.md` | 충현/성준 영역 경계 |
+| `docs/engineering/INTERFACE_CONTRACT.md` | 충현/성준 영역 경계 |
 | `app/globals.css` | 디자인 시스템 원본 (클래스 정의) |
 
 ---

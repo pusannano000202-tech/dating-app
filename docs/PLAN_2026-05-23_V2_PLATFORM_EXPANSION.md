@@ -305,7 +305,7 @@ v2에서는 `calm` 같은 새 축을 추가할지 검토한다. 현재 appearanc
 
 ### 8.4 성준 성격 선호 벡터와 사용자 방식 통합
 
-성준의 `docs/handoff/SUNGJUN_PERSONALITY_VECTOR_HANDOFF.md` 핵심은 "본인 성격"과 "내가 끌리는 상대 성격"을 분리하는 것이다. 이 방향은 사용자 방식과 충돌하지 않고, 오히려 다음처럼 합치는 것이 맞다.
+성준의 `docs/handoff/active/SUNGJUN_PERSONALITY_VECTOR_HANDOFF.md` 핵심은 "본인 성격"과 "내가 끌리는 상대 성격"을 분리하는 것이다. 이 방향은 사용자 방식과 충돌하지 않고, 오히려 다음처럼 합치는 것이 맞다.
 
 1. 본인 성격: 기존 Big5 설문으로 `self_personality_vector`를 만든다.
 2. 선호 상대 성격: 성준 방식의 `preferred_personality_vector`를 만든다.

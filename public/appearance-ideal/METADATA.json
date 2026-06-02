@@ -2,10 +2,10 @@
   "_meta": {
     "version": 4,
     "generated_at": "2026-05-21T21:08:05.741Z",
-    "design_doc": "docs/IDEAL_WORLDCUP_64_DESIGN.md",
-    "plan_doc": "docs/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md",
-    "schema_doc": "docs/APPEARANCE_ANALYSIS_SCHEMA.md",
-    "codex_prompt_doc": "docs/handoff/CODEX_FEMALE_64_IMAGE_GENERATION_PROMPT.md",
+    "design_doc": "docs/product/profile-worldcup/IDEAL_WORLDCUP_64_DESIGN.md",
+    "plan_doc": "docs/product/profile-worldcup/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md",
+    "schema_doc": "docs/product/profile-worldcup/APPEARANCE_ANALYSIS_SCHEMA.md",
+    "codex_prompt_doc": "docs/handoff/archive/CODEX_FEMALE_64_IMAGE_GENERATION_PROMPT.md",
     "notes": [
       "Female ideal worldcup pool replaced with Codex final 64 selected set.",
       "Female pool uses only appearance_score_normalized <= 77 images.",

@@ -18,17 +18,17 @@
 
 | 문서 | 목적 | 상태 |
 |---|---|---|
-| [가매칭 카드-보증금 흐름 설계](./2026-06-02-proposed-match-card-deposit-flow.md) | 보증금 선결제 제거, 카드 작성 후 보증금 결제, 익명 멤버 카드 공개 설계 | 진행 중 |
-| [구현 계획](./2026-06-02-card-deposit-flow-implementation-plan.md) | 코드/DB/UI 변경 순서 | 진행 중 |
+| [가매칭 카드-보증금 흐름 설계](../product/matching/2026-06-02-proposed-match-card-deposit-flow.md) | 보증금 선결제 제거, 카드 작성 후 보증금 결제, 익명 멤버 카드 공개 설계 | 진행 중 |
+| [구현 계획](../product/matching/2026-06-02-card-deposit-flow-implementation-plan.md) | 코드/DB/UI 변경 순서 | 진행 중 |
 
 ## 기존 참조 문서
 
 | 문서 | 쓸 곳 |
 |---|---|
-| [Daily Card Spec](../DAILY_CARD_SPEC_2026-05-28.md) | 기존 데일리 카드 카드풀/공개 일정 아이디어 |
-| [Sungjun Daily Card Handoff](../handoff/SUNGJUN_DAILY_CARD_HANDOFF_2026-06-01.md) | 매칭 엔진 경계, `match_meetings` 의존성 |
+| [Daily Card Spec](../product/matching/DAILY_CARD_SPEC_2026-05-28.md) | 기존 데일리 카드 카드풀/공개 일정 아이디어 |
+| [Sungjun Daily Card Handoff](../product/matching/SUNGJUN_DAILY_CARD_HANDOFF_2026-06-01.md) | 매칭 엔진 경계, `match_meetings` 의존성 |
 | [Master Plan](../CODEX_MASTER_2026-05-23.md) | 전체 제품 흐름과 DB/RPC 맥락 |
-| [Interface Contract](../INTERFACE_CONTRACT.md) | 프론트/매칭/DB 경계 |
+| [Interface Contract](../engineering/INTERFACE_CONTRACT.md) | 프론트/매칭/DB 경계 |
 | [Meeting Agenda](../SUNGJUN_MEETING_AGENDA_2026-06-01.md) | 성준 미팅 논의 안건 |
 
 ## 정리 원칙

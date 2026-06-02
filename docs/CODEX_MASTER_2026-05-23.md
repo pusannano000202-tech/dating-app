@@ -624,7 +624,7 @@ CSS 애니메이션 (`globals.css`에 정의):
 현황: python/matching/ 미작성
 차단: 매칭 배치 실행 → matches row 생성 안 됨
       match_pool 에 그룹이 쌓여도 자동으로 매칭되지 않음
-진입: docs/MATCHING_SYSTEM_PLAN.md + lib/matching/*.ts 인터페이스 참고
+진입: docs/product/matching/MATCHING_SYSTEM_PLAN.md + lib/matching/*.ts 인터페이스 참고
 ```
 
 ### 2. 토스페이먼츠 실결제 (충현 영역)
@@ -650,7 +650,7 @@ CSS 애니메이션 (`globals.css`에 정의):
 
 ## 17. 인터페이스 계약 (충현/성준 경계)
 
-**자세한 내용**: `docs/INTERFACE_CONTRACT.md`
+**자세한 내용**: `docs/engineering/INTERFACE_CONTRACT.md`
 
 ### 충현 소유
 - `users`, `profiles`, `photos`, `personality_scores`, `appearance_scores`
@@ -734,7 +734,7 @@ app/debug/sanji/page.tsx               ⚠️ 임시 캐릭터 프리뷰 (출시
 1. `lib/types.ts` 수정 → **PR + 성준 리뷰 필수**
 2. `supabase/migrations/` 신규 추가 → **상대방 확인 없이 main 머지 금지**
 3. `main` 브랜치 직접 push **금지**
-4. `docs/INTERFACE_CONTRACT.md` 정의된 타입/컬럼명 임의 변경 **금지**
+4. `docs/engineering/INTERFACE_CONTRACT.md` 정의된 타입/컬럼명 임의 변경 **금지**
 5. `appearance_score_raw` 외부 노출 **금지** (appearance_scores 테이블 내부만)
 6. 매칭 엔진 내부값 (`score_breakdown`, `batch_id`, `is_forced`) 사용자 노출 **금지**
 7. bypass guard 패턴 없이 RLS 테이블 직접 INSERT/UPDATE **금지**
@@ -908,7 +908,7 @@ v2 주요 축:
 성준 자료 확인:
 
 - `git fetch origin`으로 원격을 갱신했다.
-- 성준 성격 설계는 현재 브랜치의 `docs/handoff/SUNGJUN_PERSONALITY_VECTOR_HANDOFF.md`에 들어와 있다.
+- 성준 성격 설계는 현재 브랜치의 `docs/handoff/active/SUNGJUN_PERSONALITY_VECTOR_HANDOFF.md`에 들어와 있다.
 - `origin/main`, `origin/matching/group-engine`에는 해당 handoff 파일이 없고, 현재 작업 브랜치 `profile/post-worldcup-decisions-2026-05-21`에 포함된 상태다.
 
 코드 반영:
