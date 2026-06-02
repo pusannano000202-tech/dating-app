@@ -16,8 +16,11 @@
 - `docs/plans/ACTIVE_PLAN_INDEX.md`: current planning index.
 - `docs/plans/2026-06-02-proposed-match-card-deposit-flow.md`: approved product design.
 - `supabase/migrations/20260602_z50_card_then_deposit_flow.sql`: database transition for queue entry, aliases, and provisional match metadata.
+- `supabase/migrations/20260602_z51_match_card_confirmation_gate.sql`: card submission table and confirmation gate.
 - `app/group/create/page.tsx`: remove up-front deposit CTA from queue entry and explain deposit happens after match.
 - `app/api/match-pool/enter/route.ts`: same endpoint, relies on updated RPC.
+- `app/api/matches/[id]/card/route.ts`: save/read my post-match card.
+- `app/match/[id]/page.tsx`: post-match card, deposit, and confirmation readiness UI.
 - `lib/matching/member-alias.ts`: deterministic alias pool helper for future tests/UI.
 - `tests/matching/member-alias.test.ts`: alias generation regression tests.
 
@@ -167,3 +170,37 @@ Expected: both commands exit 0.
 Run: `git diff --stat`
 
 Expected: only docs, matching helper/tests, group UI, and z50 migration are changed.
+
+## Task 6: Implement Post-Match Card And Deposit Gate
+
+**Files:**
+- Create: `supabase/migrations/20260602_z51_match_card_confirmation_gate.sql`
+- Create: `app/api/matches/[id]/card/route.ts`
+- Modify: `app/match/[id]/page.tsx`
+
+- [x] **Step 1: Add card submission table**
+
+Create `match_card_submissions` with one card per `match_id + user_id`, RLS for match participants, and self insert/update.
+
+- [x] **Step 2: Add card save/read API**
+
+Add `/api/matches/[id]/card` so a signed-in match participant can save their anonymous card after a provisional match.
+
+- [x] **Step 3: Gate `confirm_match`**
+
+Redefine `confirm_match` so the caller group's active members must all have:
+
+```text
+card submitted
+paid/held deposit
+```
+
+before that side can confirm.
+
+- [x] **Step 4: Add match detail readiness fields**
+
+Expose my/opp group card counts, deposit counts, active counts, and readiness flags through `get_match_detail`.
+
+- [x] **Step 5: Add match detail UI**
+
+Add card textarea, card save CTA, post-match deposit CTA, readiness counters, and a disabled leader confirm button until my group is ready.

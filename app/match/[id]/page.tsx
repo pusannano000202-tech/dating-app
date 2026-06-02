@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Loader2, LockKeyhole, MapPin, Navigation, Phone, Users } from 'lucide-react'
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
 
 interface MatchDetail {
   match_id: string
@@ -22,6 +23,16 @@ interface MatchDetail {
   venue_name: string | null
   venue_address: string | null
   venue_map_url: string | null
+  my_card_submitted_at: string | null
+  my_card_content_text: string | null
+  my_group_active_count: number
+  my_group_card_submitted_count: number
+  my_group_deposit_paid_count: number
+  my_group_ready: boolean
+  opp_group_active_count: number
+  opp_group_card_submitted_count: number
+  opp_group_deposit_paid_count: number
+  opp_group_ready: boolean
 }
 
 interface ConnectionRow {
@@ -55,6 +66,9 @@ export default function MatchDetailPage() {
   const [attendance, setAttendance] = useState<AttendanceState | null>(null)
   const [gpsBusy, setGpsBusy] = useState(false)
   const [gpsMessage, setGpsMessage] = useState<string | null>(null)
+  const [cardText, setCardText] = useState('')
+  const [cardSaving, setCardSaving] = useState(false)
+  const [depositSaving, setDepositSaving] = useState(false)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -75,6 +89,7 @@ export default function MatchDetailPage() {
       }
       const data = await res.json() as { match: MatchDetail }
       setMatch(data.match)
+      setCardText(data.match.my_card_content_text ?? '')
     } catch {
       setError('매칭 정보를 불러오지 못했어요.')
     } finally {
@@ -211,7 +226,7 @@ export default function MatchDetailPage() {
   }
 
   async function confirmMatch() {
-    if (saving) return
+    if (saving || !match?.my_group_ready) return
     setSaving(true)
     setError(null)
     try {
@@ -249,11 +264,67 @@ export default function MatchDetailPage() {
     }
   }
 
+  async function saveCard() {
+    if (cardSaving || !match) return
+    const trimmed = cardText.trim()
+    if (trimmed.length < 10 || trimmed.length > 500) {
+      setError('카드는 10자 이상 500자 이하로 작성해주세요.')
+      return
+    }
+    setCardSaving(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/card`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_text: trimmed }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateMatchError(data.error))
+        return
+      }
+      await refresh()
+    } catch {
+      setError('카드 저장에 실패했어요.')
+    } finally {
+      setCardSaving(false)
+    }
+  }
+
+  async function payDeposit() {
+    if (depositSaving || !match) return
+    setDepositSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/deposits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: match.my_group_id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateMatchError(data.error))
+        return
+      }
+      await refresh()
+    } catch {
+      setError('보증금 결제에 실패했어요.')
+    } finally {
+      setDepositSaving(false)
+    }
+  }
+
   function translateMatchError(code?: string) {
     switch (code) {
       case 'not_match_leader':    return '리더만 확정/취소할 수 있어요.'
       case 'match_not_pending':   return '이미 처리된 매칭이에요.'
       case 'match_not_cancelable': return '취소할 수 없는 매칭이에요.'
+      case 'match_card_incomplete': return '우리 그룹 전원이 카드를 작성해야 확정할 수 있어요.'
+      case 'deposit_not_paid':    return '우리 그룹 전원이 보증금을 결제해야 확정할 수 있어요.'
+      case 'invalid_card_content': return '카드는 10자 이상 500자 이하로 작성해주세요.'
+      case 'deposit_already_exists': return '이미 결제한 보증금이 있어요.'
+      case 'not_group_member':    return '그룹 멤버만 보증금을 결제할 수 있어요.'
       default:                     return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
@@ -387,13 +458,91 @@ export default function MatchDetailPage() {
               </div>
             </section>
 
+            {match.match_status === 'pending' && (
+              <section className="glass-card rounded-3xl p-5 mb-4">
+                <div className="mb-4">
+                  <p className="text-sm font-bold">가매칭 확정 준비</p>
+                  <p className="mt-1 text-xs text-gray-500 leading-relaxed">
+                    먼저 각자 상대에게 공개될 카드를 작성하고, 그다음 보증금을 결제해요.
+                    우리 그룹 전원이 완료하면 리더가 확정할 수 있어요.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <ProgressPill
+                    label="우리 카드"
+                    current={match.my_group_card_submitted_count}
+                    total={match.my_group_active_count}
+                  />
+                  <ProgressPill
+                    label="우리 보증금"
+                    current={match.my_group_deposit_paid_count}
+                    total={match.my_group_active_count}
+                  />
+                  <ProgressPill
+                    label="상대 카드"
+                    current={match.opp_group_card_submitted_count}
+                    total={match.opp_group_active_count}
+                  />
+                  <ProgressPill
+                    label="상대 보증금"
+                    current={match.opp_group_deposit_paid_count}
+                    total={match.opp_group_active_count}
+                  />
+                </div>
+
+                <label className="block text-xs font-bold text-gray-300 mb-2">
+                  내 카드
+                </label>
+                <textarea
+                  value={cardText}
+                  onChange={(event) => setCardText(event.target.value)}
+                  maxLength={500}
+                  rows={5}
+                  className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-sm text-gray-100 outline-none focus:border-violet-400/40 resize-none"
+                  placeholder="좋아하는 음식, 주말 취향, 대화 스타일처럼 익명으로 공개해도 되는 내용을 적어주세요."
+                />
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <p className="text-[11px] text-gray-600">
+                    {cardText.trim().length}/500
+                    {match.my_card_submitted_at ? ` · 저장됨 ${formatDateTime(match.my_card_submitted_at)}` : ''}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={saveCard}
+                    disabled={cardSaving || cardText.trim().length < 10}
+                    className="px-3 py-2 rounded-xl text-xs font-bold border border-violet-400/30 bg-violet-500/10 text-violet-200 disabled:opacity-40"
+                  >
+                    {cardSaving ? '저장 중' : '카드 저장'}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={payDeposit}
+                  disabled={depositSaving || match.my_group_deposit_paid_count >= match.my_group_active_count}
+                  className="mt-4 w-full py-3 rounded-2xl text-sm font-bold border border-emerald-400/30 bg-emerald-500/10 text-emerald-200 disabled:opacity-40"
+                >
+                  {match.my_group_deposit_paid_count >= match.my_group_active_count
+                    ? '우리 그룹 보증금 결제 완료'
+                    : `보증금 ${DEPOSIT_AMOUNT.toLocaleString()}원 결제 (mock)`}
+                </button>
+
+                {!match.my_group_ready && (
+                  <p className="mt-3 text-center text-xs text-amber-300/80">
+                    우리 그룹 전원이 카드와 보증금을 완료하면 확정 버튼이 열려요.
+                  </p>
+                )}
+              </section>
+            )}
+
             {/* 매칭 액션: pending 일 때 confirm/cancel, confirmed 일 때 cancel 만 */}
             {match.match_status === 'pending' && !match.my_confirmed_at && (
               <div className="flex gap-2 mb-2">
                 <button
                   type="button"
                   onClick={confirmMatch}
-                  disabled={saving}
+                  disabled={saving || !match.my_group_ready}
                   className="btn-gradient flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40"
                 >
                   매칭 확정 (리더)
@@ -609,6 +758,22 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-gray-500">{label}</span>
       <span className={`text-xs font-bold ${highlight ? 'text-violet-200' : 'text-gray-300'}`}>{value}</span>
+    </div>
+  )
+}
+
+function ProgressPill({ label, current, total }: { label: string; current: number; total: number }) {
+  const done = total > 0 && current >= total
+  return (
+    <div className={`rounded-2xl border px-3 py-2 ${
+      done
+        ? 'border-emerald-400/25 bg-emerald-500/10'
+        : 'border-white/10 bg-white/[0.03]'
+    }`}>
+      <p className="text-[11px] text-gray-500">{label}</p>
+      <p className={`mt-0.5 text-sm font-bold ${done ? 'text-emerald-200' : 'text-gray-300'}`}>
+        {current}/{total}
+      </p>
     </div>
   )
 }
