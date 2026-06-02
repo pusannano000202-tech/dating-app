@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { requiresSchoolEmailForPath } from './lib/auth/school-email'
 
-const PROTECTED_PREFIXES = ['/profile', '/group', '/match', '/friends', '/notifications']
+const PROTECTED_PREFIXES = ['/profile', '/group', '/match', '/friends', '/notifications', '/admin']
 
 export async function middleware(request: NextRequest) {
   // Supabase 키 없으면 인증 체크 스킵 (로컬 UI 확인용)

@@ -159,29 +159,37 @@ CREATE TABLE public.appearance_score_audits (
 
 ## 8. 구현 순서 (Phase + 체크박스)
 
-### Phase 0 — 콘솔 토대
-- [ ] `/admin` 레이아웃 + `is_admin()` 가드 (비운영자 redirect)
-- [ ] z54 `app_config` + `match_requires_approval` seed + `set_app_config` RPC
+> **2026-06-02 구현됨**: §4 결정 D1~D6 추천값 채택. 마이그 번호는 z54(daily_card_draw_policy)
+> 충돌로 **z55/z56/z57** 로 배정됨.
 
-### Phase 1 — 외모 점수 (③, 의존성 먼저)
-- [ ] GPT 채점 파이프라인이 `self_appearance_score_auto` 저장 (사진 업로드 시, D6)
-- [ ] z55 audit 테이블 + `admin_set/clear_appearance_override` RPC
-- [ ] `/admin/users/[id]` — 사진 + auto 점수/벡터 + 보정 입력 + 이력
+### Phase 0 — 콘솔 토대 ✅
+- [x] `/admin` 레이아웃 + `is_admin()` 가드 (비운영자 redirect, 로컬은 dev bypass) — `app/admin/layout.tsx`, `middleware.ts`
+- [x] `app_config` + `match_requires_approval` seed + `get/set_app_config` RPC — z55
+
+### Phase 1 — 외모 점수 (③)
+- [ ] GPT 채점 파이프라인이 `self_appearance_score_auto` 저장 (사진 업로드 시, D6) — **미구현 (OpenAI 키 필요, 별도 작업)**
+- [x] z56 audit 테이블 + `admin_set/clear_appearance_override` RPC + `admin_get_user_profile`
+- [x] `/admin/users/[id]` — 사진 + auto/override/effective 점수 + 보정 입력/해제
 
 ### Phase 2 — 매칭 배치 + 승인 게이트 (①②)
-- [ ] z54 `matches.approval_status` 등 + RLS/`get_my_matches` 필터
-- [ ] 배치 러너 (§7) + `pending_review` 생성 + 요약 알림
-- [ ] `admin_list_pending_matches` / `admin_get_match_review` / `admin_review_match` RPC
+- [x] z55 `matches.approval_status` + RLS/`get_my_matches`/`get_match_detail` 게이트 + `admin_create_pending_match`
+- [x] greedy 배정 헬퍼 `lib/matching/assign.ts` + 테스트 (배치 러너의 배정 단계)
+- [ ] 배치 러너 풀 로더(`match_pool`→`GroupSummary`) + `/api/admin/run-batch` + 요약 알림 — **미구현 (라이브 DB 검증 필요)**
+- [x] `admin_list_pending_matches` / `admin_get_match_review` / `admin_review_match` RPC — z57
 
-### Phase 3 — 리뷰 콘솔 UI
-- [ ] `/admin/matches/review` 큐 (점수·근거·승인/거절 버튼)
-- [ ] `/admin/matches/[id]` 단일 상세 (양 그룹 프로필 + score_breakdown 시각화)
-- [ ] `/admin` 대시보드 (풀·통계·대기 건수)
+### Phase 3 — 리뷰 콘솔 UI ✅
+- [x] `/admin/matches/review` 큐 (점수·근거·승인/거절 버튼)
+- [x] `/admin/matches/[id]` 단일 상세 (양 그룹 멤버 프로필 + score_breakdown)
+- [x] `/admin` 대시보드 (리뷰 대기 건수 + 승인 게이트 토글)
 
-### Phase 4 — 검증
-- [ ] `npm run typecheck` + `npm run build` + `verify-migrations.py` PASS
-- [ ] 비운영자 `/admin` 접근 차단 확인
-- [ ] 승인 플래그 off 시 매칭 자동 노출 확인
+### Phase 4 — 검증 ✅
+- [x] `npm run typecheck` ✅ + `npm run build` ✅ + `npm run test:matching` ✅ 22/22 + `verify-migrations.py` (내 파일 0 issues)
+- [ ] 비운영자 `/admin` 접근 차단 — 라이브 DB 수동 확인 필요
+- [ ] 승인 플래그 off 시 매칭 자동 노출 — 라이브 DB 수동 확인 필요
+
+### 남은 2가지 (외부 의존)
+1. **GPT 채점 파이프라인** — `self_appearance_score_auto` 자동 채움. 현재 운영자 보정(override)은 auto 없이도 동작하나, auto 가 있어야 "GPT가 적정한지 보고 보정" 워크플로가 완성됨.
+2. **배치 러너 풀 로더** — `admin_create_pending_match` RPC + `assign.ts` 는 준비됨. `match_pool` 의 그룹들을 `GroupSummary` 로 적재하는 RPC/어댑터만 추가하면 `/api/admin/run-batch` 로 자동 생성 가능. 라이브 DB 스키마 검증이 필요해 이번 커밋에서 보류.
 
 ---
 
