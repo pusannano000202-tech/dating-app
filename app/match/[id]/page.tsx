@@ -54,6 +54,16 @@ interface AttendanceState {
   caller_is_no_show: boolean
 }
 
+interface DailyCard {
+  day_offset: number
+  reveal_at: string
+  revealed: boolean
+  alias: string
+  card_kind: string
+  title: string
+  content_text: string | null
+}
+
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
@@ -69,6 +79,8 @@ export default function MatchDetailPage() {
   const [cardText, setCardText] = useState('')
   const [cardSaving, setCardSaving] = useState(false)
   const [depositSaving, setDepositSaving] = useState(false)
+  const [dailyCards, setDailyCards] = useState<DailyCard[]>([])
+  const [dailyCardsLoading, setDailyCardsLoading] = useState(false)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -123,6 +135,29 @@ export default function MatchDetailPage() {
       setConnections([])
     }
   }, [match?.match_status, refreshConnections])
+
+  const refreshDailyCards = useCallback(async () => {
+    setDailyCardsLoading(true)
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/daily-cards`)
+      if (res.ok) {
+        const data = await res.json() as { cards: DailyCard[] }
+        setDailyCards(data.cards ?? [])
+      }
+    } catch {
+      // ignore - cards are a progressive reveal layer
+    } finally {
+      setDailyCardsLoading(false)
+    }
+  }, [matchId])
+
+  useEffect(() => {
+    if (match?.scheduled_start) {
+      refreshDailyCards()
+    } else {
+      setDailyCards([])
+    }
+  }, [match?.scheduled_start, refreshDailyCards])
 
   const refreshAttendance = useCallback(async () => {
     try {
@@ -609,6 +644,70 @@ export default function MatchDetailPage() {
                 </Link>
               </div>
             ) : null}
+
+            {match.scheduled_start && (
+              <section className="glass-card rounded-3xl p-5 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <CalendarClock size={16} className="text-violet-200" />
+                  <h3 className="text-sm font-bold">일일 카드 공개</h3>
+                </div>
+                <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+                  만남 전 D-6부터 D-1까지 매일 09:00에 상대 멤버 카드가 하나씩 열려요.
+                  이름 대신 가상 별칭으로만 보여줘요.
+                </p>
+
+                {dailyCardsLoading && dailyCards.length === 0 ? (
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <Loader2 size={14} className="animate-spin" />
+                    카드 일정을 불러오는 중
+                  </div>
+                ) : dailyCards.length === 0 ? (
+                  <p className="text-xs text-gray-600">
+                    약속 시간이 확정되면 카드 일정이 자동으로 만들어져요.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {dailyCards.map((card) => (
+                      <div
+                        key={`${card.day_offset}-${card.alias}`}
+                        className={`rounded-2xl border px-3 py-3 ${
+                          card.revealed
+                            ? 'border-violet-400/30 bg-violet-500/10'
+                            : 'border-white/10 bg-white/[0.03]'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-bold">
+                              D{card.day_offset} · {card.title}
+                            </p>
+                            <p className="mt-0.5 text-[11px] text-gray-500">
+                              {formatDateTime(card.reveal_at)} 공개
+                            </p>
+                          </div>
+                          <span className={`text-[10px] px-2 py-1 rounded-lg border flex-shrink-0 ${
+                            card.revealed
+                              ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200'
+                              : 'border-white/10 text-gray-500'
+                          }`}>
+                            {card.revealed ? '열림' : '잠김'}
+                          </span>
+                        </div>
+                        {card.revealed ? (
+                          <p className="mt-3 text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            {card.content_text || '상대가 아직 카드를 작성하지 않았어요.'}
+                          </p>
+                        ) : (
+                          <p className="mt-3 text-xs text-gray-600">
+                            아직 공개 시간이 아니에요.
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* GPS 체크인 + 노쇼 처리 패널 — confirmed/completed + 약속 시간 도달 후 */}
             {(match.match_status === 'confirmed' || match.match_status === 'completed')

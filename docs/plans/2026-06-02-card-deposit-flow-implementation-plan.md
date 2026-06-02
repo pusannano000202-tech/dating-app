@@ -204,3 +204,43 @@ Expose my/opp group card counts, deposit counts, active counts, and readiness fl
 - [x] **Step 5: Add match detail UI**
 
 Add card textarea, card save CTA, post-match deposit CTA, readiness counters, and a disabled leader confirm button until my group is ready.
+
+## Task 7: Auto-Populate Anonymous Member Aliases
+
+**Files:**
+- Create: `supabase/migrations/20260602_z52_auto_match_member_aliases.sql`
+
+- [x] **Step 1: Add alias population function**
+
+Create `populate_match_member_aliases(match_id)` so each viewer group sees the opposite group's active members as stable animal aliases.
+
+- [x] **Step 2: Add `matches` insert trigger**
+
+Create an `AFTER INSERT` trigger on `matches` so any matching engine path automatically creates aliases.
+
+- [x] **Step 3: Backfill existing matches**
+
+Run the population function for existing rows in `matches` during the migration.
+
+## Task 8: Add Daily Card Reveal Schedule
+
+**Files:**
+- Create: `supabase/migrations/20260602_z53_daily_card_schedule.sql`
+- Create: `app/api/matches/[id]/daily-cards/route.ts`
+- Modify: `app/match/[id]/page.tsx`
+
+- [x] **Step 1: Add D-6..D-1 schedule table**
+
+Create `match_daily_card_schedule` with one card per viewer group per day.
+
+- [x] **Step 2: Add schedule assignment RPC**
+
+Create `assign_match_daily_card_schedule(match_id)` using the scheduled meeting time and anonymous member aliases.
+
+- [x] **Step 3: Add daily cards API**
+
+Add `/api/matches/[id]/daily-cards` and hide card content until each `reveal_at`.
+
+- [x] **Step 4: Add match detail card calendar**
+
+Show opened/locked cards in the match detail page once a meeting time is scheduled.
