@@ -1,6 +1,6 @@
 # 부팅 — Plan 2: 성별 기능 + 팀 만들기 리뉴얼 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** UserProfile/TeamMember에 gender 필드 추가, 혼성 팀 매칭 로직(합산 남:여=1:1) 구현, 테스트 플로우에 성별 선택 화면 추가, 팀 만들기 페이지를 초대 코드 skeleton 방식으로 전면 교체한다.
 
@@ -31,13 +31,13 @@
 **Files:**
 - Modify: `types/matching.ts`
 
-- [ ] **Step 1: 기존 타입 파일 확인**
+- [x] **Step 1: 기존 타입 파일 확인**
 
 ```bash
 cat types/matching.ts
 ```
 
-- [ ] **Step 2: gender 필드 추가**
+- [x] **Step 2: gender 필드 추가**
 
 `UserProfile`, `TeamMember`, `TeamProfile`에 gender 추가. 기존 코드 하위 호환을 위해 optional(`?`)로 선언:
 
@@ -95,7 +95,7 @@ export type MatchResult = {
 };
 ```
 
-- [ ] **Step 3: 빌드 에러 없는지 확인**
+- [x] **Step 3: 빌드 에러 없는지 확인**
 
 ```bash
 npx tsc --noEmit 2>&1 | head -20
@@ -103,7 +103,7 @@ npx tsc --noEmit 2>&1 | head -20
 
 Expected: 에러 없음 (optional 필드이므로 기존 코드 영향 없음)
 
-- [ ] **Step 4: 커밋**
+- [x] **Step 4: 커밋**
 
 ```bash
 git add types/matching.ts
@@ -117,13 +117,13 @@ git commit -m "feat: add Gender type and optional gender fields to UserProfile/T
 **Files:**
 - Modify: `lib/storage.ts`
 
-- [ ] **Step 1: 기존 storage.ts 확인**
+- [x] **Step 1: 기존 storage.ts 확인**
 
 ```bash
 cat lib/storage.ts
 ```
 
-- [ ] **Step 2: gender 필드가 자연스럽게 저장/로드되도록 확인**
+- [x] **Step 2: gender 필드가 자연스럽게 저장/로드되도록 확인**
 
 `UserProfile`과 `TeamProfile`은 JSON 직렬화되므로 `gender` 필드는 자동으로 포함됨. storage.ts 자체는 타입만 import하므로 타입 변경만으로 충분.
 
@@ -144,7 +144,7 @@ export function saveUser(profile: UserProfile) {
 }
 ```
 
-- [ ] **Step 3: 커밋 (변경 있을 경우만)**
+- [x] **Step 3: 커밋 (변경 있을 경우만)**
 
 ```bash
 git add lib/storage.ts
@@ -159,13 +159,13 @@ git commit -m "feat: storage functions pass through gender field"
 - Modify: `lib/matching.ts`
 - Modify: `__tests__/matching.test.ts`
 
-- [ ] **Step 1: 기존 matching.ts 확인**
+- [x] **Step 1: 기존 matching.ts 확인**
 
 ```bash
 cat lib/matching.ts
 ```
 
-- [ ] **Step 2: 테스트 먼저 작성**
+- [x] **Step 2: 테스트 먼저 작성**
 
 ```ts
 // __tests__/matching.test.ts 에 추가 (기존 테스트 아래에 append)
@@ -209,7 +209,7 @@ describe("isGenderCompatible", () => {
 });
 ```
 
-- [ ] **Step 3: 테스트 실패 확인**
+- [x] **Step 3: 테스트 실패 확인**
 
 ```bash
 npm test -- --testPathPattern="matching" 2>&1 | tail -15
@@ -217,7 +217,7 @@ npm test -- --testPathPattern="matching" 2>&1 | tail -15
 
 Expected: FAIL — `isGenderCompatible is not a function`
 
-- [ ] **Step 4: isGenderCompatible 구현**
+- [x] **Step 4: isGenderCompatible 구현**
 
 `lib/matching.ts`의 기존 코드 아래에 추가:
 
@@ -248,7 +248,7 @@ export function rankTeams(myTeam: TeamProfile, candidates: TeamProfile[]): Match
 
 (기존 rankTeams 구현이 다르면 `.filter(team => isGenderCompatible(myTeam, team))` 를 map 앞에 체이닝)
 
-- [ ] **Step 5: 테스트 통과 확인**
+- [x] **Step 5: 테스트 통과 확인**
 
 ```bash
 npm test -- --testPathPattern="matching" 2>&1 | tail -15
@@ -256,7 +256,7 @@ npm test -- --testPathPattern="matching" 2>&1 | tail -15
 
 Expected: PASS (새 테스트 4개 + 기존 테스트 모두)
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 git add lib/matching.ts __tests__/matching.test.ts
@@ -270,7 +270,7 @@ git commit -m "feat: add isGenderCompatible and filter rankTeams by gender balan
 **Files:**
 - Modify: `app/test/page.tsx`
 
-- [ ] **Step 1: gender state 및 성별 선택 화면 추가**
+- [x] **Step 1: gender state 및 성별 선택 화면 추가**
 
 `app/test/page.tsx` 전체를 교체. 기존 로직은 유지하고 성별 선택 단계만 앞에 추가:
 
@@ -479,15 +479,15 @@ export default function TestPage() {
 }
 ```
 
-- [ ] **Step 2: 브라우저에서 플로우 확인**
+- [x] **Step 2: 브라우저에서 플로우 확인**
 
 `http://localhost:3000/test` → 성별 선택 화면 → 여자 탭 → 핑크 테두리 → "다음" 버튼 → 퀴즈 시작 → 완료 → 결과 화면
 
-- [ ] **Step 3: localStorage에 gender 저장 확인**
+- [x] **Step 3: localStorage에 gender 저장 확인**
 
 결과 화면에서 닉네임 입력 후 "팀 만들러 가기" → 브라우저 DevTools → Application → localStorage → `user` 키 → `{"nickname":"...","traits":{...},"gender":"female"}` 형태 확인
 
-- [ ] **Step 4: 커밋**
+- [x] **Step 4: 커밋**
 
 ```bash
 git add app/test/page.tsx
@@ -503,7 +503,7 @@ git commit -m "feat: add gender selection screen to test flow"
 
 기존 `extraMembers` / `MemberRoleCard` 방식 → 초대 코드 skeleton + 팀원 대기 상태 UI로 교체.
 
-- [ ] **Step 1: 전체 교체**
+- [x] **Step 1: 전체 교체**
 
 ```tsx
 // app/team/create/page.tsx
@@ -740,7 +740,7 @@ export default function TeamCreatePage() {
 }
 ```
 
-- [ ] **Step 2: 브라우저에서 확인**
+- [x] **Step 2: 브라우저에서 확인**
 
 `http://localhost:3000/team/create` →
 - 팀장 카드에 성별 뱃지 표시
@@ -748,7 +748,7 @@ export default function TeamCreatePage() {
 - "복사" 버튼 클릭 → "복사됨!" 2초 후 복귀
 - 대기 중 슬롯 2개 표시
 
-- [ ] **Step 3: TeamProfileCard 성별 구성 추가**
+- [x] **Step 3: TeamProfileCard 성별 구성 추가**
 
 `components/TeamProfileCard.tsx`의 팀 아이덴티티 블록에 성별 구성 뱃지 추가:
 
@@ -768,7 +768,7 @@ export default function TeamCreatePage() {
 </div>
 ```
 
-- [ ] **Step 4: 전체 테스트 확인**
+- [x] **Step 4: 전체 테스트 확인**
 
 ```bash
 npm test 2>&1 | tail -15
@@ -776,13 +776,13 @@ npm test 2>&1 | tail -15
 
 Expected: 모든 테스트 pass
 
-- [ ] **Step 5: 빌드 확인**
+- [x] **Step 5: 빌드 확인**
 
 ```bash
 npm run build 2>&1 | tail -5
 ```
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 git add app/team/create/page.tsx components/TeamProfileCard.tsx
