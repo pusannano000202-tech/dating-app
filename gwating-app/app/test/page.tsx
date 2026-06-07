@@ -66,16 +66,51 @@ export default function TestPage() {
 
   if (showNickname && resultRole) {
     const info = ROLE_LABELS[resultRole];
+    const traitLabels: Record<string, string> = {
+      atmosphereCoordination: "분위기 조율",
+      consideration:          "배려심",
+      participation:          "적극성",
+      respectfulness:         "예의/존중",
+      communicationBalance:   "소통 균형",
+    };
+
     return (
       <>
-        <AppHeader step={3} totalSteps={3} />
-        <main className="py-12 px-4">
-          <div className="max-w-[480px] mx-auto text-center">
-            <div className="text-5xl mb-4">{info.emoji}</div>
-            <h2 className="text-2xl font-bold text-ink mb-2">{info.name}</h2>
-            <p className="text-sm text-body mb-8">{info.desc}</p>
-            <div className="mb-6 text-left">
-              <label className="block text-sm font-semibold text-ink mb-2">
+        <AppHeader step={1} totalSteps={3} />
+        <main className="py-10 px-4 bg-white min-h-screen">
+          <div className="max-w-[480px] mx-auto">
+            {/* 역할 결과 */}
+            <div className="text-center mb-8">
+              <div className="text-[52px] mb-3 drop-shadow-sm">{info.emoji}</div>
+              <h2 className="text-2xl font-black text-ink tracking-[-0.5px] mb-2">{info.name}</h2>
+              <p className="text-sm text-muted leading-relaxed">{info.desc}</p>
+            </div>
+
+            {/* 성향 점수 바 */}
+            {finalTraits && (
+              <div className="bg-surface-soft rounded-card p-4 mb-6 flex flex-col gap-3">
+                {Object.entries(finalTraits).map(([key, value]) => (
+                  <div key={key} className="flex items-center gap-3">
+                    <span className="text-[10px] font-bold text-muted w-16 shrink-0 text-right">
+                      {traitLabels[key] ?? key}
+                    </span>
+                    <div className="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-[#ff8a65] rounded-full transition-all duration-500"
+                        style={{ width: `${(value / 5) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-black text-primary w-6 text-right">
+                      {value * 20}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 닉네임 입력 */}
+            <div className="mb-4">
+              <label className="block text-sm font-bold text-ink mb-2">
                 닉네임을 입력해주세요
               </label>
               <input
@@ -84,11 +119,11 @@ export default function TestPage() {
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="예: 민준"
                 maxLength={10}
-                className="w-full border border-hairline rounded-sm px-4 h-12 text-base text-ink focus:outline-none focus:border-primary"
+                className="w-full border-[1.5px] border-hairline rounded-[12px] px-4 h-12 text-base text-ink focus:outline-none focus:border-primary bg-white"
               />
             </div>
             <Button fullWidth onClick={handleSave} disabled={!nickname.trim()}>
-              팀 만들러 가기
+              팀 만들러 가기 →
             </Button>
           </div>
         </main>
@@ -99,9 +134,9 @@ export default function TestPage() {
   return (
     <>
       <AppHeader step={1} totalSteps={3} />
-      <main className="py-10 px-4 bg-canvas-warm min-h-screen">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-ink">나의 과팅 스타일은?</h1>
+      <main className="py-10 px-4 bg-white min-h-screen">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-black text-ink tracking-[-0.5px]">나의 과팅 스타일은?</h1>
           <p className="text-sm text-muted mt-1">상황을 읽고 솔직하게 골라주세요</p>
         </div>
         <QuizCard
