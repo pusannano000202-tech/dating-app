@@ -37,10 +37,12 @@ const config: Config = {
         sm:   "8px",
         md:   "14px",
         lg:   "20px",
+        card: "16px",
         full: "9999px",
       },
       boxShadow: {
-        card: "rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.10) 0 4px 8px",
+        card:    "rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.10) 0 4px 8px",
+        "btn-primary": "0 4px 18px rgba(255,90,111,0.28)",
       },
       fontSize: {
         hero:    ["32px", { lineHeight: "1.18", fontWeight: "700" }],
