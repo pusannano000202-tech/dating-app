@@ -18,16 +18,20 @@ export type MemberRole =
   | "considerate"
   | "reactor";
 
+export type Gender = "male" | "female";
+
 export type TeamMember = {
   nickname: string;
   role: MemberRole;
   traits?: Record<TraitKey, number>;
   isLeader?: boolean;
+  gender?: Gender;
 };
 
 export type UserProfile = {
   nickname: string;
   traits: Record<TraitKey, number>;
+  gender?: Gender;
 };
 
 export type TeamProfile = {
@@ -38,6 +42,8 @@ export type TeamProfile = {
   ageRange: string;
   mood: MoodKey;
   members: TeamMember[];
+  maleCount?: number;
+  femaleCount?: number;
 };
 
 export type MatchResult = {
