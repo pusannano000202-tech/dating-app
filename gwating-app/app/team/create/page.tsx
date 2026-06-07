@@ -104,37 +104,37 @@ export default function TeamCreatePage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div>
-              <label className="block text-sm font-semibold text-ink mb-2">팀 이름</label>
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">팀 이름</label>
               <input
                 type="text"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
-                placeholder="예: 서면 드리머즈"
+                placeholder="예: 컴공 왕자들, 경영 여신들"
                 maxLength={20}
-                className="w-full border border-hairline rounded-sm px-4 h-12 text-base text-ink focus:outline-none focus:border-primary"
+                className="w-full border-[1.5px] border-hairline rounded-[12px] px-4 h-12 text-base text-ink focus:outline-none focus:border-primary bg-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-ink mb-2">나이대</label>
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">나이대</label>
               <input
                 type="text"
                 value={ageRange}
                 onChange={(e) => setAgeRange(e.target.value)}
                 placeholder="예: 22~24"
                 maxLength={10}
-                className="w-full border border-hairline rounded-sm px-4 h-12 text-base text-ink focus:outline-none focus:border-primary"
+                className="w-full border-[1.5px] border-hairline rounded-[12px] px-4 h-12 text-base text-ink focus:outline-none focus:border-primary bg-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-ink mb-2">원하는 과팅 분위기</label>
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">원하는 과팅 분위기</label>
               <MoodSelector value={mood} onChange={setMood} />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-ink mb-2">팀장 (나)</label>
-              <div className="border border-primary bg-primary-soft rounded-md p-4 text-sm">
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">팀장 (나)</label>
+              <div className="bg-gradient-to-br from-primary-soft to-[#fff0f4] border-[1.5px] border-primary-disabled rounded-[14px] p-4 text-sm">
                 <span className="font-semibold text-ink">{leader.nickname}</span>
                 <span className="ml-2 text-primary font-semibold">
                   {leader.role === "moodMaker"   && "🔥 분위기 메이커형"}
@@ -147,7 +147,7 @@ export default function TeamCreatePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-ink mb-2">
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">
                 팀원 ({extraMembers.length}/4)
               </label>
               <div className="flex flex-col gap-3">
@@ -166,7 +166,7 @@ export default function TeamCreatePage() {
                   <button
                     type="button"
                     onClick={addMember}
-                    className="border border-dashed border-hairline rounded-md py-3 text-sm text-muted hover:border-primary hover:text-primary transition-colors"
+                    className="border-[1.5px] border-dashed border-hairline rounded-[12px] py-3 text-sm text-muted hover:border-primary hover:text-primary transition-colors"
                   >
                     + 팀원 추가
                   </button>
