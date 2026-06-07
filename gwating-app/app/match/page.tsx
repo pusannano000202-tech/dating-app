@@ -45,11 +45,11 @@ export default function MatchPage() {
   return (
     <>
       <AppHeader step={3} totalSteps={3} />
-      <main className="py-10 px-4 bg-canvas-warm min-h-screen">
+      <main className="py-10 px-4 bg-white min-h-screen">
         <div className="max-w-[640px] mx-auto">
-          <h1 className="text-2xl font-bold text-ink mb-1">추천 과팅 팀</h1>
-          <p className="text-sm text-muted mb-8">
-            <span className="font-semibold text-ink">{myTeam.teamName}</span>과 잘 어울릴 팀을 분위기·역할·조건 궁합으로 추천했어요.
+          <h1 className="text-2xl font-black text-ink tracking-[-0.5px] mb-1">추천 과팅 팀</h1>
+          <p className="text-xs text-muted mb-8">
+            <span className="font-bold text-ink">{myTeam.teamName}</span>과 잘 어울릴 팀을 분위기·역할·조건 궁합으로 추천했어요.
           </p>
           <div className="flex flex-col gap-4">
             {results.map((result, i) => (
