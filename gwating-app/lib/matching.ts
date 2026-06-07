@@ -98,11 +98,19 @@ export function calculateMatchScore(
   };
 }
 
+export function isGenderCompatible(teamA: TeamProfile, teamB: TeamProfile): boolean {
+  if (teamA.maleCount === undefined || teamB.maleCount === undefined) return true;
+  const totalMale = teamA.maleCount + teamB.maleCount;
+  const totalFemale = (teamA.femaleCount ?? 0) + (teamB.femaleCount ?? 0);
+  return totalMale === totalFemale;
+}
+
 export function rankTeams(
   myTeam: TeamProfile,
   candidates: TeamProfile[]
 ): MatchResult[] {
   return candidates
+    .filter((c) => isGenderCompatible(myTeam, c))
     .map((c) => calculateMatchScore(myTeam, c))
     .sort((a, b) => b.score - a.score);
 }
