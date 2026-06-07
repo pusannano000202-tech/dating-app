@@ -2,11 +2,11 @@ type Props = { reasons: string[] };
 
 export function MatchReasonList({ reasons }: Props) {
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col gap-1.5">
       {reasons.map((r, i) => (
-        <li key={i} className="flex gap-2 text-sm text-sky-ink bg-sky rounded-md px-3 py-2">
-          <span className="shrink-0">✦</span>
-          <span>{r}</span>
+        <li key={i} className="flex items-start gap-2 text-xs text-body leading-snug">
+          <span className="text-primary shrink-0 mt-0.5">✓</span>
+          {r}
         </li>
       ))}
     </ul>
