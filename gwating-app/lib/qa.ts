@@ -17,7 +17,7 @@ export function distributeQuestions(totalQuestions: number, daysLeft: number): n
  */
 export function getChemistryComment(myAnswer: string, theirAnswer: string): string {
   if (myAnswer === theirAnswer) {
-    return `둘 다 "${myAnswer.replace(/\s*[🔥🎯🤍✨🗣️📱😄🎮🍻🎤☕💬]/gu, "").trim()}" — 취향이 딱 맞네요! 😄`;
+    return `둘 다 같은 답변을 골랐어요 — 취향이 딱 맞네요! 😄`;
   }
   return `서로 다른 스타일이에요. 만나서 직접 이야기해봐요 😊`;
 }
