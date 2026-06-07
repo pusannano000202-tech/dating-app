@@ -1,6 +1,6 @@
 # 부팅 — Plan 3: 매칭 후 플로우 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 자동 매칭 완료 화면, 날짜·시간 조율, 일정 확정, Q&A 순번제 일일 공개, 당일 팀장 채팅(skeleton) 5개 신규 페이지를 구현한다.
 
@@ -35,7 +35,7 @@
 **Files:**
 - Create: `types/match-flow.ts`
 
-- [ ] **Step 1: 타입 파일 생성**
+- [x] **Step 1: 타입 파일 생성**
 
 ```ts
 // types/match-flow.ts
@@ -77,7 +77,7 @@ export type MatchFlowState = {
 };
 ```
 
-- [ ] **Step 2: 빌드 에러 없는지 확인**
+- [x] **Step 2: 빌드 에러 없는지 확인**
 
 ```bash
 npx tsc --noEmit 2>&1 | head -10
@@ -85,7 +85,7 @@ npx tsc --noEmit 2>&1 | head -10
 
 Expected: 에러 없음
 
-- [ ] **Step 3: 커밋**
+- [x] **Step 3: 커밋**
 
 ```bash
 git add types/match-flow.ts
@@ -99,7 +99,7 @@ git commit -m "feat: add MatchFlowState types for post-match flow"
 **Files:**
 - Create: `data/questions-by-mood.ts`
 
-- [ ] **Step 1: 질문 세트 생성**
+- [x] **Step 1: 질문 세트 생성**
 
 ```ts
 // data/questions-by-mood.ts
@@ -250,7 +250,7 @@ export const QUESTIONS_BY_MOOD: Record<MoodKey, QAQuestion[]> = {
 };
 ```
 
-- [ ] **Step 2: 커밋**
+- [x] **Step 2: 커밋**
 
 ```bash
 git add data/questions-by-mood.ts
@@ -265,7 +265,7 @@ git commit -m "feat: add Q&A question sets per mood (5 questions × 5 moods)"
 - Create: `lib/qa.ts`
 - Create: `__tests__/qa.test.ts`
 
-- [ ] **Step 1: 테스트 먼저 작성**
+- [x] **Step 1: 테스트 먼저 작성**
 
 ```ts
 // __tests__/qa.test.ts
@@ -311,7 +311,7 @@ describe("getChemistryComment", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 ```bash
 npm test -- --testPathPattern="qa" 2>&1 | tail -10
@@ -319,7 +319,7 @@ npm test -- --testPathPattern="qa" 2>&1 | tail -10
 
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 ```ts
 // lib/qa.ts
@@ -356,7 +356,7 @@ export function getTodayMemberIndex(dayNumber: number, teamSize: number): number
 }
 ```
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 ```bash
 npm test -- --testPathPattern="qa" 2>&1 | tail -10
@@ -364,7 +364,7 @@ npm test -- --testPathPattern="qa" 2>&1 | tail -10
 
 Expected: PASS
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add lib/qa.ts __tests__/qa.test.ts
@@ -379,7 +379,7 @@ git commit -m "feat: add Q&A distribution logic and chemistry comment generator"
 - Create: `lib/schedule.ts`
 - Create: `__tests__/schedule.test.ts`
 
-- [ ] **Step 1: 테스트 먼저 작성**
+- [x] **Step 1: 테스트 먼저 작성**
 
 ```ts
 // __tests__/schedule.test.ts
@@ -410,7 +410,7 @@ describe("getEarliestIntersection", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 ```bash
 npm test -- --testPathPattern="schedule" 2>&1 | tail -10
@@ -418,7 +418,7 @@ npm test -- --testPathPattern="schedule" 2>&1 | tail -10
 
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 ```ts
 // lib/schedule.ts
@@ -437,7 +437,7 @@ export function getEarliestIntersection(
 }
 ```
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 ```bash
 npm test -- --testPathPattern="schedule" 2>&1 | tail -10
@@ -445,7 +445,7 @@ npm test -- --testPathPattern="schedule" 2>&1 | tail -10
 
 Expected: PASS
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add lib/schedule.ts __tests__/schedule.test.ts
@@ -459,7 +459,7 @@ git commit -m "feat: add schedule intersection logic"
 **Files:**
 - Modify: `lib/storage.ts`
 
-- [ ] **Step 1: matchFlow save/load 함수 추가**
+- [x] **Step 1: matchFlow save/load 함수 추가**
 
 `lib/storage.ts` 파일 끝에 추가:
 
@@ -487,7 +487,7 @@ export function clearMatchFlow(): void {
 }
 ```
 
-- [ ] **Step 2: 커밋**
+- [x] **Step 2: 커밋**
 
 ```bash
 git add lib/storage.ts
@@ -502,7 +502,7 @@ git commit -m "feat: add matchFlow save/load to storage"
 - Create: `app/match/result/page.tsx`
 - Modify: `app/match/page.tsx`
 
-- [ ] **Step 1: result 페이지 생성**
+- [x] **Step 1: result 페이지 생성**
 
 ```tsx
 // app/match/result/page.tsx
@@ -630,7 +630,7 @@ export default function MatchResultPage() {
 }
 ```
 
-- [ ] **Step 2: 기존 match/page.tsx를 result로 redirect**
+- [x] **Step 2: 기존 match/page.tsx를 result로 redirect**
 
 ```tsx
 // app/match/page.tsx
@@ -641,11 +641,11 @@ export default function MatchPage() {
 }
 ```
 
-- [ ] **Step 3: 브라우저 확인**
+- [x] **Step 3: 브라우저 확인**
 
 팀 만든 뒤 `http://localhost:3000/match` → `/match/result`로 리다이렉트 → 점수 링 + 즉시 공개 카드 3개 확인
 
-- [ ] **Step 4: 커밋**
+- [x] **Step 4: 커밋**
 
 ```bash
 git add app/match/result/page.tsx app/match/page.tsx
@@ -659,7 +659,7 @@ git commit -m "feat: add match result page with score ring and instant reveal"
 **Files:**
 - Create: `app/match/schedule/page.tsx`
 
-- [ ] **Step 1: 달력 + 시간 선택 페이지 생성**
+- [x] **Step 1: 달력 + 시간 선택 페이지 생성**
 
 ```tsx
 // app/match/schedule/page.tsx
@@ -835,11 +835,11 @@ export default function SchedulePage() {
 }
 ```
 
-- [ ] **Step 2: 브라우저 확인**
+- [x] **Step 2: 브라우저 확인**
 
 `http://localhost:3000/match/schedule` → 달력 표시 → 날짜 선택 → 핑크 fill → "다음" → 시간 선택 → "확정하기" → `/match/confirmed` 이동 확인
 
-- [ ] **Step 3: 커밋**
+- [x] **Step 3: 커밋**
 
 ```bash
 git add app/match/schedule/page.tsx
@@ -853,7 +853,7 @@ git commit -m "feat: add date and time scheduling page"
 **Files:**
 - Create: `app/match/confirmed/page.tsx`
 
-- [ ] **Step 1: 페이지 생성**
+- [x] **Step 1: 페이지 생성**
 
 ```tsx
 // app/match/confirmed/page.tsx
@@ -974,11 +974,11 @@ export default function ConfirmedPage() {
 }
 ```
 
-- [ ] **Step 2: 브라우저 확인**
+- [x] **Step 2: 브라우저 확인**
 
 `http://localhost:3000/match/confirmed` → 날짜·시간 표시, D-N 카운트다운, Q&A 분배 일정 확인
 
-- [ ] **Step 3: 커밋**
+- [x] **Step 3: 커밋**
 
 ```bash
 git add app/match/confirmed/page.tsx
@@ -992,7 +992,7 @@ git commit -m "feat: add match confirmed page with countdown and Q&A schedule"
 **Files:**
 - Create: `app/match/qa/page.tsx`
 
-- [ ] **Step 1: 페이지 생성**
+- [x] **Step 1: 페이지 생성**
 
 ```tsx
 // app/match/qa/page.tsx
@@ -1232,11 +1232,11 @@ export default function QAPage() {
 }
 ```
 
-- [ ] **Step 2: 브라우저 확인**
+- [x] **Step 2: 브라우저 확인**
 
 `http://localhost:3000/match/qa` → 질문 카드 → 선택지 탭 → 제출 → 두 답변 비교 + 케미 코멘트 → 기록 보기 확인
 
-- [ ] **Step 3: 커밋**
+- [x] **Step 3: 커밋**
 
 ```bash
 git add app/match/qa/page.tsx
@@ -1250,7 +1250,7 @@ git commit -m "feat: add Q&A daily reveal page with rotation and chemistry comme
 **Files:**
 - Create: `app/match/chat/page.tsx`
 
-- [ ] **Step 1: 채팅 UI skeleton 생성**
+- [x] **Step 1: 채팅 UI skeleton 생성**
 
 ```tsx
 // app/match/chat/page.tsx
@@ -1340,11 +1340,11 @@ export default function ChatPage() {
 }
 ```
 
-- [ ] **Step 2: 브라우저 확인**
+- [x] **Step 2: 브라우저 확인**
 
 `http://localhost:3000/match/chat` → 초기 메시지 2개 → 입력 후 Enter or ↑ 버튼 → 메시지 추가 확인
 
-- [ ] **Step 3: 전체 테스트 확인**
+- [x] **Step 3: 전체 테스트 확인**
 
 ```bash
 npm test 2>&1 | tail -15
@@ -1352,7 +1352,7 @@ npm test 2>&1 | tail -15
 
 Expected: 모든 테스트 pass
 
-- [ ] **Step 4: 빌드 최종 확인**
+- [x] **Step 4: 빌드 최종 확인**
 
 ```bash
 npm run build 2>&1 | tail -5
@@ -1360,7 +1360,7 @@ npm run build 2>&1 | tail -5
 
 Expected: 에러 없이 빌드 성공
 
-- [ ] **Step 5: 최종 커밋**
+- [x] **Step 5: 최종 커밋**
 
 ```bash
 git add app/match/chat/page.tsx
