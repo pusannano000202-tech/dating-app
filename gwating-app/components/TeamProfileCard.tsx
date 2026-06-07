@@ -25,6 +25,18 @@ export function TeamProfileCard({ team }: Props) {
           <p className="text-xs text-muted mt-0.5">
             {team.school} · {team.size}명 · {team.ageRange}세
           </p>
+          <div className="flex items-center gap-1.5 mt-1">
+            {team.maleCount !== undefined && team.maleCount > 0 && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#f0f5ff] text-[#4f9eff] border border-[#cce0ff]">
+                남 {team.maleCount}
+              </span>
+            )}
+            {team.femaleCount !== undefined && team.femaleCount > 0 && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-soft text-primary border border-primary-disabled">
+                여 {team.femaleCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

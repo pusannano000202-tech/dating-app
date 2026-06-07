@@ -1,16 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/Button";
 import { MoodSelector } from "@/components/MoodSelector";
-import { MemberRoleCard } from "@/components/MemberRoleCard";
 import { loadUser, saveTeam } from "@/lib/storage";
 import { classifyRole } from "@/lib/scoring";
-import { MoodKey, MemberRole, TeamProfile, TeamMember } from "@/types/matching";
+import { MoodKey, TeamProfile, TeamMember, Gender } from "@/types/matching";
 
-type MemberDraft = { nickname: string; role: MemberRole | "" };
+const ROLE_LABELS: Record<string, string> = {
+  moodMaker: "🔥 분위기 메이커형",
+  coordinator: "🎯 조율자형",
+  considerate: "🤍 배려형",
+  reactor: "✨ 리액션형",
+};
+
+const GENDER_LABELS: Record<Gender, string> = {
+  male: "남자",
+  female: "여자",
+};
+
+function generateInviteCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return (
+    "BT-" +
+    Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("")
+  );
+}
 
 export default function TeamCreatePage() {
   const router = useRouter();
@@ -18,65 +35,47 @@ export default function TeamCreatePage() {
   const [ageRange, setAgeRange] = useState("");
   const [mood, setMood] = useState<MoodKey | null>(null);
   const [leader, setLeader] = useState<TeamMember | null>(null);
-  const [extraMembers, setExtraMembers] = useState<MemberDraft[]>([
-    { nickname: "", role: "" },
-  ]);
+  const inviteCode = useMemo(() => generateInviteCode(), []);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const user = loadUser();
     if (!user) return;
-    const role = classifyRole(user.traits);
     setLeader({
-      nickname:  user.nickname,
-      role,
-      traits:    user.traits,
-      isLeader:  true,
+      nickname: user.nickname,
+      role: classifyRole(user.traits),
+      traits: user.traits,
+      isLeader: true,
+      gender: user.gender,
     });
   }, []);
 
-  function addMember() {
-    if (extraMembers.length >= 4) return;
-    setExtraMembers((prev) => [...prev, { nickname: "", role: "" }]);
+  function handleCopyCode() {
+    navigator.clipboard.writeText(inviteCode).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
-  function removeMember(i: number) {
-    setExtraMembers((prev) => prev.filter((_, idx) => idx !== i));
-  }
-
-  function updateMember(i: number, patch: Partial<MemberDraft>) {
-    setExtraMembers((prev) =>
-      prev.map((m, idx) => (idx === i ? { ...m, ...patch } : m))
-    );
-  }
-
-  const isValid =
-    teamName.trim() !== "" &&
-    ageRange.trim() !== "" &&
-    mood !== null &&
-    leader !== null &&
-    extraMembers.length > 0 &&
-    extraMembers.every((m) => m.nickname.trim() !== "" && m.role !== "");
+  const isValid = teamName.trim() !== "" && ageRange.trim() !== "" && mood !== null && leader !== null;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid || !leader || !mood) return;
 
-    const members: TeamMember[] = [
-      leader,
-      ...extraMembers.map((m) => ({
-        nickname: m.nickname.trim(),
-        role:     m.role as MemberRole,
-      })),
-    ];
+    const members: TeamMember[] = [leader];
+    const maleCount = members.filter((m) => m.gender === "male").length;
+    const femaleCount = members.filter((m) => m.gender === "female").length;
 
     const team: TeamProfile = {
-      teamName:  teamName.trim(),
-      school:    "부산대학교",
-      region:    "부산",
-      size:      members.length,
-      ageRange:  ageRange.trim(),
+      teamName: teamName.trim(),
+      school: "부산대학교",
+      region: "부산",
+      size: members.length,
+      ageRange: ageRange.trim(),
       mood,
       members,
+      maleCount,
+      femaleCount,
     };
     saveTeam(team);
     router.push("/team/demo");
@@ -97,14 +96,17 @@ export default function TeamCreatePage() {
   return (
     <>
       <AppHeader step={2} totalSteps={3} />
-      <main className="py-10 px-4">
+      <main className="py-10 px-4 bg-white min-h-screen">
         <div className="max-w-[560px] mx-auto">
-          <h1 className="text-2xl font-bold text-ink mb-1">팀 만들기</h1>
-          <p className="text-sm text-muted mb-8">팀 정보를 입력하고 팀원 역할을 골라주세요</p>
+          <h1 className="text-2xl font-black text-ink tracking-[-0.5px] mb-1">팀 만들기</h1>
+          <p className="text-xs text-muted mb-8">팀 정보를 채우고 친구를 초대해요</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            {/* 팀 이름 */}
             <div>
-              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">팀 이름</label>
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">
+                팀 이름 <span className="text-primary">*</span>
+              </label>
               <input
                 type="text"
                 value={teamName}
@@ -115,8 +117,11 @@ export default function TeamCreatePage() {
               />
             </div>
 
+            {/* 나이대 */}
             <div>
-              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">나이대</label>
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">
+                나이대 <span className="text-primary">*</span>
+              </label>
               <input
                 type="text"
                 value={ageRange}
@@ -127,51 +132,92 @@ export default function TeamCreatePage() {
               />
             </div>
 
+            {/* 분위기 */}
             <div>
-              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">원하는 과팅 분위기</label>
+              <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">
+                원하는 과팅 분위기 <span className="text-primary">*</span>
+              </label>
               <MoodSelector value={mood} onChange={setMood} />
             </div>
 
+            {/* 팀장 */}
             <div>
               <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">팀장 (나)</label>
-              <div className="bg-gradient-to-br from-primary-soft to-[#fff0f4] border-[1.5px] border-primary-disabled rounded-[14px] p-4 text-sm">
-                <span className="font-semibold text-ink">{leader.nickname}</span>
-                <span className="ml-2 text-primary font-semibold">
-                  {leader.role === "moodMaker"   && "🔥 분위기 메이커형"}
-                  {leader.role === "coordinator" && "🎯 조율자형"}
-                  {leader.role === "considerate" && "🤍 배려형"}
-                  {leader.role === "reactor"     && "✨ 리액션형"}
-                </span>
-                <span className="ml-2 text-xs text-muted">(성향 테스트 결과)</span>
+              <div className="bg-gradient-to-br from-primary-soft to-[#fff0f4] border-[1.5px] border-primary-disabled rounded-[14px] p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-primary to-[#ff7e5f] flex items-center justify-center text-base shadow-[0_2px_8px_rgba(255,90,111,0.25)] shrink-0">
+                  {leader.role === "moodMaker" ? "🔥" : leader.role === "coordinator" ? "🎯" : leader.role === "considerate" ? "🤍" : "✨"}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-black text-ink">{leader.nickname}</span>
+                    <span className="text-[9px] bg-primary text-white rounded-full px-1.5 py-0.5 font-bold">팀장</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {leader.gender && (
+                      <span
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
+                          leader.gender === "male"
+                            ? "bg-[#f0f5ff] text-[#4f9eff] border-[#cce0ff]"
+                            : "bg-primary-soft text-primary border-primary-disabled"
+                        }`}
+                      >
+                        {GENDER_LABELS[leader.gender]}
+                      </span>
+                    )}
+                    <span className="text-xs text-primary font-semibold">
+                      {ROLE_LABELS[leader.role]}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* 팀원 초대 */}
             <div>
               <label className="block text-xs font-bold text-ink mb-2 uppercase tracking-wide">
-                팀원 ({extraMembers.length}/4)
+                팀원 초대
               </label>
-              <div className="flex flex-col gap-3">
-                {extraMembers.map((m, i) => (
-                  <MemberRoleCard
-                    key={i}
-                    index={i}
-                    nickname={m.nickname}
-                    role={m.role}
-                    onNicknameChange={(val) => updateMember(i, { nickname: val })}
-                    onRoleChange={(val) => updateMember(i, { role: val })}
-                    onRemove={() => removeMember(i)}
-                  />
-                ))}
-                {extraMembers.length < 4 && (
-                  <button
-                    type="button"
-                    onClick={addMember}
-                    className="border-[1.5px] border-dashed border-hairline rounded-[12px] py-3 text-sm text-muted hover:border-primary hover:text-primary transition-colors"
-                  >
-                    + 팀원 추가
-                  </button>
-                )}
+
+              {/* 초대 코드 */}
+              <div className="bg-surface-soft border-[1.5px] border-hairline rounded-[12px] p-3 flex items-center gap-3 mb-3">
+                <span className="text-lg">🔗</span>
+                <div className="flex-1">
+                  <div className="text-[10px] font-bold text-muted uppercase tracking-wide">초대 코드</div>
+                  <div className="text-lg font-black text-ink tracking-[3px] font-mono">{inviteCode}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyCode}
+                  className="text-[11px] font-bold text-primary bg-primary-soft border border-primary-disabled rounded-full px-3 py-1.5"
+                >
+                  {copied ? "복사됨!" : "복사"}
+                </button>
               </div>
+
+              {/* 대기 중 슬롯 */}
+              <div className="flex flex-col gap-2 mb-2">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="border-[1.5px] border-hairline rounded-[12px] p-3 flex items-center gap-3 bg-white opacity-60"
+                  >
+                    <div className="w-9 h-9 rounded-[10px] bg-surface-soft border-[1.5px] border-dashed border-hairline flex items-center justify-center text-base shrink-0">
+                      ⏳
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-bold text-muted">대기 중…</div>
+                      <div className="text-[10px] text-[#ff9500] font-semibold">초대 수락 대기</div>
+                    </div>
+                    <span className="text-[10px] bg-surface-soft text-muted rounded-full px-2 py-1">미정</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-[10px] text-muted text-center">
+                초대 코드를 친구에게 공유하면 팀원이 합류해요
+                <br />
+                <span className="text-[10px] text-muted/60">(현재 코드 공유 기능은 준비 중이에요)</span>
+              </p>
             </div>
 
             <Button type="submit" fullWidth disabled={!isValid}>
