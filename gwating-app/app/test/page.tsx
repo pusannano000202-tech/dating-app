@@ -8,7 +8,7 @@ import { Button } from "@/components/Button";
 import { questions } from "@/data/questions";
 import { saveUser } from "@/lib/storage";
 import { classifyRole } from "@/lib/scoring";
-import { TraitKey, MemberRole, UserProfile } from "@/types/matching";
+import { TraitKey, MemberRole, UserProfile, Gender } from "@/types/matching";
 
 const ROLE_LABELS: Record<MemberRole, { name: string; desc: string; emoji: string }> = {
   moodMaker:   { name: "분위기 메이커형", desc: "에너지를 끌어올리고 자리를 살려주는 역할이에요.",  emoji: "🔥" },
@@ -17,18 +17,33 @@ const ROLE_LABELS: Record<MemberRole, { name: string; desc: string; emoji: strin
   reactor:     { name: "리액션형",        desc: "분위기를 살려주는 반응으로 자리를 따뜻하게 해요.", emoji: "✨" },
 };
 
+const TRAIT_LABELS: Record<string, string> = {
+  atmosphereCoordination: "분위기 조율",
+  consideration:          "배려심",
+  participation:          "적극성",
+  respectfulness:         "예의/존중",
+  communicationBalance:   "소통 균형",
+};
+
 type TraitScores = Partial<Record<TraitKey, number[]>>;
+type Step = "gender" | "quiz" | "result";
 
 export default function TestPage() {
   const router = useRouter();
+  const [step, setStep] = useState<Step>("gender");
+  const [gender, setGender] = useState<Gender | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [traitScores, setTraitScores] = useState<TraitScores>({});
   const [nickname, setNickname] = useState("");
-  const [showNickname, setShowNickname] = useState(false);
   const [resultRole, setResultRole] = useState<MemberRole | null>(null);
   const [finalTraits, setFinalTraits] = useState<Record<TraitKey, number> | null>(null);
 
   const current = questions[currentIdx];
+
+  function handleGenderNext() {
+    if (!gender) return;
+    setStep("quiz");
+  }
 
   function handleSelect(score: number) {
     const trait = current.trait;
@@ -51,28 +66,70 @@ export default function TestPage() {
 
       setFinalTraits(traits);
       setResultRole(classifyRole(traits));
-      setShowNickname(true);
+      setStep("result");
     } else {
       setCurrentIdx((i) => i + 1);
     }
   }
 
   function handleSave() {
-    if (!nickname.trim() || !finalTraits) return;
-    const profile: UserProfile = { nickname: nickname.trim(), traits: finalTraits };
+    if (!nickname.trim() || !finalTraits || !gender) return;
+    const profile: UserProfile = { nickname: nickname.trim(), traits: finalTraits, gender };
     saveUser(profile);
     router.push("/team/create");
   }
 
-  if (showNickname && resultRole) {
+  // ── 성별 선택 ──
+  if (step === "gender") {
+    return (
+      <>
+        <AppHeader step={1} totalSteps={3} />
+        <main className="py-12 px-4 bg-white min-h-screen">
+          <div className="max-w-[400px] mx-auto text-center">
+            <div className="text-4xl mb-4">👋</div>
+            <h2 className="text-xl font-black text-ink tracking-[-0.5px] mb-2">먼저 성별을 알려주세요</h2>
+            <p className="text-sm text-muted mb-8 leading-relaxed">
+              팀 매칭에 사용돼요.<br />
+              <span className="text-[11px] text-muted/60">매칭 외 목적으로 사용되지 않아요</span>
+            </p>
+            <div className="flex gap-4 mb-8">
+              <button
+                type="button"
+                onClick={() => setGender("male")}
+                className={`flex-1 border-[2px] rounded-[16px] py-5 flex flex-col items-center gap-2 transition-all ${
+                  gender === "male"
+                    ? "border-[#4f9eff] bg-[#f0f5ff]"
+                    : "border-hairline bg-white hover:border-hairline-soft"
+                }`}
+              >
+                <span className="text-3xl">🙋‍♂️</span>
+                <span className="text-sm font-bold text-ink">남자</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGender("female")}
+                className={`flex-1 border-[2px] rounded-[16px] py-5 flex flex-col items-center gap-2 transition-all ${
+                  gender === "female"
+                    ? "border-primary bg-primary-soft"
+                    : "border-hairline bg-white hover:border-hairline-soft"
+                }`}
+              >
+                <span className="text-3xl">🙋‍♀️</span>
+                <span className="text-sm font-bold text-ink">여자</span>
+              </button>
+            </div>
+            <Button fullWidth disabled={!gender} onClick={handleGenderNext}>
+              다음 — 성향 테스트 시작 →
+            </Button>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  // ── 결과 ──
+  if (step === "result" && resultRole) {
     const info = ROLE_LABELS[resultRole];
-    const traitLabels: Record<string, string> = {
-      atmosphereCoordination: "분위기 조율",
-      consideration:          "배려심",
-      participation:          "적극성",
-      respectfulness:         "예의/존중",
-      communicationBalance:   "소통 균형",
-    };
 
     return (
       <>
@@ -92,7 +149,7 @@ export default function TestPage() {
                 {Object.entries(finalTraits).map(([key, value]) => (
                   <div key={key} className="flex items-center gap-3">
                     <span className="text-[10px] font-bold text-muted w-16 shrink-0 text-right">
-                      {traitLabels[key] ?? key}
+                      {TRAIT_LABELS[key] ?? key}
                     </span>
                     <div className="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
                       <div
@@ -131,6 +188,7 @@ export default function TestPage() {
     );
   }
 
+  // ── 퀴즈 ──
   return (
     <>
       <AppHeader step={1} totalSteps={3} />
