@@ -1,10 +1,12 @@
+import type { User } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 /**
  * 부산대 학교 메일(@pusan.ac.kr) 인증.
- * Supabase Auth의 이메일 OTP를 그대로 활용해 인증코드 발송/검증을 처리하고,
- * 검증 성공 시 마스킹된 이메일만 로컬에 남긴다 (앱 자체는 Supabase Auth 세션을
- * 쓰지 않으므로 검증 직후 세션은 정리한다).
+ * Supabase Auth의 이메일 OTP로 인증코드를 발송/검증하고, 검증에 성공하면
+ * Supabase가 발급한 세션(JWT)을 그대로 유지한다. 배지 상태는 이 세션을
+ * `auth.getUser()`로 서버에 검증받아 판단하므로, 클라이언트가 임의로
+ * localStorage 값을 조작해 배지를 위조할 수 없다.
  */
 
 export const SCHOOL_EMAIL_DOMAIN = "pusan.ac.kr";
@@ -13,8 +15,6 @@ export type SchoolVerification = {
   emailMasked: string;
   verifiedAt: string;
 };
-
-const STORAGE_KEY = "gwating_school_verified";
 
 export function isSchoolEmail(email: string): boolean {
   return email.trim().toLowerCase().endsWith(`@${SCHOOL_EMAIL_DOMAIN}`);
@@ -28,19 +28,25 @@ function maskEmail(email: string): string {
   return `${visible}${"*".repeat(Math.max(local.length - visibleLen, 1))}@${domain}`;
 }
 
-export function loadSchoolVerification(): SchoolVerification | null {
-  if (typeof localStorage === "undefined") return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as SchoolVerification;
-  } catch {
-    return null;
-  }
+/** 서버가 확인해 준 사용자 정보에서만 인증 배지 상태를 도출한다. */
+function toVerification(user: User | null | undefined): SchoolVerification | null {
+  const email = user?.email;
+  if (!email || !user?.email_confirmed_at || !isSchoolEmail(email)) return null;
+  return {
+    emailMasked: maskEmail(email),
+    verifiedAt: user.email_confirmed_at,
+  };
 }
 
-function saveSchoolVerification(record: SchoolVerification): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+/**
+ * 현재 세션을 Supabase 서버에 검증받아 인증 배지 상태를 가져온다.
+ * (`getSession`과 달리 `getUser`는 로컬 토큰을 그대로 믿지 않고 서버에 재확인한다.)
+ */
+export async function getSchoolVerification(): Promise<SchoolVerification | null> {
+  if (!isSupabaseConfigured || !supabase) return null;
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) return null;
+  return toVerification(data.user);
 }
 
 /** Supabase Auth가 영문으로 내려주는 흔한 오류를 한국어 안내문으로 바꾼다. */
@@ -80,7 +86,7 @@ export async function requestVerificationCode(
 export async function confirmVerificationCode(
   email: string,
   code: string
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; error?: string; verification?: SchoolVerification }> {
   if (!isSupabaseConfigured || !supabase) {
     return { ok: false, error: "인증 서비스에 연결할 수 없어요. 잠시 후 다시 시도해주세요." };
   }
@@ -95,10 +101,10 @@ export async function confirmVerificationCode(
       error: error ? translateAuthError(error.message) : "인증코드가 올바르지 않아요.",
     };
   }
-  saveSchoolVerification({
-    emailMasked: maskEmail(email.trim()),
-    verifiedAt: new Date().toISOString(),
-  });
-  await supabase.auth.signOut();
-  return { ok: true };
+  // data.user는 클라이언트가 받은 응답일 뿐이므로, 배지 상태는 서버에 한 번 더 확인받는다.
+  const verification = await getSchoolVerification();
+  if (!verification) {
+    return { ok: false, error: "인증 확인에 실패했어요. 다시 시도해주세요." };
+  }
+  return { ok: true, verification };
 }
