@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/Button";
 import { TeamProfileCard } from "@/components/TeamProfileCard";
+import { SchoolVerifyBadge } from "@/components/SchoolVerifyBadge";
 import { loadTeam } from "@/lib/storage";
 import { TeamProfile } from "@/types/matching";
 
@@ -38,7 +39,10 @@ export default function TeamDemoPage() {
       <main className="py-10 px-4 bg-white min-h-screen">
         <div className="max-w-[560px] mx-auto">
           <h1 className="text-2xl font-bold text-ink mb-1">우리 팀 프로필</h1>
-          <p className="text-sm text-muted mb-8">이 팀으로 매칭을 진행할게요</p>
+          <p className="text-sm text-muted mb-4">이 팀으로 매칭을 진행할게요</p>
+          <div className="mb-6">
+            <SchoolVerifyBadge />
+          </div>
           <TeamProfileCard team={team} />
           <div className="mt-6 flex flex-col gap-3">
             <Button fullWidth onClick={() => router.push("/match")}>
