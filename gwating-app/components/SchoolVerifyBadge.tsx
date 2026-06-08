@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   SCHOOL_EMAIL_DOMAIN,
   confirmVerificationCode,
-  loadSchoolVerification,
+  getSchoolVerification,
   requestVerificationCode,
   type SchoolVerification,
 } from "@/lib/schoolVerification";
@@ -12,15 +12,23 @@ import {
 type Step = "email" | "code";
 
 export function SchoolVerifyBadge() {
-  const [verification, setVerification] = useState<SchoolVerification | null>(() =>
-    loadSchoolVerification()
-  );
+  const [verification, setVerification] = useState<SchoolVerification | null>(null);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSchoolVerification().then((v) => {
+      if (!cancelled) setVerification(v);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function openForm() {
     setOpen(true);
@@ -46,11 +54,11 @@ export function SchoolVerifyBadge() {
     setLoading(true);
     const res = await confirmVerificationCode(email, code);
     setLoading(false);
-    if (!res.ok) {
+    if (!res.ok || !res.verification) {
       setError(res.error ?? "인증에 실패했어요.");
       return;
     }
-    setVerification(loadSchoolVerification());
+    setVerification(res.verification);
     setOpen(false);
   }
 
