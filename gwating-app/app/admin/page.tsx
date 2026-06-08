@@ -31,8 +31,10 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-export default function AdminPage() {
-  const overview = getMatchOverview();
+export const dynamic = "force-dynamic";
+
+export default async function AdminPage() {
+  const overview = await getMatchOverview();
 
   return (
     <>
@@ -44,7 +46,7 @@ export default function AdminPage() {
             <p className="text-xs text-muted leading-relaxed">
               자동 매칭 엔진이 각 팀에게 어떤 추천을 내놓는지, 점수 산정 근거와 함께 한눈에 확인해요.
               <br />
-              (현재는 mock 데이터 기준 — Supabase 연동 시 <code className="text-[11px] bg-surface-soft rounded px-1">lib/adminData.ts</code>의 데이터 소스만 교체하면 돼요)
+              (Supabase DB 연동 — 데이터가 없거나 연결에 실패하면 <code className="text-[11px] bg-surface-soft rounded px-1">lib/adminData.ts</code>가 자동으로 mock 데이터로 폴백해요)
             </p>
           </div>
 
