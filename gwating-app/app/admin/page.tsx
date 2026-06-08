@@ -31,8 +31,10 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-export default function AdminPage() {
-  const overview = getMatchOverview();
+export const dynamic = "force-dynamic";
+
+export default async function AdminPage() {
+  const overview = await getMatchOverview();
 
   return (
     <>

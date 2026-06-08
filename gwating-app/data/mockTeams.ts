@@ -2,7 +2,7 @@ import { TeamProfile } from "@/types/matching";
 
 export const mockTeams: TeamProfile[] = [
   {
-    teamName: "용두산 삼총사",
+    teamName: "국문과 이야기꾼들",
     school: "부산대학교",
     region: "부산",
     size: 3,
@@ -26,7 +26,7 @@ export const mockTeams: TeamProfile[] = [
     ],
   },
   {
-    teamName: "남포동 클럽",
+    teamName: "경영학과 인싸들",
     school: "부산대학교",
     region: "부산",
     size: 4,
@@ -51,7 +51,7 @@ export const mockTeams: TeamProfile[] = [
     ],
   },
   {
-    teamName: "해운대 게임단",
+    teamName: "물리과 악동들",
     school: "부산대학교",
     region: "부산",
     size: 3,
@@ -75,7 +75,7 @@ export const mockTeams: TeamProfile[] = [
     ],
   },
   {
-    teamName: "온천장 신사단",
+    teamName: "법학과 모범생들",
     school: "부산대학교",
     region: "부산",
     size: 3,
@@ -99,7 +99,7 @@ export const mockTeams: TeamProfile[] = [
     ],
   },
   {
-    teamName: "서면 인트로",
+    teamName: "디자인과 낭만파",
     school: "부산대학교",
     region: "부산",
     size: 4,
