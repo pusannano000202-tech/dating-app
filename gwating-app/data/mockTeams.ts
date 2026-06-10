@@ -1,0 +1,126 @@
+import { TeamProfile } from "@/types/matching";
+
+export const mockTeams: TeamProfile[] = [
+  {
+    teamName: "국문과 이야기꾼들",
+    school: "부산대학교",
+    region: "부산",
+    size: 3,
+    ageRange: "22~23",
+    mood: "comfortableTalk",
+    members: [
+      {
+        nickname: "민준",
+        role: "coordinator",
+        isLeader: true,
+        traits: {
+          atmosphereCoordination: 4,
+          consideration: 4,
+          participation: 3,
+          respectfulness: 5,
+          communicationBalance: 5,
+        },
+      },
+      { nickname: "서연", role: "coordinator" },
+      { nickname: "지호", role: "considerate" },
+    ],
+  },
+  {
+    teamName: "경영학과 인싸들",
+    school: "부산대학교",
+    region: "부산",
+    size: 4,
+    ageRange: "21~24",
+    mood: "activeSocial",
+    members: [
+      {
+        nickname: "현우",
+        role: "moodMaker",
+        isLeader: true,
+        traits: {
+          atmosphereCoordination: 5,
+          consideration: 3,
+          participation: 5,
+          respectfulness: 3,
+          communicationBalance: 4,
+        },
+      },
+      { nickname: "은지", role: "moodMaker" },
+      { nickname: "태양", role: "reactor" },
+      { nickname: "소희", role: "reactor" },
+    ],
+  },
+  {
+    teamName: "물리과 악동들",
+    school: "부산대학교",
+    region: "부산",
+    size: 3,
+    ageRange: "22~24",
+    mood: "gamesAndDrinks",
+    members: [
+      {
+        nickname: "준혁",
+        role: "moodMaker",
+        isLeader: true,
+        traits: {
+          atmosphereCoordination: 5,
+          consideration: 2,
+          participation: 5,
+          respectfulness: 3,
+          communicationBalance: 3,
+        },
+      },
+      { nickname: "다은", role: "reactor" },
+      { nickname: "성민", role: "reactor" },
+    ],
+  },
+  {
+    teamName: "법학과 모범생들",
+    school: "부산대학교",
+    region: "부산",
+    size: 3,
+    ageRange: "21~22",
+    mood: "respectfulSafe",
+    members: [
+      {
+        nickname: "도윤",
+        role: "considerate",
+        isLeader: true,
+        traits: {
+          atmosphereCoordination: 3,
+          consideration: 5,
+          participation: 3,
+          respectfulness: 5,
+          communicationBalance: 4,
+        },
+      },
+      { nickname: "나연", role: "considerate" },
+      { nickname: "재원", role: "coordinator" },
+    ],
+  },
+  {
+    teamName: "디자인과 낭만파",
+    school: "부산대학교",
+    region: "부산",
+    size: 4,
+    ageRange: "20~23",
+    mood: "naturalIntro",
+    members: [
+      {
+        nickname: "수아",
+        role: "coordinator",
+        isLeader: true,
+        traits: {
+          atmosphereCoordination: 4,
+          consideration: 4,
+          participation: 4,
+          respectfulness: 4,
+          communicationBalance: 4,
+        },
+      },
+      { nickname: "찬호", role: "moodMaker" },
+      { nickname: "예린", role: "considerate" },
+      { nickname: "민서", role: "reactor" },
+    ],
+  },
+];
