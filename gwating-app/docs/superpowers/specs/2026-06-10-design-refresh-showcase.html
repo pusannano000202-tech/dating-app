@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>부팅 — Design Vision</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+:root{
+  --paper:#FAF7F2;
+  --ink:#1B1916;
+  --ink2:#201C18;
+  --muted:#8E887E;
+  --line:rgba(27,25,22,.08);
+  --g1:#FF3D5A;
+  --g2:#FF7A3D;
+  --lilac:#C9B8FF;
+  --grad:linear-gradient(120deg,#FF3D5A 0%,#FF7A3D 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{
+  font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;
+  background:
+    radial-gradient(900px 500px at 75% -10%, rgba(255,61,90,.10), transparent 60%),
+    radial-gradient(800px 500px at 10% 110%, rgba(201,184,255,.08), transparent 60%),
+    #131110;
+  color:#EDE9E2;
+  min-height:100vh;
+  padding:56px 28px 80px;
+}
+.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- intro ---------- */
+.intro{max-width:1080px;margin:0 auto 52px;text-align:center}
+.intro .eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;color:#8E887E;margin-bottom:14px}
+.intro h1{font-size:38px;font-weight:900;letter-spacing:-1.2px;line-height:1.2}
+.intro p.lead{margin-top:14px;font-size:14px;line-height:1.7;color:#A8A299}
+.principles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px}
+.principles span{font-size:12px;font-weight:600;color:#C9C3B8;border:1px solid rgba(237,233,226,.14);border-radius:999px;padding:7px 14px;background:rgba(237,233,226,.04)}
+.principles span b{color:#fff}
+
+/* ---------- gallery ---------- */
+.gallery{display:flex;flex-wrap:wrap;gap:44px 36px;justify-content:center;max-width:1180px;margin:0 auto}
+.slot{display:flex;flex-direction:column;align-items:center;animation:up .9s cubic-bezier(.22,1,.36,1) both}
+.caption{width:292px;margin-top:18px}
+.caption .n{font-size:11px;font-weight:800;letter-spacing:3px;color:#FF6A4E}
+.caption h3{font-size:15px;font-weight:800;color:#F2EEE7;margin-top:5px;letter-spacing:-.3px}
+.caption p{font-size:12px;line-height:1.65;color:#8E887E;margin-top:5px}
+
+/* ---------- phone ---------- */
+.phone{
+  width:292px;height:622px;border-radius:44px;position:relative;overflow:hidden;
+  background:var(--paper);
+  box-shadow:0 0 0 9px #2A2520,0 0 0 10px #45403a,0 34px 70px rgba(0,0,0,.6);
+}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:84px;height:24px;border-radius:14px;background:#16130f;z-index:30}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:15px 24px 0;font-size:12px;font-weight:700;color:var(--ink);position:relative;z-index:20}
+.sb .icons{display:flex;gap:4px;align-items:center}
+.sb .icons i{display:block;border-radius:2px;background:currentColor}
+.sb .icons .s1{width:14px;height:9px;clip-path:polygon(0 100%,100% 0,100% 100%)}
+.sb .icons .s2{width:18px;height:9px;border-radius:3px;opacity:.95}
+.homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:110px;height:4px;border-radius:2px;background:rgba(27,25,22,.22);z-index:30}
+.dark .sb{color:#F2EEE7}
+.dark .homebar{background:rgba(242,238,231,.3)}
+
+/* ---------- shared bits ---------- */
+.blob{position:absolute;border-radius:50%;filter:blur(42px);pointer-events:none;animation:drift 10s ease-in-out infinite alternate}
+.btn-ink{height:54px;border-radius:18px;background:var(--ink);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 14px 28px rgba(27,25,22,.22)}
+.btn-grad{height:54px;border-radius:18px;background:var(--grad);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 30px rgba(255,77,61,.32)}
+.ghostlink{text-align:center;font-size:12px;font-weight:600;color:var(--muted)}
+.chip{font-size:11px;font-weight:600;color:#6E675C;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 11px}
+.in{animation:up .8s cubic-bezier(.22,1,.36,1) both}
+
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(14px,-18px) scale(1.12)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes ring{to{stroke-dashoffset:33}}
+@keyframes typing{0%,60%,100%{transform:none;opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shineSweep{0%{background-position:200% center}100%{background-position:-200% center}}
+
+/* ============ 01 웰컴 ============ */
+.s-welcome{padding:0 24px}
+.s-welcome .brand{display:flex;align-items:center;gap:7px;margin-top:26px}
+.s-welcome .brand b{font-size:17px;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
+.s-welcome .hero{margin-top:auto;margin-bottom:auto}
+.s-welcome h2{font-size:35px;font-weight:900;letter-spacing:-1.6px;line-height:1.22;color:var(--ink)}
+.s-welcome .sub{margin-top:14px;font-size:12.5px;line-height:1.7;color:var(--muted);font-weight:500}
+.s-welcome .cta-zone{margin-bottom:44px;display:flex;flex-direction:column;gap:14px}
+
+/* ============ 02 홈 ============ */
+.s-home{padding:0 20px}
+.s-home .head{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px}
+.s-home .head .hi{font-size:12px;font-weight:600;color:var(--muted)}
+.s-home .head h2{font-size:23px;font-weight:900;letter-spacing:-.8px;color:var(--ink);margin-top:3px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--grad);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.teamcard{margin-top:16px;border-radius:24px;background:linear-gradient(150deg,#26211C,#1B1916);padding:18px;color:#F2EEE7;box-shadow:0 18px 36px rgba(27,25,22,.28);position:relative;overflow:hidden}
+.teamcard .row1{display:flex;justify-content:space-between;align-items:center}
+.teamcard .tname{font-size:16px;font-weight:800;letter-spacing:-.4px}
+.teamcard .status{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#FFB9A3;background:rgba(255,122,61,.12);border-radius:999px;padding:5px 10px}
+.teamcard .dot{width:6px;height:6px;border-radius:50%;background:#FF7A3D;animation:pulse 1.6s ease-in-out infinite}
+.tavatars{display:flex;margin-top:14px}
+.tavatars span{width:34px;height:34px;border-radius:50%;border:2.5px solid #1F1B17;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;color:#fff;margin-right:-9px}
+.tavatars .empty{background:transparent;border:2px dashed rgba(242,238,231,.3);color:rgba(242,238,231,.5);font-weight:600}
+.teamcard .prog{margin-top:16px;height:5px;border-radius:3px;background:rgba(242,238,231,.12);overflow:hidden}
+.teamcard .prog i{display:block;height:100%;width:75%;border-radius:3px;background:var(--grad)}
+.teamcard .pcap{margin-top:8px;font-size:10.5px;font-weight:600;color:rgba(242,238,231,.55)}
+.reco{margin-top:14px;border-radius:24px;background:#fff;border:1px solid var(--line);padding:18px;box-shadow:0 14px 30px rgba(27,25,22,.07)}
+.reco .top{display:flex;justify-content:space-between;align-items:center}
+.reco .lbl{font-size:10px;font-weight:800;letter-spacing:2.5px;color:var(--muted)}
+.reco .pct{font-size:13px;font-weight:900}
+.reco h3{font-size:17px;font-weight:800;letter-spacing:-.4px;color:var(--ink);margin-top:8px}
+.frost{display:flex;margin-top:12px}
+.frost span{width:38px;height:38px;border-radius:50%;margin-right:-9px;border:2.5px solid #fff;background:linear-gradient(140deg,#EFE9E0,#E2D9CC);display:flex;align-items:center;justify-content:center;color:#B4AB9D;font-size:14px;font-weight:800;filter:blur(.4px)}
+.reco .chips{display:flex;gap:6px;margin-top:13px}
+.reco .chips .chip{background:#F7F4EE}
+.reco .note{display:flex;align-items:center;gap:5px;margin-top:13px;font-size:10.5px;font-weight:600;color:var(--muted)}
+.tabbar{margin-top:auto;display:flex;justify-content:space-around;align-items:center;padding:13px 10px 26px;background:rgba(250,247,242,.78);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#B5AFA4}
+.tab.on{color:#FF4D3D}
+.tab svg{width:21px;height:21px}
+
+/* ============ 03 테스트 ============ */
+.s-test{padding:0 22px}
+.s-test .nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;font-size:12px;font-weight:700;color:var(--ink)}
+.s-test .nav .cnt{color:var(--muted);font-weight:600}
+.segs{display:flex;gap:4px;margin-top:14px}
+.segs i{flex:1;height:4px;border-radius:2px;background:rgba(27,25,22,.09)}
+.segs i.f{background:var(--grad)}
+.qlabel{margin-top:34px;font-size:10px;font-weight:800;letter-spacing:3px;color:#FF6A4E}
+.s-test h2{margin-top:10px;font-size:27px;font-weight:900;letter-spacing:-1px;line-height:1.3;color:var(--ink)}
+.ans{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.acard{border-radius:20px;padding:17px 18px;background:#fff;border:1.5px solid var(--line)}
+.acard h4{font-size:14.5px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.acard p{font-size:11.5px;color:var(--muted);margin-top:4px;font-weight:500}
+.acard.sel{border:1.5px solid transparent;background:linear-gradient(#FFF6F1,#FFF6F1) padding-box,var(--grad) border-box;box-shadow:0 12px 26px rgba(255,77,61,.14)}
+.acard.sel h4{color:#E5402E}
+.s-test .next{margin-top:auto;margin-bottom:40px}
+
+/* ============ 04 결과 ============ */
+.s-result{padding:0 22px;align-items:center;text-align:center}
+.s-result .eyebrow{margin-top:42px;font-size:10px;font-weight:800;letter-spacing:3.5px;color:#FF6A4E}
+.ringwrap{position:relative;width:172px;height:172px;margin-top:22px;animation:floaty 3.4s ease-in-out infinite}
+.ringwrap svg{transform:rotate(-90deg)}
+.ringwrap .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringwrap .num b{font-size:46px;font-weight:900;letter-spacing:-2px;color:var(--ink);line-height:1}
+.ringwrap .num span{font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;letter-spacing:1px}
+.s-result h3{margin-top:18px;font-size:21px;font-weight:900;letter-spacing:-.6px;color:var(--ink)}
+.points{margin-top:18px;width:100%;display:flex;flex-direction:column;gap:9px;text-align:left}
+.points .pt{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:12px;font-weight:600;color:#56504A}
+.points .pt b{color:#E5402E;font-weight:900}
+.s-result .ctas{margin-top:auto;margin-bottom:40px;width:100%;display:flex;flex-direction:column;gap:12px}
+
+/* ============ 05 확정 (dark) ============ */
+.s-day{padding:0 22px;background:radial-gradient(140% 90% at 80% -10%,#2B2017 0%,#191512 52%);}
+.s-day .eyebrow{margin-top:40px;font-size:10px;font-weight:800;letter-spacing:3.5px;color:#FFB9A3}
+.s-day .dnum{margin-top:8px;font-size:84px;font-weight:900;letter-spacing:-4px;line-height:1;
+  background:linear-gradient(110deg,#FF3D5A 25%,#FFC2A1 50%,#FF7A3D 75%);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shineSweep 4s linear infinite}
+.s-day .when{margin-top:10px;font-size:13.5px;font-weight:700;color:#EDE9E2}
+.glass{margin-top:24px;border-radius:22px;background:rgba(242,238,231,.06);border:1px solid rgba(242,238,231,.1);backdrop-filter:blur(8px);padding:6px 18px}
+.glass .row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid rgba(242,238,231,.07);font-size:12.5px}
+.glass .row:last-child{border-bottom:0}
+.glass .k{color:rgba(237,233,226,.5);font-weight:600}
+.glass .v{color:#F2EEE7;font-weight:800}
+.glass .v.ok{color:#8CE8B4}
+.qa{margin-top:14px;border-radius:22px;padding:18px;background:rgba(255,122,61,.08);border:1px solid rgba(255,122,61,.22)}
+.qa .l{font-size:10px;font-weight:800;letter-spacing:2.5px;color:#FFB9A3}
+.qa p{margin-top:9px;font-size:13.5px;font-weight:700;line-height:1.55;color:#F2EEE7}
+.qa .act{margin-top:14px;height:42px;border-radius:14px;border:1.5px solid transparent;background:linear-gradient(rgba(35,28,22,.9),rgba(35,28,22,.9)) padding-box,var(--grad) border-box;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;color:#FF9D7E}
+
+/* ============ 06 채팅 ============ */
+.s-chat{background:#F6F2EB}
+.chathead{display:flex;align-items:center;gap:10px;padding:14px 18px;background:rgba(250,247,242,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.chathead .back{font-size:16px;color:var(--ink)}
+.chathead .t{font-size:13.5px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.chathead .s{font-size:10px;font-weight:600;color:var(--muted);margin-top:1px}
+.chathead .dpill{margin-left:auto;font-size:10px;font-weight:800;color:#fff;background:var(--grad);border-radius:999px;padding:5px 10px}
+.msgs{flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap:10px}
+.divider{align-self:center;font-size:10px;font-weight:700;color:#B5AFA4;background:rgba(27,25,22,.05);border-radius:999px;padding:4px 12px;margin-bottom:2px}
+.name{font-size:10px;font-weight:700;color:var(--muted);margin:2px 0 3px 6px}
+.bub{max-width:78%;padding:11px 14px;font-size:12.5px;font-weight:500;line-height:1.5}
+.bub.them{align-self:flex-start;background:#fff;color:#2B2722;border:1px solid var(--line);border-radius:18px 18px 18px 6px;box-shadow:0 4px 12px rgba(27,25,22,.05)}
+.bub.me{align-self:flex-end;background:var(--grad);color:#fff;border-radius:18px 18px 6px 18px;box-shadow:0 8px 18px rgba(255,77,61,.25);font-weight:600}
+.typing{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:18px 18px 18px 6px;padding:13px 15px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#C8C1B5;animation:typing 1.2s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+.inputbar{display:flex;align-items:center;gap:9px;padding:10px 14px 30px;background:rgba(250,247,242,.85);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.field{flex:1;height:42px;border-radius:21px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;padding:0 16px;font-size:12px;color:#B5AFA4;font-weight:500}
+.send{width:42px;height:42px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(255,77,61,.32);flex:none}
+
+.footnote{max-width:1080px;margin:54px auto 0;text-align:center;font-size:12px;color:#6E675C;line-height:1.8}
+</style>
+</head>
+<body>
+
+<header class="intro">
+  <div class="eyebrow">BOOTING · DESIGN VISION BY CLAUDE</div>
+  <h1>백지에서 다시 그린 <span class="gt">부팅</span></h1>
+  <p class="lead">"프로필 비공개 자동확정 과팅"이라는 제품의 본질을 디자인 언어로 옮겼습니다.<br>순백 대신 따뜻한 페이퍼 캔버스, 장식 대신 타이포그래피, 색은 일렉트릭 그라디언트 단 한 줄기만.</p>
+  <div class="principles">
+    <span><b>Warm Paper</b> — #FAF7F2 캔버스, 순백 금지</span>
+    <span><b>타이포 주도</b> — 큰 활자가 곧 그래픽</span>
+    <span><b>전기 한 줄기</b> — 그라디언트는 핵심 액션에만</span>
+    <span><b>비공개의 미학</b> — 프로스트 아바타로 궁금증을 디자인</span>
+    <span><b>소프트 뎁스</b> — 글래스 + 컬러 섀도우</span>
+  </div>
+</header>
+
+<main class="gallery">
+
+  <!-- ============ 01 웰컴 ============ -->
+  <div class="slot" style="animation-delay:.05s">
+    <div class="phone">
+      <div class="screen s-welcome">
+        <div class="blob" style="width:240px;height:240px;top:-70px;right:-80px;background:rgba(255,61,90,.16)"></div>
+        <div class="blob" style="width:200px;height:200px;top:200px;left:-90px;background:rgba(201,184,255,.22);animation-delay:-4s"></div>
+        <div class="island"></div>
+        <div class="sb"><span>9:41</span><span class="icons"><i class="s1"></i><i class="s2"></i></span></div>
+        <div class="brand in" style="animation-delay:.2s">
+          <svg width="19" height="19" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5h5.5L9 22l8.5-11.5H12L13 2z" fill="#1B1916"/></svg>
+          <b>부팅</b>
+        </div>
+        <div class="hero">
+          <h2 class="in" style="animation-delay:.35s">연애세포,<br>다시 <span class="gt">부팅</span>할<br>시간.</h2>
+          <p class="sub in" style="animation-delay:.5s">부산대생 팀 과팅 · 프로필 비공개<br>매칭부터 시간·장소까지 자동 확정</p>
+        </div>
+        <div class="cta-zone">
+          <div class="btn-ink in" style="animation-delay:.65s">시작하기
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5h5.5L9 22l8.5-11.5H12L13 2z" fill="url(#gx)"/><defs><linearGradient id="gx" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF3D5A"/><stop offset="1" stop-color="#FF7A3D"/></linearGradient></defs></svg>
+          </div>
+          <div class="ghostlink in" style="animation-delay:.78s">초대 코드로 합류 →</div>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <div class="caption">
+      <div class="n">01</div>
+      <h3>웰컴 — 브랜드 모먼트</h3>
+      <p>로고를 키우는 대신 활자를 키웠습니다. 오로라 블롭이 천천히 흐르고, 카피가 한 줄씩 떠오릅니다.</p>
+    </div>
+  </div>
+
+  <!-- ============ 02 홈 ============ -->
+  <div class="slot" style="animation-delay:.15s">
+    <div class="phone">
+      <div class="screen s-home">
+        <div class="island"></div>
+        <div class="sb"><span>9:41</span><span class="icons"><i class="s1"></i><i class="s2"></i></span></div>
+        <div class="head in" style="animation-delay:.2s">
+          <div>
+            <div class="hi">수요일 좋은 저녁이에요</div>
+            <h2>오늘의 매칭</h2>
+          </div>
+          <div class="avatar">성</div>
+        </div>
+        <div class="teamcard in" style="animation-delay:.32s">
+          <div class="blob" style="width:150px;height:150px;top:-60px;right:-50px;background:rgba(255,122,61,.16)"></div>
+          <div class="row1">
+            <span class="tname">공대 F4</span>
+            <span class="status"><span class="dot"></span>매칭 탐색 중</span>
+          </div>
+          <div class="tavatars">
+            <span style="background:linear-gradient(140deg,#FF3D5A,#FF7A3D)">성</span>
+            <span style="background:linear-gradient(140deg,#7B6CFF,#C9B8FF)">현</span>
+            <span style="background:linear-gradient(140deg,#2EB8A5,#8CE8B4)">준</span>
+            <span class="empty">+</span>
+          </div>
+          <div class="prog"><i></i></div>
+          <div class="pcap">팀 성향 분석 3/4 완료 — 한 명만 더!</div>
+        </div>
+        <div class="reco in" style="animation-delay:.44s">
+          <div class="top">
+            <span class="lbl">추천 상대팀</span>
+            <span class="pct gt">케미 92%</span>
+          </div>
+          <h3>간호 트리오</h3>
+          <div class="frost"><span>?</span><span>?</span><span>?</span></div>
+          <div class="chips"><span class="chip"># 차분한</span><span class="chip"># 카페파</span><span class="chip"># 수요일</span></div>
+          <div class="note">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B5AFA4" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            프로필은 매칭 확정 후에 공개돼요
+          </div>
+        </div>
+        <div class="tabbar in" style="animation-delay:.56s">
+          <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>홈</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M13 2L4.5 13.5h5.5L9 22l8.5-11.5H12L13 2z"/></svg>매칭</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/></svg>채팅</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.2 4-4.8 7-4.8s5.6 1.6 7 4.8"/></svg>마이</div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <div class="n">02</div>
+      <h3>홈 — 내 팀과 오늘의 추천</h3>
+      <p>다크 잉크 팀 카드가 앵커. 상대팀 아바타는 프로스트 처리로 "비공개"를 매력으로 바꿉니다. 글래스 탭바.</p>
+    </div>
+  </div>
+
+  <!-- ============ 03 테스트 ============ -->
+  <div class="slot" style="animation-delay:.25s">
+    <div class="phone">
+      <div class="screen s-test">
+        <div class="island"></div>
+        <div class="sb"><span>9:41</span><span class="icons"><i class="s1"></i><i class="s2"></i></span></div>
+        <div class="nav in" style="animation-delay:.2s"><span>←&nbsp;&nbsp;성향 테스트</span><span class="cnt">5 / 12</span></div>
+        <div class="segs in" style="animation-delay:.28s">
+          <i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="qlabel in" style="animation-delay:.36s">✦ QUESTION 05</div>
+        <h2 class="in" style="animation-delay:.44s">첫 만남,<br>어디서 보고 싶어?</h2>
+        <div class="ans">
+          <div class="acard sel in" style="animation-delay:.56s">
+            <h4>분위기 좋은 카페</h4>
+            <p>차분하게, 대화 위주로 천천히</p>
+          </div>
+          <div class="acard in" style="animation-delay:.66s">
+            <h4>왁자지껄 술자리</h4>
+            <p>게임하면서 순식간에 친해지기</p>
+          </div>
+        </div>
+        <div class="next in" style="animation-delay:.78s"><div class="btn-ink">다음</div></div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <div class="caption">
+      <div class="n">03</div>
+      <h3>성향 테스트 — 활자가 주인공</h3>
+      <p>질문 하나에 화면 전부를 줍니다. 선택지는 그라디언트 보더로 응답. 12분할 세그먼트 진행바.</p>
+    </div>
+  </div>
+
+  <!-- ============ 04 매칭 결과 ============ -->
+  <div class="slot" style="animation-delay:.35s">
+    <div class="phone">
+      <div class="screen s-result">
+        <div class="blob" style="width:220px;height:220px;top:-60px;left:-80px;background:rgba(255,61,90,.10)"></div>
+        <div class="island"></div>
+        <div class="sb" style="align-self:stretch"><span>9:41</span><span class="icons"><i class="s1"></i><i class="s2"></i></span></div>
+        <div class="eyebrow in" style="animation-delay:.2s">✦ MATCH FOUND</div>
+        <div class="ringwrap in" style="animation-delay:.3s">
+          <svg width="172" height="172" viewBox="0 0 172 172">
+            <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF3D5A"/><stop offset="1" stop-color="#FF7A3D"/></linearGradient></defs>
+            <circle cx="86" cy="86" r="66" fill="none" stroke="rgba(27,25,22,.07)" stroke-width="13"/>
+            <circle cx="86" cy="86" r="66" fill="none" stroke="url(#rg)" stroke-width="13" stroke-linecap="round"
+              stroke-dasharray="414.7" stroke-dashoffset="414.7" style="animation:ring 1.6s .6s cubic-bezier(.22,1,.36,1) forwards"/>
+          </svg>
+          <div class="num"><b>92</b><span>CHEMI</span></div>
+        </div>
+        <h3 class="in" style="animation-delay:.5s">공대 F4 <span class="gt">×</span> 간호 트리오</h3>
+        <div class="points">
+          <div class="pt in" style="animation-delay:.62s"><b>✦</b> 둘 다 수요일 저녁이 비어 있어요</div>
+          <div class="pt in" style="animation-delay:.72s"><b>✦</b> 선호 무드가 "차분한 카페"로 일치</div>
+          <div class="pt in" style="animation-delay:.82s"><b>✦</b> 응답 싱크로율 상위 8%의 조합</div>
+        </div>
+        <div class="ctas">
+          <div class="btn-grad in" style="animation-delay:.94s">이 팀과 과팅하기</div>
+          <div class="ghostlink in" style="animation-delay:1.02s">다음 추천 보기</div>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <div class="caption">
+      <div class="n">04</div>
+      <h3>매칭 결과 — 92의 드라마</h3>
+      <p>링이 1.6초 동안 차오르며 긴장감을 만들고, 케미 근거 3줄이 설득합니다. 그라디언트 CTA는 여기서만.</p>
+    </div>
+  </div>
+
+  <!-- ============ 05 확정 D-day (dark) ============ -->
+  <div class="slot" style="animation-delay:.45s">
+    <div class="phone">
+      <div class="screen s-day dark">
+        <div class="blob" style="width:240px;height:240px;top:-80px;right:-80px;background:rgba(255,61,90,.14)"></div>
+        <div class="island"></div>
+        <div class="sb"><span>9:41</span><span class="icons"><i class="s1"></i><i class="s2"></i></span></div>
+        <div class="eyebrow in" style="animation-delay:.2s">✦ 과팅 확정</div>
+        <div class="dnum in" style="animation-delay:.3s">D-3</div>
+        <div class="when in" style="animation-delay:.42s">6월 13일 금요일 · 저녁 7시</div>
+        <div class="glass in" style="animation-delay:.54s">
+          <div class="row"><span class="k">장소</span><span class="v">부산대 정문 앞</span></div>
+          <div class="row"><span class="k">인원</span><span class="v">3 : 3</span></div>
+          <div class="row"><span class="k">보증금</span><span class="v ok">✓ 전원 확정</span></div>
+        </div>
+        <div class="qa in" style="animation-delay:.66s">
+          <div class="l">오늘의 질문</div>
+          <p>상대팀이 궁금해해요 —<br>"과팅에서 제일 기대하는 순간은?"</p>
+          <div class="act">답변 남기기 ✦</div>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <div class="caption">
+      <div class="n">05</div>
+      <h3>D-day — 설렘의 카운트다운</h3>
+      <p>확정 후엔 무드를 뒤집어 다크로. 거대한 D-3에 광택이 흐르고, 매일 Q&amp;A가 만남 전 케미를 데웁니다.</p>
+    </div>
+  </div>
+
+  <!-- ============ 06 채팅 ============ -->
+  <div class="slot" style="animation-delay:.55s">
+    <div class="phone">
+      <div class="screen s-chat">
+        <div class="island"></div>
+        <div class="sb"><span>9:41</span><span class="icons"><i class="s1"></i><i class="s2"></i></span></div>
+        <div class="chathead in" style="animation-delay:.2s">
+          <span class="back">←</span>
+          <div>
+            <div class="t">간호 트리오</div>
+            <div class="s">팀장끼리만 · 약속 조율 채팅</div>
+          </div>
+          <span class="dpill">D-1</span>
+        </div>
+        <div class="msgs">
+          <div class="divider in" style="animation-delay:.3s">오늘</div>
+          <div class="in" style="animation-delay:.38s">
+            <div class="name">민지 · 상대 팀장</div>
+            <div class="bub them">내일 7시 그대로 가는 거죠? 저희 다 가능해요!</div>
+          </div>
+          <div class="bub me in" style="animation-delay:.5s">네 좋아요! 정문 앞에서 만나서 같이 이동해요 ✦</div>
+          <div class="bub them in" style="animation-delay:.62s">완벽해요. 저희 팀 기대 많이 하고 있어요 :)</div>
+          <div class="typing in" style="animation-delay:.74s"><i></i><i></i><i></i></div>
+        </div>
+        <div class="inputbar in" style="animation-delay:.8s">
+          <div class="field">메시지 보내기…</div>
+          <div class="send">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 12l6-6 6 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <div class="n">06</div>
+      <h3>채팅 — 따뜻한 조율의 공간</h3>
+      <p>내 말풍선만 그라디언트, 나머지는 페이퍼 톤으로 차분하게. 글래스 입력바와 타이핑 인디케이터.</p>
+    </div>
+  </div>
+
+</main>
+
+<p class="footnote">
+  모든 모션 — 오로라 드리프트 · 스태거 등장 · 링 드로잉 · 광택 스윕 · 타이핑 도트 — 은 순수 CSS입니다. 새로고침하면 다시 재생됩니다.<br>
+  컬러 시스템: Paper #FAF7F2 · Ink #1B1916 · Electric #FF3D5A→#FF7A3D · Muted #8E887E — 이 네 가지가 전부입니다.
+</p>
+
+</body>
+</html>
