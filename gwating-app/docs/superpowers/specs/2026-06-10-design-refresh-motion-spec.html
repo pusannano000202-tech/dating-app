@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>부팅 — Motion Spec</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+:root{
+  --paper:#FAF7F2;--ink:#1B1916;--muted:#8E887E;--line:rgba(27,25,22,.08);
+  --g1:#FF3D5A;--g2:#FF7A3D;--grad:linear-gradient(120deg,#FF3D5A,#FF7A3D);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;background:#131110;color:#EDE9E2;padding:52px 28px 80px}
+.gt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro{max-width:1100px;margin:0 auto 40px;text-align:center}
+.intro .eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;color:#8E887E;margin-bottom:12px}
+.intro h1{font-size:32px;font-weight:900;letter-spacing:-1px}
+.intro p{margin-top:10px;font-size:13px;color:#A8A299;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px;max-width:1100px;margin:0 auto}
+.tile{border-radius:20px;background:#1C1916;border:1px solid rgba(237,233,226,.08);overflow:hidden}
+.stage{height:200px;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:20px}
+.stage.dark{background:radial-gradient(140% 100% at 80% -10%,#2B2017 0%,#191512 55%)}
+.meta{padding:14px 18px 16px}
+.meta .n{font-size:10px;font-weight:800;letter-spacing:2.5px;color:#FF6A4E}
+.meta h3{font-size:14px;font-weight:800;color:#F2EEE7;margin-top:4px;letter-spacing:-.2px}
+.meta p{font-size:11.5px;color:#8E887E;margin-top:4px;line-height:1.6}
+
+/* ---- 01 스태거 엔트런스 ---- */
+@keyframes stg{0%{opacity:0;transform:translateY(14px)}10%,78%{opacity:1;transform:none}88%,100%{opacity:0;transform:translateY(14px)}}
+.sk{width:200px;border-radius:10px;background:#fff;border:1px solid var(--line);height:34px;margin-top:8px;animation:stg 4s ease infinite}
+.sk.t{height:18px;width:130px;background:rgba(27,25,22,.85);border:0;border-radius:6px;margin-top:0}
+
+/* ---- 02 터치 피드백 ---- */
+@keyframes press{0%,68%,100%{transform:scale(1);box-shadow:0 14px 28px rgba(27,25,22,.22)}76%,84%{transform:scale(.96);box-shadow:0 6px 12px rgba(27,25,22,.18)}}
+.pressbtn{width:200px;height:52px;border-radius:18px;background:var(--ink);color:#fff;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:press 3.2s ease infinite;transition:transform .12s ease,box-shadow .12s ease;user-select:none}
+.pressbtn:active{transform:scale(.94)!important;box-shadow:0 4px 10px rgba(27,25,22,.18)!important;animation-play-state:paused}
+
+/* ---- 03 오로라 드리프트 ---- */
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(16px,-18px) scale(1.14)}}
+.blob{position:absolute;border-radius:50%;filter:blur(34px);animation:drift 9s ease-in-out infinite alternate}
+
+/* ---- 04 웰컴 카피 ---- */
+@keyframes copyIn{0%{opacity:0;transform:translateY(12px)}12%,75%{opacity:1;transform:none}85%,100%{opacity:0;transform:translateY(12px)}}
+.copy{font-size:21px;font-weight:900;letter-spacing:-.8px;line-height:1.3;color:var(--ink);text-align:center}
+.copy span{display:block;animation:copyIn 5s ease infinite}
+
+/* ---- 05 펄스 닷 ---- */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes halo{0%{box-shadow:0 0 0 0 rgba(255,122,61,.5)}70%,100%{box-shadow:0 0 0 12px rgba(255,122,61,0)}}
+.statuspill{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#FFB9A3;background:#26211C;border-radius:999px;padding:10px 16px}
+.statuspill .dot{width:8px;height:8px;border-radius:50%;background:#FF7A3D;animation:pulse 1.6s ease-in-out infinite,halo 1.6s ease-out infinite}
+
+/* ---- 06 진행바 ---- */
+@keyframes fill{0%{width:0}45%,85%{width:75%}100%{width:0}}
+.progwrap{width:200px}
+.prog{height:6px;border-radius:3px;background:rgba(27,25,22,.1);overflow:hidden}
+.prog i{display:block;height:100%;border-radius:3px;background:var(--grad);animation:fill 4s cubic-bezier(.22,1,.36,1) infinite}
+.progcap{margin-top:10px;font-size:11px;font-weight:600;color:var(--muted);text-align:center}
+
+/* ---- 07 선택 팝 ---- */
+@keyframes selpop{0%,38%{transform:scale(1);border-color:rgba(27,25,22,.1);background:#fff;box-shadow:none}46%{transform:scale(1.04)}52%,88%{transform:scale(1);border-color:#FF4D3D;background:#FFF6F1;box-shadow:0 10px 22px rgba(255,77,61,.16)}100%{transform:scale(1);border-color:rgba(27,25,22,.1);background:#fff;box-shadow:none}}
+.acard{width:200px;border-radius:16px;border:1.5px solid var(--line);background:#fff;padding:13px 15px;margin-top:9px}
+.acard h4{font-size:12.5px;font-weight:800;color:var(--ink)}
+.acard p{font-size:10.5px;color:var(--muted);margin-top:2px}
+.acard.anim{animation:selpop 4.5s ease infinite}
+
+/* ---- 08 케미 링 ---- */
+@keyframes ring{0%{stroke-dashoffset:283}38%,85%{stroke-dashoffset:23}100%{stroke-dashoffset:283}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.ringwrap{position:relative;width:120px;height:120px;animation:floaty 3.4s ease-in-out infinite}
+.ringwrap svg{transform:rotate(-90deg)}
+.ringwrap .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringwrap b{font-size:30px;font-weight:900;letter-spacing:-1px;color:var(--ink);line-height:1}
+.ringwrap span{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-top:2px}
+
+/* ---- 09 광택 스윕 ---- */
+@keyframes shine{0%{background-position:200% center}100%{background-position:-200% center}}
+.dnum{font-size:64px;font-weight:900;letter-spacing:-3px;background:linear-gradient(110deg,#FF3D5A 25%,#FFC2A1 50%,#FF7A3D 75%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4s linear infinite}
+
+/* ---- 10 글래스 카드 등장 ---- */
+@keyframes glassIn{0%{opacity:0;transform:translateY(14px)}12%,78%{opacity:1;transform:none}88%,100%{opacity:0;transform:translateY(14px)}}
+.glassrow{width:210px;border-radius:14px;background:rgba(242,238,231,.07);border:1px solid rgba(242,238,231,.12);backdrop-filter:blur(6px);padding:12px 15px;display:flex;justify-content:space-between;font-size:11.5px;margin-top:8px;animation:glassIn 4.5s ease infinite}
+.glassrow .k{color:rgba(237,233,226,.5);font-weight:600}
+.glassrow .v{color:#F2EEE7;font-weight:800}
+
+/* ---- 11 말풍선 + 타이핑 ---- */
+@keyframes bubIn{0%{opacity:0;transform:translateY(10px) scale(.96)}10%,80%{opacity:1;transform:none}90%,100%{opacity:0;transform:translateY(10px) scale(.96)}}
+@keyframes typing{0%,60%,100%{transform:none;opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+.chatcol{display:flex;flex-direction:column;width:210px;gap:7px}
+.bub{max-width:85%;padding:9px 12px;font-size:11px;font-weight:600;line-height:1.45;animation:bubIn 5s ease infinite}
+.bub.them{align-self:flex-start;background:#fff;color:#2B2722;border:1px solid var(--line);border-radius:14px 14px 14px 5px}
+.bub.me{align-self:flex-end;background:var(--grad);color:#fff;border-radius:14px 14px 5px 14px;box-shadow:0 6px 14px rgba(255,77,61,.25)}
+.typing{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px 14px 14px 5px;padding:10px 12px;display:flex;gap:4px;animation:bubIn 5s .9s ease infinite}
+.typing i{width:5px;height:5px;border-radius:50%;background:#C8C1B5;animation:typing 1.2s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+
+/* ---- 12 칩 선택 팝 ---- */
+@keyframes chippop{0%,40%{transform:scale(1);background:#fff;color:#6E675C;border-color:rgba(27,25,22,.1)}47%{transform:scale(1.1)}53%,88%{transform:scale(1);background:#FFF0EA;color:#E5402E;border-color:#FF9D7E}100%{transform:scale(1);background:#fff;color:#6E675C;border-color:rgba(27,25,22,.1)}}
+.chips{display:flex;gap:7px}
+.chip{font-size:11.5px;font-weight:700;border:1.5px solid var(--line);background:#fff;color:#6E675C;border-radius:999px;padding:8px 14px}
+.chip.anim{animation:chippop 4s ease infinite}
+
+.footnote{max-width:1100px;margin:36px auto 0;text-align:center;font-size:12px;color:#6E675C;line-height:1.8}
+</style>
+</head>
+<body>
+
+<header class="intro">
+  <div class="eyebrow">BOOTING · MOTION SPEC</div>
+  <h1>부팅 <span class="gt">모션</span> 전체 카탈로그</h1>
+  <p>스펙 v2에 들어가는 12가지 애니메이션을 하나씩 분리했습니다. 전부 무한 반복 중이고, 실제 구현도 이 타이밍 그대로 갑니다.</p>
+</header>
+
+<div class="grid">
+
+  <div class="tile">
+    <div class="stage">
+      <div class="sk t" style="animation-delay:0s"></div>
+      <div class="sk" style="animation-delay:.12s"></div>
+      <div class="sk" style="animation-delay:.24s"></div>
+      <div class="sk" style="animation-delay:.36s"></div>
+    </div>
+    <div class="meta"><div class="n">01 · 전 페이지 공통</div><h3>스태거 엔트런스</h3><p>PageShell이 직계 자식에게 0.12s 간격 딜레이를 자동 부여 — 페이지 진입마다 위→아래 순차 등장.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="pressbtn">직접 눌러보세요</div>
+    </div>
+    <div class="meta"><div class="n">02 · 모든 버튼/카드</div><h3>터치 피드백</h3><p>누르면 0.96배 축소 + 그림자 가라앉음. 데모는 3.2초마다 자동으로 눌리지만, 마우스로 직접 눌러도 됩니다.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="blob" style="width:150px;height:150px;top:-40px;right:-30px;background:rgba(255,61,90,.20)"></div>
+      <div class="blob" style="width:130px;height:130px;bottom:-50px;left:-30px;background:rgba(201,184,255,.30);animation-delay:-4s"></div>
+      <div style="font-size:13px;font-weight:700;color:var(--muted);position:relative">배경이 천천히 숨쉬는 중</div>
+    </div>
+    <div class="meta"><div class="n">03 · 웰컴/결과/다크</div><h3>오로라 블롭 드리프트</h3><p>블러 처리된 컬러 블롭이 9초 주기로 떠다님. 정적인 페이퍼 캔버스에 생기를 주는 배경 레이어.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="copy">
+        <span style="animation-delay:.2s">연애세포,</span>
+        <span style="animation-delay:.45s">다시 <em class="gt" style="font-style:normal">부팅</em>할</span>
+        <span style="animation-delay:.7s">시간.</span>
+      </div>
+    </div>
+    <div class="meta"><div class="n">04 · 웰컴</div><h3>카피 순차 등장</h3><p>디스플레이 카피가 한 줄씩 떠오름. CTA는 마지막 줄 뒤 0.3초에 등장.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="statuspill"><span class="dot"></span>매칭 탐색 중</div>
+    </div>
+    <div class="meta"><div class="n">05 · 홈 팀 카드</div><h3>펄스 닷</h3><p>점멸 + 퍼지는 헤일로 이중 펄스. "시스템이 지금 일하고 있다"는 살아있는 신호.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="progwrap">
+        <div class="prog"><i></i></div>
+        <div class="progcap">팀 성향 분석 3/4 완료</div>
+      </div>
+    </div>
+    <div class="meta"><div class="n">06 · 홈/테스트</div><h3>진행바 차오름</h3><p>스프링 이징으로 목표치까지 차오름. 테스트 진행바·팀 분석 진행바 공용.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="acard anim"><h4>분위기 좋은 카페</h4><p>차분하게, 대화 위주로</p></div>
+      <div class="acard"><h4>왁자지껄 술자리</h4><p>게임하면서 친해지기</p></div>
+    </div>
+    <div class="meta"><div class="n">07 · 성향 테스트</div><h3>선택 팝</h3><p>답변을 고르면 1.04배 오버슈트 후 일렉트릭 보더 + 틴트로 안착.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="ringwrap">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <defs><linearGradient id="rg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF3D5A"/><stop offset="1" stop-color="#FF7A3D"/></linearGradient></defs>
+          <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(27,25,22,.07)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="45" fill="none" stroke="url(#rg2)" stroke-width="10" stroke-linecap="round" stroke-dasharray="283" style="animation:ring 4.5s cubic-bezier(.22,1,.36,1) infinite"/>
+        </svg>
+        <div class="num"><b>92</b><span>CHEMI</span></div>
+      </div>
+    </div>
+    <div class="meta"><div class="n">08 · 매칭 결과</div><h3>케미 링 드로잉</h3><p>그라디언트 링이 1.6초 동안 92%까지 차오르며 둥실 플로팅. 결과 화면의 드라마.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage dark">
+      <div class="dnum">D-3</div>
+    </div>
+    <div class="meta"><div class="n">09 · 확정 (다크)</div><h3>광택 스윕</h3><p>거대한 D-n 숫자 위로 광택이 4초 주기로 흐름. 카운트다운의 설렘 연출.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage dark">
+      <div class="glassrow" style="animation-delay:.15s"><span class="k">장소</span><span class="v">부산대 정문 앞</span></div>
+      <div class="glassrow" style="animation-delay:.3s"><span class="k">인원</span><span class="v">3 : 3</span></div>
+      <div class="glassrow" style="animation-delay:.45s"><span class="k">보증금</span><span class="v" style="color:#8CE8B4">✓ 전원 확정</span></div>
+    </div>
+    <div class="meta"><div class="n">10 · 확정/Q&amp;A (다크)</div><h3>글래스 카드 등장</h3><p>반투명 블러 카드가 순차 페이드업. 다크 무드의 정보 위계.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage" style="background:#F6F2EB">
+      <div class="chatcol">
+        <div class="bub them" style="animation-delay:.1s">내일 7시 그대로 가는 거죠?</div>
+        <div class="bub me" style="animation-delay:.5s">네 좋아요! 정문 앞에서 봬요 ✦</div>
+        <div class="typing"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+    <div class="meta"><div class="n">11 · 채팅</div><h3>말풍선 등장 + 타이핑 도트</h3><p>말풍선은 살짝 부풀며 등장, 상대가 입력 중이면 도트 3개가 파도침.</p></div>
+  </div>
+
+  <div class="tile">
+    <div class="stage">
+      <div class="chips">
+        <span class="chip anim"># 차분한</span>
+        <span class="chip"># 카페파</span>
+        <span class="chip"># 수요일</span>
+      </div>
+    </div>
+    <div class="meta"><div class="n">12 · 팀 생성/추천</div><h3>칩 선택 팝</h3><p>무드 칩 선택 시 1.1배 팝 + 일렉트릭 하이라이트로 안착.</p></div>
+  </div>
+
+</div>
+
+<p class="footnote">
+  전부 순수 CSS keyframes — 라이브러리 0개. <b style="color:#C9C3B8">prefers-reduced-motion</b> 설정 시 01~12 전체가 비활성화됩니다.<br>
+  쇼케이스(화면 단위 조합)는 이전 화면에서, 이 페이지는 부품 단위 타이밍 기준으로 사용.
+</p>
+
+</body>
+</html>
