@@ -60,18 +60,18 @@ body {
 }
 
 /* 스태거 엔트런스: .stagger 직계 자식이 0.12s 간격으로 순차 등장 (모션 01) */
-.stagger > * {
+.stagger > *:not(.animate-drift) {
   animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger > *:nth-child(2) { animation-delay: 0.17s; }
-.stagger > *:nth-child(3) { animation-delay: 0.29s; }
-.stagger > *:nth-child(4) { animation-delay: 0.41s; }
-.stagger > *:nth-child(5) { animation-delay: 0.53s; }
-.stagger > *:nth-child(6) { animation-delay: 0.65s; }
-.stagger > *:nth-child(7) { animation-delay: 0.77s; }
-.stagger > *:nth-child(8) { animation-delay: 0.89s; }
-.stagger > *:nth-child(n + 9) { animation-delay: 1.01s; }
+.stagger > *:not(.animate-drift):nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:not(.animate-drift):nth-child(2) { animation-delay: 0.17s; }
+.stagger > *:not(.animate-drift):nth-child(3) { animation-delay: 0.29s; }
+.stagger > *:not(.animate-drift):nth-child(4) { animation-delay: 0.41s; }
+.stagger > *:not(.animate-drift):nth-child(5) { animation-delay: 0.53s; }
+.stagger > *:not(.animate-drift):nth-child(6) { animation-delay: 0.65s; }
+.stagger > *:not(.animate-drift):nth-child(7) { animation-delay: 0.77s; }
+.stagger > *:not(.animate-drift):nth-child(8) { animation-delay: 0.89s; }
+.stagger > *:not(.animate-drift):nth-child(n + 9) { animation-delay: 1.01s; }
 
 /* 매칭 탐색 펄스 닷 — 점멸 + 퍼지는 헤일로 (모션 05) */
 .dot-live {
