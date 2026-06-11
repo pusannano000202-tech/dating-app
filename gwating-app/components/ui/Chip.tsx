@@ -16,6 +16,7 @@ export function Chip({
   return (
     <button
       type="button"
+      aria-pressed={selected}
       className={`rounded-full border-[1.5px] px-4 py-2 text-xs font-bold transition-colors duration-150 active:scale-95 ${look} ${className}`}
       {...props}
     >
