@@ -12,6 +12,85 @@
 }
 
 body {
-  background-color: #ffffff;
-  color: #222222;
+  background-color: #131110;
+  color: #1b1916;
+}
+
+/* ── 모션 키프레임 (모션 카탈로그 01~12 기준) ── */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(18px, -22px) scale(1.14); }
+}
+@keyframes bolt-in {
+  0% { opacity: 0; transform: scale(0.3) rotate(-14deg); }
+  65% { transform: scale(1.18) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@keyframes glow-breathe {
+  0%, 100% { box-shadow: 0 18px 36px rgba(27, 25, 22, 0.24); }
+  50% { box-shadow: 0 18px 44px rgba(255, 77, 61, 0.28); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+@keyframes halo {
+  0% { box-shadow: 0 0 0 0 rgba(255, 122, 61, 0.5); }
+  70%, 100% { box-shadow: 0 0 0 12px rgba(255, 122, 61, 0); }
+}
+@keyframes fill-bar {
+  from { width: 0; }
+}
+@keyframes shine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+@keyframes typing {
+  0%, 60%, 100% { transform: none; opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes chip-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* 스태거 엔트런스: .stagger 직계 자식이 0.12s 간격으로 순차 등장 (모션 01) */
+.stagger > * {
+  animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.17s; }
+.stagger > *:nth-child(3) { animation-delay: 0.29s; }
+.stagger > *:nth-child(4) { animation-delay: 0.41s; }
+.stagger > *:nth-child(5) { animation-delay: 0.53s; }
+.stagger > *:nth-child(6) { animation-delay: 0.65s; }
+.stagger > *:nth-child(7) { animation-delay: 0.77s; }
+.stagger > *:nth-child(8) { animation-delay: 0.89s; }
+.stagger > *:nth-child(n + 9) { animation-delay: 1.01s; }
+
+/* 매칭 탐색 펄스 닷 — 점멸 + 퍼지는 헤일로 (모션 05) */
+.dot-live {
+  animation:
+    pulse-dot 1.6s ease-in-out infinite,
+    halo 1.6s ease-out infinite;
+}
+
+/* 칩 선택 팝 (모션 12) */
+.chip-pop {
+  animation: chip-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 접근성: 모션 최소화 (스펙 요구사항) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
