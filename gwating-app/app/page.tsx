@@ -1,50 +1,56 @@
 import Link from "next/link";
-import { Button } from "@/components/Button";
+import { AuroraBlob } from "@/components/ui/AuroraBlob";
+import { BoltLogo } from "@/components/ui/BoltLogo";
+import { Button } from "@/components/ui/Button";
+import { PageShell } from "@/components/ui/PageShell";
 
-export default function HomePage() {
+export default function WelcomePage() {
   return (
-    <main className="min-h-screen bg-white flex flex-col items-center justify-between px-7 pt-14 pb-10">
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-2 mb-1">
-          <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-primary to-[#ff7e5f] flex items-center justify-center text-lg shadow-[0_3px_10px_rgba(255,90,111,0.25)]">
-            ⚡
-          </div>
-          <span className="text-[22px] font-black text-ink tracking-[-0.8px]">부팅</span>
-        </div>
-        <p className="text-[10px] font-semibold text-muted tracking-[1.5px] uppercase">
-          부산대 과팅 서비스
-        </p>
+    <PageShell stagger={false} className="px-7">
+      <AuroraBlob className="-right-28 -top-24 h-80 w-80 bg-[#FF3D5A]/15" />
+      <AuroraBlob className="-left-32 top-72 h-72 w-72 bg-[#C9B8FF]/20 [animation-delay:-4s]" />
+      <AuroraBlob className="-bottom-20 -right-16 h-60 w-60 bg-[#FF7A3D]/10 [animation-delay:-7s]" />
+
+      <div className="mt-6 flex animate-rise items-center gap-2.5 [animation-delay:0.15s]">
+        <span className="animate-bolt-in [animation-delay:0.25s]">
+          <BoltLogo size={24} />
+        </span>
+        <span className="text-[21px] font-black tracking-[-0.6px]">부팅</span>
       </div>
 
-      <div className="relative">
-        <div className="w-32 h-32 rounded-full bg-primary-soft border-2 border-primary-disabled flex items-center justify-center text-[56px] shadow-[0_8px_32px_rgba(255,90,111,0.10)]">
-          🎉
-        </div>
-        <span className="absolute -top-1 -right-1 text-xl">✨</span>
-        <span className="absolute -bottom-1 -left-3 text-lg">💬</span>
-      </div>
-
-      <div className="w-full text-center">
-        <h1 className="text-[21px] font-black text-ink leading-snug tracking-[-0.6px] mb-1.5">
-          당신의 연애세포를
-          <br />
-          <span className="text-primary">부팅</span>하세요!
+      <div className="my-auto">
+        <h1 className="text-[38px] font-black leading-[1.22] tracking-[-1.8px]">
+          <span className="block animate-rise [animation-delay:0.5s]">연애세포,</span>
+          <span className="block animate-rise [animation-delay:0.68s]">
+            다시{" "}
+            <em className="bg-electric bg-clip-text not-italic text-transparent">
+              부팅
+            </em>
+            할
+          </span>
+          <span className="block animate-rise [animation-delay:0.86s]">시간.</span>
         </h1>
-        <p className="text-xs text-muted mb-6 leading-relaxed">
-          부산대생끼리 팀을 이뤄
+        <p className="mt-4 animate-rise text-[15px] font-medium leading-[1.75] text-muted [animation-delay:1.1s]">
+          부산대생 팀 과팅 · 프로필 비공개
           <br />
-          딱 맞는 상대팀과 설레는 과팅을
+          매칭부터 시간·장소까지 자동 확정
         </p>
-        <Link href="/test" className="block mb-3">
-          <Button variant="primary" fullWidth>
-            성향 테스트 시작하기 →
+      </div>
+
+      <div className="mb-6 flex flex-col gap-4">
+        <Link href="/test" className="block animate-rise [animation-delay:1.35s]">
+          <Button variant="ink" fullWidth className="animate-glow-breathe">
+            시작하기 <BoltLogo size={16} variant="electric" />
           </Button>
         </Link>
-        <Link href="/team/create" className="text-xs text-muted">
+        <Link
+          href="/team/create"
+          className="animate-rise text-center text-sm font-semibold text-muted [animation-delay:1.55s]"
+        >
           팀 초대를 받으셨나요?{" "}
-          <span className="text-primary font-bold">코드로 합류</span>
+          <b className="font-extrabold text-[#E5402E]">코드로 합류 →</b>
         </Link>
       </div>
-    </main>
+    </PageShell>
   );
 }
