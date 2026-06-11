@@ -1,4 +1,4 @@
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, KeyboardEvent } from "react";
 
 type Props = HTMLAttributes<HTMLDivElement> & {
   variant?: "light" | "dark" | "glass";
@@ -21,9 +21,22 @@ export function Card({
   const press = pressable
     ? "cursor-pointer transition-[transform,box-shadow] duration-150 active:scale-[0.97] active:shadow-pressed"
     : "";
+  const interactive = pressable
+    ? {
+        role: "button" as const,
+        tabIndex: 0,
+        onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            e.currentTarget.click();
+          }
+        },
+      }
+    : {};
   return (
     <div
       className={`rounded-card p-5 ${variants[variant]} ${press} ${className}`}
+      {...interactive}
       {...props}
     >
       {children}
