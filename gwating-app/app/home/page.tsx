@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuroraBlob } from "@/components/ui/AuroraBlob";
 import { Avatar } from "@/components/ui/Avatar";
@@ -11,6 +12,7 @@ import { loadTeam } from "@/lib/storage";
 const FALLBACK = { teamName: "공대 F4", initials: ["성", "현", "준"] };
 
 export default function HomeDashboardPage() {
+  const router = useRouter();
   const [teamName, setTeamName] = useState(FALLBACK.teamName);
   const [initials, setInitials] = useState<string[]>(FALLBACK.initials);
 
@@ -69,7 +71,11 @@ export default function HomeDashboardPage() {
           </div>
         </Card>
 
-        <Card className="mt-4" pressable>
+        <Card
+          className="mt-4"
+          pressable
+          onClick={() => router.push("/match/result")}
+        >
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold tracking-[2.5px] text-muted">
               추천 상대팀
