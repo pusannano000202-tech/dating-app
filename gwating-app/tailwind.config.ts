@@ -77,6 +77,7 @@ const config: Config = {
         fill: "fill-bar 1.4s cubic-bezier(0.22,1,0.36,1) both",
         shine: "shine 4s linear infinite",
         typing: "typing 1.2s ease-in-out infinite",
+        floaty: "floaty 3.4s ease-in-out infinite",
       },
     },
   },

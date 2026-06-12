@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AuroraBlob } from "@/components/ui/AuroraBlob";
 import { BoltLogo } from "@/components/ui/BoltLogo";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { PageShell } from "@/components/ui/PageShell";
 
 export default function WelcomePage() {
@@ -38,11 +38,11 @@ export default function WelcomePage() {
       </div>
 
       <div className="mb-6 flex flex-col gap-4">
-        <Link href="/test" className="block animate-rise [animation-delay:1.35s]">
-          <Button variant="ink" fullWidth className="animate-glow-breathe">
+        <div className="animate-rise [animation-delay:1.35s]">
+          <ButtonLink href="/test" variant="ink" fullWidth className="animate-glow-breathe">
             시작하기 <BoltLogo size={16} variant="electric" />
-          </Button>
-        </Link>
+          </ButtonLink>
+        </div>
         <Link
           href="/team/create"
           className="animate-rise text-center text-sm font-semibold text-muted [animation-delay:1.55s]"

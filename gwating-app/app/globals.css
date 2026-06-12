@@ -58,6 +58,13 @@ body {
   50% { transform: scale(1.1); }
   100% { transform: scale(1); }
 }
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ring-draw {
+  from { stroke-dashoffset: 414.69; }
+}
 
 /* 스태거 엔트런스: .stagger 직계 자식이 0.12s 간격으로 순차 등장 (모션 01) */
 .stagger > *:not(.animate-drift) {
