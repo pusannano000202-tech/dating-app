@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BoltLogo } from "@/components/ui/BoltLogo";
 
 type Props = {
   step?: number;
@@ -7,13 +8,11 @@ type Props = {
 
 export function AppHeader({ step, totalSteps }: Props) {
   return (
-    <header className="h-11 border-b border-hairline-soft bg-white/90 backdrop-blur-sm sticky top-0 z-10">
-      <div className="max-w-[1120px] mx-auto px-4 h-full flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-1.5">
-          <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-primary to-[#ff7e5f] flex items-center justify-center text-xs shadow-[0_2px_6px_rgba(255,90,111,0.25)]">
-            ⚡
-          </div>
-          <span className="font-black text-ink text-[15px] tracking-[-0.5px]">부팅</span>
+    <header className="sticky top-0 z-30 border-b border-line bg-paper/80 backdrop-blur-xl">
+      <div className="flex h-12 items-center justify-between px-5">
+        <Link href="/" className="flex items-center gap-2">
+          <BoltLogo size={18} />
+          <span className="text-[15px] font-black tracking-[-0.5px] text-ink">부팅</span>
         </Link>
         {step !== undefined && totalSteps !== undefined && (
           <span className="text-[10px] font-bold text-muted">
