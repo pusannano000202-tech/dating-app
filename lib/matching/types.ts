@@ -29,9 +29,8 @@ export interface Big5Vector {
 export interface MatchingPreferenceWeights {
   appearance: number
   personality: number
-  time: number
-  scoreBand: number
-  weightAlignment: number
+  height: number
+  bodyType: number
 }
 
 export interface GroupSummary {

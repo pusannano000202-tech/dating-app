@@ -66,7 +66,7 @@ export default function MatchReviewQueuePage() {
           <Link href="/admin" className="p-2 glass rounded-xl"><ChevronLeft size={18} /></Link>
           <div>
             <h1 className="text-xl font-black">매칭 리뷰 대기</h1>
-            <p className="text-xs text-gray-500 mt-0.5">근거를 보고 승인/거절하세요</p>
+            <p className="text-xs text-boot-muted mt-0.5">근거를 보고 승인/거절하세요</p>
           </div>
         </header>
 
@@ -75,24 +75,24 @@ export default function MatchReviewQueuePage() {
         )}
 
         {loading ? (
-          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-gray-400">
+          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
             <Loader2 size={18} className="animate-spin" /> 불러오는 중
           </section>
         ) : matches.length === 0 ? (
-          <section className="glass rounded-3xl p-6 text-center text-sm text-gray-400">
+          <section className="glass rounded-3xl p-6 text-center text-sm text-boot-muted">
             대기 중인 매칭이 없어요.
           </section>
         ) : (
           <div className="space-y-3">
             {matches.map((m) => (
-              <section key={m.match_id} className="glass-card rounded-3xl p-5 border border-white/[0.06]">
+              <section key={m.match_id} className="glass-card rounded-3xl p-5 border border-boot-hairline">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-bold">
                       {m.group_a_size}명({m.group_a_gender === 'male' ? '남' : '여'}) ↔ {m.group_b_size}명({m.group_b_gender === 'male' ? '남' : '여'})
-                      {m.is_forced && <span className="ml-2 text-[10px] text-amber-300">강제</span>}
+                      {m.is_forced && <span className="ml-2 text-[10px] text-amber-700">강제</span>}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-boot-muted">
                       점수 {m.score != null ? (m.score * 100).toFixed(0) : '–'} · {m.matched_at ? new Date(m.matched_at).toLocaleString('ko-KR') : ''}
                     </p>
                   </div>
@@ -102,11 +102,11 @@ export default function MatchReviewQueuePage() {
                 </div>
 
                 {m.score_breakdown && (
-                  <div className="mt-3 grid grid-cols-3 gap-2 text-[11px] text-gray-400">
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-[11px] text-boot-muted">
                     {breakdownRows(m.score_breakdown).map(([label, val]) => (
-                      <div key={label} className="rounded-lg bg-white/[0.04] px-2 py-1.5">
-                        <span className="text-gray-500">{label}</span>{' '}
-                        <span className="text-gray-200 font-medium">{val}</span>
+                      <div key={label} className="rounded-lg bg-white/90 px-2 py-1.5">
+                        <span className="text-boot-muted">{label}</span>{' '}
+                        <span className="text-boot-body font-medium">{val}</span>
                       </div>
                     ))}
                   </div>
@@ -125,7 +125,7 @@ export default function MatchReviewQueuePage() {
                     type="button"
                     onClick={() => review(m.match_id, 'reject')}
                     disabled={busyId === m.match_id}
-                    className="py-2.5 rounded-2xl text-sm font-bold border border-white/15 text-gray-300 hover:border-red-400/40 hover:text-red-200 flex items-center justify-center gap-1.5 disabled:opacity-40"
+                    className="py-2.5 rounded-2xl text-sm font-bold border border-boot-hairline text-boot-body hover:border-red-400/40 hover:text-red-200 flex items-center justify-center gap-1.5 disabled:opacity-40"
                   >
                     <X size={16} /> 거절
                   </button>

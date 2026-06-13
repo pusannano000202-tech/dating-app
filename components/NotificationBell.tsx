@@ -30,7 +30,7 @@ export default function NotificationBell() {
   return (
     <Link
       href="/notifications"
-      className="relative p-2 glass rounded-xl hover:border-violet-400/30"
+      className="relative p-2 glass rounded-xl border border-boot-hairline text-boot-body hover:border-boot-primary/30 hover:text-boot-primary"
       aria-label="알림"
     >
       <Bell size={18} />

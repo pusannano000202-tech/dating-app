@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase'
 import { loadIdealMetadata, type IdealMetadata } from '@/lib/appearance/metadata'
 import type { PreferenceResult } from '@/lib/appearance/preference'
 import { legacyTypeFromBucketWeights } from '@/lib/appearance/bucket-to-legacy'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { isSupabaseConfigured } from '@/lib/utils'
 import type { Gender } from '@/lib/types'
 
@@ -29,7 +30,7 @@ export default function WorldcupPage() {
     let cancelled = false
     async function init() {
       try {
-        if (!isSupabaseConfigured()) {
+        if (!isSupabaseConfigured() || isDevPreviewClientSession()) {
           const meta = await loadIdealMetadata()
           if (cancelled) return
           setMetadata(meta)
@@ -84,19 +85,26 @@ export default function WorldcupPage() {
     setSaving(true)
     setSaveError(null)
     try {
-      if (!isSupabaseConfigured()) {
+      if (!isSupabaseConfigured() || isDevPreviewClientSession()) {
         try {
           sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
         } catch {
           // sessionStorage 미지원 환경은 조용히 무시
         }
-        router.push('/profile/photos')
+        router.push('/profile/survey')
         return
       }
 
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
+        if (isDevPreviewClientSession()) {
+          try {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
+          } catch {}
+          router.push('/profile/survey')
+          return
+        }
         router.push('/login')
         return
       }
@@ -161,7 +169,7 @@ export default function WorldcupPage() {
         sessionStorage.removeItem(SESSION_KEY)
       } catch {}
 
-      router.push('/profile/photos')
+      router.push('/profile/survey')
     } catch {
       setSaveError('저장 중 오류가 발생했어. 다시 시도해줘.')
     } finally {

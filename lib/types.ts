@@ -32,9 +32,6 @@ export interface PreferenceWeights {
   personality: number
   height: number
   body_type: number
-  school: number
-  hobby: number
-  time_fit: number
   // 합계 = 1.0 보장 필요
 }
 

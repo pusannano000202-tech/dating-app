@@ -3,6 +3,7 @@ import { createClient as createSupabaseServiceClient } from '@supabase/supabase-
 import { NextRequest, NextResponse } from 'next/server'
 import { isPnuEmail, normalizeSchoolEmail } from '@/lib/auth/school-email'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 
 interface RequestBody {
   email?: unknown
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString()
 
   const service = createSupabaseServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl(),
     process.env.SUPABASE_SERVICE_ROLE_KEY
   )
 
@@ -70,7 +71,7 @@ async function readJson(request: NextRequest): Promise<unknown> {
 }
 
 function hashSchoolEmailCode(userId: string, email: string, code: string): string {
-  const secret = process.env.SCHOOL_EMAIL_CODE_SECRET ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'local'
+  const secret = process.env.SCHOOL_EMAIL_CODE_SECRET || getSupabasePublicKey() || 'local'
   return createHash('sha256')
     .update(`${secret}:${userId}:${email}:${code}`)
     .digest('hex')

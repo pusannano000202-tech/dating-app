@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Loader2, LockKeyhole, MapPin, Navigation, Phone, Users } from 'lucide-react'
-import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Loader2, LockKeyhole, MapPin, Navigation, Phone, Sparkles, Users } from 'lucide-react'
+import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 
 interface MatchDetail {
   match_id: string
@@ -55,18 +55,105 @@ interface AttendanceState {
 }
 
 interface DailyCard {
+  id: string
   day_offset: number
   reveal_at: string
+  reveal_window_start: string
+  reveal_window_end: string
   revealed: boolean
+  can_pick: boolean
+  selected_at: string | null
+  forfeited_at: string | null
   alias: string
   card_kind: string
   title: string
   content_text: string | null
 }
 
+function createDevMatchDetail(matchId: string): MatchDetail {
+  const start = new Date(Date.now() + 1000 * 60 * 60 * 26)
+  const end = new Date(start.getTime() + 1000 * 60 * 90)
+
+  return {
+    match_id: matchId,
+    my_group_id: 'dev-group-1',
+    opp_group_id: 'dev-group-2',
+    opp_group_size: 3,
+    opp_group_gender: 'female',
+    match_status: 'confirmed',
+    matched_at: new Date().toISOString(),
+    confirmed_at: new Date().toISOString(),
+    completed_at: null,
+    my_confirmed_at: new Date().toISOString(),
+    opp_confirmed_at: new Date().toISOString(),
+    scheduled_start: start.toISOString(),
+    scheduled_end: end.toISOString(),
+    venue_name: 'PNU Station Cafe',
+    venue_address: 'Busan National University',
+    venue_map_url: 'https://map.naver.com',
+    my_card_submitted_at: null,
+    my_card_content_text: '첫 만남 전에 좋아하는 노래를 공유해요.',
+    my_group_active_count: 3,
+    my_group_card_submitted_count: 2,
+    my_group_deposit_paid_count: 3,
+    my_group_ready: true,
+    opp_group_active_count: 3,
+    opp_group_card_submitted_count: 2,
+    opp_group_deposit_paid_count: 3,
+    opp_group_ready: true,
+  }
+}
+
+const DEV_CONNECTIONS: ConnectionRow[] = [
+  {
+    target_user_id: 'dev-opp-1',
+    target_display_name: 'Preview A',
+    contact_revealed_at: null,
+    scheduled_reveal_at: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
+    target_phone: null,
+  },
+  {
+    target_user_id: 'dev-opp-2',
+    target_display_name: 'Preview B',
+    contact_revealed_at: null,
+    scheduled_reveal_at: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
+    target_phone: null,
+  },
+]
+
+const DEV_ATTENDANCE: AttendanceState = {
+  my_checked_in: false,
+  my_within_radius: false,
+  total_participants: 6,
+  attendee_count: 0,
+  scheduled_start: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
+  finalize_available: false,
+  no_show_finalized: false,
+  caller_is_no_show: false,
+}
+
+const DEV_DAILY_CARDS: DailyCard[] = [
+  {
+    id: 'dev-card-1',
+    day_offset: 0,
+    reveal_at: new Date().toISOString(),
+    reveal_window_start: new Date().toISOString(),
+    reveal_window_end: new Date(Date.now() + 1000 * 60 * 60 * 4).toISOString(),
+    revealed: true,
+    can_pick: true,
+    selected_at: null,
+    forfeited_at: null,
+    alias: 'A',
+    card_kind: 'music',
+    title: '좋아하는 노래',
+    content_text: '처음 만나기 전에 서로 노래 하나씩 공유하기',
+  },
+]
+
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
+  const isDevPreview = isDevAuthBypassEnabled()
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -81,10 +168,20 @@ export default function MatchDetailPage() {
   const [depositSaving, setDepositSaving] = useState(false)
   const [dailyCards, setDailyCards] = useState<DailyCard[]>([])
   const [dailyCardsLoading, setDailyCardsLoading] = useState(false)
+  const [dailyCardPicking, setDailyCardPicking] = useState<number | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
     setError(null)
+
+    if (isDevPreview) {
+      const devMatch = createDevMatchDetail(matchId)
+      setMatch(devMatch)
+      setCardText(devMatch.my_card_content_text ?? '')
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}`)
       if (res.status === 401) {
@@ -107,7 +204,7 @@ export default function MatchDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [matchId])
+  }, [isDevPreview, matchId])
 
   useEffect(() => {
     refresh()
@@ -115,6 +212,12 @@ export default function MatchDetailPage() {
 
   const refreshConnections = useCallback(async () => {
     setConnectionsLoading(true)
+    if (isDevPreview) {
+      setConnections(DEV_CONNECTIONS)
+      setConnectionsLoading(false)
+      return
+    }
+
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/connections`)
       if (res.ok) {
@@ -126,7 +229,7 @@ export default function MatchDetailPage() {
     } finally {
       setConnectionsLoading(false)
     }
-  }, [matchId])
+  }, [isDevPreview, matchId])
 
   useEffect(() => {
     if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {
@@ -138,6 +241,12 @@ export default function MatchDetailPage() {
 
   const refreshDailyCards = useCallback(async () => {
     setDailyCardsLoading(true)
+    if (isDevPreview) {
+      setDailyCards(DEV_DAILY_CARDS)
+      setDailyCardsLoading(false)
+      return
+    }
+
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/daily-cards`)
       if (res.ok) {
@@ -149,7 +258,7 @@ export default function MatchDetailPage() {
     } finally {
       setDailyCardsLoading(false)
     }
-  }, [matchId])
+  }, [isDevPreview, matchId])
 
   useEffect(() => {
     if (match?.scheduled_start) {
@@ -160,6 +269,11 @@ export default function MatchDetailPage() {
   }, [match?.scheduled_start, refreshDailyCards])
 
   const refreshAttendance = useCallback(async () => {
+    if (isDevPreview) {
+      setAttendance(DEV_ATTENDANCE)
+      return
+    }
+
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/attendance-state`)
       if (res.ok) {
@@ -169,7 +283,7 @@ export default function MatchDetailPage() {
     } catch {
       // ignore
     }
-  }, [matchId])
+  }, [isDevPreview, matchId])
 
   useEffect(() => {
     if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {
@@ -222,7 +336,7 @@ export default function MatchDetailPage() {
 
   async function handleFinalize() {
     if (gpsBusy) return
-    if (!window.confirm('노쇼 처리하기? 현재 출석 안 된 사람의 보증금이 forfeit 됩니다.')) return
+    if (!window.confirm('노쇼 처리하기? 무료 베타 기간에는 결제 차감 없이 출석 상태만 기록됩니다.')) return
     setGpsBusy(true)
     setGpsMessage(null)
     try {
@@ -327,6 +441,29 @@ export default function MatchDetailPage() {
     }
   }
 
+  async function pickDailyCard(selectedSlot: number) {
+    if (dailyCardPicking) return
+    setDailyCardPicking(selectedSlot)
+    setError(null)
+    try {
+      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/daily-cards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selected_slot: selectedSlot }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateDailyCardError(data.error))
+        return
+      }
+      await refreshDailyCards()
+    } catch {
+      setError('오늘 카드를 뽑지 못했어요.')
+    } finally {
+      setDailyCardPicking(null)
+    }
+  }
+
   async function payDeposit() {
     if (depositSaving || !match) return
     setDepositSaving(true)
@@ -344,7 +481,7 @@ export default function MatchDetailPage() {
       }
       await refresh()
     } catch {
-      setError('보증금 결제에 실패했어요.')
+      setError('무료 베타 참여 확인에 실패했어요.')
     } finally {
       setDepositSaving(false)
     }
@@ -356,12 +493,19 @@ export default function MatchDetailPage() {
       case 'match_not_pending':   return '이미 처리된 매칭이에요.'
       case 'match_not_cancelable': return '취소할 수 없는 매칭이에요.'
       case 'match_card_incomplete': return '우리 그룹 전원이 카드를 작성해야 확정할 수 있어요.'
-      case 'deposit_not_paid':    return '우리 그룹 전원이 보증금을 결제해야 확정할 수 있어요.'
+      case 'deposit_not_paid':    return '우리 그룹 전원의 무료 베타 참여가 확인되어야 확정할 수 있어요.'
       case 'invalid_card_content': return '카드는 10자 이상 500자 이하로 작성해주세요.'
-      case 'deposit_already_exists': return '이미 결제한 보증금이 있어요.'
-      case 'not_group_member':    return '그룹 멤버만 보증금을 결제할 수 있어요.'
+      case 'deposit_already_exists': return '이미 무료 베타 참여가 확인됐어요.'
+      case 'not_group_member':    return '그룹 멤버만 무료 베타 참여 확인을 할 수 있어요.'
       default:                     return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
+  }
+
+  function translateDailyCardError(code?: string) {
+    if (code?.includes('no_draw_available')) return '지금은 뽑을 수 있는 카드가 없어요. 오후 4시부터 8시 사이에 하루 한 번만 가능해요.'
+    if (code?.includes('not_match_participant')) return '본인이 참여한 매칭의 카드만 뽑을 수 있어요.'
+    if (code?.includes('match_not_found')) return '매칭을 찾을 수 없어요.'
+    return '오늘 카드를 뽑지 못했어요.'
   }
 
   return (
@@ -373,7 +517,7 @@ export default function MatchDetailPage() {
           </Link>
           <div>
             <h1 className="text-xl font-black">매칭 상세</h1>
-            <p className="text-xs text-gray-500 mt-0.5">상대 그룹 정보 + 다음 단계 안내</p>
+            <p className="text-xs text-boot-muted mt-0.5">상대 그룹 정보 + 다음 단계 안내</p>
           </div>
         </header>
 
@@ -384,7 +528,7 @@ export default function MatchDetailPage() {
         )}
 
         {loading ? (
-          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-gray-400">
+          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
             <Loader2 size={18} className="animate-spin" />
             매칭 정보를 불러오는 중
           </section>
@@ -392,11 +536,11 @@ export default function MatchDetailPage() {
           <>
             <section className="glass-card rounded-3xl p-5 mb-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-12 w-12 rounded-2xl bg-violet-500/15 border border-violet-400/20 flex items-center justify-center">
-                  <Users size={22} className="text-violet-200" />
+                <div className="h-12 w-12 rounded-2xl bg-boot-soft border border-boot-hairline flex items-center justify-center">
+                  <Users size={22} className="text-boot-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">상대 그룹</p>
+                  <p className="text-xs text-boot-muted">상대 그룹</p>
                   <p className="text-lg font-black">
                     {match.opp_group_size}명 · {match.opp_group_gender === 'male' ? '남자' : '여자'}
                   </p>
@@ -429,30 +573,30 @@ export default function MatchDetailPage() {
               {match.scheduled_start ? (
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-3">
-                    <CalendarClock size={18} className="text-rose-200 mt-0.5" />
+                    <CalendarClock size={18} className="text-boot-coral mt-0.5" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-gray-500">약속 시간</p>
+                      <p className="text-xs text-boot-muted">약속 시간</p>
                       <p className="text-sm font-bold mt-0.5">
                         {formatDateTime(match.scheduled_start)}
                       </p>
                       {match.scheduled_end && (
-                        <p className="text-[11px] text-gray-500 mt-0.5">
+                        <p className="text-[11px] text-boot-muted mt-0.5">
                           ~ {formatDateTime(match.scheduled_end)}
                         </p>
                       )}
-                      <p className="text-[11px] text-rose-300 mt-1">
+                      <p className="text-[11px] text-boot-coral mt-1">
                         {formatCountdown(match.scheduled_start)}
                       </p>
                     </div>
                   </div>
                   {match.venue_name && (
-                    <div className="flex items-start gap-3 pt-3 border-t border-white/10">
-                      <MapPin size={18} className="text-violet-200 mt-0.5" />
+                    <div className="flex items-start gap-3 pt-3 border-t border-boot-hairline">
+                      <MapPin size={18} className="text-boot-primary mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs text-gray-500">장소</p>
+                        <p className="text-xs text-boot-muted">장소</p>
                         <p className="text-sm font-bold mt-0.5 truncate">{match.venue_name}</p>
                         {match.venue_address && (
-                          <p className="text-[11px] text-gray-500 mt-0.5 break-keep">
+                          <p className="text-[11px] text-boot-muted mt-0.5 break-keep">
                             {match.venue_address}
                           </p>
                         )}
@@ -461,7 +605,7 @@ export default function MatchDetailPage() {
                             href={match.venue_map_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-block mt-1 text-[11px] px-2 py-1 rounded-lg border border-violet-400/30 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20"
+                            className="inline-block mt-1 text-[11px] px-2 py-1 rounded-lg border border-boot-primary/25 bg-boot-soft text-boot-primary hover:bg-boot-soft"
                           >
                             지도로 열기
                           </a>
@@ -472,10 +616,10 @@ export default function MatchDetailPage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <CalendarClock size={18} className="text-rose-200" />
+                  <CalendarClock size={18} className="text-boot-coral" />
                   <div>
                     <p className="text-sm font-bold">만남 정보</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-boot-muted mt-0.5">
                       시간·장소는 매칭 엔진이 자동 확정해요. 곧 알림으로 전달돼요.
                     </p>
                   </div>
@@ -484,10 +628,10 @@ export default function MatchDetailPage() {
             </section>
 
             <section className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] px-4 py-3 flex items-start gap-3 mb-4">
-              <LockKeyhole size={16} className="text-emerald-300 mt-0.5 flex-shrink-0" />
+              <LockKeyhole size={16} className="text-emerald-700 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs font-bold text-emerald-200">상대 사진은 만남 시점에 공개</p>
-                <p className="mt-0.5 text-[11px] text-gray-500 leading-relaxed">
+                <p className="text-xs font-bold text-emerald-700">상대 사진은 만남 시점에 공개</p>
+                <p className="mt-0.5 text-[11px] text-boot-muted leading-relaxed">
                   실제 만남 시점까지 상대 그룹 멤버의 이름·사진은 공개되지 않아요.
                 </p>
               </div>
@@ -497,8 +641,8 @@ export default function MatchDetailPage() {
               <section className="glass-card rounded-3xl p-5 mb-4">
                 <div className="mb-4">
                   <p className="text-sm font-bold">가매칭 확정 준비</p>
-                  <p className="mt-1 text-xs text-gray-500 leading-relaxed">
-                    먼저 각자 상대에게 공개될 카드를 작성하고, 그다음 보증금을 결제해요.
+                  <p className="mt-1 text-xs text-boot-muted leading-relaxed">
+                    먼저 각자 상대에게 공개될 카드를 작성하고, 그다음 무료 베타 참여를 확인해요.
                     우리 그룹 전원이 완료하면 리더가 확정할 수 있어요.
                   </p>
                 </div>
@@ -510,7 +654,7 @@ export default function MatchDetailPage() {
                     total={match.my_group_active_count}
                   />
                   <ProgressPill
-                    label="우리 보증금"
+                    label="우리 참여"
                     current={match.my_group_deposit_paid_count}
                     total={match.my_group_active_count}
                   />
@@ -520,13 +664,13 @@ export default function MatchDetailPage() {
                     total={match.opp_group_active_count}
                   />
                   <ProgressPill
-                    label="상대 보증금"
+                    label="상대 참여"
                     current={match.opp_group_deposit_paid_count}
                     total={match.opp_group_active_count}
                   />
                 </div>
 
-                <label className="block text-xs font-bold text-gray-300 mb-2">
+                <label className="block text-xs font-bold text-boot-body mb-2">
                   내 카드
                 </label>
                 <textarea
@@ -534,11 +678,11 @@ export default function MatchDetailPage() {
                   onChange={(event) => setCardText(event.target.value)}
                   maxLength={500}
                   rows={5}
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-sm text-gray-100 outline-none focus:border-violet-400/40 resize-none"
+                  className="w-full rounded-2xl border border-boot-hairline bg-white/90 px-3 py-3 text-sm text-boot-ink outline-none focus:border-boot-primary resize-none"
                   placeholder="좋아하는 음식, 주말 취향, 대화 스타일처럼 익명으로 공개해도 되는 내용을 적어주세요."
                 />
                 <div className="mt-2 flex items-center justify-between gap-3">
-                  <p className="text-[11px] text-gray-600">
+                  <p className="text-[11px] text-boot-muted">
                     {cardText.trim().length}/500
                     {match.my_card_submitted_at ? ` · 저장됨 ${formatDateTime(match.my_card_submitted_at)}` : ''}
                   </p>
@@ -546,7 +690,7 @@ export default function MatchDetailPage() {
                     type="button"
                     onClick={saveCard}
                     disabled={cardSaving || cardText.trim().length < 10}
-                    className="px-3 py-2 rounded-xl text-xs font-bold border border-violet-400/30 bg-violet-500/10 text-violet-200 disabled:opacity-40"
+                    className="px-3 py-2 rounded-xl text-xs font-bold border border-boot-primary/25 bg-boot-soft text-boot-primary disabled:opacity-40"
                   >
                     {cardSaving ? '저장 중' : '카드 저장'}
                   </button>
@@ -556,16 +700,16 @@ export default function MatchDetailPage() {
                   type="button"
                   onClick={payDeposit}
                   disabled={depositSaving || match.my_group_deposit_paid_count >= match.my_group_active_count}
-                  className="mt-4 w-full py-3 rounded-2xl text-sm font-bold border border-emerald-400/30 bg-emerald-500/10 text-emerald-200 disabled:opacity-40"
+                  className="mt-4 w-full py-3 rounded-2xl text-sm font-bold border border-emerald-400/30 bg-emerald-500/10 text-emerald-700 disabled:opacity-40"
                 >
                   {match.my_group_deposit_paid_count >= match.my_group_active_count
-                    ? '우리 그룹 보증금 결제 완료'
-                    : `보증금 ${DEPOSIT_AMOUNT.toLocaleString()}원 결제 (mock)`}
+                    ? '우리 그룹 무료 베타 참여 확인 완료'
+                    : '무료 베타 참여 확인'}
                 </button>
 
                 {!match.my_group_ready && (
-                  <p className="mt-3 text-center text-xs text-amber-300/80">
-                    우리 그룹 전원이 카드와 보증금을 완료하면 확정 버튼이 열려요.
+                  <p className="mt-3 text-center text-xs text-amber-700/80">
+                    우리 그룹 전원이 카드와 무료 베타 참여 확인을 완료하면 확정 버튼이 열려요.
                   </p>
                 )}
               </section>
@@ -586,14 +730,14 @@ export default function MatchDetailPage() {
                   type="button"
                   onClick={cancelMatch}
                   disabled={saving}
-                  className="flex-1 py-3 rounded-2xl text-sm text-gray-300 border border-white/15 hover:border-white/25 disabled:opacity-40"
+                  className="flex-1 py-3 rounded-2xl text-sm text-boot-body border border-boot-hairline hover:border-boot-primary/30 disabled:opacity-40"
                 >
                   거절
                 </button>
               </div>
             )}
             {match.match_status === 'pending' && match.my_confirmed_at && !match.opp_confirmed_at && (
-              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-200 mb-2">
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-700 mb-2">
                 내 측은 확정 완료. 상대 그룹 리더의 확정을 기다리는 중이에요.
               </div>
             )}
@@ -612,17 +756,17 @@ export default function MatchDetailPage() {
                 <div className="flex items-start gap-3">
                   <AlertTriangle size={20} className="text-rose-400 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm font-bold text-rose-200">
+                    <p className="text-sm font-bold text-boot-coral">
                       {attendance.caller_is_no_show
                         ? '노쇼로 처리됐어요'
                         : '이번 매칭에 노쇼가 발생했어요'}
                     </p>
-                    <p className="mt-1.5 text-xs text-gray-400 leading-relaxed">
+                    <p className="mt-1.5 text-xs text-boot-muted leading-relaxed">
                       {attendance.caller_is_no_show
-                        ? '약속 장소 GPS 체크인이 확인되지 않아 보증금이 forfeit 됐어요. 환불 / 이어가기 / 평가 흐름은 진입할 수 없어요.'
-                        : '약속 장소에 안 나타난 사람의 보증금이 forfeit 되어 출석자에게 균등 분배됐어요. 만남이 정상적으로 이어지지 않아 환불 선택 / 평가는 생략돼요.'}
+                        ? '약속 장소 GPS 체크인이 확인되지 않았어요. 무료 베타 기간에는 결제 차감 없이 이어가기 / 평가 흐름만 막아요.'
+                        : '약속 장소에 안 나타난 사람이 있어 만남이 정상적으로 이어지지 않았어요. 무료 베타라 환불 선택 / 평가는 생략돼요.'}
                     </p>
-                    <p className="mt-2 text-[11px] text-gray-500">
+                    <p className="mt-2 text-[11px] text-boot-muted">
                       자세한 내역은 알림에서 확인하세요.
                     </p>
                   </div>
@@ -638,7 +782,7 @@ export default function MatchDetailPage() {
                 </Link>
                 <Link
                   href={`/match/${encodeURIComponent(matchId)}/review`}
-                  className="w-full py-3 rounded-2xl text-sm border border-white/15 text-gray-300 hover:border-white/30 text-center"
+                  className="w-full py-3 rounded-2xl text-sm border border-boot-hairline text-boot-body hover:border-boot-primary/40 text-center"
                 >
                   만남 평가 작성
                 </Link>
@@ -648,62 +792,102 @@ export default function MatchDetailPage() {
             {match.scheduled_start && (
               <section className="glass-card rounded-3xl p-5 mb-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <CalendarClock size={16} className="text-violet-200" />
-                  <h3 className="text-sm font-bold">일일 카드 공개</h3>
+                  <Sparkles size={16} className="text-boot-primary" />
+                  <h3 className="text-sm font-bold">매칭 채널</h3>
                 </div>
-                <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                  만남 전 D-6부터 D-1까지 매일 09:00에 상대 멤버 카드가 하나씩 열려요.
-                  이름 대신 가상 별칭으로만 보여줘요.
+                <p className="text-xs text-boot-muted mb-3 leading-relaxed">
+                  매일 오후 4시부터 8시까지 상대팀을 알아가는 카드 한 장을 뽑을 수 있어요.
+                  시간이 지나면 그날 기회는 소진되고, 이미 뽑은 카드는 다시 뽑히지 않아요.
                 </p>
 
                 {dailyCardsLoading && dailyCards.length === 0 ? (
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-boot-muted">
                     <Loader2 size={14} className="animate-spin" />
                     카드 일정을 불러오는 중
                   </div>
                 ) : dailyCards.length === 0 ? (
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-boot-muted">
                     약속 시간이 확정되면 카드 일정이 자동으로 만들어져요.
                   </p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {dailyCards.map((card) => (
-                      <div
-                        key={`${card.day_offset}-${card.alias}`}
-                        className={`rounded-2xl border px-3 py-3 ${
-                          card.revealed
-                            ? 'border-violet-400/30 bg-violet-500/10'
-                            : 'border-white/10 bg-white/[0.03]'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-bold">
-                              D{card.day_offset} · {card.title}
-                            </p>
-                            <p className="mt-0.5 text-[11px] text-gray-500">
-                              {formatDateTime(card.reveal_at)} 공개
-                            </p>
+                    {dailyCards.map((card) => {
+                      const missed = !!card.forfeited_at
+                      const picked = !!card.selected_at
+                      return (
+                        <div
+                          key={card.id}
+                          className={`rounded-2xl border px-3 py-3 ${
+                            picked
+                              ? 'border-boot-primary/25 bg-boot-soft'
+                              : missed
+                                ? 'border-amber-400/20 bg-amber-500/10'
+                                : card.can_pick
+                                  ? 'border-emerald-400/30 bg-emerald-500/10'
+                                  : 'border-boot-hairline bg-white/80'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-bold">
+                                D{card.day_offset} · {formatCardKind(card.card_kind)}
+                              </p>
+                              <p className="mt-0.5 text-[11px] text-boot-muted">
+                                {formatDateTime(card.reveal_window_start)} ~ {formatTime(card.reveal_window_end)}
+                              </p>
+                            </div>
+                            <span className={`text-[10px] px-2 py-1 rounded-lg border flex-shrink-0 ${
+                              picked
+                                ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-700'
+                                : missed
+                                  ? 'border-amber-400/30 bg-amber-500/10 text-amber-700'
+                                  : card.can_pick
+                                    ? 'border-boot-primary/25 bg-boot-soft text-boot-primary'
+                                    : 'border-boot-hairline text-boot-muted'
+                            }`}>
+                              {picked ? '뽑음' : missed ? '기회 소진' : card.can_pick ? '뽑기 가능' : '대기'}
+                            </span>
                           </div>
-                          <span className={`text-[10px] px-2 py-1 rounded-lg border flex-shrink-0 ${
-                            card.revealed
-                              ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200'
-                              : 'border-white/10 text-gray-500'
-                          }`}>
-                            {card.revealed ? '열림' : '잠김'}
-                          </span>
+                          {card.can_pick ? (
+                            <div className="mt-3 grid grid-cols-3 gap-2">
+                              {[1, 2, 3].map((slot) => (
+                                <button
+                                  key={slot}
+                                  type="button"
+                                  onClick={() => pickDailyCard(slot)}
+                                  disabled={!!dailyCardPicking}
+                                  className="aspect-[3/4] rounded-2xl border border-boot-primary/25 bg-boot-soft text-xs font-bold text-boot-primary hover:bg-boot-soft disabled:opacity-50 flex flex-col items-center justify-center gap-1"
+                                >
+                                  {dailyCardPicking === slot ? (
+                                    <Loader2 size={16} className="animate-spin" />
+                                  ) : (
+                                    <Sparkles size={16} />
+                                  )}
+                                  카드 {slot}
+                                </button>
+                              ))}
+                            </div>
+                          ) : picked ? (
+                            <div className="mt-3 ml-auto max-w-[82%] rounded-2xl rounded-br-[4px] border border-boot-primary/20 bg-gradient-to-r from-boot-primary to-boot-coral px-3 py-3 text-white shadow-sm">
+                              <p className="text-[11px] font-bold text-white/80 mb-1">
+                                {card.alias} · {card.title}
+                              </p>
+                              <p className="text-xs text-white leading-relaxed whitespace-pre-wrap">
+                                {card.content_text || '상대가 아직 카드를 작성하지 않았어요.'}
+                              </p>
+                            </div>
+                          ) : missed ? (
+                            <p className="mt-3 text-xs text-amber-700/80">
+                              이 카드는 시간 안에 뽑지 않아서 넘어갔어요.
+                            </p>
+                          ) : (
+                            <p className="mt-3 text-xs text-boot-muted">
+                              아직 오늘의 뽑기 시간이 아니에요.
+                            </p>
+                          )}
                         </div>
-                        {card.revealed ? (
-                          <p className="mt-3 text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">
-                            {card.content_text || '상대가 아직 카드를 작성하지 않았어요.'}
-                          </p>
-                        ) : (
-                          <p className="mt-3 text-xs text-gray-600">
-                            아직 공개 시간이 아니에요.
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </section>
@@ -716,24 +900,24 @@ export default function MatchDetailPage() {
               && (
               <section className="glass-card rounded-3xl p-5 mb-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Navigation size={16} className="text-emerald-300" />
+                  <Navigation size={16} className="text-emerald-700" />
                   <h3 className="text-sm font-bold">출석 확인 (GPS)</h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-                  <div className="rounded-2xl border border-white/10 px-3 py-2">
-                    <p className="text-gray-500">내 체크인</p>
+                  <div className="rounded-2xl border border-boot-hairline px-3 py-2">
+                    <p className="text-boot-muted">내 체크인</p>
                     <p className="mt-0.5 font-bold">
                       {attendance.my_checked_in
                         ? attendance.my_within_radius
-                          ? <span className="text-emerald-300">✓ 출석 확인</span>
-                          : <span className="text-amber-300">⚠️ 범위 밖</span>
-                        : <span className="text-gray-400">미체크</span>}
+                          ? <span className="text-emerald-700">✓ 출석 확인</span>
+                          : <span className="text-amber-700">⚠️ 범위 밖</span>
+                        : <span className="text-boot-muted">미체크</span>}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 px-3 py-2">
-                    <p className="text-gray-500">출석률</p>
-                    <p className="mt-0.5 font-bold text-violet-200">
+                  <div className="rounded-2xl border border-boot-hairline px-3 py-2">
+                    <p className="text-boot-muted">출석률</p>
+                    <p className="mt-0.5 font-bold text-boot-primary">
                       {attendance.attendee_count} / {attendance.total_participants}
                     </p>
                   </div>
@@ -755,7 +939,7 @@ export default function MatchDetailPage() {
                       type="button"
                       onClick={handleFinalize}
                       disabled={gpsBusy}
-                      className="py-3 rounded-2xl text-sm border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20 flex items-center justify-center gap-2 disabled:opacity-40"
+                      className="py-3 rounded-2xl text-sm border border-rose-400/30 bg-rose-500/10 text-boot-coral hover:bg-rose-500/20 flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                       <AlertTriangle size={14} />
                       🚨 안 나타난 사람 노쇼 처리
@@ -764,11 +948,11 @@ export default function MatchDetailPage() {
                 </div>
 
                 {gpsMessage && (
-                  <p className="mt-3 text-xs text-gray-300 leading-relaxed text-center">{gpsMessage}</p>
+                  <p className="mt-3 text-xs text-boot-body leading-relaxed text-center">{gpsMessage}</p>
                 )}
 
-                <p className="mt-3 text-[10px] text-gray-600 leading-relaxed">
-                  💡 양쪽 모두 출석 = 구걸 환불 흐름. 누군가 노쇼 = 노쇼 보증금 forfeit + 출석자 균등 분배.
+                <p className="mt-3 text-[10px] text-boot-muted leading-relaxed">
+                  💡 양쪽 모두 출석 = 이어가기 선택. 누군가 노쇼 = 무료 베타에서는 결제 차감 없이 상태만 기록.
                 </p>
               </section>
             )}
@@ -777,21 +961,21 @@ export default function MatchDetailPage() {
             {(match.match_status === 'confirmed' || match.match_status === 'completed') && (
               <section className="glass-card rounded-3xl p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Phone size={16} className="text-emerald-300" />
+                  <Phone size={16} className="text-emerald-700" />
                   <h3 className="text-sm font-bold">상대 핸드폰 (약속 시간 자동 공개)</h3>
                 </div>
-                <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+                <p className="text-xs text-boot-muted mb-3 leading-relaxed">
                   배정된 약속 시간이 되면 상대 그룹 멤버의 핸드폰 번호가 자동으로 공개돼요.
                   당일 늦거나 못 찾을 때 바로 연락할 수 있어요.
                 </p>
 
                 {connectionsLoading && connections.length === 0 ? (
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-boot-muted">
                     <Loader2 size={14} className="animate-spin" />
                     불러오는 중
                   </div>
                 ) : connections.length === 0 ? (
-                  <p className="text-xs text-gray-600">상대 그룹 멤버 정보를 불러올 수 없어요.</p>
+                  <p className="text-xs text-boot-muted">상대 그룹 멤버 정보를 불러올 수 없어요.</p>
                 ) : (
                   <div className="flex flex-col gap-2">
                     {connections.map((c) => {
@@ -803,7 +987,7 @@ export default function MatchDetailPage() {
                           className={`rounded-2xl border px-3 py-3 ${
                             revealed
                               ? 'border-emerald-400/30 bg-emerald-500/5'
-                              : 'border-white/10'
+                              : 'border-boot-hairline'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-3">
@@ -812,24 +996,24 @@ export default function MatchDetailPage() {
                                 {c.target_display_name ?? '이름 미설정'}
                               </p>
                               {revealed && c.target_phone ? (
-                                <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-200">
+                                <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700">
                                   <Phone size={12} />
                                   <a href={`tel:${c.target_phone}`} className="font-bold tracking-wider">
                                     {c.target_phone}
                                   </a>
                                 </div>
                               ) : scheduledFuture ? (
-                                <p className="text-[11px] text-gray-500 mt-0.5">
+                                <p className="text-[11px] text-boot-muted mt-0.5">
                                   {formatDateTime(c.scheduled_reveal_at!)} 자동 공개
                                 </p>
                               ) : (
-                                <p className="text-[11px] text-gray-500 mt-0.5">
+                                <p className="text-[11px] text-boot-muted mt-0.5">
                                   약속 시간 배정 전 (매칭 엔진 대기 중)
                                 </p>
                               )}
                             </div>
                             {revealed && (
-                              <span className="text-[10px] px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-200 border border-emerald-400/30 flex-shrink-0">
+                              <span className="text-[10px] px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 border border-emerald-400/30 flex-shrink-0">
                                 공개됨
                               </span>
                             )}
@@ -844,7 +1028,7 @@ export default function MatchDetailPage() {
           </>
         ) : (
           <section className="glass rounded-3xl p-5">
-            <p className="text-sm text-gray-300">매칭 정보가 없어요.</p>
+            <p className="text-sm text-boot-body">매칭 정보가 없어요.</p>
           </section>
         )}
       </div>
@@ -855,8 +1039,8 @@ export default function MatchDetailPage() {
 function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-xs text-gray-500">{label}</span>
-      <span className={`text-xs font-bold ${highlight ? 'text-violet-200' : 'text-gray-300'}`}>{value}</span>
+      <span className="text-xs text-boot-muted">{label}</span>
+      <span className={`text-xs font-bold ${highlight ? 'text-boot-primary' : 'text-boot-body'}`}>{value}</span>
     </div>
   )
 }
@@ -867,10 +1051,10 @@ function ProgressPill({ label, current, total }: { label: string; current: numbe
     <div className={`rounded-2xl border px-3 py-2 ${
       done
         ? 'border-emerald-400/25 bg-emerald-500/10'
-        : 'border-white/10 bg-white/[0.03]'
+        : 'border-boot-hairline bg-white/80'
     }`}>
-      <p className="text-[11px] text-gray-500">{label}</p>
-      <p className={`mt-0.5 text-sm font-bold ${done ? 'text-emerald-200' : 'text-gray-300'}`}>
+      <p className="text-[11px] text-boot-muted">{label}</p>
+      <p className={`mt-0.5 text-sm font-bold ${done ? 'text-emerald-700' : 'text-boot-body'}`}>
         {current}/{total}
       </p>
     </div>
@@ -910,6 +1094,32 @@ function formatDateTime(iso: string): string {
     return `${yyyy}.${mm}.${dd} ${hh}:${mi}`
   } catch {
     return iso
+  }
+}
+
+function formatTime(iso: string): string {
+  try {
+    const d = new Date(iso)
+    const hh = d.getHours().toString().padStart(2, '0')
+    const mi = d.getMinutes().toString().padStart(2, '0')
+    return `${hh}:${mi}`
+  } catch {
+    return iso
+  }
+}
+
+function formatCardKind(kind: string): string {
+  switch (kind) {
+    case 'mbti': return 'MBTI 카드'
+    case 'music': return '좋아하는 노래 3곡'
+    case 'pre_meeting_question': return '만남 전 질문 카드'
+    case 'debate': return '인터넷 논쟁 카드'
+    case 'preference': return '취향 카드'
+    case 'group_preference': return '그룹 취향 카드'
+    case 'relationship_style': return '연애 스타일 카드'
+    case 'intro': return '기본 분위기 카드'
+    case 'vibe': return '분위기 카드'
+    default: return kind
   }
 }
 

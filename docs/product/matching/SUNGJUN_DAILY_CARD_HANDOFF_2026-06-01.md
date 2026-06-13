@@ -1,5 +1,7 @@
 # 성준 인수인계서 — 데일리카드 (Daily Card) 매칭 연동
 
+> 2026-06-12 결정: 이 인수서의 `매일 09:00 공개` 기준은 오래된 초안이다. 현재 기준은 `16:00-20:00 사이 사용자가 직접 하루 카드 한 장을 뽑는 방식`이다. 구현 기준은 `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`과 `docs/plans/2026-06-12-thread-context-consolidated-audit.md`를 따른다.
+
 > **작성일**: 2026-06-01 · 작성자: 충현 (Claude Code 세션)
 > **받는 사람**: 성준 (그룹/매칭 엔진 + 매칭 풀 흐름 담당)
 > **목적**: 데일리카드 기능이 **성준 영역(매칭 풀 진입 / 매칭 confirm / match_meetings)** 과 만나는 지점을 합의하기 위한 인수서.

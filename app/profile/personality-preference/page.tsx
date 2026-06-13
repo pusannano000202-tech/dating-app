@@ -12,6 +12,8 @@ import {
   type PersonalityPreferenceProfile,
 } from '@/lib/matching/personality-preference'
 import type { Big5Vector } from '@/lib/matching/types'
+import { getSafeClientRedirect } from '@/lib/client-redirect'
+import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 
 type Phase = 'survey' | 'result'
@@ -81,6 +83,10 @@ export default function PersonalityPreferencePage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
+        if (markDevMatchSetupStepComplete('personality')) {
+          router.push(getSafeClientRedirect('/profile/schedule'))
+          return
+        }
         router.push('/login')
         return
       }
@@ -98,7 +104,7 @@ export default function PersonalityPreferencePage() {
         )
 
       if (dbErr) throw dbErr
-      router.push('/profile/schedule')
+      router.push(getSafeClientRedirect('/profile/schedule'))
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해줘.')
       setSaving(false)
@@ -106,10 +112,10 @@ export default function PersonalityPreferencePage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pb-10">
+    <div className="flex flex-col min-h-screen booting-band px-5 pb-10 text-boot-ink">
       <div className="mb-7">
-        <h1 className="text-2xl font-black gradient-fate-text">상대 성격 취향</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-black text-boot-ink">상대 성격 취향</h1>
+        <p className="text-sm text-boot-muted mt-1">
           {phase === 'survey'
             ? '내가 어떤 성격의 상대에게 끌리는지 골라볼게.'
             : '네가 끌리는 상대 성격 방향이야.'}
@@ -119,7 +125,7 @@ export default function PersonalityPreferencePage() {
       {!loaded ? (
         <div className="flex flex-col gap-5 animate-pulse">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-16 bg-white/5 rounded-2xl" />
+            <div key={i} className="h-16 rounded-2xl border border-boot-hairline bg-white/70" />
           ))}
         </div>
       ) : phase === 'survey' ? (
@@ -136,7 +142,7 @@ export default function PersonalityPreferencePage() {
         />
       )}
 
-      {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
+      {error && <p className="mt-3 text-xs text-red-500 text-center">{error}</p>}
     </div>
   )
 }

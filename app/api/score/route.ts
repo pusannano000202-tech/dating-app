@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import {
   extractSelfAppearanceScore,
   normalizeProfileAppearanceScore,
   resolveSelfAppearanceScore,
 } from '@/lib/profile/appearance-score'
+import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 // Server-only env var (no NEXT_PUBLIC_ prefix) — AI server stays hidden from browser
 const AI_SERVER_URL = process.env.AI_SERVER_URL ?? 'http://localhost:8001'
@@ -20,12 +19,7 @@ interface ScorePersistenceMetadata {
 
 export async function POST(req: NextRequest) {
   // Verify the caller is authenticated
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll() { return cookieStore.getAll() }, setAll() {} } }
-  )
+  const supabase = createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

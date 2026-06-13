@@ -63,4 +63,7 @@ export const APPEARANCE_TYPE_INFO: Record<
   },
 }
 
-export const DEPOSIT_AMOUNT = 10000 // 원 (1인당 보증금)
+// 무료 베타 기간에는 사용자에게 보증금/매칭비를 청구하지 않는다.
+// 기존 deposit 테이블/RPC는 매칭 확정 게이트 호환을 위해 일단 유지한다.
+export const FREE_BETA_ENABLED = true
+export const DEPOSIT_AMOUNT = 10000 // 원 (legacy internal placeholder)

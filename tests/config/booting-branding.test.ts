@@ -1,0 +1,150 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+const ROOT = process.cwd()
+
+function readSource(path: string) {
+  return readFileSync(join(ROOT, path), 'utf8')
+}
+
+test('root layout uses Booting production metadata and light theme color', () => {
+  const layout = readSource('app/layout.tsx')
+
+  assert.match(layout, /themeColor:\s*'#fff7f3'/)
+  assert.match(layout, /bg-app min-h-screen text-boot-ink/)
+  assert.doesNotMatch(layout, /Destiny/)
+})
+
+test('home page keeps real app login flow while presenting Booting UI', () => {
+  const home = readSource('app/page.tsx')
+
+  assert.match(home, /BootingLogo/)
+  assert.match(home, /href="\/login"/)
+  assert.match(home, /MatchingPool/)
+  assert.doesNotMatch(home, /font-destiny/)
+  assert.doesNotMatch(home, /DestinyLogo/)
+})
+
+test('profile personality flows use Booting surfaces instead of Destiny dark styling', () => {
+  const profileLayout = readSource('app/profile/layout.tsx')
+  const surveyPage = readSource('app/profile/survey/page.tsx')
+  const preferencePage = readSource('app/profile/personality-preference/page.tsx')
+  const big5Survey = readSource('components/profile/Big5Survey.tsx')
+  const big5Result = readSource('components/profile/Big5Result.tsx')
+  const preferenceSurvey = readSource('components/profile/PersonalityPreferenceSurvey.tsx')
+  const preferenceResult = readSource('components/profile/PersonalityPreferenceResult.tsx')
+
+  assert.match(profileLayout, /booting-band/)
+  assert.match(surveyPage, /booting-band/)
+  assert.match(preferencePage, /booting-band/)
+
+  for (const source of [big5Survey, big5Result, preferenceSurvey, preferenceResult]) {
+    assert.match(source, /boot-/)
+    assert.doesNotMatch(source, /shadow-violet-900/)
+    assert.doesNotMatch(source, /border-white\/10/)
+  }
+})
+
+test('match result surfaces keep real APIs while using Booting chat-style cards', () => {
+  const matchList = readSource('app/match/page.tsx')
+  const matchDetail = readSource('app/match/[id]/page.tsx')
+
+  assert.match(matchList, /fetch\('\/api\/matches'\)/)
+  assert.match(matchList, /text-boot-ink/)
+  assert.doesNotMatch(matchList, /text-gray-300/)
+
+  assert.match(matchDetail, /\/api\/matches\/\$\{encodeURIComponent\(matchId\)\}\/daily-cards/)
+  assert.match(matchDetail, /rounded-br-\[4px\]/)
+  assert.doesNotMatch(matchDetail, /bg-black\/10/)
+})
+
+test('auth and completion entry points use Booting branding', () => {
+  const login = readSource('app/(auth)/login/page.tsx')
+  const complete = readSource('app/profile/complete/page.tsx')
+  const edit = readSource('app/profile/edit/page.tsx')
+
+  for (const source of [login, complete, edit]) {
+    assert.match(source, /BootingLogo/)
+    assert.doesNotMatch(source, /DestinyLogo/)
+    assert.doesNotMatch(source, /font-destiny/)
+    assert.doesNotMatch(source, /shadow-violet-900/)
+  }
+})
+
+test('login page uses Supabase email OTP while phone provider is disabled', () => {
+  const login = readSource('app/(auth)/login/page.tsx')
+
+  assert.match(login, /signInWithOtp\(\{\s*email/)
+  assert.match(login, /verifyOtp\(\{\s*email/)
+  assert.match(login, /token/)
+  assert.match(login, /type:\s*'email'/)
+  assert.match(login, /isEmailOtpRateLimitError/)
+  assert.match(login, /email rate limit exceeded/)
+  assert.match(login, /moveToCodeStep\(normalizedEmail\)/)
+  assert.doesNotMatch(login, /너무 자주/)
+  assert.match(login, /type="email"/)
+  assert.doesNotMatch(login, /type="tel"/)
+  assert.doesNotMatch(login, /phone:/)
+})
+
+test('onboarding and match setup are separate product flows', () => {
+  const home = readSource('app/page.tsx')
+  const worldcup = readSource('app/profile/worldcup/page.tsx')
+  const survey = readSource('app/profile/survey/page.tsx')
+  const photos = readSource('app/profile/photos/page.tsx')
+  const personalityPreference = readSource('app/profile/personality-preference/page.tsx')
+  const schedulePage = readSource('app/profile/schedule/page.tsx')
+  const preferencesPage = readSource('app/profile/preferences/page.tsx')
+  const stepProgress = readSource('components/profile/StepProgress.tsx')
+  const matchStart = readSource('app/match/start/page.tsx')
+
+  assert.match(home, /href="\/friends"/)
+  assert.match(home, /href="\/match\/start"/)
+  assert.match(worldcup, /router\.push\('\/profile\/survey'\)/)
+  assert.match(survey, /router\.push\('\/profile\/photos'\)/)
+  assert.match(photos, /router\.push\('\/profile\/complete'\)/)
+  assert.match(stepProgress, /기본정보/)
+  assert.match(stepProgress, /이상형/)
+  assert.match(stepProgress, /성향/)
+  assert.match(stepProgress, /사진/)
+  assert.doesNotMatch(stepProgress, /매칭 비중/)
+  assert.match(matchStart, /function getCurrentSetupState/)
+  assert.match(matchStart, /const current = getCurrentSetupState\(steps\)/)
+  assert.match(matchStart, /aria-current=\{index === current\.currentIndex/)
+  assert.doesNotMatch(matchStart, /steps\.map\(\(\{ href, label, desc, done, Icon \}\)/)
+  assert.match(matchStart, /buildDevMatchSetupProfile/)
+  assert.match(personalityPreference, /markDevMatchSetupStepComplete\('personality'\)/)
+  assert.match(schedulePage, /markDevMatchSetupStepComplete\('schedule'\)/)
+  assert.match(preferencesPage, /markDevMatchSetupStepComplete\('preferences'\)/)
+})
+
+test('profile onboarding pages allow dev preview without Supabase user redirects', () => {
+  const basic = readSource('app/profile/basic/page.tsx')
+  const worldcup = readSource('app/profile/worldcup/page.tsx')
+  const survey = readSource('app/profile/survey/page.tsx')
+
+  for (const source of [basic, worldcup, survey]) {
+    assert.match(source, /isDevPreviewClientSession/)
+  }
+})
+
+test('middleware issues dev auth cookie when opening dev preview', () => {
+  const middleware = readSource('middleware.ts')
+  const devMatchSetup = readSource('lib/dev-match-setup.ts')
+
+  assert.match(middleware, /pathname\.startsWith\('\/dev\/preview'\)/)
+  assert.match(middleware, /response\.cookies\.set\(DEV_AUTH_COOKIE/)
+  assert.match(devMatchSetup, /function hasDevAuthCookie/)
+  assert.match(devMatchSetup, /document\.cookie/)
+  assert.match(devMatchSetup, /hasDevAuthLocalStorage\(\) \|\| hasDevAuthCookie\(\)/)
+})
+
+test('health check validates Supabase Auth with the public key', () => {
+  const healthRoute = readSource('app/api/health/route.ts')
+
+  assert.match(healthRoute, /\/auth\/v1\/health/)
+  assert.match(healthRoute, /getSupabasePublicKey\(\)/)
+  assert.doesNotMatch(healthRoute, /\/rest\/v1\//)
+})

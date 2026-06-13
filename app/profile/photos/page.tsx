@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import PhotoUpload, { type PhotoUploadResult } from '@/components/profile/PhotoUpload'
 import { createClient } from '@/lib/supabase'
+import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { isSupabaseConfigured } from '@/lib/utils'
 
 const STORAGE_BUCKET = 'photos'
@@ -46,6 +47,11 @@ export default function PhotosPage() {
     setError(null)
 
     try {
+      if (isDevAuthBypassEnabled()) {
+        router.push('/profile/complete')
+        return
+      }
+
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -87,9 +93,14 @@ export default function PhotosPage() {
 
         // Block progression until the internal matching score is persisted.
         await requestScorePersistence(uploadedUrls)
+
+        const { error: profileErr } = await supabase
+          .from('profiles')
+          .upsert({ user_id: user.id, is_profile_complete: true }, { onConflict: 'user_id' })
+        if (profileErr) throw profileErr
       }
 
-      router.push('/profile/survey')
+      router.push('/profile/complete')
     } catch (err) {
       if (err instanceof Error && err.message === 'score_failed') {
         setError('사진 분석 점수 저장에 실패했어요. 다시 시도해줘.')
@@ -107,8 +118,20 @@ export default function PhotosPage() {
     setError(null)
 
     try {
+      if (isDevAuthBypassEnabled()) {
+        router.push('/profile/complete')
+        return
+      }
+
       await requestScorePersistence(existingPhotos)
-      router.push('/profile/survey')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .upsert({ user_id: user.id, is_profile_complete: true }, { onConflict: 'user_id' })
+      if (profileErr) throw profileErr
+      router.push('/profile/complete')
     } catch (err) {
       if (err instanceof Error && err.message === 'score_failed') {
         setError('사진 분석 점수 저장에 실패했어요. 다시 시도해줘.')

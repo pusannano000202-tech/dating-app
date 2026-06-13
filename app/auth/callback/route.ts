@@ -2,18 +2,26 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { isSafeLocalRedirect } from '@/lib/auth/school-email'
+import { getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const next = requestUrl.searchParams.get('next')
   const destination = isSafeLocalRedirect(next) ? next : '/'
+  const configIssue = getSupabaseConfigIssue()
+
+  if (configIssue) {
+    const loginUrl = new URL('/login', requestUrl.origin)
+    loginUrl.searchParams.set('auth_error', configIssue)
+    return NextResponse.redirect(loginUrl)
+  }
 
   if (code) {
     const cookieStore = cookies()
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      getSupabaseUrl(),
+      getSupabasePublicKey(),
       {
         cookies: {
           getAll() {

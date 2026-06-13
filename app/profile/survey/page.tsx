@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Big5Survey, { type Big5Scores } from '@/components/profile/Big5Survey'
 import Big5Result from '@/components/profile/Big5Result'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 
 type Phase = 'survey' | 'result'
@@ -60,7 +61,17 @@ export default function SurveyPage() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      if (!user) {
+        if (isDevPreviewClientSession()) {
+          try {
+            sessionStorage.setItem('booting_dev_big5_scores', JSON.stringify(scores))
+          } catch {}
+          router.push('/profile/photos')
+          return
+        }
+        router.push('/login')
+        return
+      }
 
       const { error: dbErr } = await supabase
         .from('profiles')
@@ -76,7 +87,7 @@ export default function SurveyPage() {
           { onConflict: 'user_id' }
         )
       if (dbErr) throw dbErr
-      router.push('/profile/personality-preference')
+      router.push('/profile/photos')
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해줘.')
       setSaving(false)
@@ -84,10 +95,10 @@ export default function SurveyPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pb-10">
+    <div className="flex flex-col min-h-screen booting-band px-5 pb-10 text-boot-ink">
       <div className="mb-7">
-        <h1 className="text-2xl font-black gradient-fate-text">성격 테스트</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-black text-boot-ink">성격 테스트</h1>
+        <p className="text-sm text-boot-muted mt-1">
           {phase === 'survey'
             ? '나랑 잘 맞는 사람을 찾기 위한 5가지 성격 특성 테스트야.'
             : '테스트 결과야. 매칭할 때 참고할게.'}
@@ -97,7 +108,7 @@ export default function SurveyPage() {
       {!loaded ? (
         <div className="flex flex-col gap-5 animate-pulse">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-16 bg-white/5 rounded-2xl" />
+            <div key={i} className="h-16 rounded-2xl border border-boot-hairline bg-white/70" />
           ))}
         </div>
       ) : phase === 'survey' ? (
@@ -111,7 +122,7 @@ export default function SurveyPage() {
         />
       )}
 
-      {error && <p className="mt-3 text-xs text-red-400 text-center">{error}</p>}
+      {error && <p className="mt-3 text-xs text-red-500 text-center">{error}</p>}
     </div>
   )
 }

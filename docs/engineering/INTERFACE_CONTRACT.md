@@ -130,19 +130,17 @@ CREATE TABLE appearance_scores (
 
 ```json
 {
-  "appearance": 0.30,
-  "personality": 0.25,
-  "height": 0.10,
-  "body_type": 0.10,
-  "school": 0.10,
-  "hobby": 0.10,
-  "time_fit": 0.05
+  "appearance": 0.35,
+  "personality": 0.35,
+  "height": 0.15,
+  "body_type": 0.15
 }
 ```
 
 - 모든 값의 합이 반드시 `1.0`이 되어야 한다.
-- 충현의 프로필 입력 UI에서 슬라이더로 입력받아 저장한다.
-- 성준의 매칭 엔진은 이 값을 그대로 읽어 가중 합산한다.
+- 충현의 프로필 입력 UI에서 숫자 입력으로 받는다.
+- 현재 판단 데이터가 없는 `school`, `hobby`, `time_fit` 가중치는 제거한다.
+- 성준의 매칭 엔진은 이 4개 값을 그대로 읽거나, 배치 로더에서 명시적으로 동일 4개 키로 변환한다.
 
 ---
 
@@ -210,9 +208,6 @@ export interface PreferenceWeights {
   personality: number
   height: number
   body_type: number
-  school: number
-  hobby: number
-  time_fit: number
   // 합계 = 1.0 보장 필요
 }
 

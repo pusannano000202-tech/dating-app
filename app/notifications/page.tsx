@@ -186,10 +186,10 @@ function kindLabel(kind: string): string {
     case 'meeting_reminder': return '약속이 다가오고 있어요'
     case 'continuation_choice_request': return '이 만남, 이어가실래요?'
     case 'both_continue':   return '💜 양쪽 모두 이어가기 선택'
-    case 'partner_paid_zero': return '😢 상대방이 0원 지불 선택'
-    case 'refund_processed': return '보증금 환불 처리 완료'
+    case 'partner_paid_zero': return '무료 베타 정산 없음'
+    case 'refund_processed': return '무료 베타 정산 완료'
     case 'attendance_confirmed': return '✅ 출석 확인됨'
-    case 'no_show_confirmed': return '🚨 노쇼 확정 (보증금 forfeit)'
+    case 'no_show_confirmed': return '🚨 노쇼 확정'
     default:                  return '알림'
   }
 }
@@ -207,15 +207,15 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
     case 'review_request':  return '5점 별점 + 이슈 chip + 코멘트.'
     case 'friend_request_received': return '받은 요청을 친구 목록에서 확인하세요.'
     case 'meeting_reminder': return '약속 시간을 다시 확인해주세요.'
-    case 'continuation_choice_request': return '양쪽 모두 ‘이어간다’ 시 전액 자동 환불.'
-    case 'both_continue': return '보증금 전액 환불 + 핸드폰 자동 공개.'
+    case 'continuation_choice_request': return '무료 베타 기간에는 이어가기 선택만 기록돼요.'
+    case 'both_continue': return '양쪽 모두 이어가기를 선택했어요. 정산 절차는 없어요.'
     case 'partner_paid_zero': {
       const reasons = Array.isArray(payload?.reasons) ? payload.reasons.join(', ') : ''
-      return reasons ? `사유: ${reasons}` : '운영자에게 신고됐어요.'
+      return reasons ? `사유: ${reasons}` : '무료 베타라 상대에게 결제 금액 알림을 보내지 않아요.'
     }
     case 'refund_processed': {
       const amt = typeof payload?.refund_amount === 'number' ? payload.refund_amount : 0
-      return `${amt.toLocaleString()}원 환불 완료.`
+      return amt > 0 ? `${amt.toLocaleString()}원 환불 완료.` : '무료 베타라 환불할 금액이 없어요.'
     }
     case 'attendance_confirmed': {
       const pool = typeof payload?.forfeited_pool === 'number' ? payload.forfeited_pool : 0
@@ -225,7 +225,7 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
         : '양쪽 모두 출석 확인.'
     }
     case 'no_show_confirmed':
-      return '약속 장소에 안 나타나서 보증금이 forfeit 됐어요.'
+      return '약속 장소에 안 나타난 기록이 남았어요. 무료 베타 기간에는 결제 차감은 없어요.'
     default:                  return ''
   }
 }

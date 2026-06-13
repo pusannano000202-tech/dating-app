@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { ChevronLeft, Heart, HeartCrack, Loader2 } from 'lucide-react'
+import { FREE_BETA_ENABLED } from '@/lib/constants'
 
 interface State {
   my_choice: 'continue' | 'end' | null
@@ -73,7 +74,9 @@ export default function ContinuationPage() {
           </Link>
           <div>
             <h1 className="text-xl font-black">이 만남, 이어갈까요?</h1>
-            <p className="text-xs text-gray-500 mt-0.5">이어가기 선택 시 매칭비 정산으로 이동</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {FREE_BETA_ENABLED ? '무료 베타 기간에는 정산 없이 선택만 기록해요' : '이어가기 선택 시 매칭비 정산으로 이동'}
+            </p>
           </div>
         </header>
 
@@ -95,22 +98,18 @@ export default function ContinuationPage() {
                 <Heart size={40} className="mx-auto mb-3 text-rose-400" />
                 <p className="text-lg font-black gradient-fate-text">양쪽 모두 이어가기로 했어요 💜</p>
                 <p className="mt-3 text-sm text-gray-300 leading-relaxed">
-                  우리 덕분에 잘 연결됐죠? 🥺<br />
-                  보증금 환불받기 전에 운영비 조금만 남겨주실래요?
+                  서로 더 만나보고 싶은 상태예요.<br />
+                  지금은 무료 베타라 결제나 환불 절차 없이 바로 마무리됩니다.
                 </p>
                 <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
-                  보증금 20,000원 중 앱에게 줄 매칭비를 직접 선택할 수 있어요.<br />
-                  앱 운영 + 다음 매칭 풀 유지에 큰 도움이 돼요.
+                  사용자 확보가 우선이라 매칭비 정산 UX는 비활성화해뒀어요.
                 </p>
                 <Link
-                  href={`/match/${encodeURIComponent(matchId)}/refund`}
+                  href={`/match/${encodeURIComponent(matchId)}`}
                   className="btn-gradient w-full block py-3 rounded-2xl text-sm font-bold mt-5"
                 >
-                  환불 금액 선택하러 가기 →
+                  매칭 상세로 돌아가기
                 </Link>
-                <p className="mt-2 text-[10px] text-gray-600">
-                  14일 안에 선택 안 하면 자동으로 전액 환불돼요.
-                </p>
               </section>
             )}
 
@@ -122,8 +121,8 @@ export default function ContinuationPage() {
                   이 만남은 여기서 마무리됐어요
                 </p>
                 <p className="mt-2 text-xs text-gray-500 text-center leading-relaxed">
-                  한 명이라도 ‘충분’을 선택하면 모두 보증금이 자동 전액 환불돼요.<br />
-                  돈 떼지 않을게요. 좋은 만남 되시길.
+                  무료 베타라 정산이나 환불 절차는 없어요.<br />
+                  좋은 만남 되시길.
                 </p>
                 <Link
                   href={`/match/${encodeURIComponent(matchId)}/review`}
@@ -146,8 +145,8 @@ export default function ContinuationPage() {
                   오늘 만남 어땠어요?
                 </p>
                 <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
-                  • 양쪽 모두 ‘이어갈래요’ → 매칭비 직접 선택 (앱에 얼마 줄지 결정)<br />
-                  • 한 명이라도 ‘충분’ → 모두 자동 전액 환불 (돈 안 떼요)
+                  • 양쪽 모두 ‘이어갈래요’ → 이어가기 상태만 기록<br />
+                  • 한 명이라도 ‘충분’ → 무료 베타라 정산 없이 종료
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -169,7 +168,7 @@ export default function ContinuationPage() {
                   >
                     <HeartCrack size={28} className="mx-auto mb-2 text-gray-400" />
                     <p className="text-sm font-bold">한 번이면 충분</p>
-                    <p className="text-[10px] text-gray-500 mt-1">자동 전액 환불</p>
+                    <p className="text-[10px] text-gray-500 mt-1">정산 없이 종료</p>
                   </button>
                 </div>
 
@@ -189,8 +188,8 @@ export default function ContinuationPage() {
                   상대 응답 대기 중 — {state.continue_count}/{state.total_participants} 이어가기.
                 </p>
                 <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
-                  양쪽 모두 이어가기 선택 시 매칭비를 선택할 수 있어요.<br />
-                  한 명이라도 ‘충분’ 누르면 자동 전액 환불.
+                  무료 베타 기간에는 양쪽 선택만 기록해요.<br />
+                  한 명이라도 ‘충분’ 누르면 정산 없이 종료됩니다.
                 </p>
               </section>
             )}

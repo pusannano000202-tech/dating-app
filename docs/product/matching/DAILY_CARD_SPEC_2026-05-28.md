@@ -1,5 +1,7 @@
 # 데일리카드 (Daily Card) — 매칭 후 ~ 만남 전 공백기 설계
 
+> 2026-06-12 결정: 이 문서의 `매일 09:00 자동 공개` 기준은 오래된 초안이다. 현재 기준은 `16:00-20:00 사이 사용자가 직접 하루 카드 한 장을 뽑는 방식`이다. 구현 기준은 `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`과 `docs/plans/2026-06-12-thread-context-consolidated-audit.md`를 따른다.
+
 > **작성일**: 2026-05-28 · 작성자: 충현 (Claude Code 세션)
 > **상태**: 스펙 초안 (코드 미작성). 후속 마이그 후보 = `z50_daily_cards`
 > **읽기 전 권장**: `docs/CODEX_MASTER_2026-05-23.md` §3 (현재 진행률), `lib/types.ts` L41~66 (`PreferredAppearance` / `PreferredPersonality`)

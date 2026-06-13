@@ -23,6 +23,7 @@ interface GroupMemberRecord {
   role: GroupRole
   joined_at: string
   left_at: string | null
+  match_setup_ready: boolean
 }
 
 interface GroupInviteRecord {
@@ -43,6 +44,13 @@ interface FriendSummary {
   phone: string | null
   status: 'active'
   group_status: FriendGroupStatus
+}
+
+interface ProfileMatchSetupSummary {
+  user_id: string
+  personality_preference_completed_at: string | null
+  available_timeslots: { slots?: unknown[] } | null
+  preference_weights: Record<string, unknown> | null
 }
 
 export async function GET() {
@@ -166,14 +174,45 @@ async function loadMembers(
   const { data } = await supabase.rpc('get_group_member_summaries', { p_group_id: groupId })
 
   type Row = { user_id: string; display_name: string | null; role: GroupRole; joined_at: string }
-  return ((data ?? []) as Row[]).map((row) => ({
+  const members = ((data ?? []) as Row[]).map((row) => ({
     group_id: groupId,
     user_id: row.user_id,
     display_name: row.display_name,
     role: row.role,
     joined_at: row.joined_at,
     left_at: null,
+    match_setup_ready: false,
   }))
+
+  if (members.length === 0) {
+    return members
+  }
+
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('user_id, personality_preference_completed_at, available_timeslots, preference_weights')
+    .in('user_id', members.map((member) => member.user_id))
+
+  const readySet = new Set<string>(
+    ((profiles ?? []) as ProfileMatchSetupSummary[]).filter(isMatchSetupComplete).map((row) => row.user_id)
+  )
+
+  return members.map((member) => ({
+    ...member,
+    match_setup_ready: readySet.has(member.user_id),
+  }))
+}
+
+function hasSlots(payload: { slots?: unknown[] } | null): boolean {
+  return Boolean(payload && typeof payload === 'object' && Array.isArray(payload.slots) && payload.slots.length > 0)
+}
+
+function isMatchSetupComplete(profile: ProfileMatchSetupSummary): boolean {
+  return Boolean(
+    profile.personality_preference_completed_at &&
+      hasSlots(profile.available_timeslots) &&
+      profile.preference_weights != null
+  )
 }
 
 async function loadInvites(

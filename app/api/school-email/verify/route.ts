@@ -2,6 +2,7 @@ import { createHash } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { isPnuEmail, normalizeSchoolEmail } from '@/lib/auth/school-email'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { getSupabasePublicKey } from '@/lib/utils'
 
 interface VerifyBody {
   email?: unknown
@@ -53,7 +54,7 @@ async function readJson(request: NextRequest): Promise<unknown> {
 }
 
 function hashSchoolEmailCode(userId: string, email: string, code: string): string {
-  const secret = process.env.SCHOOL_EMAIL_CODE_SECRET ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'local'
+  const secret = process.env.SCHOOL_EMAIL_CODE_SECRET || getSupabasePublicKey() || 'local'
   return createHash('sha256')
     .update(`${secret}:${userId}:${email}:${code}`)
     .digest('hex')

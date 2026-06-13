@@ -1,333 +1,327 @@
 'use client'
 
-import { Suspense, useState, useRef, useEffect } from 'react'
+import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { CircleUserRound, MessageCircle } from 'lucide-react'
+import { Eye, MailCheck, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { getSupabaseConfigIssue } from '@/lib/utils'
-import DestinyLogo from '@/components/DestinyLogo'
+import BootingLogo from '@/components/BootingLogo'
 
-type Step = 'phone' | 'otp'
-type OAuthProvider = 'kakao' | 'google'
+type LoginStep = 'email' | 'code'
 
-function toE164(raw: string): string {
-  const digits = raw.replace(/\D/g, '')
-  if (digits.startsWith('0')) return '+82' + digits.slice(1)
-  if (digits.startsWith('82')) return '+' + digits
-  return '+82' + digits
+function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase()
 }
 
-function formatPhone(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 3) return digits
-  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
-  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+function isLikelyEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
-/* 별 파티클 — 로고 주변 */
-const STARS = [
-  { top: '-18px', left: '8px',   size: 5, delay: '0s',    dur: '2.4s' },
-  { top: '-10px', left: '52px',  size: 4, delay: '0.6s',  dur: '2.0s' },
-  { top: '10px',  left: '-16px', size: 3, delay: '1.1s',  dur: '2.8s' },
-  { top: '48px',  left: '-20px', size: 4, delay: '0.3s',  dur: '2.2s' },
-  { top: '60px',  left: '56px',  size: 3, delay: '0.9s',  dur: '2.6s' },
-  { top: '20px',  left: '66px',  size: 5, delay: '1.5s',  dur: '2.0s' },
-]
+function isEmailOtpRateLimitError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message.toLowerCase() : ''
+  return message.includes('email rate limit exceeded') || message.includes('rate limit')
+}
 
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') ?? '/profile/basic'
   const supabaseConfigIssue = getSupabaseConfigIssue()
+  const devAuthBypassEnabled = isDevAuthBypassEnabled()
 
-  const [step, setStep] = useState<Step>('phone')
-  const [phone, setPhone] = useState('')
-  const [otp, setOtp] = useState(['', '', '', '', '', ''])
+  const [step, setStep] = useState<LoginStep>('email')
+  const [email, setEmail] = useState('')
+  const [code, setCode] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
-  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [resendCooldown, setResendCooldown] = useState(0)
-  const otpRefs = useRef<(HTMLInputElement | null)[]>([])
+  const codeRefs = useRef<(HTMLInputElement | null)[]>([])
+
+  const normalizedEmail = normalizeEmail(email)
+  const codeValue = code.join('')
 
   useEffect(() => {
     if (resendCooldown <= 0) return
-    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setResendCooldown((current) => current - 1), 1000)
+    return () => clearTimeout(timer)
   }, [resendCooldown])
 
   useEffect(() => {
-    if (step === 'otp') setTimeout(() => otpRefs.current[0]?.focus(), 50)
+    if (step !== 'code') return
+    const timer = setTimeout(() => codeRefs.current[0]?.focus(), 60)
+    return () => clearTimeout(timer)
   }, [step])
 
   useEffect(() => {
-    if (step === 'otp' && otp.every((d) => d !== '') && !loading) verifyOtp()
+    if (step === 'code' && codeValue.length === 6 && !loading) {
+      void verifyEmailCode()
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [otp, step])
+  }, [codeValue, step])
 
-  async function sendOtp() {
+  async function sendEmailCode(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault()
     setError(null)
+
     if (supabaseConfigIssue) {
       setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
       return
     }
-    if (!phone.trim()) { setError('번호를 입력해줘.'); return }
+
+    if (!isLikelyEmail(normalizedEmail)) {
+      setError('이메일 주소를 입력해줘.')
+      return
+    }
+
     setLoading(true)
     try {
       const supabase = createClient()
-      const { error: err } = await supabase.auth.signInWithOtp({ phone: toE164(phone) })
-      if (err) throw err
-      setStep('otp')
-      setResendCooldown(60)
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : '오류가 발생했어요. 다시 시도해줘.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function signInWithProvider(provider: OAuthProvider) {
-    setError(null)
-    if (supabaseConfigIssue) {
-      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
-      return
-    }
-
-    setOauthLoading(provider)
-    try {
-      const supabase = createClient()
-      const callback = new URL('/auth/callback', window.location.origin)
-      callback.searchParams.set('next', redirectTo)
-      const { error: err } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: callback.toString(),
-        },
+      const { error: err } = await supabase.auth.signInWithOtp({
+        email: normalizedEmail,
       })
-      if (err) throw err
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : '소셜 로그인을 시작하지 못했어요.')
-      setOauthLoading(null)
-    }
-  }
 
-  async function verifyOtp() {
-    setError(null)
-    if (supabaseConfigIssue) {
-      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
-      return
-    }
-    const token = otp.join('')
-    if (token.length < 6) { setError('인증번호 6자리를 입력해줘.'); return }
-    setLoading(true)
-    try {
-      const supabase = createClient()
-      const { error: err } = await supabase.auth.verifyOtp({ phone: toE164(phone), token, type: 'sms' })
       if (err) throw err
-      router.push(redirectTo)
+      moveToCodeStep(normalizedEmail)
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : '인증번호가 틀렸어. 다시 확인해줘.')
+      if (isEmailOtpRateLimitError(e)) {
+        moveToCodeStep(normalizedEmail)
+        setResendCooldown(60)
+        return
+      }
+
+      setError(e instanceof Error ? e.message : '인증번호를 보내지 못했어요. 다시 시도해줘.')
     } finally {
       setLoading(false)
     }
   }
 
-  function handleOtpInput(idx: number, value: string) {
+  function moveToCodeStep(nextEmail: string) {
+    setEmail(nextEmail)
+    setCode(['', '', '', '', '', ''])
+    setError(null)
+    setStep('code')
+    setResendCooldown(60)
+  }
+
+  async function verifyEmailCode() {
+    setError(null)
+
+    if (supabaseConfigIssue) {
+      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
+      return
+    }
+
+    if (!isLikelyEmail(normalizedEmail)) {
+      setError('이메일 주소를 다시 확인해줘.')
+      setStep('email')
+      return
+    }
+
+    if (codeValue.length !== 6) {
+      setError('인증번호 6자리를 입력해줘.')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { error: err } = await supabase.auth.verifyOtp({
+        email: normalizedEmail,
+        token: codeValue,
+        type: 'email',
+      })
+
+      if (err) throw err
+      router.replace(redirectTo)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '인증번호가 맞지 않거나 만료됐어요. 다시 확인해줘.')
+      setCode(['', '', '', '', '', ''])
+      setTimeout(() => codeRefs.current[0]?.focus(), 60)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleCodeInput(index: number, value: string) {
     if (!/^\d*$/.test(value)) return
-    const next = [...otp]
-    next[idx] = value.slice(-1)
-    setOtp(next)
-    if (value && idx < 5) otpRefs.current[idx + 1]?.focus()
+
+    const next = [...code]
+    next[index] = value.slice(-1)
+    setCode(next)
+
+    if (value && index < 5) codeRefs.current[index + 1]?.focus()
   }
 
-  function handleOtpKeyDown(idx: number, e: React.KeyboardEvent) {
-    if (e.key === 'Backspace' && !otp[idx] && idx > 0) otpRefs.current[idx - 1]?.focus()
+  function handleCodeKeyDown(index: number, event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Backspace' && !code[index] && index > 0) {
+      codeRefs.current[index - 1]?.focus()
+    }
   }
 
-  function handleOtpPaste(e: React.ClipboardEvent) {
-    const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+  function handleCodePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    const digits = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
     if (!digits) return
-    e.preventDefault()
-    const next = [...otp]
+
+    event.preventDefault()
+    const next = ['', '', '', '', '', '']
     for (let i = 0; i < 6; i++) next[i] = digits[i] ?? ''
-    setOtp(next)
-    otpRefs.current[Math.min(digits.length, 5)]?.focus()
+    setCode(next)
+    codeRefs.current[Math.min(digits.length, 5)]?.focus()
+  }
+
+  function enterDevPreview() {
+    const maxAge = 60 * 60 * 24 * 7
+    document.cookie = `${DEV_AUTH_COOKIE}=${getDevAuthCookieValue()}; path=/; max-age=${maxAge}; SameSite=Lax`
+    window.localStorage.setItem(DEV_AUTH_COOKIE, getDevAuthCookieValue())
+    router.replace('/dev/preview')
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-5 overflow-hidden">
-
-      {/* 배경 — 우주적 운명 분위기 */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-25%] left-[-20%]  w-[600px] h-[600px] rounded-full bg-violet-700/30  blur-[150px]" />
-        <div className="absolute top-[-10%] right-[-20%] w-[450px] h-[450px] rounded-full bg-rose-700/22    blur-[120px]" />
-        <div className="absolute bottom-[-20%] left-1/2  -translate-x-1/2 w-[500px] h-[400px] rounded-full bg-purple-800/20 blur-[130px]" />
-        {/* 미묘한 황금빛 — 운명의 빛 */}
-        <div className="absolute top-[30%] right-[5%]   w-[200px] h-[200px] rounded-full bg-amber-600/8   blur-[80px]" />
-      </div>
-
-      <div className="relative w-full max-w-sm">
-
-        {/* ── 로고 히어로 ── */}
-        <div className="text-center mb-10">
-          {/* 아이콘 + 별 파티클 */}
-          <div className="relative inline-block mb-5">
-            {STARS.map((s, i) => (
-              <span
-                key={i}
-                className="absolute text-amber-300 animate-star pointer-events-none select-none"
-                style={{
-                  top: s.top, left: s.left,
-                  fontSize: s.size,
-                  animationDelay: s.delay,
-                  animationDuration: s.dur,
-                }}
-              >
-                ✦
-              </span>
-            ))}
-            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-violet-950 via-rose-950 to-amber-950 flex items-center justify-center shadow-2xl animate-pulse-glow border border-white/10">
-              <DestinyLogo size={48} />
-            </div>
+    <main className="flex min-h-screen items-center justify-center overflow-hidden booting-band px-5 py-10 text-boot-ink">
+      <section className="w-full max-w-sm">
+        <div className="mb-9 text-center">
+          <div className="mb-5 flex justify-center">
+            <BootingLogo size="lg" />
           </div>
-
-          <h1 className="font-destiny text-4xl font-bold tracking-widest gradient-brand-text">
-            Destiny
+          <h1 className="text-3xl font-black leading-tight">
+            이메일 코드로<br />부팅하세요
           </h1>
-          <p className="text-sm text-gray-400 mt-2 leading-relaxed text-center">
-            당신의 인연이 여기서 시작됩니다
+          <p className="mt-2 text-sm leading-relaxed text-boot-muted">
+            메일로 받은 6자리 숫자를 입력하면 로그인돼요.
           </p>
         </div>
 
-        {/* ── 로그인 카드 ── */}
-        <div className="glass-card rounded-3xl p-6">
-          {step === 'phone' && (
-            <div className="mb-5 space-y-2.5">
-              <button
-                type="button"
-                onClick={() => signInWithProvider('kakao')}
-                disabled={Boolean(oauthLoading)}
-                className="w-full rounded-xl bg-[#FEE500] px-4 py-3.5 text-sm font-black text-black flex items-center justify-center gap-2 disabled:opacity-60"
-              >
-                <MessageCircle className="w-4 h-4" strokeWidth={2.5} />
-                {oauthLoading === 'kakao' ? '카카오 연결 중...' : '카카오로 계속하기'}
-              </button>
-              <button
-                type="button"
-                onClick={() => signInWithProvider('google')}
-                disabled={Boolean(oauthLoading)}
-                className="w-full rounded-xl bg-white px-4 py-3.5 text-sm font-black text-gray-900 flex items-center justify-center gap-2 disabled:opacity-60"
-              >
-                <CircleUserRound className="w-4 h-4" strokeWidth={2.5} />
-                {oauthLoading === 'google' ? 'Google 연결 중...' : 'Google로 계속하기'}
-              </button>
-              <div className="flex items-center gap-3 py-1">
-                <div className="h-px flex-1 bg-white/10" />
-                <span className="text-[11px] text-gray-600">또는</span>
-                <div className="h-px flex-1 bg-white/10" />
-              </div>
-            </div>
-          )}
-
-          {step === 'phone' ? (
-            <>
-              <p className="text-base font-bold mb-0.5">휴대폰 번호로 시작하기</p>
-              <p className="text-xs text-gray-500 mb-5">번호는 외부에 절대 공개되지 않아요</p>
-
-              <div className="flex gap-2 mb-4">
-                <div className="glass rounded-xl px-3 py-3.5 text-sm font-medium text-gray-400 flex items-center whitespace-nowrap">
-                  🇰🇷 +82
-                </div>
-                <input
-                  type="tel"
-                  placeholder="010-0000-0000"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhone(e.target.value))}
-                  onKeyDown={(e) => e.key === 'Enter' && sendOtp()}
-                  autoComplete="tel"
-                  className="flex-1 glass rounded-xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:ring-1 focus:ring-rose-500/50 border border-transparent transition-all"
-                />
-              </div>
-
-              {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
-
-              <button
-                onClick={sendOtp}
-                disabled={loading}
-                className="btn-gradient-animated w-full py-3.5 rounded-xl font-bold text-sm text-white"
-              >
-                {loading ? '발송 중...' : '인연 찾기'}
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-base font-bold mb-0.5">인증번호 입력</p>
-              <p className="text-xs text-gray-500 mb-5">
-                {phone}으로 발송된 6자리 번호
+        <div className="glass-card rounded-3xl border border-boot-hairline p-6">
+          {step === 'email' ? (
+            <form onSubmit={sendEmailCode}>
+              <p className="mb-0.5 text-base font-black">이메일로 시작하기</p>
+              <p className="mb-5 text-xs leading-5 text-boot-muted">
+                가입과 로그인을 같은 인증번호로 처리해요.
               </p>
 
-              <div className="flex gap-2 mb-5">
-                {otp.map((digit, idx) => (
+              <label className="mb-4 block">
+                <span className="mb-2 block text-xs font-black text-boot-body">이메일</span>
+                <input
+                  type="email"
+                  placeholder="student@example.com"
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value)
+                    setError(null)
+                  }}
+                  autoComplete="email"
+                  className="glass w-full rounded-xl border border-boot-hairline px-4 py-3.5 text-sm text-boot-ink placeholder-boot-muted transition-all focus:outline-none focus:ring-1 focus:ring-boot-primary/50"
+                />
+              </label>
+
+              {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-black text-white disabled:opacity-70"
+              >
+                <Send size={15} strokeWidth={2.6} />
+                {loading ? '인증번호 보내는 중...' : '인증번호 받기'}
+              </button>
+            </form>
+          ) : (
+            <div>
+              <div className="mb-5 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-boot-soft text-boot-primary">
+                  <MailCheck size={26} strokeWidth={2.5} />
+                </div>
+                <p className="text-base font-black">인증번호 입력</p>
+                <p className="mt-2 break-words text-sm leading-6 text-boot-muted">
+                  {normalizedEmail} 메일함에 있는 최신 6자리 숫자를 입력해줘.
+                </p>
+              </div>
+
+              <div className="mb-5 flex gap-2">
+                {code.map((digit, index) => (
                   <input
-                    key={idx}
-                    ref={(el) => { otpRefs.current[idx] = el }}
+                    key={index}
+                    ref={(element) => { codeRefs.current[index] = element }}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
-                    aria-label={`인증번호 ${idx + 1}번째 자리`}
+                    aria-label={`인증번호 ${index + 1}번째 자리`}
                     autoComplete="one-time-code"
-                    onChange={(e) => handleOtpInput(idx, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                    onPaste={handleOtpPaste}
-                    className="flex-1 aspect-square text-center text-xl font-black glass rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all"
+                    onChange={(event) => handleCodeInput(index, event.target.value)}
+                    onKeyDown={(event) => handleCodeKeyDown(index, event)}
+                    onPaste={handleCodePaste}
+                    className="glass aspect-square min-w-0 flex-1 rounded-xl border border-boot-hairline text-center text-xl font-black text-boot-ink transition-all focus:outline-none focus:ring-2 focus:ring-boot-primary/50"
                   />
                 ))}
               </div>
 
-              {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+              {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
 
               <button
-                onClick={verifyOtp}
+                type="button"
+                onClick={() => void verifyEmailCode()}
                 disabled={loading}
-                className="btn-gradient-animated w-full py-3.5 rounded-xl font-bold text-sm text-white mb-3"
+                className="btn-gradient-animated w-full rounded-xl py-3.5 text-sm font-black text-white disabled:opacity-70"
               >
-                {loading ? '확인 중...' : '확인'}
+                {loading ? '확인 중...' : '확인하고 로그인'}
               </button>
 
-              <div className="flex items-center justify-between">
+              <div className="mt-3 flex items-center justify-between">
                 <button
-                  onClick={() => { setStep('phone'); setOtp(['','','','','','']); setError(null); setResendCooldown(0) }}
-                  className="py-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                  type="button"
+                  onClick={() => {
+                    setStep('email')
+                    setCode(['', '', '', '', '', ''])
+                    setError(null)
+                    setResendCooldown(0)
+                  }}
+                  className="px-1 py-2 text-xs font-bold text-boot-muted transition-colors hover:text-boot-primary"
                 >
-                  번호 다시 입력
+                  다른 이메일 입력
                 </button>
                 <button
-                  onClick={sendOtp}
+                  type="button"
+                  onClick={() => void sendEmailCode()}
                   disabled={loading || resendCooldown > 0}
-                  className="py-2 text-xs text-rose-400 hover:text-rose-300 transition-colors disabled:text-gray-600 disabled:cursor-not-allowed"
+                  className="px-1 py-2 text-xs font-bold text-boot-primary transition-colors hover:text-boot-coral disabled:cursor-not-allowed disabled:text-boot-muted"
                 >
-                  {resendCooldown > 0 ? `재발송 (${resendCooldown}초)` : '재발송'}
+                  {resendCooldown > 0 ? `다시 받기 (${resendCooldown}초)` : '다시 받기'}
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
 
-        <p className="text-center text-[11px] text-gray-700 mt-6 leading-relaxed">
-          가입 시 이용약관 및 개인정보처리방침에 동의하게 됩니다
+        {devAuthBypassEnabled && (
+          <button
+            type="button"
+            onClick={enterDevPreview}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 text-sm font-black text-boot-primary shadow-sm transition-colors hover:border-boot-primary/30"
+          >
+            <Eye size={16} strokeWidth={2.5} />
+            디자인 확인용으로 입장
+          </button>
+        )}
+
+        <p className="mt-6 text-center text-[11px] leading-relaxed text-boot-muted">
+          이메일은 로그인과 학교 인증 진행을 위해서만 사용돼요.
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 rounded-full border-2 border-rose-500/30 border-t-rose-500 animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-rose-500/30 border-t-rose-500" />
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   )

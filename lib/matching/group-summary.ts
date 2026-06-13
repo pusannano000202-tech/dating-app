@@ -83,9 +83,8 @@ function meanPreferenceWeights(values: MatchingPreferenceWeights[]): MatchingPre
   return {
     appearance: mean(values.map((value) => value.appearance)),
     personality: mean(values.map((value) => value.personality)),
-    time: mean(values.map((value) => value.time)),
-    scoreBand: mean(values.map((value) => value.scoreBand)),
-    weightAlignment: mean(values.map((value) => value.weightAlignment)),
+    height: mean(values.map((value) => value.height)),
+    bodyType: mean(values.map((value) => value.bodyType)),
   }
 }
 

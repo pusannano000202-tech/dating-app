@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import BasicInfoForm, { type BasicInfoData } from '@/components/profile/BasicInfoForm'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 
 export default function BasicInfoPage() {
@@ -34,7 +35,17 @@ export default function BasicInfoPage() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
+      if (!user) {
+        if (isDevPreviewClientSession()) {
+          try {
+            sessionStorage.setItem('booting_dev_basic_profile', JSON.stringify(data))
+          } catch {}
+          router.push('/profile/worldcup')
+          return
+        }
+        router.push('/login')
+        return
+      }
 
       const { error } = await supabase
         .from('profiles')

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Loader2 } from 'lucide-react'
-import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import { DEPOSIT_AMOUNT, FREE_BETA_ENABLED } from '@/lib/constants'
 import {
   appFeeToRefundAmount,
   getAppFeeFlowDecision,
@@ -47,6 +47,37 @@ export default function RefundPage() {
         })
     }).catch(() => undefined)
   }, [])
+
+  if (FREE_BETA_ENABLED) {
+    return (
+      <main className="min-h-screen px-5 pb-10">
+        <div className="max-w-md mx-auto pt-6">
+          <header className="mb-6 flex items-center gap-3">
+            <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
+              <ChevronLeft size={18} />
+            </Link>
+            <div>
+              <h1 className="text-xl font-black">무료 베타 진행 중</h1>
+              <p className="text-xs text-gray-500 mt-0.5">지금은 매칭비 정산을 받지 않아요</p>
+            </div>
+          </header>
+
+          <section className="glass-card rounded-3xl p-6 text-center">
+            <p className="text-lg font-black gradient-fate-text">정산할 금액이 없어요</p>
+            <p className="mt-3 text-sm leading-relaxed text-gray-500">
+              사용자 확보를 우선하기 위해 무료 베타 기간에는 보증금, 환불, 앱 매칭비 선택을 모두 비활성화합니다.
+            </p>
+            <Link
+              href={`/match/${encodeURIComponent(matchId)}`}
+              className="btn-gradient mt-5 block w-full rounded-2xl py-3 text-sm font-bold"
+            >
+              매칭 상세로 돌아가기
+            </Link>
+          </section>
+        </div>
+      </main>
+    )
+  }
 
   async function submit(finalAppFee: number) {
     if (busy) return

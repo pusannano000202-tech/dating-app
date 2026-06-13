@@ -43,7 +43,7 @@ const TYPE_INFO: Record<PersonalityType, { label: string; desc: string; Icon: Lu
     label: '지적/탐구형',
     desc: '취향과 생각이 깊고 새로운 대화가 이어지는 사람',
     Icon: Brain,
-    color: 'from-violet-500 to-fuchsia-500',
+    color: 'from-boot-primary to-boot-coral',
   },
   free_individual: {
     label: '자유/개성형',
@@ -85,49 +85,49 @@ export default function PersonalityPreferenceResult({ profile, onNext, onRetry, 
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="glass-strong rounded-3xl p-6 text-center border border-white/10">
-        <p className="text-xs text-violet-400 font-bold tracking-widest uppercase mb-2">끌리는 상대 성격</p>
+      <div className="glass-strong rounded-3xl p-6 text-center border border-boot-hairline bg-white/90">
+        <p className="text-xs text-boot-primary font-bold tracking-widest uppercase mb-2">끌리는 상대 성격</p>
         <div className={`mx-auto mb-4 w-16 h-16 rounded-2xl bg-gradient-to-br ${primary.color} flex items-center justify-center shadow-lg`}>
           <primary.Icon className="w-8 h-8 text-white" strokeWidth={1.8} />
         </div>
         <h2 className="text-2xl font-black mb-1">{primary.label}</h2>
-        <p className="text-sm text-gray-400 leading-relaxed">{primary.desc}</p>
+        <p className="text-sm text-boot-muted leading-relaxed">{primary.desc}</p>
       </div>
 
       {secondary && (
-        <div className="glass rounded-2xl p-4 border border-white/10">
-          <p className="text-xs text-gray-500 mb-2">같이 반응하는 분위기</p>
+        <div className="glass rounded-2xl p-4 border border-boot-hairline">
+          <p className="text-xs text-boot-muted mb-2">같이 반응하는 분위기</p>
           <div className="flex items-start gap-3">
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${secondary.color} flex items-center justify-center flex-shrink-0`}>
               <secondary.Icon className="w-5 h-5 text-white" strokeWidth={1.8} />
             </div>
             <div>
               <p className="text-sm font-bold">{secondary.label}</p>
-              <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{secondary.desc}</p>
+              <p className="text-xs text-boot-muted mt-0.5 leading-relaxed">{secondary.desc}</p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="glass rounded-2xl p-4 border border-white/10">
-        <p className="text-xs text-gray-500 mb-3">상위 성격 분위기</p>
+      <div className="glass rounded-2xl p-4 border border-boot-hairline">
+        <p className="text-xs text-boot-muted mb-3">상위 성격 분위기</p>
         <div className="flex flex-wrap gap-2">
           {relatedTypes.map((label) => (
-            <span key={label} className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-gray-300">
+            <span key={label} className="px-3 py-2 rounded-xl bg-white/80 border border-boot-hairline text-xs font-bold text-boot-body">
               {label}
             </span>
           ))}
         </div>
       </div>
 
-      <p className="text-xs text-gray-600 text-center">
+      <p className="text-xs text-boot-muted text-center">
         상대에게는 자세한 답변이 공개되지 않아.
       </p>
 
       <button
         onClick={onNext}
         disabled={saving}
-        className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-50"
+        className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-sm disabled:opacity-50"
       >
         {saving ? '저장 중...' : '다음'}
       </button>
@@ -136,7 +136,7 @@ export default function PersonalityPreferenceResult({ profile, onNext, onRetry, 
           type="button"
           onClick={onRetry}
           disabled={saving}
-          className="w-full py-3 rounded-2xl glass text-sm text-gray-400 hover:text-gray-200 border border-white/5 transition-colors"
+          className="w-full py-3 rounded-2xl glass text-sm text-boot-body hover:text-boot-primary border border-boot-hairline transition-colors"
         >
           다시 하기
         </button>

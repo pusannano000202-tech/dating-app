@@ -54,31 +54,32 @@ export default function AdminDashboardPage() {
   return (
     <main className="px-5 pb-10">
       <div className="max-w-3xl mx-auto pt-6">
-        <h1 className="text-2xl font-black mb-1">운영자 대시보드</h1>
-        <p className="text-xs text-gray-500 mb-6">매칭 품질 통제 · 외모 점수 보정</p>
+        <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-boot-primary">Admin Review</p>
+        <h1 className="text-2xl font-black mb-1 text-boot-ink">운영자 대시보드</h1>
+        <p className="text-xs text-boot-muted mb-6">매칭 품질 통제 · 외모 점수 보정</p>
 
         {error && (
-          <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
             {error}
           </div>
         )}
 
         {loading ? (
-          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-gray-400">
+          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
             <Loader2 size={18} className="animate-spin" /> 불러오는 중
           </section>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Link href="/admin/matches/review" className="glass-card rounded-3xl p-5 hover:border-violet-500/30 border border-white/[0.06]">
-              <ClipboardCheck size={24} className="text-violet-300 mb-3" />
-              <p className="text-sm font-bold">매칭 리뷰 대기</p>
+            <Link href="/admin/matches/review" className="glass-card rounded-3xl p-5 border border-boot-hairline transition hover:-translate-y-0.5 hover:border-boot-primary/30">
+              <ClipboardCheck size={24} className="text-boot-primary mb-3" />
+              <p className="text-sm font-black text-boot-ink">매칭 리뷰 대기</p>
               <p className="mt-1 text-3xl font-black gradient-fate-text">{pendingCount ?? '–'}</p>
-              <p className="mt-1 text-[11px] text-gray-500">승인/거절하러 가기 →</p>
+              <p className="mt-1 text-[11px] font-bold text-boot-muted">승인/거절하러 가기 →</p>
             </Link>
 
-            <section className="glass-card rounded-3xl p-5 border border-white/[0.06]">
-              <p className="text-sm font-bold mb-1">매칭 승인 게이트</p>
-              <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
+            <section className="glass-card rounded-3xl p-5 border border-boot-hairline">
+              <p className="text-sm font-black mb-1 text-boot-ink">매칭 승인 게이트</p>
+              <p className="text-[11px] text-boot-muted mb-4 leading-relaxed">
                 켜면 모든 신규 매칭이 운영자 승인 전까지 사용자에게 노출되지 않아요.
               </p>
               <button
@@ -88,9 +89,9 @@ export default function AdminDashboardPage() {
                 className="flex items-center gap-2 text-sm font-bold disabled:opacity-40"
               >
                 {requiresApproval ? (
-                  <><ToggleRight size={28} className="text-emerald-400" /> 승인 필요 (ON)</>
+                  <><ToggleRight size={28} className="text-emerald-600" /> 승인 필요 (ON)</>
                 ) : (
-                  <><ToggleLeft size={28} className="text-gray-500" /> 자동 노출 (OFF)</>
+                  <><ToggleLeft size={28} className="text-boot-muted" /> 자동 노출 (OFF)</>
                 )}
               </button>
             </section>

@@ -9,7 +9,7 @@ import {
   Heart,
   AlertTriangle, Pencil, Check,
 } from 'lucide-react'
-import DestinyLogo from '@/components/DestinyLogo'
+import BootingLogo from '@/components/BootingLogo'
 import { createClient } from '@/lib/supabase'
 import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
 import type { AppearanceType, Gender } from '@/lib/types'
@@ -18,49 +18,49 @@ const EDIT_SECTIONS = [
   {
     href: '/profile/worldcup',
     icon: Crosshair,
-    iconBg: 'from-violet-600 to-purple-700',
+    iconBg: 'from-boot-primary to-boot-coral',
     title: '이상형 스타일',
     desc: '선호하는 외모 타입 다시 고르기',
   },
   {
     href: '/profile/basic',
     icon: ClipboardList,
-    iconBg: 'from-indigo-600 to-violet-700',
+    iconBg: 'from-sky-500 to-cyan-400',
     title: '기본 정보',
     desc: '나이, 키, 학과 등 수정하기',
   },
   {
     href: '/profile/photos',
     icon: Camera,
-    iconBg: 'from-pink-600 to-rose-700',
+    iconBg: 'from-boot-coral to-amber-400',
     title: '사진',
     desc: '프로필 사진 바꾸기',
   },
   {
     href: '/profile/survey',
     icon: Brain,
-    iconBg: 'from-purple-600 to-fuchsia-700',
+    iconBg: 'from-emerald-500 to-teal-400',
     title: '성격 테스트',
     desc: 'Big5 성격 테스트 다시 하기',
   },
   {
     href: '/profile/personality-preference',
     icon: Heart,
-    iconBg: 'from-rose-600 to-fuchsia-700',
+    iconBg: 'from-rose-500 to-boot-coral',
     title: '상대 성격 취향',
     desc: '끌리는 상대 성격 다시 고르기',
   },
   {
     href: '/profile/schedule',
     icon: CalendarDays,
-    iconBg: 'from-violet-700 to-indigo-700',
+    iconBg: 'from-boot-primary to-sky-500',
     title: '가능한 시간대',
     desc: '과팅 가능한 요일/시간 수정',
   },
   {
     href: '/profile/preferences',
     icon: SlidersHorizontal,
-    iconBg: 'from-fuchsia-700 to-violet-600',
+    iconBg: 'from-amber-400 to-boot-coral',
     title: '매칭 가중치',
     desc: '중요하게 보는 조건 조정하기',
   },
@@ -165,35 +165,29 @@ export default function ProfileEditPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pb-10">
-      {/* 배경 glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-15%] left-[-20%] w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-15%] w-[350px] h-[350px] rounded-full bg-fuchsia-700/15 blur-[100px]" />
-      </div>
-
+    <div className="flex flex-col min-h-screen booting-band px-5 pb-10 text-boot-ink">
       {/* 헤더 */}
       <div className="relative pt-6 mb-7 flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 glass rounded-xl">
+        <button onClick={() => router.back()} className="p-2 glass rounded-xl border border-boot-hairline text-boot-body hover:text-boot-primary">
           <ChevronRight className="w-5 h-5 rotate-180" />
         </button>
         <div>
-          <h1 className="text-xl font-black">프로필 수정</h1>
-          <p className="text-xs text-gray-500 mt-0.5">수정할 항목을 골라줘</p>
+          <h1 className="text-xl font-black">부팅 프로필 수정</h1>
+          <p className="text-xs text-boot-muted mt-0.5">수정할 항목을 골라줘</p>
         </div>
       </div>
 
       {/* 프로필 요약 카드 — 로딩 스켈레톤 */}
       {!summary && (
-        <div className="glass-card rounded-2xl p-4 mb-5 animate-pulse">
+        <div className="glass-card rounded-2xl border border-boot-hairline p-4 mb-5 animate-pulse">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex-shrink-0" />
+            <div className="w-12 h-12 rounded-2xl bg-boot-soft flex-shrink-0" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-white/10 rounded w-3/4" />
-              <div className="h-3 bg-white/5 rounded w-1/2" />
+              <div className="h-4 bg-boot-hairline rounded w-3/4" />
+              <div className="h-3 bg-boot-hairline/70 rounded w-1/2" />
               <div className="flex gap-2 mt-1">
-                <div className="h-4 bg-white/10 rounded-full w-20" />
-                <div className="h-4 bg-white/5 rounded-full w-14" />
+                <div className="h-4 bg-boot-hairline rounded-full w-20" />
+                <div className="h-4 bg-boot-hairline/70 rounded-full w-14" />
               </div>
             </div>
           </div>
@@ -202,10 +196,10 @@ export default function ProfileEditPage() {
 
       {/* 프로필 요약 카드 */}
       {summary && (
-        <div className="relative glass-card rounded-2xl p-4 mb-5">
+        <div className="relative glass-card rounded-2xl border border-boot-hairline p-4 mb-5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-950 via-rose-950 to-amber-950 flex items-center justify-center flex-shrink-0 shadow-lg border border-white/10">
-              <DestinyLogo size={30} />
+            <div className="flex-shrink-0">
+              <BootingLogo size="sm" showSubtitle={false} />
             </div>
             <div className="flex-1 min-w-0">
               {editingName ? (
@@ -218,13 +212,13 @@ export default function ProfileEditPage() {
                       maxLength={20}
                       autoFocus
                       placeholder="2~20자"
-                      className="flex-1 min-w-0 bg-white/[0.05] border border-violet-400/30 rounded-lg px-2 py-1 text-sm font-bold text-white focus:outline-none focus:border-violet-500"
+                      className="flex-1 min-w-0 rounded-lg border border-boot-hairline bg-white px-2 py-1 text-sm font-bold text-boot-ink focus:outline-none focus:border-boot-primary"
                     />
                     <button
                       type="button"
                       onClick={saveDisplayName}
                       disabled={savingName}
-                      className="p-1.5 rounded-lg bg-violet-400/20 border border-violet-400/30 text-violet-200 disabled:opacity-50"
+                      className="p-1.5 rounded-lg bg-boot-soft border border-boot-primary/30 text-boot-primary disabled:opacity-50"
                       aria-label="저장"
                     >
                       <Check size={14} />
@@ -233,7 +227,7 @@ export default function ProfileEditPage() {
                       type="button"
                       onClick={() => { setEditingName(false); setNameError(null) }}
                       disabled={savingName}
-                      className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300"
+                      className="p-1.5 rounded-lg text-boot-muted hover:text-boot-body"
                       aria-label="취소"
                     >
                       ✕
@@ -251,7 +245,7 @@ export default function ProfileEditPage() {
                   <button
                     type="button"
                     onClick={startEditName}
-                    className="p-1 rounded text-gray-500 hover:text-violet-300"
+                    className="p-1 rounded text-boot-muted hover:text-boot-primary"
                     aria-label="이름 수정"
                   >
                     <Pencil size={12} />
@@ -264,15 +258,15 @@ export default function ProfileEditPage() {
                 {summary.school ? ` · ${summary.school}` : ''}
               </p>
               {summary.department && (
-                <p className="text-xs text-gray-500 mt-0.5 truncate">{summary.department}</p>
+                <p className="text-xs text-boot-muted mt-0.5 truncate">{summary.department}</p>
               )}
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {summary.appearance_type && (
-                  <span className="text-[10px] bg-violet-500/20 text-violet-300 rounded-full px-2 py-0.5">
+                  <span className="text-[10px] bg-boot-soft text-boot-primary rounded-full px-2 py-0.5">
                     {APPEARANCE_TYPE_INFO[summary.appearance_type].label} 스타일 선호
                   </span>
                 )}
-                <span className="text-[10px] bg-white/10 text-gray-400 rounded-full px-2 py-0.5">
+                <span className="text-[10px] bg-white/80 text-boot-muted rounded-full px-2 py-0.5 border border-boot-hairline">
                   사진 {summary.photo_count}장
                 </span>
               </div>
@@ -287,7 +281,7 @@ export default function ProfileEditPage() {
           <Link
             key={href}
             href={href}
-            className="glass-card rounded-2xl px-4 py-3.5 flex items-center gap-4 hover:border-violet-500/30 border border-white/[0.06] transition-all hover:bg-white/[0.07] active:scale-[0.99]"
+            className="glass-card rounded-2xl px-4 py-3.5 flex items-center gap-4 hover:border-boot-primary/30 border border-boot-hairline transition-all hover:bg-white/95 active:scale-[0.99]"
           >
             {/* 컬러 아이콘 박스 */}
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${iconBg} flex items-center justify-center flex-shrink-0 shadow-lg`}>
@@ -295,14 +289,14 @@ export default function ProfileEditPage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold">{title}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+              <p className="text-xs text-boot-muted mt-0.5">{desc}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-600 flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 text-boot-muted flex-shrink-0" />
           </Link>
         ))}
 
         {/* 위험 구역 */}
-        <div className="mt-3 pt-4 border-t border-white/[0.06]">
+        <div className="mt-3 pt-4 border-t border-boot-hairline">
           {!showConfirm ? (
             <button
               onClick={() => setShowConfirm(true)}
@@ -314,7 +308,7 @@ export default function ProfileEditPage() {
           ) : (
             <div className="glass-card rounded-2xl p-4 border border-red-500/30">
               <p className="text-sm font-bold text-red-400 mb-1">정말 초기화할 거야?</p>
-              <p className="text-xs text-gray-500 mb-4">프로필 정보가 모두 삭제돼. 되돌릴 수 없어.</p>
+              <p className="text-xs text-boot-muted mb-4">프로필 정보가 모두 삭제돼. 되돌릴 수 없어.</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowConfirm(false)}

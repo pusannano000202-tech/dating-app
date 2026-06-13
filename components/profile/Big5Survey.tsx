@@ -29,8 +29,8 @@ const TRAITS: Trait[] = [
     key: 'openness',
     label: '개방성',
     Icon: Palette,
-    iconBg: 'from-violet-600 to-fuchsia-600',
-    color: 'from-violet-500 to-fuchsia-500',
+    iconBg: 'from-boot-primary to-boot-coral',
+    color: 'from-boot-primary to-boot-coral',
     questions: [
       '새로운 취미나 경험을 즐겨 찾는 편이야?',
       '창의적이거나 예술적인 것에 관심이 많아?',
@@ -40,8 +40,8 @@ const TRAITS: Trait[] = [
     key: 'conscientiousness',
     label: '성실성',
     Icon: ClipboardCheck,
-    iconBg: 'from-blue-600 to-cyan-600',
-    color: 'from-blue-500 to-cyan-500',
+    iconBg: 'from-sky-500 to-cyan-400',
+    color: 'from-sky-500 to-cyan-400',
     questions: [
       '계획을 세우고 체계적으로 일하는 편이야?',
       '맡은 일은 끝까지 마무리하고 마는 편이야?',
@@ -62,8 +62,8 @@ const TRAITS: Trait[] = [
     key: 'agreeableness',
     label: '친화성',
     Icon: Heart,
-    iconBg: 'from-emerald-600 to-teal-600',
-    color: 'from-emerald-500 to-teal-500',
+    iconBg: 'from-emerald-500 to-teal-400',
+    color: 'from-emerald-500 to-teal-400',
     questions: [
       '다른 사람 감정에 잘 공감하는 편이야?',
       '갈등보다는 타협과 배려를 선호해?',
@@ -155,29 +155,29 @@ export default function Big5Survey({ onComplete }: Props) {
       {/* 진행 바 */}
       <div>
         <div className="flex justify-between mb-2">
-          <span className="text-xs font-bold" style={{ background: `linear-gradient(135deg, #a78bfa, #f0abfc)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <span className="text-xs font-bold text-boot-primary">
             {trait.label}
           </span>
-          <span className="text-xs text-gray-500">{traitIdx + 1} / {TRAITS.length}</span>
+          <span className="text-xs text-boot-muted">{traitIdx + 1} / {TRAITS.length}</span>
         </div>
-        <div className="w-full bg-white/10 rounded-full h-1">
+        <div className="w-full bg-boot-hairline rounded-full h-1">
           <div className="h-1 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%`, background: 'linear-gradient(135deg, #7c3aed, #c026d3)' }} />
+            style={{ width: `${progress}%`, background: 'linear-gradient(135deg, #ff5a6f, #ff7e5f)' }} />
         </div>
       </div>
 
       {/* 트레이트 카드 */}
-      <div className="glass-strong rounded-3xl p-5 text-center border border-white/10">
+      <div className="glass-strong rounded-3xl p-5 text-center border border-boot-hairline bg-white/90">
         <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${trait.iconBg} mb-3 shadow-lg`}>
           <trait.Icon className="w-8 h-8 text-white" strokeWidth={1.8} />
         </div>
         <h2 className="text-xl font-black mb-1">{trait.label}</h2>
-        <p className="text-xs text-gray-500">솔직하게 답해줘 — 정답은 없어</p>
+        <p className="text-xs text-boot-muted">솔직하게 답해줘. 정답은 없어</p>
       </div>
 
       {/* 질문들 */}
       {trait.questions.map((q, qIdx) => (
-        <div key={`${traitIdx}-${qIdx}`} className="glass rounded-2xl p-4">
+        <div key={`${traitIdx}-${qIdx}`} className="glass rounded-2xl p-4 border border-boot-hairline">
           <p className="text-sm font-bold mb-4 leading-relaxed">{q}</p>
 
           {/* 5점 척도 */}
@@ -191,13 +191,13 @@ export default function Big5Survey({ onComplete }: Props) {
                   onClick={() => setAnswer(qIdx, val)}
                   className={`flex-1 py-3 rounded-xl text-center transition-all duration-200 border ${
                     selected
-                      ? 'border-transparent shadow-md shadow-violet-900/30'
-                      : 'border-white/10 hover:border-white/20'
+                      ? 'border-transparent shadow-sm'
+                      : 'border-boot-hairline bg-white/80 hover:border-boot-primary/30'
                   }`}
-                  style={selected ? { background: 'linear-gradient(135deg, #7c3aed, #c026d3)' } : {}}
+                  style={selected ? { background: 'linear-gradient(135deg, #ff5a6f, #ff7e5f)' } : {}}
                 >
-                  <div className={`text-xs font-bold ${selected ? 'text-white' : 'text-gray-400'}`}>{val}</div>
-                  <div className={`text-[9px] mt-0.5 whitespace-pre-line leading-tight ${selected ? 'text-white/80' : 'text-gray-600'}`}>
+                  <div className={`text-xs font-bold ${selected ? 'text-white' : 'text-boot-body'}`}>{val}</div>
+                  <div className={`text-[9px] mt-0.5 whitespace-pre-line leading-tight ${selected ? 'text-white/80' : 'text-boot-muted'}`}>
                     {SCALE_LABELS[val - 1]}
                   </div>
                 </button>
@@ -212,7 +212,7 @@ export default function Big5Survey({ onComplete }: Props) {
           <button
             type="button"
             onClick={handleBack}
-            className="glass py-4 px-5 rounded-2xl font-medium text-sm text-gray-400 hover:text-gray-200 border border-white/10 transition-colors"
+            className="glass py-4 px-5 rounded-2xl font-medium text-sm text-boot-body hover:text-boot-primary border border-boot-hairline transition-colors"
           >
             이전
           </button>
@@ -221,7 +221,7 @@ export default function Big5Survey({ onComplete }: Props) {
           type="button"
           onClick={handleNext}
           disabled={!bothAnswered}
-          className="btn-gradient flex-1 py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="btn-gradient flex-1 py-4 rounded-2xl font-bold text-base shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {isLast ? '완료' : '다음'}
         </button>

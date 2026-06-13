@@ -2,105 +2,36 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import {
-  CalendarClock,
-  Check,
-  ChevronRight,
-  Copy,
-  Crown,
-  CreditCard,
-  Link as LinkIcon,
-  Loader2,
-  LockKeyhole,
-  LogOut,
-  Send,
-  ShieldCheck,
-  Trash2,
-  UserPlus,
-  Users,
-  Wallet,
-} from 'lucide-react'
+import { Loader2, LockKeyhole } from 'lucide-react'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
-import NotificationBell from '@/components/NotificationBell'
-
-type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
-type GroupRole = 'leader' | 'member'
-type FriendGroupStatus = 'available' | 'invited' | 'in_group'
-
-interface GroupRecord {
-  id: string
-  leader_user_id: string
-  name: string | null
-  size: number
-  gender: 'male' | 'female'
-  status: GroupStatus
-}
-
-interface GroupMemberRecord {
-  group_id: string
-  user_id: string
-  display_name: string | null
-  role: GroupRole
-  joined_at: string
-  left_at: string | null
-}
-
-interface GroupInviteRecord {
-  id: string
-  group_id: string
-  invited_phone: string | null
-  invited_user_id: string | null
-  invite_kind: 'user' | 'phone' | 'link'
-  token: string
-  status: string
-  expires_at: string
-  created_at: string
-}
-
-interface FriendSummary {
-  user_id: string
-  display_name: string
-  phone: string | null
-  status: 'active'
-  group_status: FriendGroupStatus
-}
-
-interface GroupState {
-  group: GroupRecord | null
-  members: GroupMemberRecord[]
-  invites: GroupInviteRecord[]
-  friends: FriendSummary[]
-  current_user_id?: string
-}
-
-const EMPTY_STATE: GroupState = {
-  group: null,
-  members: [],
-  invites: [],
-  friends: [],
-}
-
-interface MyDeposit {
-  id: string
-  status: string
-  amount: number
-}
-
-interface DepositSummaryRow {
-  user_id: string
-  display_name: string | null
-  role: string
-  deposit_status: string
-}
-
-interface DepositSummary {
-  rows: DepositSummaryRow[]
-  total_active: number
-  paid_count: number
-  all_paid: boolean
-}
+import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import QueueRadarCard from '@/components/matching/QueueRadarCard'
+import {
+  DEV_DEPOSIT_SUMMARY,
+  DEV_GROUP_STATE,
+  DEV_QUEUE_VISUAL,
+  EMPTY_STATE,
+  QUEUE_VISUAL_DEFAULT,
+} from '@/components/matching/group-create/dev-state'
+import { FriendListPanel } from '@/components/matching/group-create/FriendListPanel'
+import { FreeBetaQueuePanel } from '@/components/matching/group-create/FreeBetaQueuePanel'
+import { GroupDangerZone } from '@/components/matching/group-create/GroupDangerZone'
+import { GroupHeader } from '@/components/matching/group-create/GroupHeader'
+import { GroupMemberStatusPanel } from '@/components/matching/group-create/GroupMemberStatusPanel'
+import { InviteFriendPanel } from '@/components/matching/group-create/InviteFriendPanel'
+import { getQueueStatusText } from '@/components/matching/group-create/status'
+import type {
+  DepositSummary,
+  FriendSummary,
+  GroupInviteRecord,
+  GroupMemberRecord,
+  GroupState,
+  MyDeposit,
+  QueueVisualState,
+} from '@/components/matching/group-create/types'
 
 export default function GroupCreatePage() {
+  const isDevPreview = isDevAuthBypassEnabled()
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(true)
@@ -110,6 +41,7 @@ export default function GroupCreatePage() {
   const [myDeposit, setMyDeposit] = useState<MyDeposit | null>(null)
   const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
   const [showTransferPanel, setShowTransferPanel] = useState(false)
+  const [queueVisualState, setQueueVisualState] = useState<QueueVisualState>(DEV_QUEUE_VISUAL)
 
   const group = state.group
   const members = state.members
@@ -119,14 +51,67 @@ export default function GroupCreatePage() {
   const openSlots = Math.max(0, capacity - members.length)
   const isLeader = Boolean(group && currentUserId && group.leader_user_id === currentUserId)
   const inQueue = group?.status === 'ready' || group?.status === 'in_pool'
-  const canEnterQueue = Boolean(group && isLeader && members.length >= 2 && group.status === 'forming')
+  const groupId = group?.id
+  const memberMatchReadyByUserId = useMemo(
+    () => new Map(members.map((member) => [member.user_id, isDevPreview || member.match_setup_ready])),
+    [isDevPreview, members]
+  )
+  const readyMemberCount = members.filter((member) => memberMatchReadyByUserId.get(member.user_id)).length
+  const needsSetupCount = Math.max(0, members.length - readyMemberCount)
+  const canEnterQueue = Boolean(
+    group &&
+      isLeader &&
+      members.length >= 2 &&
+      group.status === 'forming' &&
+      needsSetupCount === 0
+  )
   const canCancelQueue = Boolean(group && isLeader && inQueue)
+  const groupStatusLabel = `${Math.min(members.length, group?.size ?? capacity)}/${group?.size ?? capacity} 현재 멤버`
 
   const groupStats = useMemo(() => [
-    { label: '현재 멤버', value: `${members.length}/${capacity}` },
-    { label: '대기 초대', value: `${pendingInvites.length}` },
-    { label: '남은 자리', value: `${openSlots}` },
-  ], [capacity, members.length, openSlots, pendingInvites.length])
+    { label: groupStatusLabel, value: `${members.length}` },
+    { label: '매칭 설정 준비 완료', value: `${readyMemberCount}명` },
+    { label: '매칭 설정 입력 필요', value: `${needsSetupCount}명` },
+  ], [groupStatusLabel, members.length, readyMemberCount, needsSetupCount])
+
+  useEffect(() => {
+    if (!inQueue || !groupId) {
+      if (!inQueue) {
+        setQueueVisualState(QUEUE_VISUAL_DEFAULT)
+      }
+      return
+    }
+
+    if (isDevPreview) {
+      setQueueVisualState({
+        ...DEV_QUEUE_VISUAL,
+        myGroupSize: members.length,
+        myGroupInQueue: true,
+      })
+      return
+    }
+
+    const loadQueueStats = async () => {
+      const res = await fetch('/api/match-pool/stats')
+      if (!res.ok) return
+
+      const data = await res.json().catch(() => null)
+      if (!data || typeof data !== 'object') return
+
+      const male = Number((data as { male?: number }).male)
+      const female = Number((data as { female?: number }).female)
+      if (!Number.isFinite(male) || !Number.isFinite(female)) return
+
+      setQueueVisualState({
+        male: Math.max(0, Math.floor(male)),
+        female: Math.max(0, Math.floor(female)),
+        myGroupSize: members.length,
+        myGroupInQueue: true,
+      })
+    }
+
+    void loadQueueStats()
+  }, [isDevPreview, inQueue, groupId, members.length])
 
   useEffect(() => {
     ensureGroup()
@@ -136,6 +121,14 @@ export default function GroupCreatePage() {
   async function ensureGroup() {
     setLoading(true)
     setError(null)
+
+    if (isDevPreview) {
+      setState(DEV_GROUP_STATE)
+      setMyDeposit({ id: 'dev-deposit-1', status: 'paid', amount: DEPOSIT_AMOUNT })
+      setDepositSummary(DEV_DEPOSIT_SUMMARY)
+      setLoading(false)
+      return
+    }
 
     try {
       const res = await fetch('/api/groups', {
@@ -150,7 +143,7 @@ export default function GroupCreatePage() {
       }
 
       if (!res.ok) {
-        setError('그룹을 만들 수 없어요. 기본 프로필을 먼저 완료해줘.')
+        setError('그룹을 만들 수 없어요. 기본 프로필을 먼저 완료해 주세요.')
         return
       }
 
@@ -167,6 +160,8 @@ export default function GroupCreatePage() {
   }
 
   async function refreshGroup() {
+    if (isDevPreview) return
+
     const res = await fetch('/api/groups')
     if (!res.ok) return
     const data = await res.json() as GroupState
@@ -177,6 +172,8 @@ export default function GroupCreatePage() {
   }
 
   async function refreshDeposit(groupId: string) {
+    if (isDevPreview) return
+
     try {
       const [own, summary] = await Promise.all([
         fetch(`/api/deposits?group_id=${encodeURIComponent(groupId)}`),
@@ -197,6 +194,12 @@ export default function GroupCreatePage() {
 
   async function payDeposit() {
     if (!group || saving) return
+    if (isDevPreview) {
+      setMyDeposit({ id: 'dev-deposit-1', status: 'paid', amount: DEPOSIT_AMOUNT })
+      setDepositSummary((current) => current ? { ...current, paid_count: current.total_active, all_paid: true } : DEV_DEPOSIT_SUMMARY)
+      return
+    }
+
     setSaving(true)
     setError(null)
     try {
@@ -212,7 +215,7 @@ export default function GroupCreatePage() {
       }
       await refreshDeposit(group.id)
     } catch {
-      setError('보증금 결제에 실패했어요.')
+      setError('무료 베타 참여 확인에 실패했어요.')
     } finally {
       setSaving(false)
     }
@@ -220,16 +223,39 @@ export default function GroupCreatePage() {
 
   function translateDepositError(code?: string) {
     switch (code) {
-      case 'deposit_already_exists': return '이미 결제한 보증금이 있어요.'
-      case 'not_group_member':       return '그룹 멤버만 결제할 수 있어요.'
-      case 'invalid_amount':         return '결제 금액이 올바르지 않아요.'
-      default:                        return '결제에 실패했어요. 잠시 후 다시 시도해주세요.'
+      case 'deposit_already_exists': return '이미 무료 베타 참여가 확인됐어요.'
+      case 'not_group_member':       return '그룹 멤버만 참여 확인을 할 수 있어요.'
+      case 'invalid_amount':         return '참여 확인 값이 올바르지 않아요.'
+      default:                        return '무료 베타 참여 확인에 실패했어요. 잠시 후 다시 시도해 주세요.'
     }
   }
 
   async function inviteByPhone() {
     const clean = phone.trim()
     if (!clean || !group || saving) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        invites: [
+          ...current.invites,
+          {
+            id: `dev-invite-${Date.now()}`,
+            group_id: group.id,
+            invited_phone: clean,
+            invited_user_id: null,
+            invite_kind: 'phone',
+            token: 'dev-preview',
+            status: 'pending',
+            expires_at: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
+            created_at: new Date().toISOString(),
+          },
+        ],
+      }))
+      setPhone('')
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -246,6 +272,32 @@ export default function GroupCreatePage() {
 
   async function inviteFriend(friend: FriendSummary) {
     if (!group || saving || friend.group_status !== 'available') return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        invites: current.invites,
+        friends: current.friends.map((item) =>
+          item.user_id === friend.user_id ? { ...item, group_status: 'in_group' } : item
+        ),
+        members: current.members.some((item) => item.user_id === friend.user_id)
+          ? current.members
+          : [
+              ...current.members,
+              {
+                group_id: group.id,
+                user_id: friend.user_id,
+                display_name: friend.display_name,
+                role: 'member',
+                joined_at: new Date().toISOString(),
+                left_at: null,
+                match_setup_ready: true,
+              },
+            ],
+      }))
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -261,6 +313,14 @@ export default function GroupCreatePage() {
 
   async function copyInviteLink() {
     if (!group || saving) return
+
+    if (isDevPreview) {
+      await navigator.clipboard.writeText(`${window.location.origin}/group/invite/dev-preview`)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1400)
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -301,6 +361,15 @@ export default function GroupCreatePage() {
 
   async function enterQueue() {
     if (!group || saving || !canEnterQueue) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'in_pool' } : current.group,
+      }))
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -325,6 +394,15 @@ export default function GroupCreatePage() {
 
   async function cancelQueue() {
     if (!group || saving || !canCancelQueue) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+      }))
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -349,13 +427,17 @@ export default function GroupCreatePage() {
 
   function translateQueueError(code?: string) {
     switch (code) {
-      case 'not_enough_members': return '그룹에 최소 2명 이상이 있어야 큐에 들어갈 수 있어요.'
+      case 'not_enough_members': return '그룹은 최소 2명 이상이어야 큐에 들어갈 수 있어요.'
       case 'already_in_queue':   return '이미 매칭 큐에 들어가 있어요.'
       case 'not_group_leader':   return '리더만 큐 진입/취소를 할 수 있어요.'
       case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
-      case 'deposit_not_paid':   return '모든 멤버가 보증금을 결제해야 큐에 들어갈 수 있어요.'
-      default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해줘.'
+      case 'deposit_not_paid':   return '모든 멤버의 무료 베타 참여가 확인되어야 큐에 들어갈 수 있어요.'
+      case 'member_match_setup_incomplete':
+        return '멤버의 성향 선호/가능 시간/매칭 비중 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
+      case 'member_profile_lookup_failed':
+        return '멤버 준비 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'
+      default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해 주세요.'
     }
   }
 
@@ -415,7 +497,7 @@ export default function GroupCreatePage() {
 
   async function transferLeadership(newLeaderUserId: string) {
     if (!group || saving || !isLeader) return
-    if (!window.confirm('이 멤버에게 리더를 위임할까요? 위임 후엔 본인이 비-리더가 돼요.')) return
+    if (!window.confirm('이 멤버에게 리더를 위임할까요? 위임 이후 본인은 일반 멤버가 돼요.')) return
     setSaving(true)
     setError(null)
     try {
@@ -440,14 +522,14 @@ export default function GroupCreatePage() {
 
   function translateGroupError(code?: string) {
     switch (code) {
-      case 'not_group_leader':   return '리더만 해체할 수 있어요.'
-      case 'leader_cannot_leave': return '리더는 떠날 수 없어요. 해체하거나 리더 위임 먼저 해야 해요.'
+      case 'not_group_leader':   return '리더만 그룹을 해체할 수 있어요.'
+      case 'leader_cannot_leave': return '리더는 바로 나갈 수 없어요. 해체하거나 리더 위임을 먼저 해야 해요.'
       case 'not_active_member':  return '이미 이 그룹의 활성 멤버가 아니에요.'
       case 'group_locked':       return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'new_leader_required': return '새 리더를 선택해야 해요.'
       case 'new_leader_is_caller': return '본인을 새 리더로 지정할 수 없어요.'
       case 'new_leader_not_member': return '선택한 멤버가 이 그룹의 활성 멤버가 아니에요.'
-      default:                    return '처리에 실패했어요. 잠시 후 다시 시도해줘.'
+      default:                    return '처리에 실패했어요. 잠시 후 다시 시도해 주세요.'
     }
   }
 
@@ -456,19 +538,10 @@ export default function GroupCreatePage() {
   return (
     <main className="min-h-screen px-5 pb-10">
       <div className="relative max-w-md mx-auto pt-7">
-        <header className="mb-6 flex items-start justify-between gap-3">
-          <div className="flex-1">
-            <p className="text-xs font-bold text-violet-300 tracking-[0.24em] uppercase">Group Match</p>
-            <h1 className="mt-2 text-2xl font-black">친구와 같이 매칭받기</h1>
-            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-              2명 이상 모이면 이번 주 매칭 큐에 들어갈 수 있어요.
-            </p>
-          </div>
-          <NotificationBell />
-        </header>
+        <GroupHeader />
 
         {loading ? (
-          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-gray-400">
+          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
             <Loader2 size={18} className="animate-spin" />
             그룹 정보를 준비하는 중
           </section>
@@ -480,385 +553,89 @@ export default function GroupCreatePage() {
               </div>
             )}
 
-            <section className="glass-card rounded-3xl p-5 mb-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs text-gray-500">우리 그룹</p>
-                  <h2 className="mt-1 text-xl font-black">{members.length}/{capacity}명</h2>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {canEnterQueue ? '매칭 큐 진입 준비 완료' : '친구 1명이 더 필요해요'}
-                  </p>
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-violet-500/15 border border-violet-400/20 flex items-center justify-center">
-                  <Users size={22} className="text-violet-200" />
-                </div>
-              </div>
-
-              <p className="mt-5 mb-2 text-xs font-bold text-gray-500">그룹 멤버</p>
-              <div className="grid grid-cols-3 gap-2">
-                {members.map((member) => {
-                  const isSelf = currentUserId != null && member.user_id === currentUserId
-                  const name = isSelf
-                    ? '나'
-                    : member.display_name ?? `친구 ${member.user_id.slice(0, 4)}`
-                  return (
-                    <div
-                      key={member.user_id}
-                      className="min-h-[86px] rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-3 text-center"
-                    >
-                      <div className="mx-auto mb-2 h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">
-                        {member.role === 'leader' ? <ShieldCheck size={16} /> : <Check size={16} />}
-                      </div>
-                      <p className="text-sm font-bold truncate">{name}</p>
-                      <p className="mt-0.5 text-[10px] text-gray-600">
-                        {member.role === 'leader' ? '리더' : '참여중'}
-                      </p>
-                    </div>
-                  )
-                })}
-                {Array.from({ length: openSlots }).map((_, index) => (
-                  <div
-                    key={`open-${index}`}
-                    className="min-h-[86px] rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-2 py-3 text-center flex flex-col items-center justify-center"
-                  >
-                    <UserPlus size={17} className="text-gray-600" />
-                    <p className="mt-2 text-[11px] text-gray-600">친구 자리</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="glass rounded-3xl p-4 mb-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h2 className="text-sm font-black">초대하기</h2>
-                  <p className="text-xs text-gray-600 mt-0.5">전화번호 또는 링크로 그룹 초대를 보내요.</p>
-                </div>
-                <UserPlus size={18} className="text-violet-300" />
-              </div>
-
-              <div className="flex gap-2">
-                <input
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  placeholder="010-0000-0000"
-                  className="flex-1 min-w-0 glass rounded-2xl px-4 py-3 text-sm text-white placeholder-gray-600 border border-white/10 focus:outline-none focus:border-violet-500"
-                />
-                <button
-                  type="button"
-                  onClick={inviteByPhone}
-                  disabled={saving || !group || !phone.trim()}
-                  className="h-12 w-12 rounded-2xl btn-gradient flex items-center justify-center disabled:opacity-40"
-                  aria-label="전화번호 초대 보내기"
-                >
-                  <Send size={17} />
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={copyInviteLink}
-                disabled={saving || !group}
-                className="mt-3 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 flex items-center justify-between text-sm disabled:opacity-40"
-              >
-                <span className="flex items-center gap-2 text-gray-300">
-                  <LinkIcon size={16} className="text-violet-300" />
-                  초대 링크 복사
-                </span>
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  {copied ? '복사됨' : '공유'}
-                  <Copy size={14} />
-                </span>
-              </button>
-
-              {pendingInvites.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {pendingInvites.map((invite) => (
-                    <div key={invite.id} className="rounded-2xl bg-white/[0.03] px-3 py-2 flex items-center justify-between gap-3">
-                      <span className="min-w-0 truncate text-xs text-gray-400">
-                        {invite.invite_kind === 'link'
-                          ? '공개 초대 링크'
-                          : invite.invited_user_id
-                            ? `친구 ${invite.invited_user_id.slice(0, 8)}`
-                            : invite.invited_phone ?? '대상 없음'}
-                      </span>
-                      <span className="text-[10px] font-bold text-amber-300">수락 대기</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section className="mb-5">
-              <div className="flex items-center justify-between px-1 mb-2">
-                <h2 className="text-sm font-black">친구 목록</h2>
-                <span className="text-xs text-gray-600">{state.friends.length}명</span>
-              </div>
-
-              {state.friends.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5">
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    아직 등록된 친구가 없어요. 친구를 먼저 추가해야 그룹을 꾸릴 수 있어요.
-                  </p>
-                  <Link
-                    href="/friends"
-                    className="mt-3 inline-block px-4 py-2 rounded-xl text-xs font-bold border border-violet-400/30 bg-violet-400/10 text-violet-200"
-                  >
-                    친구 추가하러 가기 →
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {state.friends.map((friend) => {
-                    const isInvited = friend.group_status === 'invited'
-                    const isInGroup = friend.group_status === 'in_group'
-                    const isDisabled = saving || isInvited || isInGroup || openSlots === 0
-
-                    return (
-                      <div key={friend.user_id} className="glass rounded-2xl px-4 py-3 flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-2xl bg-white/[0.08] flex items-center justify-center text-sm font-black">
-                          {friend.display_name.slice(0, 1)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold truncate">{friend.display_name}</p>
-                          <p className="text-xs text-gray-600 truncate">{friend.phone ?? friend.user_id}</p>
-                        </div>
-                        <button
-                          type="button"
-                          disabled={isDisabled}
-                          onClick={() => inviteFriend(friend)}
-                          className={`px-3 py-2 rounded-xl text-xs font-bold border transition-colors disabled:opacity-45 ${
-                            isInGroup
-                              ? 'border-emerald-400/20 text-emerald-300 bg-emerald-400/10'
-                              : isInvited
-                                ? 'border-amber-400/20 text-amber-300 bg-amber-400/10'
-                                : 'border-violet-400/20 text-violet-200 bg-violet-400/10 hover:bg-violet-400/15'
-                          }`}
-                        >
-                          {isInGroup ? '참여중' : isInvited ? '초대중' : '초대'}
-                        </button>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </section>
-
-            <section className="glass rounded-3xl p-4 mb-5">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-2xl bg-rose-500/10 border border-rose-400/20 flex items-center justify-center">
-                  <CalendarClock size={18} className="text-rose-200" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-black">이번 주 매칭 큐</h2>
-                  <p className="text-xs text-gray-600">그룹이 완성되면 보증금 결제 후 큐에 들어가요.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                {groupStats.map((stat) => (
-                  <div key={stat.label} className="rounded-2xl bg-white/[0.035] px-3 py-3">
-                    <p className="text-lg font-black">{stat.value}</p>
-                    <p className="mt-1 text-[10px] leading-snug text-gray-600">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {inQueue ? (
-              <>
-                <div className="rounded-2xl border border-violet-400/20 bg-violet-400/10 px-4 py-3 mb-3 text-center">
-                  <p className="text-xs font-bold text-violet-200">매칭 큐 진입 완료</p>
-                  <p className="mt-0.5 text-[11px] text-gray-400">
-                    토요일 14:00 매칭 결과를 기다려주세요.
-                  </p>
-                </div>
-                <Link
-                  href="/match"
-                  className="mb-2 w-full block text-center py-3 rounded-2xl text-sm font-bold border border-violet-400/30 bg-violet-400/10 text-violet-200"
-                >
-                  매칭 결과 확인하기
-                </Link>
-                <button
-                  type="button"
-                  disabled={saving || !canCancelQueue}
-                  onClick={cancelQueue}
-                  className="w-full py-3 rounded-2xl text-sm text-gray-300 border border-white/15 hover:border-white/25 transition-colors disabled:opacity-40"
-                >
-                  큐에서 빠지기
-                </button>
-              </>
+              <QueueRadarCard
+                stats={queueVisualState}
+                saving={saving}
+                canCancel={canCancelQueue}
+                onCancel={cancelQueue}
+                homeHref="/"
+                resultHref="/match"
+              />
             ) : (
               <>
-                {/* 내 보증금 결제 상태 */}
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 mb-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <Wallet size={16} className={myDepositPaid ? 'text-emerald-300' : 'text-amber-300'} />
-                      <div>
-                        <p className="text-xs font-bold">내 보증금</p>
-                        <p className="text-[11px] text-gray-500">
-                          {DEPOSIT_AMOUNT.toLocaleString()}원 · 출석 시 환불
-                        </p>
-                      </div>
-                    </div>
-                    {myDepositPaid ? (
-                      <span className="text-[11px] font-bold text-emerald-300">결제 완료</span>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={saving}
-                        onClick={payDeposit}
-                        className="px-3 py-2 rounded-xl text-xs font-bold bg-violet-400/15 border border-violet-400/30 text-violet-200 disabled:opacity-40"
-                      >
-                        결제하기 (mock)
-                      </button>
-                    )}
-                  </div>
-                  {/* 그룹 전체 결제 현황 */}
-                  {depositSummary && depositSummary.total_active > 0 && (
-                    <div className="mt-3 pt-3 border-t border-white/[0.06]">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-[11px] text-gray-500">그룹 전체</p>
-                        <p className="text-[11px] font-bold text-gray-400">
-                          {depositSummary.paid_count}/{depositSummary.total_active} 결제 완료
-                        </p>
-                      </div>
-                      <div className="flex gap-1.5">
-                        {depositSummary.rows.map((row) => {
-                          const paid = row.deposit_status === 'paid' || row.deposit_status === 'held'
-                          return (
-                            <div
-                              key={row.user_id}
-                              className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg text-[10px] truncate text-center ${
-                                paid
-                                  ? 'bg-emerald-400/10 border border-emerald-400/20 text-emerald-200'
-                                  : 'bg-white/[0.04] border border-white/10 text-gray-500'
-                              }`}
-                              title={row.display_name ?? row.user_id.slice(0, 8)}
-                            >
-                              {row.display_name ?? `친구 ${row.user_id.slice(0, 4)}`}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
+            <GroupMemberStatusPanel
+              members={members}
+              currentUserId={currentUserId}
+              capacity={capacity}
+              groupStats={groupStats}
+              memberMatchReadyByUserId={memberMatchReadyByUserId}
+              queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
+            />
 
-                <button
-                  type="button"
-                  disabled={saving || !canEnterQueue}
-                  onClick={enterQueue}
-                  className="btn-gradient w-full py-4 rounded-2xl font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <CreditCard size={17} />
-                  이번 주 매칭 큐에 들어가기
-                </button>
+            <InviteFriendPanel
+              phone={phone}
+              copied={copied}
+              saving={saving || !group}
+              pendingInvites={pendingInvites}
+              onPhoneChange={setPhone}
+              onInviteByPhone={inviteByPhone}
+              onCopyInviteLink={copyInviteLink}
+            />
 
-                {!canEnterQueue && (
-                  <p className="mt-3 text-center text-xs text-gray-600">
-                    {members.length < 2
-                      ? '친구 1명이 그룹에 참여하면 큐 진입 단계로 넘어갈 수 있어요.'
-                      : !isLeader
-                        ? '리더만 큐 진입을 시작할 수 있어요.'
-                        : '큐 진입 조건을 만족하면 버튼이 활성화돼요.'}
-                  </p>
-                )}
-                {canEnterQueue && !myDepositPaid && (
-                  <p className="mt-3 text-center text-xs text-amber-300/80">
-                    보증금은 가매칭 후 카드 작성 단계에서 결제해요.
-                  </p>
-                )}
-                <p className="mt-2 text-center text-[10px] text-gray-700">
-                  현재는 mock 결제예요. 토스페이먼츠 연동 후 실제 결제로 교체돼요.
-                </p>
+            <FriendListPanel
+              friends={state.friends}
+              saving={saving}
+              openSlots={openSlots}
+              memberMatchReadyByUserId={memberMatchReadyByUserId}
+              onInviteFriend={inviteFriend}
+            />
+
+            <FreeBetaQueuePanel
+              saving={saving}
+              canEnterQueue={canEnterQueue}
+              isLeader={isLeader}
+              membersLength={members.length}
+              needsSetupCount={needsSetupCount}
+              myDepositPaid={myDepositPaid}
+              depositSummary={depositSummary}
+              groupStats={groupStats}
+              onConfirmParticipation={payDeposit}
+              onEnterQueue={enterQueue}
+            />
               </>
             )}
           </>
         )}
 
-        {/* 그룹 관리 (떠나기 / 해체 / 리더 위임) */}
         {group && !inQueue && (
-          <>
-            <div className="mt-4 flex gap-2">
-              {isLeader ? (
-                <>
-                  {members.filter(m => m.user_id !== currentUserId && !m.left_at).length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowTransferPanel(prev => !prev)}
-                      disabled={saving}
-                      className="flex-1 py-3 rounded-2xl text-xs text-amber-200/80 border border-amber-300/15 hover:border-amber-300/30 hover:bg-amber-500/5 flex items-center justify-center gap-1.5 disabled:opacity-40"
-                    >
-                      <Crown size={13} />
-                      리더 위임
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={disbandGroup}
-                    disabled={saving}
-                    className="flex-1 py-3 rounded-2xl text-xs text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 flex items-center justify-center gap-1.5 disabled:opacity-40"
-                  >
-                    <Trash2 size={13} />
-                    그룹 해체
-                  </button>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  onClick={leaveGroup}
-                  disabled={saving}
-                  className="flex-1 py-3 rounded-2xl text-xs text-gray-400 border border-white/10 hover:border-white/20 flex items-center justify-center gap-1.5 disabled:opacity-40"
-                >
-                  <LogOut size={13} />
-                  그룹 나가기
-                </button>
-              )}
-            </div>
-
-            {showTransferPanel && isLeader && (
-              <section className="glass-card mt-3 rounded-2xl p-4">
-                <p className="text-xs font-bold text-amber-200 mb-2">새 리더를 선택해주세요</p>
-                <p className="text-[11px] text-gray-500 mb-3">
-                  위임 후엔 본인이 비-리더로 전환돼요. 다음부터는 그룹 나가기도 가능해요.
-                </p>
-                <div className="flex flex-col gap-1.5">
-                  {members
-                    .filter(m => m.user_id !== currentUserId && !m.left_at)
-                    .map(m => (
-                      <button
-                        key={m.user_id}
-                        type="button"
-                        onClick={() => transferLeadership(m.user_id)}
-                        disabled={saving}
-                        className="flex items-center justify-between gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm hover:border-amber-300/30 hover:bg-amber-500/5 disabled:opacity-40"
-                      >
-                        <span className="text-gray-100">
-                          {m.display_name ?? '이름 미설정'}
-                        </span>
-                        <ChevronRight size={14} className="text-gray-500" />
-                      </button>
-                    ))}
-                </div>
-              </section>
-            )}
-          </>
+          <GroupDangerZone
+            isLeader={isLeader}
+            saving={saving}
+            showTransferPanel={showTransferPanel}
+            members={members}
+            currentUserId={currentUserId}
+            onToggleTransferPanel={() => setShowTransferPanel((prev) => !prev)}
+            onTransferLeadership={transferLeadership}
+            onLeaveGroup={leaveGroup}
+            onDisbandGroup={disbandGroup}
+          />
         )}
 
         <Link
           href="/profile/edit"
-          className="mt-4 w-full py-3 rounded-2xl text-sm text-gray-500 text-center block hover:text-gray-300 transition-colors"
+          className="mt-4 w-full py-3 rounded-2xl text-sm text-boot-muted text-center block hover:text-boot-body transition-colors"
         >
           프로필 다시 확인하기
         </Link>
 
-        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-gray-700">
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-boot-muted">
           <LockKeyhole size={13} />
-          서로 매칭되기 전까지 사진과 이름은 공개하지 않아요.
+          서로 매칭하기 전까지 사진과 이름은 공개하지 않아요
         </div>
       </div>
     </main>
   )
 }
+
+

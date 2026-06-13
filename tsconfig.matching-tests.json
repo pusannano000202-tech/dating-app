@@ -13,6 +13,7 @@
     "noEmit": false
   },
   "include": [
+    "components/matching/group-create/**/*.ts",
     "lib/matching/**/*.ts",
     "tests/matching/**/*.ts"
   ]
