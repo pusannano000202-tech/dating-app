@@ -73,13 +73,30 @@ Reference: `docs/plans/2026-06-14-phase-4-db-lint-cleanup-worker-result.md`.
 - `db lint --local --fail-on error` now fails only on Category B `match_meetings` / `venues` cross-branch schema dependency errors.
 - App verification passed: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
 
+## Phase 5 Meeting Schema Integration Snapshot (2026-06-14)
+
+Reference: `docs/plans/2026-06-14-phase-5-category-b-meeting-schema-worker-result.md`.
+
+- Status: DONE_WITH_CONCERNS.
+- Production Supabase was not touched.
+- z54 was not modified; SHA-256 stayed `7FFA30BAC15DDE0CDD265873CEA65D622BE23E2C23A797E3D4C5BB5B51E20A4B`.
+- Phase 4 migration was not modified; SHA-256 stayed `8ED86FF0284BE988F0DBF7D556A4D5DDE68E533C1C57464F6AF9B13433303493`.
+- New source migration: `supabase/migrations/20260614125057_phase_5_meeting_schema_integration.sql`.
+- Chosen strategy: Option A, importing Sungjun's real `venues` / `match_meetings` schema from `origin/matching/group-engine` through a current-branch timestamped migration.
+- Option B dynamic guard rewrites were not used because the real schema import was not blocked.
+- `.tmp/phase5-local-supabase` replayed migrations successfully through local-only Phase 5 copy `202606140157_phase_5_meeting_schema_integration.sql`.
+- `db lint --local --fail-on error` passed. Remaining lint output is non-failing existing warning-extra variables in `mock_pay_deposit` and `leave_group`.
+- Security advisors completed with existing unrelated `function_search_path_mutable` warnings and no new `venues` / `match_meetings` warning.
+- Runtime smoke checks passed for `get_match_scheduled_reveal_at`, `get_match_meeting_info`, and `enqueue_meeting_reminders`.
+- App verification passed: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
+- Verification caveats: first local reset needed a local-only `supabase start`; raw `to_regclass(...)` table output hit a Supabase CLI regclass scan issue, so the relation check was verified with `::text` casts.
+
 ## Active Next Phase
 
-- Execute Phase 5 Category B meeting schema integration/guard cleanup.
-- Reference: `docs/plans/2026-06-14-phase-5-category-b-meeting-schema-worker-brief.md`.
-- Production DB apply is not approved.
-- Do not apply z54 or Phase 4 to production until Category B is consciously accepted or fixed, then validation is repeated on a disposable staging branch/project.
-- Recommended default path: inspect `origin/matching/group-engine`, then import Sungjun's real `venues` / `match_meetings` schema through a new current-branch migration. Use dynamic guards only if schema import is blocked and manager-approved.
+- Phase 5 is locally complete.
+- Production DB apply is still not approved.
+- Before any production or staging apply, review the Phase 5 schema ownership/security tradeoff and rerun validation in the approved target environment.
+- Next product/backend work: implement the meeting assignment path that creates `match_meetings` rows after match confirmation, plus explicit Data API grants/RLS only if a concrete UI path requires direct table access.
 
 ## Completed
 
@@ -98,6 +115,7 @@ Reference: `docs/plans/2026-06-14-phase-4-db-lint-cleanup-worker-result.md`.
 - `supabase/migrations/20260602_z52_auto_match_member_aliases.sql`
 - `supabase/migrations/20260602_z53_daily_card_schedule.sql`
 - `supabase/migrations/20260602_z54_daily_card_draw_policy.sql` (patched and locally validated in `.tmp`; production apply still not approved)
+- `supabase/migrations/20260614125057_phase_5_meeting_schema_integration.sql` (locally validated in `.tmp`; production apply still not approved)
 - `app/group/create/page.tsx`
 - `app/match/[id]/page.tsx`
 - `app/api/matches/[id]/card/route.ts`
