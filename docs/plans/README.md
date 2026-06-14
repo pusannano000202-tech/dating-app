@@ -10,6 +10,8 @@ This folder is the canonical entry point for active product and implementation p
 - [Phase 0 Current State Audit](./2026-06-13-phase-0-current-state-audit.md)
 - [Phase 1 Group Create Refactor Worker Brief](./2026-06-13-phase-1-group-create-refactor-worker-brief.md)
 - [Phase 2 Cleanup Worker Brief](./2026-06-13-phase-2-cleanup-worker-brief.md)
+- [Phase 3 Daily Card DB Worker Brief](./2026-06-13-phase-3-db-worker-brief.md)
+- [Phase 3 Daily Card DB Worker Result](./2026-06-13-phase-3-db-worker-result.md)
 - [Document Organization Plan](./DOCUMENT_ORGANIZATION_PLAN.md)
 - [Document Organization Result (Codex용 결과 보고서)](./DOCUMENT_ORGANIZATION_RESULT_2026-06-02.md)
 - [Active Plan Index](./ACTIVE_PLAN_INDEX.md)

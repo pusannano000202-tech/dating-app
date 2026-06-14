@@ -1,6 +1,6 @@
 # Current Implementation Status
 
-Last updated: 2026-06-13
+Last updated: 2026-06-14
 
 ## Current Product Decisions (2026-06-12)
 
@@ -44,9 +44,28 @@ Reference: `docs/plans/2026-06-13-phase-2-cleanup-result.md`.
 - Fresh verification passed: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
 - `localhost:3003` was restarted after build. Team-manager browser smoke checks passed for `/dev/preview`, `/group/create`, and `/match/start`; `/match/start` renders the exact `매칭찾기 준비 완료` copy.
 
+## Phase 3 DB Worker Snapshot (2026-06-13)
+
+Reference: `docs/plans/2026-06-13-phase-3-db-worker-result.md`.
+
+- Phase 3 local DB validation was resumed and re-run in a disposable `.tmp/phase3-local-supabase` project.
+- Status: DONE_FOR_Z54_WITH_LEGACY_LINT_REMAINING.
+- Production Supabase was not touched.
+- Source z54 was patched directly: `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`.
+- The `.tmp` project rewrote copied migration prefixes to unique local-only versions to bypass duplicate source migration version conflicts.
+- Local Supabase migration reset/list succeeded with versions `202606140001` through `202606140055`.
+- Runtime schema checks passed for z54 columns, day-offset constraint, functions, and authenticated EXECUTE grants.
+- Runtime behavior checks passed for assignment, hidden content before draw, user pick, duplicate-pick blocking, missed-card forfeiture, and outsider blocking.
+- KST draw-window verification passed: unmodified assigned rows store as UTC 07:00-11:00 and render as KST 16:00-20:00.
+- App verification passed after DB validation: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
+- Supabase `db lint --local --fail-on error` still fails on existing legacy/cross-branch functions outside z54; z54 functions were not part of the lint failures.
+
 ## Active Next Phase
 
-- DB/migration work remains split into a separate DB worker/phase.
+- Review and commit the Phase 3 z54 source fix plus updated Phase 3 docs.
+- Reference: `docs/plans/2026-06-13-phase-3-db-worker-result.md`.
+- Production DB apply is not approved.
+- Do not apply z54 to production until the same validation is repeated on a disposable staging branch/project and the legacy DB lint issues are consciously accepted or cleaned up.
 
 ## Completed
 
@@ -64,6 +83,7 @@ Reference: `docs/plans/2026-06-13-phase-2-cleanup-result.md`.
 - `supabase/migrations/20260602_z51_match_card_confirmation_gate.sql`
 - `supabase/migrations/20260602_z52_auto_match_member_aliases.sql`
 - `supabase/migrations/20260602_z53_daily_card_schedule.sql`
+- `supabase/migrations/20260602_z54_daily_card_draw_policy.sql` (patched and locally validated in `.tmp`; production apply still not approved)
 - `app/group/create/page.tsx`
 - `app/match/[id]/page.tsx`
 - `app/api/matches/[id]/card/route.ts`
