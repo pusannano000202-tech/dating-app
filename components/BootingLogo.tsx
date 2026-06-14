@@ -40,7 +40,9 @@ export default function BootingLogo({
         <Zap size={s.icon} strokeWidth={2.7} />
       </div>
       <div>
-        <p className={`${s.title} font-black tracking-normal text-boot-ink leading-none`}>부팅</p>
+        <p className={`${s.title} font-black leading-none tracking-normal text-boot-ink`}>
+          부팅
+        </p>
         {showSubtitle && (
           <p className={`${s.subtitle} mt-1 font-bold uppercase tracking-[0.18em] text-boot-muted`}>
             부산대 과팅

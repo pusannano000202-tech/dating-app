@@ -6,9 +6,20 @@
 @tailwind utilities;
 
 @layer base {
-  * { -webkit-font-smoothing: antialiased; }
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
 
-body {
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
     font-family: 'PretendardVariable', -apple-system, sans-serif;
     background: #fff7f3;
     color: #221f20;

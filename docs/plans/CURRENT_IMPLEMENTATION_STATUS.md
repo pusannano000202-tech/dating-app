@@ -91,9 +91,26 @@ Reference: `docs/plans/2026-06-14-phase-5-category-b-meeting-schema-worker-resul
 - App verification passed: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
 - Verification caveats: first local reset needed a local-only `supabase start`; raw `to_regclass(...)` table output hit a Supabase CLI regclass scan issue, so the relation check was verified with `::text` casts.
 
+## Phase 6 Sungjun Alignment Snapshot (2026-06-14)
+
+Reference: `docs/plans/2026-06-14-phase-6-sungjun-github-alignment-audit-result.md`.
+
+- Status: DONE_FOR_LOCAL_FRONTEND_REVIEW_WITH_CHAT_HELD.
+- Production Supabase was not touched.
+- Sungjun's `origin/main` and `origin/matching/group-engine` were reviewed in read-only worktrees.
+- Direct `gwating-app/` replacement was rejected because it would create a second app/data model.
+- Adopted from Sungjun: `venues` / `match_meetings` through Phase 5, plus the minimal Booting home direction.
+- Adapted in root app: `/`, `/dev/preview`, `/group/create`, `/match/start`, `/match`, and matching/home supporting components.
+- Held: chat UI/schema, Q&A reveal details, schedule/venue assignment logic, admin score explanation UX.
+- Rejected direct import: `teams`, `team_members`, open anon `chat_messages`, and prototype seed teams.
+- Local dev server is running at `http://localhost:3003`.
+- CDP browser verification passed on `/dev/preview`, `/`, `/group/create`, `/group/create?from=home-queue`, `/match/start`, and `/match`.
+- `/group/create` click verification passed: `이번 주 매칭 큐에 들어가기` renders the queue radar completion screen.
+- Mobile overflow check passed on the verified routes.
+
 ## Active Next Phase
 
-- Phase 5 is locally complete.
+- Phase 6 local frontend review baseline is complete.
 - Production DB apply is still not approved.
 - Before any production or staging apply, review the Phase 5 schema ownership/security tradeoff and rerun validation in the approved target environment.
 - Next product/backend work: implement the meeting assignment path that creates `match_meetings` rows after match confirmation, plus explicit Data API grants/RLS only if a concrete UI path requires direct table access.

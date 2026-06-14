@@ -537,7 +537,7 @@ export default function GroupCreatePage() {
 
   return (
     <main className="min-h-screen px-5 pb-10">
-      <div className="relative max-w-md mx-auto pt-7">
+      <div className="relative mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-7 sm:max-w-md">
         <GroupHeader />
 
         {loading ? (

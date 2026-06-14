@@ -10,15 +10,6 @@ type GroupPayload = {
   group: { status: GroupStatus } | null
 }
 
-const DEFAULT_LABELS = {
-  inPoolTitle: '매칭 찾는 중',
-  inPoolMessage: '현재 큐 상태를 실시간으로 확인하고, 매칭이 확정되면 즉시 이동해요.',
-  inPoolAction: '진행중인 매칭 결과 확인하기',
-  matchedTitle: '매칭 결과 확인',
-  matchedMessage: '매칭이 확정되면 상세 결과를 바로 확인할 수 있어요.',
-  matchedAction: '매칭 결과 확인하기',
-}
-
 export default function ActiveMatchingHomeCard() {
   const [groupStatus, setGroupStatus] = useState<GroupStatus | null>(null)
   const [loading, setLoading] = useState(true)
@@ -71,18 +62,22 @@ export default function ActiveMatchingHomeCard() {
             <Search size={18} />
           </span>
           <div>
-          <p className="text-sm font-black text-boot-ink">{DEFAULT_LABELS.inPoolTitle}</p>
-          <p className="text-xs text-boot-muted">{DEFAULT_LABELS.inPoolMessage}</p>
+            <p className="text-sm font-black text-boot-ink">매칭 찾는 중</p>
+            <p className="text-xs text-boot-muted">
+              지금 들어간 매칭 큐 상태를 바로 확인할 수 있어요.
+            </p>
+          </div>
         </div>
-      </div>
-        <div className="mb-3 rounded-2xl bg-emerald-50 border border-emerald-100 px-3 py-2 text-xs text-emerald-700">
-          {groupStatus === 'ready' ? '준비 완료 · 큐 진입 대기 중' : '큐 진입 완료 · 매칭 찾는 중'}
+        <div className="mb-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+          {groupStatus === 'ready'
+            ? '준비 완료 · 큐 진입 대기 중'
+            : '큐 진입 완료 · 매칭 탐색 중'}
         </div>
         <Link
           href="/group/create?from=home-queue"
           className="btn-gradient block w-full rounded-2xl py-2.5 text-center text-sm font-black"
         >
-          {DEFAULT_LABELS.inPoolAction}
+          진행중인 매칭 결과 확인하기
         </Link>
       </section>
     )
@@ -95,15 +90,17 @@ export default function ActiveMatchingHomeCard() {
           <CalendarClock size={18} />
         </span>
         <div>
-          <p className="text-sm font-black text-boot-ink">{DEFAULT_LABELS.matchedTitle}</p>
-          <p className="text-xs text-boot-muted">{DEFAULT_LABELS.matchedMessage}</p>
+          <p className="text-sm font-black text-boot-ink">매칭 결과 확인</p>
+          <p className="text-xs text-boot-muted">
+            확정된 매칭의 시간, 장소, 데일리 카드를 확인하세요.
+          </p>
         </div>
       </div>
       <Link
         href="/match"
         className="block w-full rounded-2xl border border-boot-primary/25 bg-boot-soft px-4 py-2.5 text-center text-sm font-black text-boot-primary"
       >
-        {DEFAULT_LABELS.matchedAction}
+        매칭 결과 확인하기
       </Link>
     </section>
   )

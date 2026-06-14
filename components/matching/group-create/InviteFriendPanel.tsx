@@ -22,11 +22,13 @@ export function InviteFriendPanel({
   onCopyInviteLink,
 }: InviteFriendPanelProps) {
   return (
-    <section className="glass rounded-3xl p-4 mb-5">
-      <div className="flex items-center justify-between mb-3">
+    <section className="glass mb-5 rounded-3xl p-4">
+      <div className="mb-3 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-black">초대하기</h2>
-          <p className="text-xs text-boot-muted mt-0.5">전화번호 또는 링크로 그룹 초대를 보내요</p>
+          <h2 className="text-sm font-black">친구 초대하기</h2>
+          <p className="mt-0.5 text-xs text-boot-muted">
+            전화번호나 초대 링크로 그룹 초대를 보냅니다.
+          </p>
         </div>
         <UserPlus size={18} className="text-boot-primary" />
       </div>
@@ -36,14 +38,14 @@ export function InviteFriendPanel({
           value={phone}
           onChange={(event) => onPhoneChange(event.target.value)}
           placeholder="010-0000-0000"
-          className="flex-1 min-w-0 glass rounded-2xl px-4 py-3 text-sm text-boot-ink placeholder-boot-muted border border-boot-hairline focus:outline-none focus:border-boot-primary"
+          className="glass min-w-0 flex-1 rounded-2xl border border-boot-hairline px-4 py-3 text-sm text-boot-ink placeholder-boot-muted focus:border-boot-primary focus:outline-none"
         />
         <button
           type="button"
           onClick={onInviteByPhone}
           disabled={saving || !phone.trim()}
-          className="h-12 w-12 rounded-2xl btn-gradient flex items-center justify-center disabled:opacity-40"
-          aria-label="전화번호 초대하기"
+          className="btn-gradient flex h-12 w-12 items-center justify-center rounded-2xl disabled:opacity-40"
+          aria-label="전화번호로 초대하기"
         >
           <Send size={17} />
         </button>
@@ -53,7 +55,7 @@ export function InviteFriendPanel({
         type="button"
         onClick={onCopyInviteLink}
         disabled={saving}
-        className="mt-3 w-full rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 flex items-center justify-between text-sm disabled:opacity-40"
+        className="mt-3 flex w-full items-center justify-between rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 text-sm disabled:opacity-40"
       >
         <span className="flex items-center gap-2 text-boot-body">
           <LinkIcon size={16} className="text-boot-primary" />
@@ -68,15 +70,15 @@ export function InviteFriendPanel({
       {pendingInvites.length > 0 && (
         <div className="mt-3 space-y-2">
           {pendingInvites.map((invite) => (
-            <div key={invite.id} className="rounded-2xl bg-white/80 px-3 py-2 flex items-center justify-between gap-3">
+            <div key={invite.id} className="flex items-center justify-between gap-3 rounded-2xl bg-white/80 px-3 py-2">
               <span className="min-w-0 truncate text-xs text-boot-muted">
                 {invite.invite_kind === 'link'
-                  ? '공개 초대링크'
+                  ? '공개 초대 링크'
                   : invite.invited_user_id
                     ? `친구 ${invite.invited_user_id.slice(0, 8)}`
                     : invite.invited_phone ?? '대상 없음'}
               </span>
-              <span className="text-[10px] font-bold text-amber-700">초대중</span>
+              <span className="text-[10px] font-bold text-amber-700">초대 중</span>
             </div>
           ))}
         </div>

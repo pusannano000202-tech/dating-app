@@ -40,21 +40,21 @@ function buildSetupSteps(profile: MatchSetupProfile | null): SetupStep[] {
     {
       href: `/profile/personality-preference?redirect=${encodeURIComponent(REDIRECT_TO)}`,
       label: '성향 선호',
-      desc: '어떤 성격의 상대가 편한지 고르기',
+      desc: '어떤 성향의 상대와 편한지 선택합니다.',
       done: hasPersonalityPreference,
       Icon: HeartHandshake,
     },
     {
       href: `/profile/schedule?redirect=${encodeURIComponent(REDIRECT_TO)}`,
       label: '가능 시간',
-      desc: '이번 주 만날 수 있는 시간대 고르기',
+      desc: '이번 주 만날 수 있는 시간대를 고릅니다.',
       done: hasTimeslots,
       Icon: CalendarClock,
     },
     {
       href: `/profile/preferences?redirect=${encodeURIComponent(REDIRECT_TO)}`,
       label: '매칭 비중',
-      desc: '외모, 성격, 시간 등 중요도 조절하기',
+      desc: '외모, 성격, 키, 체형 중 무엇을 더 볼지 정합니다.',
       done: hasPreferenceWeights,
       Icon: SlidersHorizontal,
     },
@@ -89,14 +89,16 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
   if (!currentStep) {
     return (
       <main className="min-h-screen booting-band px-5 pb-12 pt-7 text-boot-ink">
-        <div className="mx-auto w-full max-w-md">
+        <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
           <header className="mb-6 flex items-center gap-3">
             <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
               <ChevronLeft size={18} />
             </Link>
             <div>
               <h1 className="text-2xl font-black">매칭찾기 준비 완료</h1>
-              <p className="mt-0.5 text-xs text-boot-muted">이제 그룹을 만들고 매칭을 시작할 수 있어요.</p>
+              <p className="mt-0.5 text-xs text-boot-muted">
+                이제 친구와 그룹을 만들고 큐에 들어가면 됩니다.
+              </p>
             </div>
           </header>
 
@@ -104,9 +106,9 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
               <Check size={24} strokeWidth={3} />
             </div>
-            <h2 className="text-xl font-black">설정이 전부 끝났어요</h2>
+            <h2 className="text-xl font-black">설정이 모두 끝났어요</h2>
             <p className="mt-2 text-sm leading-6 text-boot-muted">
-              성향 선호, 가능 시간, 매칭 비중을 모두 확인했어요.
+              성향 선호, 가능 시간, 매칭 비중이 모두 저장되었습니다.
             </p>
           </section>
 
@@ -126,14 +128,16 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
 
   return (
     <main className="min-h-screen booting-band px-5 pb-12 pt-7 text-boot-ink">
-      <div className="mx-auto w-full max-w-md">
+      <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-6 flex items-center gap-3">
           <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
             <ChevronLeft size={18} />
           </Link>
           <div>
             <h1 className="text-2xl font-black">매칭찾기 준비</h1>
-            <p className="mt-0.5 text-xs text-boot-muted">매칭에 필요한 선호만 여기서 따로 맞춰요.</p>
+            <p className="mt-0.5 text-xs text-boot-muted">
+              매칭에 필요한 정보만 차례대로 확인합니다.
+            </p>
           </div>
         </header>
 
@@ -170,7 +174,7 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             <div>
               <h2 className="text-lg font-black">그룹 매칭 전 설정</h2>
               <p className="mt-1 text-sm leading-6 text-boot-muted">
-                가입 프로필은 끝났고, 여기서는 실제 매칭 점수에 들어가는 선호만 확인해요.
+                내가 원하는 성향과 시간, 중요하게 보는 기준이 실제 매칭 점수에 반영됩니다.
               </p>
             </div>
           </div>

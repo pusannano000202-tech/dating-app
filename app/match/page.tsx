@@ -53,17 +53,17 @@ export default function MatchesPage() {
     try {
       const res = await fetch('/api/matches')
       if (res.status === 401) {
-        setError('로그인이 필요해요.')
+        setError('로그인이 필요합니다.')
         return
       }
       if (!res.ok) {
-        setError('매칭 정보를 불러오지 못했어요.')
+        setError('매칭 정보를 불러오지 못했습니다.')
         return
       }
       const data = await res.json() as { matches: MatchRow[] }
       setMatches(data.matches ?? [])
     } catch {
-      setError('매칭 정보를 불러오지 못했어요.')
+      setError('매칭 정보를 불러오지 못했습니다.')
     } finally {
       setLoading(false)
     }
@@ -75,14 +75,16 @@ export default function MatchesPage() {
 
   return (
     <main className="min-h-screen booting-band px-5 pb-10 text-boot-ink">
-      <div className="max-w-md mx-auto pt-6">
+      <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-6 sm:max-w-md">
         <header className="mb-6 flex items-center gap-3">
-          <Link href="/group/create" className="p-2 glass rounded-xl border border-boot-hairline text-boot-body hover:text-boot-primary">
+          <Link href="/group/create" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
             <ChevronLeft size={18} />
           </Link>
           <div className="flex-1">
             <h1 className="text-2xl font-black">매칭 결과</h1>
-            <p className="text-xs text-boot-muted mt-0.5">토요일 14:00 이후에 결과가 도착해요.</p>
+            <p className="mt-0.5 text-xs text-boot-muted">
+              토요일 14:00 이후 공개되는 매칭을 확인합니다.
+            </p>
           </div>
           <NotificationBell />
         </header>
@@ -94,22 +96,22 @@ export default function MatchesPage() {
         )}
 
         {loading ? (
-          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
+          <section className="glass flex items-center gap-3 rounded-3xl p-5 text-sm text-boot-muted">
             <Loader2 size={18} className="animate-spin" />
             매칭 정보를 확인하는 중
           </section>
         ) : matches.length === 0 ? (
           <section className="glass rounded-3xl p-5 text-center">
-            <div className="h-12 w-12 rounded-2xl bg-boot-soft border border-boot-primary/15 flex items-center justify-center mx-auto mb-3">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-boot-primary/15 bg-boot-soft">
               <CalendarClock size={20} className="text-boot-primary" />
             </div>
-            <p className="text-sm font-bold text-boot-body">아직 매칭 결과가 없어요.</p>
+            <p className="text-sm font-bold text-boot-body">아직 매칭 결과가 없습니다</p>
             <p className="mt-1 text-xs text-boot-muted">
-              매칭 큐에 들어간 그룹은 토요일 14:00 자동 매칭을 받아요.
+              매칭 큐에 들어간 그룹은 토요일 14:00에 결과를 받을 수 있어요.
             </p>
             <Link
               href="/group/create"
-              className="mt-4 inline-block px-4 py-2 rounded-xl text-xs font-bold border border-boot-primary/25 bg-boot-soft text-boot-primary"
+              className="mt-4 inline-block rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
             >
               그룹으로 돌아가기
             </Link>
@@ -120,12 +122,12 @@ export default function MatchesPage() {
               <Link
                 key={m.match_id}
                 href={`/match/${encodeURIComponent(m.match_id)}`}
-                className="glass-card rounded-3xl px-4 py-4 flex items-center gap-3 border border-boot-hairline hover:border-boot-primary/30"
+                className="glass-card flex items-center gap-3 rounded-3xl border border-boot-hairline px-4 py-4 hover:border-boot-primary/30"
               >
-                <div className="h-11 w-11 rounded-2xl bg-boot-soft border border-boot-primary/20 flex items-center justify-center">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-boot-primary/20 bg-boot-soft">
                   <Users size={20} className="text-boot-primary" />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-boot-ink">
                     상대 그룹 · {m.opp_group_size}명 · {m.opp_group_gender === 'male' ? '남자' : '여자'}
                   </p>
@@ -133,8 +135,8 @@ export default function MatchesPage() {
                     {formatDate(m.matched_at)} · {translateStatus(m.match_status)}
                   </p>
                   {m.scheduled_start && (
-                    <p className="mt-1 text-[11px] text-boot-primary truncate">
-                      🕒 {formatDateTime(m.scheduled_start)}
+                    <p className="mt-1 truncate text-[11px] text-boot-primary">
+                      약속 {formatDateTime(m.scheduled_start)}
                       {m.venue_name ? ` · ${m.venue_name}` : ''}
                     </p>
                   )}
@@ -173,11 +175,11 @@ function formatDateTime(iso: string): string {
 
 function translateStatus(status: string): string {
   switch (status) {
-    case 'pending':   return '대기 중'
+    case 'pending': return '대기 중'
     case 'confirmed': return '확정'
     case 'completed': return '완료'
-    case 'cancelled': return '취소됨'
-    case 'no_show':   return '노쇼'
-    default:           return status
+    case 'cancelled': return '취소'
+    case 'no_show': return '노쇼'
+    default: return status
   }
 }
