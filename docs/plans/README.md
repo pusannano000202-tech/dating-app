@@ -14,6 +14,7 @@ This folder is the canonical entry point for active product and implementation p
 - [Phase 3 Daily Card DB Worker Result](./2026-06-13-phase-3-db-worker-result.md)
 - [Phase 4 DB Lint Cleanup Worker Brief](./2026-06-14-phase-4-db-lint-cleanup-worker-brief.md)
 - [Phase 4 DB Lint Cleanup Worker Result](./2026-06-14-phase-4-db-lint-cleanup-worker-result.md)
+- [Phase 5 Category B Meeting Schema Worker Brief](./2026-06-14-phase-5-category-b-meeting-schema-worker-brief.md)
 - [Document Organization Plan](./DOCUMENT_ORGANIZATION_PLAN.md)
 - [Document Organization Result (Codex용 결과 보고서)](./DOCUMENT_ORGANIZATION_RESULT_2026-06-02.md)
 - [Active Plan Index](./ACTIVE_PLAN_INDEX.md)

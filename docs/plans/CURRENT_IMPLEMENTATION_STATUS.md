@@ -75,11 +75,11 @@ Reference: `docs/plans/2026-06-14-phase-4-db-lint-cleanup-worker-result.md`.
 
 ## Active Next Phase
 
-- Review and commit the Phase 4 Category A cleanup.
-- Reference: `docs/plans/2026-06-14-phase-4-db-lint-cleanup-worker-result.md`.
+- Execute Phase 5 Category B meeting schema integration/guard cleanup.
+- Reference: `docs/plans/2026-06-14-phase-5-category-b-meeting-schema-worker-brief.md`.
 - Production DB apply is not approved.
 - Do not apply z54 or Phase 4 to production until Category B is consciously accepted or fixed, then validation is repeated on a disposable staging branch/project.
-- Recommended next worker phase: import Sungjun's real `venues` / `match_meetings` migration or write an approved dynamic-guard cleanup for Category B.
+- Recommended default path: inspect `origin/matching/group-engine`, then import Sungjun's real `venues` / `match_meetings` schema through a new current-branch migration. Use dynamic guards only if schema import is blocked and manager-approved.
 
 ## Completed
 
