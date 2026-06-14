@@ -60,12 +60,26 @@ Reference: `docs/plans/2026-06-13-phase-3-db-worker-result.md`.
 - App verification passed after DB validation: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
 - Supabase `db lint --local --fail-on error` still fails on existing legacy/cross-branch functions outside z54; z54 functions were not part of the lint failures.
 
+## Phase 4 DB Lint Cleanup Snapshot (2026-06-14)
+
+Reference: `docs/plans/2026-06-14-phase-4-db-lint-cleanup-worker-result.md`.
+
+- Status: DONE_FOR_CATEGORY_A_WITH_CATEGORY_B_DEPENDENCY_REMAINING.
+- Production Supabase was not touched.
+- z54 was not modified; SHA-256 stayed `7FFA30BAC15DDE0CDD265873CEA65D622BE23E2C23A797E3D4C5BB5B51E20A4B`.
+- New corrective migration: `supabase/migrations/20260614121354_phase_4_db_lint_cleanup.sql`.
+- Fixed Category A legacy ambiguous-reference lint errors in `accept_friend_request`, `mock_pay_deposit`, `leave_group`, `disband_group`, `get_friend_request_summaries`, and `transfer_group_leadership`.
+- `.tmp/phase4-local-supabase` replayed migrations successfully through the local-only Phase 4 copy.
+- `db lint --local --fail-on error` now fails only on Category B `match_meetings` / `venues` cross-branch schema dependency errors.
+- App verification passed: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run build`.
+
 ## Active Next Phase
 
-- Review and commit the Phase 3 z54 source fix plus updated Phase 3 docs.
-- Reference: `docs/plans/2026-06-13-phase-3-db-worker-result.md`.
+- Review and commit the Phase 4 Category A cleanup.
+- Reference: `docs/plans/2026-06-14-phase-4-db-lint-cleanup-worker-result.md`.
 - Production DB apply is not approved.
-- Do not apply z54 to production until the same validation is repeated on a disposable staging branch/project and the legacy DB lint issues are consciously accepted or cleaned up.
+- Do not apply z54 or Phase 4 to production until Category B is consciously accepted or fixed, then validation is repeated on a disposable staging branch/project.
+- Recommended next worker phase: import Sungjun's real `venues` / `match_meetings` migration or write an approved dynamic-guard cleanup for Category B.
 
 ## Completed
 
