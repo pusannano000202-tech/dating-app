@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Loader2, LockKeyhole, MapPin, Navigation, Phone, Sparkles, Users } from 'lucide-react'
+import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, Loader2, LockKeyhole, MapPin, MessageCircle, Navigation, Phone, Sparkles, Users } from 'lucide-react'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 
 interface MatchDetail {
@@ -68,7 +68,10 @@ interface DailyCard {
   card_kind: string
   title: string
   content_text: string | null
+  selected_slot?: number | null
 }
+
+type DailyCardVisualState = 'available' | 'picked' | 'missed' | 'locked'
 
 function createDevMatchDetail(matchId: string): MatchDetail {
   const start = new Date(Date.now() + 1000 * 60 * 60 * 26)
@@ -134,8 +137,24 @@ const DEV_ATTENDANCE: AttendanceState = {
 
 const DEV_DAILY_CARDS: DailyCard[] = [
   {
-    id: 'dev-card-1',
-    day_offset: 0,
+    id: 'dev-card-picked',
+    day_offset: -3,
+    reveal_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+    reveal_window_start: new Date(Date.now() - 1000 * 60 * 60 * 52).toISOString(),
+    reveal_window_end: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+    revealed: true,
+    can_pick: false,
+    selected_at: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),
+    forfeited_at: null,
+    alias: 'A',
+    card_kind: 'music',
+    title: '첫 플레이리스트',
+    content_text: '상대 그룹은 잔잔한 인디 음악보다 같이 따라 부를 수 있는 노래를 더 좋아해요.',
+    selected_slot: 2,
+  },
+  {
+    id: 'dev-card-today',
+    day_offset: -1,
     reveal_at: new Date().toISOString(),
     reveal_window_start: new Date().toISOString(),
     reveal_window_end: new Date(Date.now() + 1000 * 60 * 60 * 4).toISOString(),
@@ -143,10 +162,43 @@ const DEV_DAILY_CARDS: DailyCard[] = [
     can_pick: true,
     selected_at: null,
     forfeited_at: null,
-    alias: 'A',
-    card_kind: 'music',
-    title: '좋아하는 노래',
-    content_text: '처음 만나기 전에 서로 노래 하나씩 공유하기',
+    alias: 'B',
+    card_kind: 'pre_meeting_question',
+    title: '만나기 전 질문',
+    content_text: '상대는 처음 만나면 맛집 이야기보다 여행지 이야기로 분위기를 여는 편이에요.',
+    selected_slot: null,
+  },
+  {
+    id: 'dev-card-missed',
+    day_offset: -2,
+    reveal_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    reveal_window_start: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(),
+    reveal_window_end: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    revealed: false,
+    can_pick: false,
+    selected_at: null,
+    forfeited_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    alias: 'C',
+    card_kind: 'preference',
+    title: '취향 힌트',
+    content_text: null,
+    selected_slot: null,
+  },
+  {
+    id: 'dev-card-locked',
+    day_offset: -1,
+    reveal_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
+    reveal_window_start: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
+    reveal_window_end: new Date(Date.now() + 1000 * 60 * 60 * 28).toISOString(),
+    revealed: false,
+    can_pick: false,
+    selected_at: null,
+    forfeited_at: null,
+    alias: 'D',
+    card_kind: 'vibe',
+    title: '분위기 카드',
+    content_text: null,
+    selected_slot: null,
   },
 ]
 
@@ -445,6 +497,25 @@ export default function MatchDetailPage() {
     if (dailyCardPicking) return
     setDailyCardPicking(selectedSlot)
     setError(null)
+
+    if (isDevPreview) {
+      window.setTimeout(() => {
+        setDailyCards((cards) => cards.map((card) => (
+          card.can_pick
+            ? {
+                ...card,
+                can_pick: false,
+                revealed: true,
+                selected_at: new Date().toISOString(),
+                selected_slot: selectedSlot,
+              }
+            : card
+        )))
+        setDailyCardPicking(null)
+      }, 220)
+      return
+    }
+
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/daily-cards`, {
         method: 'POST',
@@ -506,6 +577,57 @@ export default function MatchDetailPage() {
     if (code?.includes('not_match_participant')) return '본인이 참여한 매칭의 카드만 뽑을 수 있어요.'
     if (code?.includes('match_not_found')) return '매칭을 찾을 수 없어요.'
     return '오늘 카드를 뽑지 못했어요.'
+  }
+
+  function getDailyCardVisualState(card: DailyCard): DailyCardVisualState {
+    if (card.selected_at) return 'picked'
+    if (card.forfeited_at) return 'missed'
+    if (card.can_pick) return 'available'
+    return 'locked'
+  }
+
+  function getDailyCardStatusLabel(state: DailyCardVisualState): string {
+    switch (state) {
+      case 'available': return '오늘 뽑기'
+      case 'picked': return '공개 완료'
+      case 'missed': return '기회 소진'
+      case 'locked': return '잠김'
+    }
+  }
+
+  function getDailyCardShellClass(state: DailyCardVisualState): string {
+    switch (state) {
+      case 'available': return 'border-boot-primary/25 bg-boot-soft'
+      case 'picked': return 'border-emerald-400/25 bg-emerald-500/[0.06]'
+      case 'missed': return 'border-amber-400/25 bg-amber-500/[0.08]'
+      case 'locked': return 'border-boot-hairline bg-white/80'
+    }
+  }
+
+  function getDailyCardIconClass(state: DailyCardVisualState): string {
+    switch (state) {
+      case 'available': return 'border-boot-primary/25 bg-white text-boot-primary'
+      case 'picked': return 'border-emerald-400/30 bg-emerald-500/10 text-emerald-700'
+      case 'missed': return 'border-amber-400/30 bg-amber-500/10 text-amber-700'
+      case 'locked': return 'border-boot-hairline bg-white text-boot-muted'
+    }
+  }
+
+  function getDailyCardBadgeClass(state: DailyCardVisualState): string {
+    switch (state) {
+      case 'available': return 'border-boot-primary/25 bg-white text-boot-primary'
+      case 'picked': return 'border-emerald-400/30 bg-emerald-500/10 text-emerald-700'
+      case 'missed': return 'border-amber-400/30 bg-amber-500/10 text-amber-700'
+      case 'locked': return 'border-boot-hairline bg-white/80 text-boot-muted'
+    }
+  }
+
+  function getDailyCardSortRank(card: DailyCard): number {
+    const state = getDailyCardVisualState(card)
+    if (state === 'available') return 0
+    if (state === 'picked') return 1
+    if (state === 'locked') return 2
+    return 3
   }
 
   return (
@@ -741,6 +863,15 @@ export default function MatchDetailPage() {
                 내 측은 확정 완료. 상대 그룹 리더의 확정을 기다리는 중이에요.
               </div>
             )}
+            {(match.match_status === 'confirmed' || match.match_status === 'completed') && (
+              <Link
+                href={`/match/${encodeURIComponent(matchId)}/chat`}
+                className="mb-2 w-full py-3 rounded-2xl text-sm border border-boot-primary/25 bg-boot-soft text-boot-primary hover:bg-boot-soft flex items-center justify-center gap-2"
+              >
+                <MessageCircle size={16} />
+                매칭 채팅방 보기
+              </Link>
+            )}
             {match.match_status === 'confirmed' && (
               <button
                 type="button"
@@ -790,15 +921,22 @@ export default function MatchDetailPage() {
             ) : null}
 
             {match.scheduled_start && (
-              <section className="glass-card rounded-3xl p-5 mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles size={16} className="text-boot-primary" />
-                  <h3 className="text-sm font-bold">매칭 채널</h3>
+              <section className="glass-card rounded-3xl border border-boot-hairline p-5 mb-4">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-boot-primary/20 bg-boot-soft px-2.5 py-1 text-[11px] font-black text-boot-primary">
+                      <Clock3 size={12} />
+                      16:00-20:00
+                    </div>
+                    <h3 className="text-base font-black text-boot-ink">하루 1장 공개 카드</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-boot-muted">
+                      매일 정해진 시간에 세 장 중 하나를 고르면 상대 그룹의 익명 힌트가 열려요.
+                    </p>
+                  </div>
+                  <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-boot-primary/20 bg-white text-boot-primary shadow-sm">
+                    <Gift size={19} />
+                  </div>
                 </div>
-                <p className="text-xs text-boot-muted mb-3 leading-relaxed">
-                  매일 오후 4시부터 8시까지 상대팀을 알아가는 카드 한 장을 뽑을 수 있어요.
-                  시간이 지나면 그날 기회는 소진되고, 이미 뽑은 카드는 다시 뽑히지 않아요.
-                </p>
 
                 {dailyCardsLoading && dailyCards.length === 0 ? (
                   <div className="flex items-center gap-2 text-xs text-boot-muted">
@@ -810,79 +948,96 @@ export default function MatchDetailPage() {
                     약속 시간이 확정되면 카드 일정이 자동으로 만들어져요.
                   </p>
                 ) : (
-                  <div className="flex flex-col gap-2">
-                    {dailyCards.map((card) => {
-                      const missed = !!card.forfeited_at
-                      const picked = !!card.selected_at
+                  <div className="flex flex-col gap-3">
+                    {[...dailyCards].sort((a, b) => getDailyCardSortRank(a) - getDailyCardSortRank(b)).map((card) => {
+                      const visualState = getDailyCardVisualState(card)
+                      const picked = visualState === 'picked'
+                      const missed = visualState === 'missed'
+                      const locked = visualState === 'locked'
+                      const available = visualState === 'available'
                       return (
                         <div
                           key={card.id}
-                          className={`rounded-2xl border px-3 py-3 ${
-                            picked
-                              ? 'border-boot-primary/25 bg-boot-soft'
-                              : missed
-                                ? 'border-amber-400/20 bg-amber-500/10'
-                                : card.can_pick
-                                  ? 'border-emerald-400/30 bg-emerald-500/10'
-                                  : 'border-boot-hairline bg-white/80'
-                          }`}
+                          className={`rounded-2xl border px-3 py-3 ${getDailyCardShellClass(visualState)}`}
                         >
-                          <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border ${getDailyCardIconClass(visualState)}`}>
+                              {picked ? <CheckCircle2 size={17} /> : locked ? <LockKeyhole size={16} /> : missed ? <AlertTriangle size={16} /> : <Sparkles size={17} />}
+                            </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-bold">
-                                D{card.day_offset} · {formatCardKind(card.card_kind)}
-                              </p>
-                              <p className="mt-0.5 text-[11px] text-boot-muted">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="text-[11px] font-bold text-boot-muted">
+                                    {formatDailyCardDay(card.day_offset)}
+                                  </p>
+                                  <p className="mt-0.5 text-sm font-black text-boot-ink">
+                                    {formatCardKind(card.card_kind)}
+                                  </p>
+                                </div>
+                                <span className={`flex-shrink-0 rounded-full border px-2 py-1 text-[10px] font-black ${getDailyCardBadgeClass(visualState)}`}>
+                                  {getDailyCardStatusLabel(visualState)}
+                                </span>
+                              </div>
+                              <p className="mt-1 text-[11px] text-boot-muted">
                                 {formatDateTime(card.reveal_window_start)} ~ {formatTime(card.reveal_window_end)}
                               </p>
                             </div>
-                            <span className={`text-[10px] px-2 py-1 rounded-lg border flex-shrink-0 ${
-                              picked
-                                ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-700'
-                                : missed
-                                  ? 'border-amber-400/30 bg-amber-500/10 text-amber-700'
-                                  : card.can_pick
-                                    ? 'border-boot-primary/25 bg-boot-soft text-boot-primary'
-                                    : 'border-boot-hairline text-boot-muted'
-                            }`}>
-                              {picked ? '뽑음' : missed ? '기회 소진' : card.can_pick ? '뽑기 가능' : '대기'}
-                            </span>
                           </div>
-                          {card.can_pick ? (
-                            <div className="mt-3 grid grid-cols-3 gap-2">
-                              {[1, 2, 3].map((slot) => (
-                                <button
-                                  key={slot}
-                                  type="button"
-                                  onClick={() => pickDailyCard(slot)}
-                                  disabled={!!dailyCardPicking}
-                                  className="aspect-[3/4] rounded-2xl border border-boot-primary/25 bg-boot-soft text-xs font-bold text-boot-primary hover:bg-boot-soft disabled:opacity-50 flex flex-col items-center justify-center gap-1"
-                                >
-                                  {dailyCardPicking === slot ? (
-                                    <Loader2 size={16} className="animate-spin" />
-                                  ) : (
-                                    <Sparkles size={16} />
-                                  )}
-                                  카드 {slot}
-                                </button>
-                              ))}
+
+                          {available ? (
+                            <div className="mt-4">
+                              <div className="mb-2 flex items-center justify-between gap-2">
+                                <p className="text-xs font-bold text-boot-body">오늘 열 카드 선택</p>
+                                <span className="text-[10px] font-bold text-boot-muted">한 번 선택하면 고정</span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2">
+                                {[1, 2, 3].map((slot) => (
+                                  <button
+                                    key={slot}
+                                    type="button"
+                                    onClick={() => pickDailyCard(slot)}
+                                    disabled={!!dailyCardPicking}
+                                    className="group relative aspect-[3/4] min-h-[116px] overflow-hidden rounded-2xl border border-boot-primary/20 bg-white text-xs font-black text-boot-primary shadow-sm transition hover:-translate-y-0.5 hover:border-boot-primary/40 disabled:translate-y-0 disabled:opacity-50"
+                                  >
+                                    <span className="absolute inset-x-3 top-3 h-1 rounded-full bg-boot-soft" />
+                                    <span className="flex h-full flex-col items-center justify-center gap-2">
+                                      {dailyCardPicking === slot ? (
+                                        <Loader2 size={17} className="animate-spin" />
+                                      ) : (
+                                        <Gift size={18} />
+                                      )}
+                                      <span>카드 {slot}</span>
+                                      <span className="text-[10px] font-bold text-boot-muted">
+                                        {slot === 1 ? '느낌' : slot === 2 ? '취향' : '질문'}
+                                      </span>
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
                             </div>
                           ) : picked ? (
-                            <div className="mt-3 ml-auto max-w-[82%] rounded-2xl rounded-br-[4px] border border-boot-primary/20 bg-gradient-to-r from-boot-primary to-boot-coral px-3 py-3 text-white shadow-sm">
-                              <p className="text-[11px] font-bold text-white/80 mb-1">
-                                {card.alias} · {card.title}
-                              </p>
-                              <p className="text-xs text-white leading-relaxed whitespace-pre-wrap">
+                            <div className="mt-4 rounded-2xl rounded-br-[4px] border border-boot-primary/20 bg-white px-4 py-3 shadow-sm">
+                              <div className="mb-2 flex items-center justify-between gap-2">
+                                <p className="text-[11px] font-black text-boot-primary">
+                                  {card.alias} · {card.title}
+                                </p>
+                                {card.selected_slot && (
+                                  <span className="rounded-full bg-boot-soft px-2 py-1 text-[10px] font-black text-boot-primary">
+                                    {card.selected_slot}번 카드
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs leading-relaxed text-boot-body whitespace-pre-wrap">
                                 {card.content_text || '상대가 아직 카드를 작성하지 않았어요.'}
                               </p>
                             </div>
                           ) : missed ? (
-                            <p className="mt-3 text-xs text-amber-700/80">
-                              이 카드는 시간 안에 뽑지 않아서 넘어갔어요.
+                            <p className="mt-3 rounded-2xl border border-amber-400/20 bg-white/70 px-3 py-2 text-xs leading-relaxed text-amber-700">
+                              이 카드는 시간 안에 뽑지 않아서 지나갔어요. 다음 공개 시간에 새 카드를 뽑을 수 있어요.
                             </p>
                           ) : (
-                            <p className="mt-3 text-xs text-boot-muted">
-                              아직 오늘의 뽑기 시간이 아니에요.
+                            <p className="mt-3 rounded-2xl border border-boot-hairline bg-white/80 px-3 py-2 text-xs leading-relaxed text-boot-muted">
+                              아직 공개 시간이 아니에요. 다음 16:00-20:00 창에 열립니다.
                             </p>
                           )}
                         </div>
@@ -1106,6 +1261,13 @@ function formatTime(iso: string): string {
   } catch {
     return iso
   }
+}
+
+function formatDailyCardDay(dayOffset: number): string {
+  if (dayOffset === -1) return '만남 하루 전'
+  if (dayOffset < -1) return `만남 ${Math.abs(dayOffset)}일 전`
+  if (dayOffset === 0) return '오늘 카드'
+  return `만남 ${dayOffset}일 후`
 }
 
 function formatCardKind(kind: string): string {

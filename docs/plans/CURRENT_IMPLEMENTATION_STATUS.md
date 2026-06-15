@@ -1,6 +1,6 @@
 # Current Implementation Status
 
-Last updated: 2026-06-14
+Last updated: 2026-06-16
 
 ## Current Product Decisions (2026-06-12)
 
@@ -114,6 +114,37 @@ Reference: `docs/plans/2026-06-14-phase-6-sungjun-github-alignment-audit-result.
 - Production DB apply is still not approved.
 - Before any production or staging apply, review the Phase 5 schema ownership/security tradeoff and rerun validation in the approved target environment.
 - Next product/backend work: implement the meeting assignment path that creates `match_meetings` rows after match confirmation, plus explicit Data API grants/RLS only if a concrete UI path requires direct table access.
+
+## Phase 8~9 Update Snapshot (2026-06-16)
+
+- Phase 8 result: `매칭 채팅방 보기` 액션이 `/match/[id]`에서 `confirmed/completed` 상태일 때 노출되어 사용자가 즉시 채팅으로 이동 가능합니다. (`app/match/[id]/page.tsx`)
+- Phase 9 result:
+  - `/api/matches/[id]/chat`는 `current_user_id`를 함께 반환하도록 보강했습니다.
+  - 채팅 페이지는 본인 메시지 구분 렌더링, 오류/비어있음 상태 처리, dev 모드 폴백을 정비했습니다.
+  - 기존 스키마 마이그레이션(`supabase/migrations/20260616_phase_9_match_chat.sql`)와 연동되어, 실서버/로컬 인증 흐름에서 채팅 접근 거부 시 401/권한 응답을 그대로 반영합니다.
+
+## Current Active Next Phase
+
+## Phase 10 Match Detail Daily Card UX Snapshot (2026-06-16)
+
+Reference: `docs/plans/2026-06-16-phase-10-match-detail-daily-card-ux-result.md`.
+
+- Status: DONE_FOR_LOCAL_FRONTEND_REVIEW.
+- DB/schema/API/auth/matching engine were not changed.
+- `/match/[id]` daily-card area now presents the user-driven 16:00-20:00 draw window as a clear "하루 1장 공개 카드" surface.
+- Daily-card states are visually separated: 오늘 뽑기, 공개 완료, 잠김, 기회 소진.
+- Dev-preview sample cards now cover all major states so `/match/dev-match-1` can be reviewed without live DB setup.
+- Dev-preview card selection updates local UI state directly instead of calling authenticated daily-card APIs.
+- Confirmed/completed match chat entry remains exposed through `매칭 채팅방 보기`.
+- Verification passed: `npm run typecheck`, `npm run lint`, `npm run test:config`, `npm run test:matching`, `npm run test:auth`, `npm run test:profile`, `npm run build`.
+- Local dev server restarted at `http://127.0.0.1:3003`; dev-preview session route checks passed for `/match`, `/match/dev-match-1`, `/match/dev-match-1/chat`, and `/group/create`.
+- Playwright browser-rendered checks passed for `/dev/preview`, `/match`, `/match/dev-match-1`, `/match/dev-match-1/chat`, `/group/create`, and the local daily-card click transition.
+- Mobile screenshots were captured before and after card selection in `.tmp/phase10-match-detail-before-pick-mobile.png` and `.tmp/phase10-match-detail-after-pick-mobile.png`.
+
+## Current Active Next Phase
+
+- Phase 10 local frontend review is ready for manual visual feedback.
+- Next product work: polish `/match/[id]/chat` beyond foundation level (message history pagination/read state/realtime polling or SSE) after the daily-card design is approved.
 
 ## Completed
 
