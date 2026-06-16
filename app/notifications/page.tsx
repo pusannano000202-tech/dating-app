@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Bell, CheckCheck, ChevronLeft, Heart, Loader2, MessageSquareText, PartyPopper, Phone, Users } from 'lucide-react'
+import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 
 interface NotificationRow {
   id: string
@@ -12,7 +13,40 @@ interface NotificationRow {
   created_at: string
 }
 
+const DEV_NOTIFICATIONS: NotificationRow[] = [
+  {
+    id: 'dev-notification-match-created',
+    kind: 'match_created',
+    payload: {
+      match_id: 'dev-match-pending',
+      opp_group_size: 3,
+      opp_group_gender: 'female',
+    },
+    read_at: null,
+    created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+  },
+  {
+    id: 'dev-notification-match-confirmed',
+    kind: 'match_confirmed',
+    payload: {
+      match_id: 'dev-match-1',
+    },
+    read_at: null,
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+  },
+  {
+    id: 'dev-notification-meeting-reminder',
+    kind: 'meeting_reminder',
+    payload: {
+      match_id: 'dev-match-1',
+    },
+    read_at: new Date(Date.now() - 1000 * 60 * 40).toISOString(),
+    created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+  },
+]
+
 export default function NotificationsPage() {
+  const isDevPreview = isDevAuthBypassEnabled()
   const [items, setItems] = useState<NotificationRow[]>([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -21,6 +55,13 @@ export default function NotificationsPage() {
   const refresh = useCallback(async () => {
     setLoading(true)
     setError(null)
+
+    if (isDevPreview) {
+      setItems(DEV_NOTIFICATIONS)
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch('/api/notifications?limit=100')
       if (res.status === 401) {
@@ -38,7 +79,7 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isDevPreview])
 
   useEffect(() => {
     refresh()
@@ -48,6 +89,11 @@ export default function NotificationsPage() {
     if (busy) return
     setBusy(true)
     try {
+      if (isDevPreview) {
+        const now = new Date().toISOString()
+        setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? now })))
+        return
+      }
       await fetch('/api/notifications/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
       await refresh()
     } finally {
@@ -57,6 +103,10 @@ export default function NotificationsPage() {
 
   async function markOne(id: string) {
     try {
+      if (isDevPreview) {
+        setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: n.read_at ?? new Date().toISOString() } : n)))
+        return
+      }
       await fetch('/api/notifications/read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -69,7 +119,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <main className="min-h-screen px-5 pb-10">
+    <main className="min-h-screen px-5 pb-28">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
           <Link href="/" className="p-2 glass rounded-xl">
@@ -177,8 +227,8 @@ function KindIcon({ kind }: { kind: string }) {
 
 function kindLabel(kind: string): string {
   switch (kind) {
-    case 'match_created':   return '새 매칭이 도착했어요'
-    case 'match_confirmed': return '양쪽 모두 매칭 확정'
+    case 'match_created':   return '새 가매칭이 도착했어요'
+    case 'match_confirmed': return '매칭이 확정되었습니다. 축하합니다!'
     case 'match_completed': return '만남이 완료됐어요'
     case 'phone_revealed':  return '상대 핸드폰이 공개됐어요'
     case 'review_request':  return '평가를 작성해주세요'
@@ -199,14 +249,14 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
   const gender = payload?.opp_group_gender === 'male' ? '남자' : payload?.opp_group_gender === 'female' ? '여자' : null
   switch (kind) {
     case 'match_created':
-      if (size && gender) return `상대 그룹 ${size}명 · ${gender}. 확정을 기다리는 중.`
-      return '매칭 상세에서 확정 여부를 결정해주세요.'
-    case 'match_confirmed': return '약속 시간/장소를 매칭 상세에서 확인하세요.'
+      if (size && gender) return `상대 그룹 ${size}명 · ${gender}. 사전 힌트를 작성하고 참여를 확인해주세요.`
+      return '사전 힌트를 작성하고 참여를 확인해주세요.'
+    case 'match_confirmed': return '약속 정보와 오늘의 카드를 확인하세요.'
     case 'match_completed': return '평가 작성 + 핸드폰 자동 공개.'
     case 'phone_revealed':  return '약속 시간이 되어 상대 핸드폰이 공개됐어요.'
     case 'review_request':  return '5점 별점 + 이슈 chip + 코멘트.'
     case 'friend_request_received': return '받은 요청을 친구 목록에서 확인하세요.'
-    case 'meeting_reminder': return '약속 시간을 다시 확인해주세요.'
+    case 'meeting_reminder': return '오늘 만남 시간과 장소를 다시 확인해주세요.'
     case 'continuation_choice_request': return '무료 베타 기간에는 이어가기 선택만 기록돼요.'
     case 'both_continue': return '양쪽 모두 이어가기를 선택했어요. 정산 절차는 없어요.'
     case 'partner_paid_zero': {

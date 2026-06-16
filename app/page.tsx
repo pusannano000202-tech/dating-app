@@ -18,7 +18,7 @@ import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '
 import { isSupabaseConfigured } from '@/lib/utils'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
-import ActiveMatchingHomeCard from '@/components/matching/ActiveMatchingHomeCard'
+import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
 import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
 import { aggregateMatchPoolStats, type MatchPoolStatsRow } from '@/lib/match-pool-stats'
 
@@ -130,7 +130,7 @@ function LandingPage({ poolStats }: { poolStats: PoolStats }) {
 
 function HomeDashboard({ poolStats }: { poolStats: PoolStats }) {
   return (
-    <main className="min-h-screen booting-band px-5 pb-12 pt-7 text-boot-ink">
+    <main className="min-h-screen booting-band px-5 pb-28 pt-7 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-7 flex items-center justify-between">
           <BootingLogo size="md" />
@@ -145,13 +145,13 @@ function HomeDashboard({ poolStats }: { poolStats: PoolStats }) {
 
         <section className="mb-5">
           <p className="text-xs font-black uppercase tracking-normal text-boot-primary">Home</p>
-          <h1 className="mt-2 text-3xl font-black leading-tight">오늘은 어디까지 갈까요?</h1>
+          <h1 className="mt-2 text-3xl font-black leading-tight">오늘 해야 할 일만 볼게요</h1>
           <p className="mt-2 text-sm leading-6 text-boot-muted">
-            친구를 추가하고, 그룹을 만든 다음, 이번 주 매칭 큐에 들어가세요.
+            친구, 매칭, 사전 힌트, 오늘의 카드를 한 흐름으로 이어가요.
           </p>
         </section>
 
-        <ActiveMatchingHomeCard />
+        <HomeTodayTaskCard />
 
         <section className="mb-5 grid grid-cols-2 gap-3">
           <HomeActionCard

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import AppBottomNav from '@/components/navigation/AppBottomNav'
 
 export const metadata: Metadata = {
   title: '부팅 — 부산대 과팅',
@@ -24,7 +25,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="bg-app min-h-screen text-boot-ink safe-area-padding">{children}</body>
+      <body className="bg-app min-h-screen text-boot-ink safe-area-padding">
+        {children}
+        <AppBottomNav />
+      </body>
     </html>
   )
 }

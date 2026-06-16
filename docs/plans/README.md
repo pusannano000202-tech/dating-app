@@ -21,6 +21,7 @@ This folder is the canonical entry point for active product and implementation p
 - [Phase 8 Match Detail UX Result](./2026-06-16-phase-8-match-detail-ux-result.md)
 - [Phase 9 Match Chat Result](./2026-06-16-phase-9-match-chat-result.md)
 - [Phase 10 Match Detail Daily Card UX Result](./2026-06-16-phase-10-match-detail-daily-card-ux-result.md)
+- [Phase 11 Frontend Flow Redesign Worker Brief](./2026-06-15-phase-11-frontend-flow-redesign-worker-brief.md)
 - [Document Organization Plan](./DOCUMENT_ORGANIZATION_PLAN.md)
 - [Document Organization Result (Codex용 결과 보고서)](./DOCUMENT_ORGANIZATION_RESULT_2026-06-02.md)
 - [Active Plan Index](./ACTIVE_PLAN_INDEX.md)
