@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppHeader } from "@/components/AppHeader";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { PageShell } from "@/components/ui/PageShell";
 import { loadMatchFlow, saveMatchFlow, loadTeam } from "@/lib/storage";
 import { QUESTIONS_BY_MOOD, QAQuestion } from "@/data/questions-by-mood";
 import { distributeQuestions, getTodayMemberIndex, getChemistryComment } from "@/lib/qa";
@@ -77,158 +78,165 @@ export default function QAPage() {
 
   if (view === "revealed" && latestAnswer) {
     return (
-      <>
-        <AppHeader />
-        <main className="py-10 px-4 bg-white min-h-screen">
-          <div className="max-w-[480px] mx-auto flex flex-col gap-4">
-            <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 bg-primary-soft border border-primary-disabled rounded-full px-3 py-1.5 text-[10px] font-bold text-primary mb-3">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full" />
-                상대팀 답변이 공개됐어요!
-              </div>
-              <p className="text-sm font-black text-ink mb-1 leading-snug">
-                {todayQuestion?.text}
-              </p>
-            </div>
+      <PageShell mood="dark">
+        <AuroraBlobBg />
+        <div className="mt-6 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FF7A3D]/25 bg-[#FF7A3D]/10 px-3 py-1.5 text-[10px] font-bold text-[#FFB9A3]">
+            <span className="dot-live h-1.5 w-1.5 rounded-full bg-[#FF7A3D]" />
+            상대팀 답변이 공개됐어요!
+          </span>
+          <p className="mt-4 text-base font-extrabold leading-snug text-[#F2EEE7]">
+            {todayQuestion?.text}
+          </p>
+        </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="bg-gradient-to-br from-primary-soft to-[#ffe4ed] border-[1.5px] border-primary-disabled rounded-[14px] p-4">
-                <div className="text-[9px] font-bold text-[#ff9ab0] uppercase tracking-wide mb-2">우리 팀원 답변</div>
-                <div className="text-sm font-black text-ink">{latestAnswer.myAnswer}</div>
-              </div>
-              <div className="bg-gradient-to-br from-[#f0f5ff] to-[#e8e8ff] border-[1.5px] border-[#cce0ff] rounded-[14px] p-4">
-                <div className="text-[9px] font-bold text-[#90b4e8] uppercase tracking-wide mb-2">상대팀원 답변</div>
-                <div className="text-sm font-black text-ink">{latestAnswer.theirAnswer}</div>
-              </div>
-            </div>
+        <div className="mt-6 flex flex-col gap-3">
+          <Card variant="glass">
+            <p className="text-[9px] font-extrabold tracking-[2px] text-[#FFB9A3]">우리 팀원 답변</p>
+            <p className="mt-2 text-sm font-extrabold">{latestAnswer.myAnswer}</p>
+          </Card>
+          <Card variant="glass">
+            <p className="text-[9px] font-extrabold tracking-[2px] text-lilac">상대팀원 답변</p>
+            <p className="mt-2 text-sm font-extrabold">{latestAnswer.theirAnswer}</p>
+          </Card>
+        </div>
 
-            <div className="bg-surface-soft rounded-[12px] p-3 text-center text-xs text-muted leading-relaxed">
-              {getChemistryComment(latestAnswer.myAnswer, latestAnswer.theirAnswer ?? "")}
-            </div>
+        <Card variant="glass" className="mt-3 p-4 text-center">
+          <p className="text-xs font-medium leading-relaxed text-[#EDE9E2]/70">
+            {getChemistryComment(latestAnswer.myAnswer, latestAnswer.theirAnswer ?? "")}
+          </p>
+        </Card>
 
-            <Button fullWidth onClick={() => setView("history")}>
-              전체 기록 보기
-            </Button>
-          </div>
-        </main>
-      </>
+        <div className="mt-auto pt-6">
+          <Button variant="glass" fullWidth onClick={() => setView("history")}>
+            전체 기록 보기
+          </Button>
+        </div>
+      </PageShell>
     );
   }
 
   if (view === "history") {
     return (
-      <>
-        <AppHeader />
-        <main className="py-10 px-4 bg-white min-h-screen">
-          <div className="max-w-[480px] mx-auto">
-            <h1 className="text-xl font-black text-ink tracking-[-0.5px] mb-1">Q&A 기록</h1>
-            <p className="text-xs text-muted mb-6">지금까지 나눈 대화예요</p>
-            <div className="flex flex-col gap-3 mb-6">
-              {flow?.qaAnswers.map((a, i) => (
-                <div key={i} className="bg-surface-soft rounded-[14px] p-4">
-                  <p className="text-[10px] font-bold text-muted mb-3 uppercase tracking-wide">Q{i + 1}</p>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2 items-start">
-                      <span className="text-[10px] font-bold text-primary w-12 shrink-0">우리팀</span>
-                      <span className="text-xs text-ink">{a.myAnswer}</span>
-                    </div>
-                    {a.theirAnswer && (
-                      <div className="flex gap-2 items-start">
-                        <span className="text-[10px] font-bold text-[#4f9eff] w-12 shrink-0">상대팀</span>
-                        <span className="text-xs text-ink">{a.theirAnswer}</span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[10px] text-muted mt-2 italic">
-                    {a.theirAnswer ? getChemistryComment(a.myAnswer, a.theirAnswer) : ""}
-                  </p>
+      <PageShell mood="dark">
+        <AuroraBlobBg />
+        <p className="mt-6 text-[10px] font-extrabold tracking-[3px] text-[#FFB9A3]">✦ Q&A 기록</p>
+        <h1 className="mt-2 text-xl font-black tracking-[-0.6px]">지금까지 나눈 대화</h1>
+        <div className="mt-5 flex flex-col gap-3">
+          {flow?.qaAnswers.map((a, i) => (
+            <Card key={i} variant="glass">
+              <p className="text-[10px] font-extrabold tracking-[2px] text-[#EDE9E2]/40">
+                Q{i + 1}
+              </p>
+              <div className="mt-2.5 flex flex-col gap-2">
+                <div className="flex items-start gap-2">
+                  <span className="w-12 shrink-0 text-[10px] font-bold text-[#FFB9A3]">우리팀</span>
+                  <span className="text-xs font-medium">{a.myAnswer}</span>
                 </div>
-              ))}
-            </div>
-            {todayQuestion && isMyTurn && (
-              <Button fullWidth onClick={() => setView("question")}>
-                오늘 질문 답하기 →
-              </Button>
-            )}
+                {a.theirAnswer && (
+                  <div className="flex items-start gap-2">
+                    <span className="w-12 shrink-0 text-[10px] font-bold text-lilac">상대팀</span>
+                    <span className="text-xs font-medium">{a.theirAnswer}</span>
+                  </div>
+                )}
+              </div>
+              {a.theirAnswer && (
+                <p className="mt-2.5 text-[10px] font-medium italic text-[#EDE9E2]/45">
+                  {getChemistryComment(a.myAnswer, a.theirAnswer)}
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+        {todayQuestion && isMyTurn && (
+          <div className="mt-auto pt-6">
+            <Button variant="electric" fullWidth onClick={() => setView("question")}>
+              오늘 질문 답하기
+            </Button>
           </div>
-        </main>
-      </>
+        )}
+      </PageShell>
     );
   }
 
   // 내 차례 아닐 때
   if (!isMyTurn) {
     return (
-      <>
-        <AppHeader />
-        <main className="py-10 px-4 bg-white min-h-screen">
-          <div className="max-w-[480px] mx-auto text-center">
-            <div className="text-4xl mb-4">⏳</div>
-            <h2 className="text-lg font-black text-ink mb-2">오늘은 {todayMemberName}님 차례예요</h2>
-            <p className="text-sm text-muted mb-8">답변이 완료되면 대화를 볼 수 있어요</p>
-            <Button variant="secondary" fullWidth onClick={() => setView("history")}>
-              이전 기록 보기
-            </Button>
-          </div>
-        </main>
-      </>
+      <PageShell mood="dark" className="items-center justify-center text-center">
+        <AuroraBlobBg />
+        <p className="text-[10px] font-extrabold tracking-[3px] text-[#FFB9A3]">✦ 오늘의 질문</p>
+        <h2 className="mt-3 text-lg font-black">오늘은 {todayMemberName}님 차례예요</h2>
+        <p className="mt-2 text-sm font-medium text-[#EDE9E2]/55">
+          답변이 완료되면 대화를 볼 수 있어요
+        </p>
+        <div className="mt-8 w-full">
+          <Button variant="glass" fullWidth onClick={() => setView("history")}>
+            이전 기록 보기
+          </Button>
+        </div>
+      </PageShell>
     );
   }
 
   // 내 차례 + 질문
-  return (
-    <>
-      <AppHeader />
-      <main className="py-10 px-4 bg-white min-h-screen">
-        <div className="max-w-[480px] mx-auto flex flex-col gap-5">
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-[10px] font-bold text-primary">오늘의 질문</span>
-              <span className="text-[10px] text-muted font-bold">
-                {(flow?.qaAnswers.length ?? 0) + 1} / {QUESTIONS_BY_MOOD[flow?.matchedTeam.mood ?? "comfortableTalk"]?.length ?? 5}
-              </span>
-            </div>
-            <div className="h-1 bg-surface-soft rounded-full">
-              <div
-                className="h-full bg-gradient-to-r from-primary to-[#ff8a65] rounded-full"
-                style={{
-                  width: `${((flow?.qaAnswers.length ?? 0) / (QUESTIONS_BY_MOOD[flow?.matchedTeam.mood ?? "comfortableTalk"]?.length ?? 5)) * 100}%`,
-                }}
-              />
-            </div>
-          </div>
+  const totalQ = QUESTIONS_BY_MOOD[flow?.matchedTeam.mood ?? "comfortableTalk"]?.length ?? 5;
+  const answered = flow?.qaAnswers.length ?? 0;
 
-          <div className="rounded-[16px] overflow-hidden shadow-card">
-            <div className="bg-gradient-to-br from-[#1a1230] to-[#2d1f45] p-5 text-center">
-              <div className="inline-block bg-[rgba(255,90,111,0.2)] text-[#ff9ab0] text-[9px] font-bold rounded-full px-3 py-1 mb-3 border border-[rgba(255,90,111,0.25)]">
-                📬 오늘 질문 도착
-              </div>
-              <p className="text-sm font-black text-white leading-snug">{todayQuestion?.text}</p>
-            </div>
-            <div className="bg-white p-4">
-              <div className="flex flex-col gap-2 mb-4">
-                {todayQuestion?.choices.map((choice) => (
-                  <button
-                    key={choice}
-                    type="button"
-                    onClick={() => setSelectedAnswer(choice)}
-                    className={`text-left px-4 py-3 rounded-[10px] border-[1.5px] text-sm font-medium transition-all ${
-                      selectedAnswer === choice
-                        ? "border-primary bg-primary-soft text-primary font-bold"
-                        : "border-hairline text-body hover:border-primary"
-                    }`}
-                  >
-                    {choice}
-                  </button>
-                ))}
-              </div>
-              <Button fullWidth disabled={!selectedAnswer} onClick={handleSubmit}>
-                답변 제출하고 상대 보기 →
-              </Button>
-            </div>
-          </div>
+  return (
+    <PageShell mood="dark">
+      <AuroraBlobBg />
+      <div className="mt-6">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-extrabold tracking-[3px] text-[#FFB9A3]">
+            ✦ 오늘의 질문
+          </span>
+          <span className="text-[10px] font-bold text-[#EDE9E2]/45">
+            {answered + 1} / {totalQ}
+          </span>
         </div>
-      </main>
-    </>
+        <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#F2EEE7]/10">
+          <div
+            className="h-full rounded-full bg-electric"
+            style={{ width: `${(answered / totalQ) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <h1 className="mt-7 text-[22px] font-black leading-[1.4] tracking-[-0.6px] text-[#F2EEE7]">
+        {todayQuestion?.text}
+      </h1>
+
+      <div className="mt-6 flex flex-col gap-2.5">
+        {todayQuestion?.choices.map((choice) => (
+          <button
+            key={choice}
+            type="button"
+            onClick={() => setSelectedAnswer(choice)}
+            className={`rounded-2xl border-[1.5px] px-4 py-3.5 text-left text-sm font-semibold transition-all active:scale-[0.98] ${
+              selectedAnswer === choice
+                ? "border-[#FF7A3D] bg-[#FF7A3D]/15 text-white"
+                : "border-[#F2EEE7]/10 bg-[#F2EEE7]/[0.05] text-[#EDE9E2]"
+            }`}
+          >
+            {choice}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-auto pt-6">
+        <Button variant="electric" fullWidth disabled={!selectedAnswer} onClick={handleSubmit}>
+          답변 제출하고 상대 보기
+        </Button>
+      </div>
+    </PageShell>
+  );
+}
+
+function AuroraBlobBg() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute -right-24 -top-20 h-72 w-72 animate-drift rounded-full bg-[#FF3D5A]/12 blur-[58px]"
+    />
   );
 }
