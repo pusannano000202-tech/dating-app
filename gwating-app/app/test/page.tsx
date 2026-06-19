@@ -3,18 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
-import { QuizCard } from "@/components/QuizCard";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { PageShell } from "@/components/ui/PageShell";
 import { questions } from "@/data/questions";
 import { saveUser } from "@/lib/storage";
 import { classifyRole } from "@/lib/scoring";
 import { TraitKey, MemberRole, UserProfile, Gender } from "@/types/matching";
 
-const ROLE_LABELS: Record<MemberRole, { name: string; desc: string; emoji: string }> = {
-  moodMaker:   { name: "분위기 메이커형", desc: "에너지를 끌어올리고 자리를 살려주는 역할이에요.",  emoji: "🔥" },
-  coordinator: { name: "조율자형",        desc: "대화 흐름을 이어주고 균형을 맞추는 역할이에요.",    emoji: "🎯" },
-  considerate: { name: "배려형",          desc: "모두를 세심하게 챙기는 역할이에요.",               emoji: "🤍" },
-  reactor:     { name: "리액션형",        desc: "분위기를 살려주는 반응으로 자리를 따뜻하게 해요.", emoji: "✨" },
+const ROLE_LABELS: Record<MemberRole, { name: string; desc: string }> = {
+  moodMaker:   { name: "분위기 메이커형", desc: "에너지를 끌어올리고 자리를 살려주는 역할이에요." },
+  coordinator: { name: "조율자형",        desc: "대화 흐름을 이어주고 균형을 맞추는 역할이에요." },
+  considerate: { name: "배려형",          desc: "모두를 세심하게 챙기는 역할이에요." },
+  reactor:     { name: "리액션형",        desc: "분위기를 살려주는 반응으로 자리를 따뜻하게 해요." },
 };
 
 const TRAIT_LABELS: Record<string, string> = {
@@ -24,6 +25,11 @@ const TRAIT_LABELS: Record<string, string> = {
   respectfulness:         "예의/존중",
   communicationBalance:   "소통 균형",
 };
+
+const GENDER_OPTIONS: { value: Gender; label: string }[] = [
+  { value: "male", label: "남자" },
+  { value: "female", label: "여자" },
+];
 
 type TraitScores = Partial<Record<TraitKey, number[]>>;
 type Step = "gender" | "quiz" | "result";
@@ -84,45 +90,40 @@ export default function TestPage() {
     return (
       <>
         <AppHeader step={1} totalSteps={3} />
-        <main className="py-12 px-4 bg-white min-h-screen">
-          <div className="max-w-[400px] mx-auto text-center">
-            <div className="text-4xl mb-4">👋</div>
-            <h2 className="text-xl font-black text-ink tracking-[-0.5px] mb-2">먼저 성별을 알려주세요</h2>
-            <p className="text-sm text-muted mb-8 leading-relaxed">
-              팀 매칭에 사용돼요.<br />
-              <span className="text-[11px] text-muted/60">매칭 외 목적으로 사용되지 않아요</span>
-            </p>
-            <div className="flex gap-4 mb-8">
+        <PageShell className="pt-8">
+          <p className="text-[10px] font-extrabold tracking-[3px] text-[#FF6A4E]">✦ START</p>
+          <h2 className="mt-2 text-[26px] font-black leading-[1.3] tracking-[-1px]">
+            먼저 성별을
+            <br />
+            알려주세요
+          </h2>
+          <p className="mt-3 text-sm font-medium leading-relaxed text-muted">
+            팀 매칭에만 사용돼요.
+            <br />
+            <span className="text-xs text-muted/60">매칭 외 목적으로 사용되지 않아요</span>
+          </p>
+          <div className="mt-8 flex gap-3">
+            {GENDER_OPTIONS.map(({ value, label }) => (
               <button
+                key={value}
                 type="button"
-                onClick={() => setGender("male")}
-                className={`flex-1 border-[2px] rounded-[16px] py-5 flex flex-col items-center gap-2 transition-all ${
-                  gender === "male"
-                    ? "border-[#4f9eff] bg-[#f0f5ff]"
-                    : "border-hairline bg-white hover:border-hairline-soft"
+                onClick={() => setGender(value)}
+                className={`flex-1 rounded-card border-[1.5px] py-7 text-center text-base font-extrabold transition-all active:scale-[0.97] ${
+                  gender === value
+                    ? "chip-pop border-[#FF4D3D] bg-[#FFF6F1] text-[#E5402E] shadow-[0_10px_22px_rgba(255,77,61,0.16)]"
+                    : "border-line bg-white text-ink"
                 }`}
               >
-                <span className="text-3xl">🙋‍♂️</span>
-                <span className="text-sm font-bold text-ink">남자</span>
+                {label}
               </button>
-              <button
-                type="button"
-                onClick={() => setGender("female")}
-                className={`flex-1 border-[2px] rounded-[16px] py-5 flex flex-col items-center gap-2 transition-all ${
-                  gender === "female"
-                    ? "border-primary bg-primary-soft"
-                    : "border-hairline bg-white hover:border-hairline-soft"
-                }`}
-              >
-                <span className="text-3xl">🙋‍♀️</span>
-                <span className="text-sm font-bold text-ink">여자</span>
-              </button>
-            </div>
+            ))}
+          </div>
+          <div className="mt-auto pt-8">
             <Button fullWidth disabled={!gender} onClick={handleGenderNext}>
-              다음 — 성향 테스트 시작 →
+              다음 — 성향 테스트 시작
             </Button>
           </div>
-        </main>
+        </PageShell>
       </>
     );
   }
@@ -134,56 +135,55 @@ export default function TestPage() {
     return (
       <>
         <AppHeader step={1} totalSteps={3} />
-        <main className="py-10 px-4 bg-white min-h-screen">
-          <div className="max-w-[480px] mx-auto">
-            {/* 역할 결과 */}
-            <div className="text-center mb-8">
-              <div className="text-[52px] mb-3 drop-shadow-sm">{info.emoji}</div>
-              <h2 className="text-2xl font-black text-ink tracking-[-0.5px] mb-2">{info.name}</h2>
-              <p className="text-sm text-muted leading-relaxed">{info.desc}</p>
-            </div>
+        <PageShell className="pt-8">
+          <p className="text-center text-[10px] font-extrabold tracking-[3px] text-[#FF6A4E]">
+            ✦ RESULT
+          </p>
+          <h2 className="mt-2 text-center text-[26px] font-black tracking-[-1px]">{info.name}</h2>
+          <p className="mt-2 text-center text-sm font-medium leading-relaxed text-muted">
+            {info.desc}
+          </p>
 
-            {/* 성향 점수 바 */}
-            {finalTraits && (
-              <div className="bg-surface-soft rounded-card p-4 mb-6 flex flex-col gap-3">
-                {Object.entries(finalTraits).map(([key, value]) => (
-                  <div key={key} className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-muted w-16 shrink-0 text-right">
-                      {TRAIT_LABELS[key] ?? key}
-                    </span>
-                    <div className="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-primary to-[#ff8a65] rounded-full transition-all duration-500"
-                        style={{ width: `${(value / 5) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] font-black text-primary w-6 text-right">
-                      {value * 20}
-                    </span>
+          {finalTraits && (
+            <Card className="mt-7 flex flex-col gap-3.5">
+              {Object.entries(finalTraits).map(([key, value]) => (
+                <div key={key} className="flex items-center gap-3">
+                  <span className="w-16 shrink-0 text-right text-[10px] font-bold text-muted">
+                    {TRAIT_LABELS[key] ?? key}
+                  </span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F1EDE6]">
+                    <div
+                      className="h-full rounded-full bg-electric transition-all duration-500"
+                      style={{ width: `${(value / 5) * 100}%` }}
+                    />
                   </div>
-                ))}
-              </div>
-            )}
+                  <span className="w-6 text-right text-[10px] font-black text-[#E5402E]">
+                    {value * 20}
+                  </span>
+                </div>
+              ))}
+            </Card>
+          )}
 
-            {/* 닉네임 입력 */}
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-ink mb-2">
-                닉네임을 입력해주세요
-              </label>
-              <input
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="예: 민준"
-                maxLength={10}
-                className="w-full border-[1.5px] border-hairline rounded-[12px] px-4 h-12 text-base text-ink focus:outline-none focus:border-primary bg-white"
-              />
-            </div>
+          <div className="mt-6">
+            <label className="mb-2 block text-[10px] font-extrabold tracking-[2px] text-muted">
+              닉네임을 입력해주세요
+            </label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="예: 민준"
+              maxLength={10}
+              className="h-12 w-full rounded-btn border-[1.5px] border-line bg-white px-4 text-base text-ink focus:border-[#FF9D7E] focus:outline-none"
+            />
+          </div>
+          <div className="mt-auto pt-6">
             <Button fullWidth onClick={handleSave} disabled={!nickname.trim()}>
-              팀 만들러 가기 →
+              팀 만들러 가기
             </Button>
           </div>
-        </main>
+        </PageShell>
       </>
     );
   }
@@ -192,18 +192,39 @@ export default function TestPage() {
   return (
     <>
       <AppHeader step={1} totalSteps={3} />
-      <main className="py-10 px-4 bg-white min-h-screen">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-black text-ink tracking-[-0.5px]">나의 과팅 스타일은?</h1>
-          <p className="text-sm text-muted mt-1">상황을 읽고 솔직하게 골라주세요</p>
+      <PageShell key={currentIdx} className="pt-6">
+        <div className="flex gap-1">
+          {questions.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1 flex-1 rounded-full ${
+                i <= currentIdx ? "bg-electric" : "bg-ink/10"
+              }`}
+            />
+          ))}
         </div>
-        <QuizCard
-          question={current}
-          current={currentIdx + 1}
-          total={questions.length}
-          onSelect={handleSelect}
-        />
-      </main>
+        <p className="mt-8 text-[10px] font-extrabold tracking-[3px] text-[#FF6A4E]">
+          ✦ QUESTION {String(currentIdx + 1).padStart(2, "0")}
+        </p>
+        <h1 className="mt-2 text-2xl font-black leading-[1.35] tracking-[-0.8px]">
+          {current.situation}
+        </h1>
+        <div className="mt-7 flex flex-col gap-3">
+          {current.choices.map((choice, i) => (
+            <Card
+              key={i}
+              pressable
+              onClick={() => handleSelect(choice.score)}
+              className="px-[18px] py-4"
+            >
+              <p className="text-sm font-bold leading-snug">{choice.text}</p>
+            </Card>
+          ))}
+        </div>
+        <p className="mt-auto pt-6 text-center text-[10px] font-semibold text-muted">
+          {currentIdx + 1} / {questions.length}
+        </p>
+      </PageShell>
     </>
   );
 }
