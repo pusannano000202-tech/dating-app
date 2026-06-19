@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppHeader } from "@/components/AppHeader";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { ChemiRing } from "@/components/ui/ChemiRing";
+import { LockIcon } from "@/components/ui/LockIcon";
+import { PageShell } from "@/components/ui/PageShell";
+import { TabBar } from "@/components/ui/TabBar";
+import { AuroraBlob } from "@/components/ui/AuroraBlob";
 import { loadTeam, saveMatchFlow } from "@/lib/storage";
 import { rankTeams } from "@/lib/matching";
 import { mockTeams } from "@/data/mockTeams";
@@ -49,11 +54,18 @@ export default function MatchResultPage() {
   if (!myTeam || !flow) {
     return (
       <>
-        <AppHeader />
-        <main className="py-20 px-4 text-center max-w-[480px] mx-auto">
-          <p className="text-body mb-6">팀 정보가 없어요. 팀을 먼저 만들어주세요.</p>
-          <Button onClick={() => router.push("/team/create")}>팀 만들러 가기</Button>
-        </main>
+        <PageShell withTabBar className="items-center justify-center text-center">
+          <p className="text-sm font-medium leading-relaxed text-muted">
+            팀 정보가 없어요.
+            <br />팀을 먼저 만들어주세요.
+          </p>
+          <div className="mt-6 w-full">
+            <Button fullWidth onClick={() => router.push("/team/create")}>
+              팀 만들러 가기
+            </Button>
+          </div>
+        </PageShell>
+        <TabBar />
       </>
     );
   }
@@ -62,62 +74,55 @@ export default function MatchResultPage() {
 
   return (
     <>
-      <AppHeader />
-      <main className="py-10 px-4 bg-white min-h-screen">
-        <div className="max-w-[480px] mx-auto flex flex-col items-center text-center gap-6">
-          {/* 축하 */}
-          <div>
-            <div className="text-[44px] mb-3">🎉</div>
-            <h1 className="text-2xl font-black text-ink tracking-[-0.5px] mb-1">매칭됐어요!</h1>
-            <p className="text-sm text-muted">딱 맞는 팀을 찾았어요</p>
-          </div>
+      <PageShell withTabBar className="items-center text-center">
+        <AuroraBlob className="-left-24 -top-16 h-56 w-56 bg-[#FF3D5A]/10" />
+        <p className="mt-5 text-[10px] font-extrabold tracking-[3.5px] text-[#FF6A4E]">
+          ✦ MATCH FOUND
+        </p>
+        <div className="mt-5">
+          <ChemiRing score={flow.score} />
+        </div>
+        <h1 className="mt-5 text-[21px] font-black tracking-[-0.6px]">매칭됐어요!</h1>
+        <p className="mt-1 text-sm font-medium text-muted">딱 맞는 팀을 찾았어요</p>
 
-          {/* 점수 링 */}
-          <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary-soft to-[#ffe4ed] border-[3px] border-primary-disabled flex flex-col items-center justify-center shadow-[0_6px_24px_rgba(255,90,111,0.15)]">
-            <span className="text-3xl font-black text-primary leading-none tracking-[-1px]">{flow.score}%</span>
-            <span className="text-[10px] font-bold text-primary mt-0.5">궁합 점수</span>
-          </div>
+        <div className="mt-6 flex w-full flex-col gap-2.5 text-left">
+          <Card className="flex items-center justify-between p-4">
+            <span className="text-[10px] font-extrabold tracking-[2px] text-muted">학과</span>
+            <span className="text-sm font-extrabold text-ink">경영학과</span>
+          </Card>
+          <Card className="flex items-center justify-between p-4">
+            <span className="text-[10px] font-extrabold tracking-[2px] text-muted">나이대</span>
+            <span className="text-sm font-extrabold text-ink">{matchedTeam.ageRange}세</span>
+          </Card>
+          <Card className="flex items-center justify-between p-4">
+            <span className="text-[10px] font-extrabold tracking-[2px] text-muted">성별 구성</span>
+            <span className="flex gap-1.5">
+              <span className="rounded-full border border-[#FF9D7E] bg-[#FFF0EA] px-2 py-0.5 text-[11px] font-bold text-[#E5402E]">
+                여 {matchedTeam.femaleCount}명
+              </span>
+              <span className="rounded-full border border-line bg-[#F7F4EE] px-2 py-0.5 text-[11px] font-bold text-[#6E675C]">
+                남 {matchedTeam.maleCount}명
+              </span>
+            </span>
+          </Card>
+        </div>
 
-          {/* 즉시 공개 */}
-          <div className="w-full">
-            <p className="text-xs font-bold text-muted uppercase tracking-wide mb-3">상대팀 기본 정보</p>
-            <div className="flex flex-col gap-2">
-              {[
-                { icon: "🎓", label: "학과", value: "경영학과" },
-                { icon: "🎂", label: "나이대", value: `${matchedTeam.ageRange}세` },
-              ].map(({ icon, label, value }) => (
-                <div key={label} className="bg-surface-soft rounded-[12px] px-4 py-3 flex items-center gap-3 text-left">
-                  <span className="text-lg w-6 text-center">{icon}</span>
-                  <div>
-                    <div className="text-[10px] font-bold text-muted uppercase tracking-wide">{label}</div>
-                    <div className="text-sm font-black text-ink">{value}</div>
-                  </div>
-                </div>
-              ))}
-              <div className="bg-surface-soft rounded-[12px] px-4 py-3 flex items-center gap-3 text-left">
-                <span className="text-lg w-6 text-center">👥</span>
-                <div>
-                  <div className="text-[10px] font-bold text-muted uppercase tracking-wide">성별 구성</div>
-                  <div className="flex gap-1.5 mt-1">
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-primary-soft text-primary border border-primary-disabled">여 {matchedTeam.femaleCount}명</span>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f0f5ff] text-[#4f9eff] border border-[#cce0ff]">남 {matchedTeam.maleCount}명</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <Card className="mt-3 w-full p-4 text-left">
+          <p className="flex items-center gap-1.5 text-sm font-extrabold text-ink">
+            <LockIcon /> 상대팀 이름은 아직 비공개예요
+          </p>
+          <p className="mt-1 text-xs font-medium leading-relaxed text-muted">
+            날짜를 정하고, 만남 전까지 하루씩 Q&A로 알아가요
+          </p>
+        </Card>
 
-          {/* 잠금 힌트 */}
-          <div className="w-full bg-surface-soft rounded-[12px] p-4 text-sm text-muted text-left leading-relaxed">
-            <span className="font-bold text-ink">🔒 상대팀 이름은 아직 비공개예요</span><br />
-            날짜를 정하고, 만남 전까지 하루씩 Q&A로 알아가요!
-          </div>
-
-          <Button fullWidth onClick={() => router.push("/match/schedule")}>
-            만날 날짜 정하러 가기 →
+        <div className="mt-auto w-full pt-6">
+          <Button variant="electric" fullWidth onClick={() => router.push("/match/schedule")}>
+            만날 날짜 정하러 가기
           </Button>
         </div>
-      </main>
+      </PageShell>
+      <TabBar />
     </>
   );
 }
