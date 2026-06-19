@@ -64,7 +64,7 @@ export function SchoolVerifyBadge() {
 
   if (verification) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-sky-ink bg-sky border border-[#cfe6fb] rounded-full px-2.5 py-1">
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#1F6FB2] bg-[#EAF5FF] border border-[#cfe6fb] rounded-full px-2.5 py-1">
         🎓 부산대 재학생 인증 완료
         <span className="text-[9px] font-medium text-muted">{verification.emailMasked}</span>
       </span>
@@ -76,7 +76,7 @@ export function SchoolVerifyBadge() {
       <button
         type="button"
         onClick={openForm}
-        className="text-[11px] font-bold text-sky-ink bg-sky border border-[#cfe6fb] rounded-full px-3 py-1.5 hover:bg-[#dcedfd] transition-colors"
+        className="text-[11px] font-bold text-[#1F6FB2] bg-[#EAF5FF] border border-[#cfe6fb] rounded-full px-3 py-1.5 hover:bg-[#dcedfd] transition-colors"
       >
         🎓 학교 메일로 인증하고 신뢰도 올리기
       </button>
@@ -84,7 +84,7 @@ export function SchoolVerifyBadge() {
   }
 
   return (
-    <div className="bg-sky border border-[#cfe6fb] rounded-[12px] p-4 max-w-[360px] flex flex-col gap-3">
+    <div className="bg-[#EAF5FF] border border-[#cfe6fb] rounded-[12px] p-4 max-w-[360px] flex flex-col gap-3">
       <div>
         <p className="text-xs font-bold text-ink mb-0.5">부산대 재학생 인증</p>
         <p className="text-[11px] text-muted">
@@ -98,7 +98,7 @@ export function SchoolVerifyBadge() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={`example@${SCHOOL_EMAIL_DOMAIN}`}
-            className="h-10 px-3 rounded-[10px] border border-hairline-soft bg-white text-sm text-ink focus:outline-none focus:border-primary"
+            className="h-10 px-3 rounded-[10px] border border-line bg-white text-sm text-ink focus:outline-none focus:border-[#FF4D3D]"
           />
           {error && <p className="text-[11px] text-[#c0392b]">{error}</p>}
           <div className="flex gap-2">
@@ -106,7 +106,7 @@ export function SchoolVerifyBadge() {
               type="button"
               onClick={handleSendCode}
               disabled={loading || !email.trim()}
-              className="flex-1 h-9 rounded-full bg-gradient-to-r from-primary to-[#ff7e5f] text-white text-xs font-bold disabled:opacity-40"
+              className="flex-1 h-9 rounded-full bg-gradient-to-r from-[#FF4D3D] to-[#ff7e5f] text-white text-xs font-bold disabled:opacity-40"
             >
               {loading ? "전송 중…" : "인증코드 받기"}
             </button>
@@ -129,7 +129,7 @@ export function SchoolVerifyBadge() {
             onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
             placeholder="123456"
             inputMode="numeric"
-            className="h-10 px-3 rounded-[10px] border border-hairline-soft bg-white text-sm text-ink tracking-[6px] text-center focus:outline-none focus:border-primary"
+            className="h-10 px-3 rounded-[10px] border border-line bg-white text-sm text-ink tracking-[6px] text-center focus:outline-none focus:border-[#FF4D3D]"
           />
           {error && <p className="text-[11px] text-[#c0392b]">{error}</p>}
           <div className="flex gap-2">
@@ -137,7 +137,7 @@ export function SchoolVerifyBadge() {
               type="button"
               onClick={handleVerify}
               disabled={loading || code.length < 6}
-              className="flex-1 h-9 rounded-full bg-gradient-to-r from-primary to-[#ff7e5f] text-white text-xs font-bold disabled:opacity-40"
+              className="flex-1 h-9 rounded-full bg-gradient-to-r from-[#FF4D3D] to-[#ff7e5f] text-white text-xs font-bold disabled:opacity-40"
             >
               {loading ? "확인 중…" : "인증 완료하기"}
             </button>
