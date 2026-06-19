@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/Button";
+import { PageShell } from "@/components/ui/PageShell";
 import { loadMatchFlow, saveMatchFlow } from "@/lib/storage";
 import { getEarliestIntersection } from "@/lib/schedule";
 
@@ -87,34 +88,41 @@ export default function SchedulePage() {
     return (
       <>
         <AppHeader />
-        <main className="py-10 px-4 bg-white min-h-screen">
-          <div className="max-w-[480px] mx-auto">
-            <h1 className="text-2xl font-black text-ink tracking-[-0.5px] mb-1">가능한 시간을 골라주세요</h1>
-            <p className="text-xs text-muted mb-8">두 팀이 겹치는 가장 빠른 시간으로 자동 확정돼요</p>
-            <div className="grid grid-cols-3 gap-3 mb-8">
-              {TIME_SLOTS.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => toggleTime(t)}
-                  className={`py-3 rounded-[12px] text-sm font-bold border-[1.5px] transition-all ${
-                    selectedTimes.includes(t)
-                      ? "bg-gradient-to-br from-primary to-[#ff7e5f] text-white border-primary shadow-btn-primary"
-                      : "border-hairline text-muted hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  오후 {parseInt(t) - 12 > 0 ? parseInt(t) - 12 : parseInt(t)}시
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-muted text-center mb-6">
-              {selectedTimes.length}개 선택됨
-            </p>
+        <PageShell className="pt-7">
+          <p className="text-[10px] font-extrabold tracking-[3px] text-[#FF6A4E]">✦ SCHEDULE</p>
+          <h1 className="mt-2 text-2xl font-black leading-[1.3] tracking-[-0.8px]">
+            가능한 시간을
+            <br />
+            골라주세요
+          </h1>
+          <p className="mt-2 text-xs font-medium text-muted">
+            두 팀이 겹치는 가장 빠른 시간으로 자동 확정돼요
+          </p>
+          <div className="mt-7 grid grid-cols-3 gap-2.5">
+            {TIME_SLOTS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => toggleTime(t)}
+                className={`rounded-btn border-[1.5px] py-3.5 text-sm font-bold transition-all active:scale-[0.97] ${
+                  selectedTimes.includes(t)
+                    ? "border-transparent bg-electric text-white shadow-glow"
+                    : "border-line bg-white text-muted"
+                }`}
+              >
+                오후 {parseInt(t) - 12 > 0 ? parseInt(t) - 12 : parseInt(t)}시
+              </button>
+            ))}
+          </div>
+          <p className="mt-5 text-center text-[10px] font-semibold text-muted">
+            {selectedTimes.length}개 선택됨
+          </p>
+          <div className="mt-auto pt-6">
             <Button fullWidth disabled={selectedTimes.length === 0} onClick={handleConfirm}>
-              확정하기 →
+              확정하기
             </Button>
           </div>
-        </main>
+        </PageShell>
       </>
     );
   }
@@ -122,49 +130,56 @@ export default function SchedulePage() {
   return (
     <>
       <AppHeader />
-      <main className="py-10 px-4 bg-white min-h-screen">
-        <div className="max-w-[480px] mx-auto">
-          <h1 className="text-2xl font-black text-ink tracking-[-0.5px] mb-1">가능한 날짜를 골라주세요</h1>
-          <p className="text-xs text-muted mb-6">
-            한 달 내 가능한 날 모두 선택해주세요.<br />
-            <span className="text-primary font-bold">●</span> 상대팀도 가능한 날이에요
-          </p>
-          <div className="grid grid-cols-4 gap-2 mb-8">
-            {calendarDays.map((d) => {
-              const isMine = selectedDates.includes(d);
-              const isBoth = isMine && MOCK_THEIR_DATES.includes(d);
-              const isTheirOnly = !isMine && MOCK_THEIR_DATES.includes(d);
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => toggleDate(d)}
-                  className={`py-2.5 rounded-[10px] text-xs font-bold border-[1.5px] transition-all relative ${
-                    isBoth
-                      ? "bg-gradient-to-br from-primary to-[#ff7e5f] text-white border-primary shadow-btn-primary"
-                      : isMine
-                      ? "bg-primary-soft text-primary border-primary-disabled"
-                      : isTheirOnly
-                      ? "border-primary-disabled text-primary bg-white"
-                      : "border-hairline text-muted"
-                  }`}
-                >
-                  {formatDateLabel(d)}
-                  {isTheirOnly && (
-                    <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-primary rounded-full" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-[10px] text-muted text-center mb-6">
-            {selectedDates.length}개 선택됨 · 겹치는 날 {selectedDates.filter((d) => MOCK_THEIR_DATES.includes(d)).length}개
-          </p>
+      <PageShell className="pt-7">
+        <p className="text-[10px] font-extrabold tracking-[3px] text-[#FF6A4E]">✦ SCHEDULE</p>
+        <h1 className="mt-2 text-2xl font-black leading-[1.3] tracking-[-0.8px]">
+          가능한 날짜를
+          <br />
+          골라주세요
+        </h1>
+        <p className="mt-2 text-xs font-medium leading-relaxed text-muted">
+          한 달 내 가능한 날을 모두 선택해주세요.
+          <br />
+          <span className="font-bold text-[#E5402E]">●</span> 상대팀도 가능한 날이에요
+        </p>
+        <div className="mt-6 grid grid-cols-4 gap-2">
+          {calendarDays.map((d) => {
+            const isMine = selectedDates.includes(d);
+            const isBoth = isMine && MOCK_THEIR_DATES.includes(d);
+            const isTheirOnly = !isMine && MOCK_THEIR_DATES.includes(d);
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => toggleDate(d)}
+                className={`relative rounded-[12px] border-[1.5px] py-2.5 text-xs font-bold transition-all active:scale-[0.95] ${
+                  isBoth
+                    ? "border-transparent bg-electric text-white shadow-glow"
+                    : isMine
+                    ? "border-[#FF9D7E] bg-[#FFF0EA] text-[#E5402E]"
+                    : isTheirOnly
+                    ? "border-line bg-white text-ink"
+                    : "border-line bg-white text-muted"
+                }`}
+              >
+                {formatDateLabel(d)}
+                {isTheirOnly && (
+                  <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#FF7A3D]" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-5 text-center text-[10px] font-semibold text-muted">
+          {selectedDates.length}개 선택됨 · 겹치는 날{" "}
+          {selectedDates.filter((d) => MOCK_THEIR_DATES.includes(d)).length}개
+        </p>
+        <div className="mt-auto pt-6">
           <Button fullWidth disabled={selectedDates.length === 0} onClick={handleDateNext}>
-            다음 — 시간 선택 →
+            다음 — 시간 선택
           </Button>
         </div>
-      </main>
+      </PageShell>
     </>
   );
 }
