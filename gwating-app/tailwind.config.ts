@@ -18,25 +18,6 @@ const config: Config = {
         "electric-from": "#FF3D5A",
         "electric-to": "#FF7A3D",
         lilac: "#C9B8FF",
-        // ── legacy: Plan 2에서 구 페이지 마이그레이션 후 제거 ──
-        primary: "#ff5a6f",
-        "primary-active": "#e6475d",
-        "primary-soft": "#fff0f2",
-        "primary-disabled": "#ffd6dd",
-        canvas: "#ffffff",
-        "canvas-warm": "#fffaf7",
-        "surface-soft": "#f7f7f7",
-        body: "#3f3f3f",
-        hairline: "#dddddd",
-        "hairline-soft": "#ebebeb",
-        mint: "#dff8ec",
-        "mint-ink": "#147a55",
-        lavender: "#f0eaff",
-        "lavender-ink": "#5b3ab8",
-        sky: "#eaf5ff",
-        "sky-ink": "#1f6fb2",
-        amber: "#fff3d8",
-        "amber-ink": "#9a6700",
       },
       backgroundImage: {
         electric: "linear-gradient(120deg,#FF3D5A,#FF7A3D)",
@@ -62,7 +43,6 @@ const config: Config = {
         pressed: "0 6px 12px rgba(27,25,22,0.18)",
         frame:
           "0 0 0 10px #2A2520, 0 0 0 11px #45403A, 0 44px 90px rgba(0,0,0,0.65)",
-        "btn-primary": "0 4px 18px rgba(255,90,111,0.28)", // legacy
       },
       fontSize: {
         hero: ["32px", { lineHeight: "1.18", fontWeight: "700" }],
