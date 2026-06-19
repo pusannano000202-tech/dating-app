@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AppHeader } from "@/components/AppHeader";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { loadTeam, loadMatchFlow } from "@/lib/storage";
 
@@ -108,79 +107,81 @@ export default function ChatPage() {
   }
 
   return (
-    <>
-      <AppHeader />
-      <div className="flex flex-col h-[calc(100vh-44px)] bg-white max-w-[560px] mx-auto">
-        {/* 채팅 헤더 */}
-        <div className="px-4 py-3 bg-surface-soft border-b border-hairline-soft flex items-center gap-3">
-          <div className="flex">
-            <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-primary to-[#ff7e5f] flex items-center justify-center text-xs">👑</div>
-            <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-[#7c5cbf] to-[#a07ee8] flex items-center justify-center text-xs -ml-1.5 border-2 border-white">👑</div>
+    <div className="flex h-full flex-col bg-[#F6F2EB]">
+      {/* 채팅 헤더 */}
+      <div className="flex items-center gap-3 border-b border-line bg-paper/85 px-5 py-3 backdrop-blur-xl">
+        <div className="flex-1">
+          <div className="text-[13px] font-extrabold tracking-[-0.3px] text-ink">팀장 채팅</div>
+          <div className="mt-0.5 text-[10px] font-semibold text-muted">
+            약속 조율용 · 오늘만 열려요
           </div>
-          <div className="flex-1">
-            <div className="text-xs font-black text-ink">팀장 채널</div>
-            <div className="text-[10px] text-muted">오늘만 열리는 채팅이에요</div>
-          </div>
-          <span className="text-[9px] bg-mint text-mint-ink border border-[#bdebd3] rounded-full px-2 py-0.5 font-bold">
-            live
-          </span>
         </div>
-
-        {/* 메시지 목록 */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
-          {error && (
-            <div className="text-[11px] text-center text-[#c0392b] bg-[#fdecea] rounded-[10px] px-3 py-2">
-              {error}
-            </div>
-          )}
-          {ready && !error && messages.length === 0 && (
-            <div className="text-[11px] text-center text-muted py-6">
-              아직 메시지가 없어요. 먼저 인사를 건네보세요 👋
-            </div>
-          )}
-          {messages.map((m) => {
-            const isMe = m.sender === myName;
-            return (
-              <div key={m.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-0.5`}>
-                  {!isMe && <span className="text-[9px] text-muted px-1">{m.sender}</span>}
-                  <div
-                    className={`px-3 py-2 rounded-[12px] text-sm leading-snug ${
-                      isMe
-                        ? "bg-gradient-to-r from-primary to-[#ff7e5f] text-white rounded-br-[4px]"
-                        : "bg-surface-soft text-ink rounded-bl-[4px]"
-                    }`}
-                  >
-                    {m.body}
-                  </div>
-                  <span className="text-[9px] text-muted">{formatTime(m.created_at)}</span>
-                </div>
-              </div>
-            );
-          })}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* 입력창 */}
-        <div className="px-4 py-3 border-t border-hairline-soft flex gap-2 items-center">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="메시지 입력…"
-            disabled={!isSupabaseConfigured}
-            className="flex-1 bg-surface-soft rounded-full px-4 py-2 text-sm text-ink focus:outline-none disabled:opacity-50"
-          />
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={!isSupabaseConfigured || !input.trim()}
-            className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-[#ff7e5f] flex items-center justify-center text-white text-sm font-bold shadow-btn-primary disabled:opacity-40"
-          >
-            ↑
-          </button>
-        </div>
+        <span className="rounded-full bg-electric px-2.5 py-1 text-[9px] font-extrabold tracking-[1px] text-white">
+          LIVE
+        </span>
       </div>
-    </>
+
+      {/* 메시지 목록 */}
+      <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto px-4 py-4">
+        {error && (
+          <div className="rounded-xl border border-[#E5402E]/25 bg-[#FFF0EA] px-3 py-2 text-center text-[11px] font-semibold text-[#C0392B]">
+            {error}
+          </div>
+        )}
+        {ready && !error && messages.length === 0 && (
+          <div className="py-6 text-center text-[11px] font-medium text-muted">
+            아직 메시지가 없어요. 먼저 인사를 건네보세요
+          </div>
+        )}
+        {messages.map((m) => {
+          const isMe = m.sender === myName;
+          return (
+            <div key={m.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+              <div className={`flex max-w-[78%] flex-col gap-0.5 ${isMe ? "items-end" : "items-start"}`}>
+                {!isMe && (
+                  <span className="px-1.5 text-[9px] font-bold text-muted">{m.sender}</span>
+                )}
+                <div
+                  className={`px-3.5 py-2.5 text-sm font-medium leading-snug ${
+                    isMe
+                      ? "rounded-[18px] rounded-br-[6px] bg-electric text-white shadow-[0_8px_18px_rgba(255,77,61,0.25)]"
+                      : "rounded-[18px] rounded-bl-[6px] border border-line bg-white text-[#2B2722]"
+                  }`}
+                >
+                  {m.body}
+                </div>
+                <span className="px-1 text-[9px] font-medium text-muted">
+                  {formatTime(m.created_at)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* 입력창 */}
+      <div className="flex items-center gap-2.5 border-t border-line bg-paper/85 px-4 py-3 backdrop-blur-xl">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          placeholder="메시지 입력…"
+          disabled={!isSupabaseConfigured}
+          className="h-11 flex-1 rounded-full border border-line bg-white px-4 text-sm text-ink focus:border-[#FF9D7E] focus:outline-none disabled:opacity-50"
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={!isSupabaseConfigured || !input.trim()}
+          aria-label="보내기"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-electric shadow-glow transition-transform active:scale-90 disabled:opacity-40"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 19V6M6 12l6-6 6 6" />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
 }
