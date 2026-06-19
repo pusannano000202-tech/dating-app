@@ -1,38 +1,35 @@
 import { TeamProfile, MemberRole } from "@/types/matching";
 import { MoodChip } from "./MoodChip";
+import { Avatar } from "./ui/Avatar";
+import { Card } from "./ui/Card";
 
-const ROLE_INFO: Record<MemberRole, { label: string; emoji: string }> = {
-  moodMaker:   { label: "분위기 메이커형", emoji: "🔥" },
-  coordinator: { label: "조율자형",         emoji: "🎯" },
-  considerate: { label: "배려형",           emoji: "🤍" },
-  reactor:     { label: "리액션형",         emoji: "✨" },
+const ROLE_LABELS: Record<MemberRole, string> = {
+  moodMaker: "분위기 메이커형",
+  coordinator: "조율자형",
+  considerate: "배려형",
+  reactor: "리액션형",
 };
 
 type Props = { team: TeamProfile };
 
 export function TeamProfileCard({ team }: Props) {
-  const initials = team.teamName.slice(0, 2);
-
   return (
-    <div className="bg-white rounded-card shadow-card p-5 max-w-[480px] w-full">
-      {/* 팀 아이덴티티 */}
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-primary to-[#ff7e5f] flex items-center justify-center text-lg font-black text-white shadow-[0_3px_10px_rgba(255,90,111,0.25)] shrink-0">
-          {initials}
-        </div>
+    <Card>
+      <div className="flex items-center gap-3">
+        <Avatar label={team.teamName.slice(0, 1)} className="h-12 w-12 text-base" />
         <div>
-          <h2 className="text-[18px] font-black text-ink tracking-[-0.4px]">{team.teamName}</h2>
-          <p className="text-xs text-muted mt-0.5">
+          <h2 className="text-lg font-extrabold tracking-[-0.4px]">{team.teamName}</h2>
+          <p className="mt-0.5 text-xs font-medium text-muted">
             {team.school} · {team.size}명 · {team.ageRange}세
           </p>
-          <div className="flex items-center gap-1.5 mt-1">
+          <div className="mt-1.5 flex items-center gap-1.5">
             {team.maleCount !== undefined && team.maleCount > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#f0f5ff] text-[#4f9eff] border border-[#cce0ff]">
+              <span className="rounded-full border border-line bg-[#F7F4EE] px-2 py-0.5 text-[10px] font-bold text-[#6E675C]">
                 남 {team.maleCount}
               </span>
             )}
             {team.femaleCount !== undefined && team.femaleCount > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary-soft text-primary border border-primary-disabled">
+              <span className="rounded-full border border-[#FF9D7E] bg-[#FFF0EA] px-2 py-0.5 text-[10px] font-bold text-[#E5402E]">
                 여 {team.femaleCount}
               </span>
             )}
@@ -40,39 +37,32 @@ export function TeamProfileCard({ team }: Props) {
         </div>
       </div>
 
-      {/* 분위기 */}
-      <div className="mb-4">
-        <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-2">원하는 분위기</p>
+      <div className="mt-5">
+        <p className="mb-2 text-[10px] font-extrabold tracking-[2px] text-muted">원하는 분위기</p>
         <MoodChip mood={team.mood} selected />
       </div>
 
-      {/* 팀원 */}
-      <div>
-        <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-2">팀원 구성</p>
+      <div className="mt-4">
+        <p className="mb-1 text-[10px] font-extrabold tracking-[2px] text-muted">팀원 구성</p>
         <div className="flex flex-col">
-          {team.members.map((m, i) => {
-            const info = ROLE_INFO[m.role];
-            return (
-              <div
-                key={i}
-                className="flex items-center justify-between py-2 border-b border-hairline-soft last:border-0"
-              >
-                <span className="text-sm font-semibold text-ink flex items-center gap-1.5">
-                  {m.nickname}
-                  {m.isLeader && (
-                    <span className="text-[10px] text-primary font-bold bg-primary-soft px-1.5 py-0.5 rounded-full">
-                      팀장
-                    </span>
-                  )}
-                </span>
-                <span className="text-xs text-muted">
-                  {info.emoji} {info.label}
-                </span>
-              </div>
-            );
-          })}
+          {team.members.map((m, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between border-b border-line py-2.5 last:border-0"
+            >
+              <span className="flex items-center gap-1.5 text-sm font-bold text-ink">
+                {m.nickname}
+                {m.isLeader && (
+                  <span className="rounded-full bg-electric px-1.5 py-0.5 text-[9px] font-bold text-white">
+                    팀장
+                  </span>
+                )}
+              </span>
+              <span className="text-xs font-medium text-muted">{ROLE_LABELS[m.role]}</span>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
