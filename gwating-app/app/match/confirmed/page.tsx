@@ -26,6 +26,14 @@ function formatDate(iso: string): string {
   return `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
 }
 
+function formatHour(time: string): string {
+  const h = parseInt(time, 10);
+  if (h === 0) return "오전 12시";
+  if (h < 12) return `오전 ${h}시`;
+  if (h === 12) return "오후 12시";
+  return `오후 ${h - 12}시`;
+}
+
 export default function ConfirmedPage() {
   const router = useRouter();
   const [flow, setFlow] = useState<MatchFlowState | null>(null);
@@ -64,7 +72,7 @@ export default function ConfirmedPage() {
       </div>
       <p className="mt-3 text-[15px] font-bold text-[#EDE9E2]">
         {formatDate(flow.schedule.confirmedDate)}
-        {flow.schedule.confirmedTime && ` · 오후 ${parseInt(flow.schedule.confirmedTime) - 12}시`}
+        {flow.schedule.confirmedTime && ` · ${formatHour(flow.schedule.confirmedTime)}`}
       </p>
 
       <Card variant="glass" className="mt-7 px-5 py-1">
@@ -76,7 +84,7 @@ export default function ConfirmedPage() {
           <div className="flex items-center justify-between border-b border-[#F2EEE7]/10 py-3.5 text-[13px]">
             <span className="font-semibold text-[#EDE9E2]/50">시간</span>
             <span className="font-extrabold">
-              오후 {parseInt(flow.schedule.confirmedTime) - 12}시
+              {formatHour(flow.schedule.confirmedTime)}
             </span>
           </div>
         )}

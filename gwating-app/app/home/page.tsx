@@ -21,7 +21,10 @@ export default function HomeDashboardPage() {
     const team = loadTeam();
     if (team?.teamName) setTeamName(team.teamName);
     if (team?.members?.length) {
-      setInitials(team.members.map((m) => m.nickname.slice(0, 1)));
+      const next = team.members
+        .map((m) => m.nickname.trim().slice(0, 1))
+        .filter(Boolean);
+      if (next.length) setInitials(next);
     }
   }, []);
 
@@ -35,7 +38,7 @@ export default function HomeDashboardPage() {
               오늘의 매칭
             </h1>
           </div>
-          <Avatar label={initials[0] ?? "부"} />
+          <Avatar label={initials[0] || "부"} />
         </div>
 
         <Card variant="dark" className="relative mt-5 overflow-hidden">
