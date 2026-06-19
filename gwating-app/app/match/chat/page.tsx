@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { loadTeam, loadMatchFlow } from "@/lib/storage";
@@ -109,7 +110,16 @@ export default function ChatPage() {
   return (
     <div className="flex h-full flex-col bg-[#F6F2EB]">
       {/* 채팅 헤더 */}
-      <div className="flex items-center gap-3 border-b border-line bg-paper/85 px-5 py-3 backdrop-blur-xl">
+      <div className="flex items-center gap-3 border-b border-line bg-paper/85 px-4 py-3 backdrop-blur-xl">
+        <Link
+          href="/home"
+          aria-label="홈으로"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-ink transition-transform active:scale-90"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </Link>
         <div className="flex-1">
           <div className="text-[13px] font-extrabold tracking-[-0.3px] text-ink">팀장 채팅</div>
           <div className="mt-0.5 text-[10px] font-semibold text-muted">
