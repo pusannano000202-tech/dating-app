@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageShell } from "@/components/ui/PageShell";
@@ -14,7 +13,6 @@ import { TeamProfile } from "@/types/matching";
 type ViewState = "question" | "waiting" | "revealed" | "history";
 
 export default function QAPage() {
-  const router = useRouter();
   const [flow, setFlow] = useState<MatchFlowState | null>(null);
   const [team, setTeam] = useState<TeamProfile | null>(null);
   const [view, setView] = useState<ViewState>("question");
