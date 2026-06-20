@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase-server'
 import { cancelPayment } from '@/lib/payments/toss'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: Request) {
   const { orderId, reason } = await req.json()
   if (!orderId || !orderId.startsWith('deposit_')) {

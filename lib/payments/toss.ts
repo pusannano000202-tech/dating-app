@@ -4,6 +4,7 @@ export interface TossPayment {
   status: string
   method?: string
   paymentKey?: string
+  totalAmount?: number
   [key: string]: unknown
 }
 

@@ -3,6 +3,8 @@ import { createServiceClient } from '@/lib/supabase-server'
 import { generateOrderId } from '@/lib/payments/orders'
 import { DEPOSIT_AMOUNT_KRW } from '@/lib/payments/config'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: Request) {
   const { match_id, group_id, payer_user_id } = await req.json()
   if (!match_id || !group_id || !payer_user_id) {

@@ -3,6 +3,8 @@ import { createServiceClient } from '@/lib/supabase-server'
 import { generateOrderId } from '@/lib/payments/orders'
 import { TIP_MIN_KRW, TIP_MAX_KRW } from '@/lib/payments/config'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: Request) {
   const { match_id, payer_user_id, amount } = await req.json()
   if (!match_id || !payer_user_id || typeof amount !== 'number') {
