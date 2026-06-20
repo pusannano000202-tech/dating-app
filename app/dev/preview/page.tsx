@@ -31,7 +31,7 @@ const previewLinks = [
   { href: '/profile/personality-preference', label: '성향 선호', detail: '상대 성향 선호', Icon: HeartHandshake },
   { href: '/profile/schedule', label: '가능 시간', detail: '만남 가능 시간대', Icon: CalendarClock },
   { href: '/profile/preferences', label: '매칭 비중', detail: '외모/성격/키/체형 가중치', Icon: SlidersHorizontal },
-  { href: '/friends', label: '친구 추가', detail: '친구 목록/초대', Icon: UsersRound },
+  { href: '/friends', label: '친구 초대', detail: '링크 초대/친구 목록', Icon: UsersRound },
   { href: '/group/create', label: '그룹 만들기', detail: '초대/준비/큐 진입', Icon: UsersRound },
   { href: '/group/create?from=home-queue', label: '큐 레이더', detail: '매칭 탐색 화면', Icon: Radar },
   { href: '/match', label: '매칭 결과', detail: '결과 목록', Icon: HeartHandshake },

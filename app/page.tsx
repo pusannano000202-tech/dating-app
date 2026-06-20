@@ -8,7 +8,6 @@ import {
   LockKeyhole,
   Search,
   Settings2,
-  ShieldCheck,
   Sparkles,
   UserPlus,
   UsersRound,
@@ -47,14 +46,6 @@ async function getOnboardingRedirect(
   supabase: ServerSupabaseClient,
   userId: string,
 ): Promise<string | null> {
-  const { data: appUser } = await supabase
-    .from('users')
-    .select('school_email_verified_at')
-    .eq('id', userId)
-    .maybeSingle()
-
-  if (!appUser?.school_email_verified_at) return '/profile/school'
-
   const { data: profile } = await supabase
     .from('profiles')
     .select('gender, appearance_type, big5_openness')
@@ -156,8 +147,8 @@ function HomeDashboard({ poolStats }: { poolStats: PoolStats }) {
         <section className="mb-5 grid grid-cols-2 gap-3">
           <HomeActionCard
             href="/friends"
-            title="친구 추가"
-            desc="같이 과팅할 친구를 먼저 모아요"
+            title="친구 초대"
+            desc="링크로 같이 과팅할 친구를 모아요"
             Icon={UserPlus}
           />
           <HomeActionCard

@@ -12,22 +12,18 @@ export function isSafeLocalRedirect(path: string | null | undefined): path is st
   return Boolean(path && path.startsWith('/') && !path.startsWith('//'))
 }
 
-export function requiresSchoolEmailForPath(path: string | null | undefined): boolean {
-  if (!isSafeLocalRedirect(path)) return false
-  return path.startsWith('/group') || path.startsWith('/match')
+export function requiresSchoolEmailForPath(_path: string | null | undefined): boolean {
+  return false
 }
 
 export function getPostLoginDestination({
-  schoolEmailVerifiedAt,
+  schoolEmailVerifiedAt: _schoolEmailVerifiedAt,
   requestedRedirect,
 }: {
   schoolEmailVerifiedAt: string | null | undefined
   requestedRedirect?: string | null
 }): string {
   if (isSafeLocalRedirect(requestedRedirect)) {
-    if (!schoolEmailVerifiedAt && requiresSchoolEmailForPath(requestedRedirect)) {
-      return `/profile/school?redirect=${encodeURIComponent(requestedRedirect)}`
-    }
     return requestedRedirect
   }
   return '/profile/basic'

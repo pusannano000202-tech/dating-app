@@ -28,13 +28,13 @@ export function FriendListPanel({
       {friends.length === 0 ? (
         <div className="rounded-2xl border border-boot-hairline bg-white/80 px-4 py-5">
           <p className="text-sm leading-relaxed text-boot-muted">
-            아직 등록된 친구가 없습니다. 친구를 먼저 추가해야 그룹을 꾸릴 수 있어요.
+            아직 등록된 친구가 없어도 괜찮아요. 위의 그룹 초대 링크를 보내면 친구가 로그인 후 바로 그룹에 들어올 수 있어요.
           </p>
           <Link
             href="/friends"
             className="mt-3 inline-block rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
           >
-            친구 추가하러 가기
+            친구 관리 보러가기
           </Link>
         </div>
       ) : (

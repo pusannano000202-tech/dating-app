@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation'
 
 const STEPS = [
-  { label: '학교인증', path: '/profile/school' },
   { label: '기본정보', path: '/profile/basic' },
   { label: '이상형', path: '/profile/worldcup' },
   { label: '성향', path: '/profile/survey' },

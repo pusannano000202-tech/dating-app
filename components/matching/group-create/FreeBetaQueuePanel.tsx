@@ -90,7 +90,7 @@ export function FreeBetaQueuePanel({
         : `친구 ${missingMembers}명이 더 들어와야 해요`,
       done: groupIsFull,
       href: '/friends',
-      cta: '친구 추가',
+      cta: '친구 초대',
     },
     {
       label: '그룹원 매칭 준비',
@@ -103,7 +103,7 @@ export function FreeBetaQueuePanel({
     },
     {
       label: '리더 큐 진입',
-      desc: isLeader ? '리더 권한으로 큐에 들어갈 수 있어요' : '리더만 큐 진입 버튼을 누를 수 있어요',
+      desc: isLeader ? '리더가 큐에 넣고 임시 매칭을 기다려요' : '리더만 큐 진입 버튼을 누를 수 있어요',
       done: isLeader,
     },
   ]
@@ -118,7 +118,7 @@ export function FreeBetaQueuePanel({
           <div>
             <h2 className="text-sm font-black">이번 주 매칭 큐</h2>
             <p className="text-xs text-boot-muted">
-              그룹 준비가 끝나면 무료 베타 참여 확인 후 큐에 들어갑니다.
+              그룹 준비가 끝나면 큐에 들어가고, 임시 매칭 후 카드와 참여 확인으로 확정합니다.
             </p>
           </div>
         </div>
@@ -217,7 +217,7 @@ export function FreeBetaQueuePanel({
             <Wallet size={16} className={myDepositPaid ? 'text-emerald-700' : 'text-amber-700'} />
             <div>
               <p className="text-xs font-bold">무료 베타 참여</p>
-              <p className="text-[11px] text-boot-muted">현재는 결제 없이 참여 가능합니다.</p>
+              <p className="text-[11px] text-boot-muted">큐 진입은 가능하고, 매칭 확정 전에는 모두 확인해야 해요.</p>
             </div>
           </div>
           {myDepositPaid ? (
@@ -289,7 +289,7 @@ export function FreeBetaQueuePanel({
       )}
       {canEnterQueue && !myDepositPaid && (
         <p className="mt-3 text-center text-xs text-amber-700/80">
-          무료 베타 참여 확인은 매칭 카드 작성 단계에서 한 번 더 확인됩니다.
+          큐 진입은 가능해요. 무료 참여 확인은 임시 매칭 후 확정 전에 반드시 끝내면 됩니다.
         </p>
       )}
       <p className="mt-2 text-center text-[10px] text-boot-muted">

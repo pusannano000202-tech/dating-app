@@ -27,11 +27,27 @@ export function InviteFriendPanel({
         <div>
           <h2 className="text-sm font-black">친구 초대하기</h2>
           <p className="mt-0.5 text-xs text-boot-muted">
-            전화번호나 초대 링크로 그룹 초대를 보냅니다.
+            링크를 복사해서 카카오톡이나 메시지로 보내는 방식이 가장 빠릅니다.
           </p>
         </div>
         <UserPlus size={18} className="text-boot-primary" />
       </div>
+
+      <button
+        type="button"
+        onClick={onCopyInviteLink}
+        disabled={saving}
+        className="mb-3 flex w-full items-center justify-between rounded-2xl border border-boot-primary/20 bg-boot-soft px-4 py-3 text-sm disabled:opacity-40"
+      >
+        <span className="flex items-center gap-2 font-black text-boot-primary">
+          <LinkIcon size={16} />
+          그룹 초대 링크 복사
+        </span>
+        <span className="flex items-center gap-1 text-xs font-bold text-boot-primary">
+          {copied ? '복사됨' : '복사'}
+          <Copy size={14} />
+        </span>
+      </button>
 
       <div className="flex gap-2">
         <input
@@ -50,22 +66,9 @@ export function InviteFriendPanel({
           <Send size={17} />
         </button>
       </div>
-
-      <button
-        type="button"
-        onClick={onCopyInviteLink}
-        disabled={saving}
-        className="mt-3 flex w-full items-center justify-between rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 text-sm disabled:opacity-40"
-      >
-        <span className="flex items-center gap-2 text-boot-body">
-          <LinkIcon size={16} className="text-boot-primary" />
-          초대 링크 복사
-        </span>
-        <span className="flex items-center gap-1 text-xs text-boot-muted">
-          {copied ? '복사됨' : '복사'}
-          <Copy size={14} />
-        </span>
-      </button>
+      <p className="mt-2 text-[11px] leading-4 text-boot-muted">
+        전화번호 초대는 이미 서로 번호를 알고 있을 때 보조로 사용합니다.
+      </p>
 
       {pendingInvites.length > 0 && (
         <div className="mt-3 space-y-2">

@@ -454,7 +454,7 @@ export default function GroupCreatePage() {
       case 'not_group_leader':   return '리더만 큐 진입/취소를 할 수 있어요.'
       case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
-      case 'deposit_not_paid':   return '모든 멤버의 무료 베타 참여가 확인되어야 큐에 들어갈 수 있어요.'
+      case 'deposit_not_paid':   return '매칭 확정 전에는 모든 멤버의 무료 베타 참여 확인이 필요해요.'
       case 'member_match_setup_incomplete':
         return '멤버의 성향 선호/가능 시간/매칭 비중 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
       case 'member_profile_lookup_failed':

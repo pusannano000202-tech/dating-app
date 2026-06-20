@@ -133,9 +133,9 @@ export default function HomeTodayTaskCard() {
     return {
       eyebrow: '시작하기',
       title: '친구와 그룹을 만들어볼까요?',
-      description: '같이 과팅할 친구를 먼저 모으고 매칭을 시작해요.',
+      description: '초대 링크로 친구를 모으고 매칭을 시작해요.',
       href: '/friends',
-      cta: '친구 추가',
+      cta: '친구 초대',
       Icon: UserPlus,
       tone: 'neutral' as const,
     }

@@ -23,13 +23,13 @@ test('getPostLoginDestination does not require school verification for basic onb
   assert.equal(getPostLoginDestination({ schoolEmailVerifiedAt: '2026-05-23T00:00:00Z' }), '/profile/basic')
 })
 
-test('getPostLoginDestination sends unverified users to school verification only for group blind date redirects', () => {
+test('getPostLoginDestination keeps safe redirects without school verification gate', () => {
   assert.equal(
     getPostLoginDestination({
       schoolEmailVerifiedAt: null,
       requestedRedirect: '/group/create',
     }),
-    '/profile/school?redirect=%2Fgroup%2Fcreate'
+    '/group/create'
   )
   assert.equal(
     getPostLoginDestination({
