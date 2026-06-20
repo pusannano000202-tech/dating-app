@@ -22,8 +22,9 @@ export default function DebateChoiceCard({
     <button
       type="button"
       onClick={onSelect}
+      aria-pressed={selected}
       className={[
-        'group overflow-hidden rounded-3xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
+        'group overflow-hidden rounded-3xl border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-boot-primary/12',
         selected
           ? 'border-boot-primary/65 ring-4 ring-boot-primary/10'
           : 'border-boot-hairline hover:border-boot-primary/30',
@@ -46,6 +47,11 @@ export default function DebateChoiceCard({
         {selected && (
           <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-xl bg-white text-boot-primary shadow-sm">
             <CheckCircle2 size={17} />
+          </span>
+        )}
+        {selected && (
+          <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-black text-boot-primary shadow-sm">
+            선택됨
           </span>
         )}
         <span className={[

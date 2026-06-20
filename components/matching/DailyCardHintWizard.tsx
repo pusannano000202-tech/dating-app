@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { CheckCircle2, ChevronLeft, ChevronRight, Film, MapPin, Music2, Save, Sparkles } from 'lucide-react'
+import { CheckCircle2, ChevronLeft, ChevronRight, ExternalLink, Film, MapPin, Music2, Save, Sparkles } from 'lucide-react'
 import DebateChoiceCard from '@/components/matching/DebateChoiceCard'
 import {
   countCompletedDailyCardDebateAnswers,
@@ -51,14 +51,17 @@ const PNU_RESTAURANT_SUGGESTIONS = [
   {
     name: '톤쇼우',
     hint: '돈카츠',
+    mood: '든든한 첫 만남',
   },
   {
     name: '겐쇼심야라멘',
     hint: '라멘',
+    mood: '편한 저녁 약속',
   },
   {
     name: '모모스커피',
     hint: '카페',
+    mood: '가볍게 대화 시작',
   },
 ]
 
@@ -126,9 +129,27 @@ export default function DailyCardHintWizard({
     onTextChange('songs', encodeDailyCardSongs(nextSongs))
   }
 
+  function goToNextIncomplete() {
+    const nextIndex = DAILY_CARD_FIELDS.findIndex((item) => !isFieldComplete(item.id))
+    if (nextIndex < 0) return
+    setActiveIndex(nextIndex)
+    setActiveDebateIndex(0)
+  }
+
+  function handleDebateChoiceSelect(value: string) {
+    if (!activePrompt) return
+    onDebateAnswer(activePrompt.id, value)
+    if (canGoNextDebate) {
+      setActiveDebateIndex((index) => Math.min(prompts.length - 1, index + 1))
+    }
+  }
+
   function buildRestaurantMapUrl(restaurant: string): string {
     return `https://map.naver.com/p/search/${encodeURIComponent(`부산대 ${restaurant.trim()}`)}`
   }
+
+  const nextIncompleteIndex = DAILY_CARD_FIELDS.findIndex((item) => !isFieldComplete(item.id))
+  const nextIncompleteField = nextIncompleteIndex >= 0 ? DAILY_CARD_FIELDS[nextIncompleteIndex] : null
 
   return (
     <div className="overflow-hidden rounded-[30px] border border-boot-hairline bg-white/95 shadow-sm">
@@ -171,6 +192,28 @@ export default function DailyCardHintWizard({
             className="h-full rounded-full bg-boot-primary transition-all"
             style={{ width: `${progressPercent}%` }}
           />
+        </div>
+      </div>
+
+      <div className="mb-4 rounded-2xl border border-boot-hairline bg-white/80 px-3 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black text-boot-primary">
+              {nextIncompleteField ? '다음 작성할 카드' : '모든 카드 작성 완료'}
+            </p>
+            <p className="mt-0.5 truncate text-xs font-bold text-boot-ink">
+              {nextIncompleteField ? nextIncompleteField.title : '이제 저장하고 참여 확인으로 넘어가면 돼요'}
+            </p>
+          </div>
+          {nextIncompleteField && nextIncompleteIndex !== activeIndex && (
+            <button
+              type="button"
+              onClick={goToNextIncomplete}
+              className="flex-shrink-0 rounded-xl border border-boot-primary/20 bg-boot-soft px-3 py-2 text-[11px] font-black text-boot-primary"
+            >
+              바로가기
+            </button>
+          )}
         </div>
       </div>
 
@@ -225,7 +268,7 @@ export default function DailyCardHintWizard({
                 description={choice.description}
                 imageSrc={debateImageMap[activePrompt.id]?.[choiceIndex] ?? '/daily-cards/debate/tangsuyuk-dip.png'}
                 selected={debateAnswers[activePrompt.id] === choice.value}
-                onSelect={() => onDebateAnswer(activePrompt.id, choice.value)}
+                onSelect={() => handleDebateChoiceSelect(choice.value)}
               />
             ))}
           </div>
@@ -308,6 +351,13 @@ export default function DailyCardHintWizard({
             />
           </label>
 
+          <div className="rounded-2xl border border-boot-primary/15 bg-boot-soft px-3 py-3">
+            <p className="text-[11px] font-black text-boot-primary">부산대 근처 예시 3곳</p>
+            <p className="mt-0.5 text-[11px] leading-4 text-boot-muted">
+              직접 입력해도 되고, 아래에서 하나 골라도 돼요. 상대가 카드를 열면 지도 검색으로 이어집니다.
+            </p>
+          </div>
+
           <div className="grid grid-cols-3 gap-2">
             {PNU_RESTAURANT_SUGGESTIONS.map((restaurant) => {
               const selected = value.trim() === restaurant.name
@@ -325,6 +375,9 @@ export default function DailyCardHintWizard({
                 >
                   <span className="block text-xs font-black">{restaurant.name}</span>
                   <span className="mt-0.5 block text-[10px] text-boot-muted">{restaurant.hint}</span>
+                  <span className="mt-2 block rounded-full bg-white/75 px-2 py-1 text-center text-[9px] font-bold text-boot-muted">
+                    {restaurant.mood}
+                  </span>
                 </button>
               )
             })}
@@ -339,9 +392,10 @@ export default function DailyCardHintWizard({
                   href={buildRestaurantMapUrl(value)}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-black text-boot-primary underline underline-offset-2"
+                  className="inline-flex items-center gap-1 font-black text-boot-primary underline underline-offset-2"
                 >
                   네이버지도에서 미리 보기
+                  <ExternalLink size={11} />
                 </a>
               </p>
             ) : (

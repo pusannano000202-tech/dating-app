@@ -1,4 +1,5 @@
 import type { DepositSummary, GroupState, QueueVisualState } from './types'
+import { EMPTY_MATCH_SETUP_STATUS } from '../../../lib/matching/match-setup-status'
 
 export const EMPTY_STATE: GroupState = {
   group: null,
@@ -56,6 +57,7 @@ export const DEV_GROUP_STATE: GroupState = {
     },
   ],
   current_user_id: 'dev-user-1',
+  current_user_match_setup: EMPTY_MATCH_SETUP_STATUS,
 }
 
 export const DEV_QUEUE_VISUAL: QueueVisualState = {

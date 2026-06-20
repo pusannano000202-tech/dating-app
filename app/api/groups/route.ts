@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  EMPTY_MATCH_SETUP_STATUS,
+  getMatchSetupStatus,
+  type MatchSetupProfile,
+  type MatchSetupStatus,
+} from '@/lib/matching/match-setup-status'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
@@ -46,11 +52,8 @@ interface FriendSummary {
   group_status: FriendGroupStatus
 }
 
-interface ProfileMatchSetupSummary {
+interface ProfileMatchSetupSummary extends MatchSetupProfile {
   user_id: string
-  personality_preference_completed_at: string | null
-  available_timeslots: { slots?: unknown[] } | null
-  preference_weights: Record<string, unknown> | null
 }
 
 export async function GET() {
@@ -151,6 +154,7 @@ async function loadGroupState(
     members,
     invites,
     friends,
+    current_user_match_setup: await loadCurrentUserMatchSetup(supabase, userId),
   }
 }
 
@@ -194,7 +198,9 @@ async function loadMembers(
     .in('user_id', members.map((member) => member.user_id))
 
   const readySet = new Set<string>(
-    ((profiles ?? []) as ProfileMatchSetupSummary[]).filter(isMatchSetupComplete).map((row) => row.user_id)
+    ((profiles ?? []) as ProfileMatchSetupSummary[])
+      .filter((row) => getMatchSetupStatus(row).allDone)
+      .map((row) => row.user_id)
   )
 
   return members.map((member) => ({
@@ -203,16 +209,18 @@ async function loadMembers(
   }))
 }
 
-function hasSlots(payload: { slots?: unknown[] } | null): boolean {
-  return Boolean(payload && typeof payload === 'object' && Array.isArray(payload.slots) && payload.slots.length > 0)
-}
+async function loadCurrentUserMatchSetup(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  userId: string,
+): Promise<MatchSetupStatus> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('personality_preference_completed_at, available_timeslots, preference_weights')
+    .eq('user_id', userId)
+    .maybeSingle()
 
-function isMatchSetupComplete(profile: ProfileMatchSetupSummary): boolean {
-  return Boolean(
-    profile.personality_preference_completed_at &&
-      hasSlots(profile.available_timeslots) &&
-      profile.preference_weights != null
-  )
+  if (error) return EMPTY_MATCH_SETUP_STATUS
+  return getMatchSetupStatus((data as MatchSetupProfile | null) ?? null)
 }
 
 async function loadInvites(

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { CalendarCheck2, ChevronRight, Loader2, Search, Sparkles, UserPlus, UsersRound } from 'lucide-react'
-import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 
@@ -38,7 +38,7 @@ const DEV_MATCHES: MatchRow[] = [
 ]
 
 export default function HomeTodayTaskCard() {
-  const isDevPreview = isDevAuthBypassEnabled()
+  const isDevPreview = isDevPreviewClientSession()
   const [loading, setLoading] = useState(true)
   const [groupStatus, setGroupStatus] = useState<GroupStatus | null>(null)
   const [matches, setMatches] = useState<MatchRow[]>([])

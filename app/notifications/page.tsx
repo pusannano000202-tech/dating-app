@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Bell, CheckCheck, ChevronLeft, Heart, Loader2, MessageSquareText, PartyPopper, Phone, Users } from 'lucide-react'
-import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 
 interface NotificationRow {
   id: string
@@ -46,7 +46,7 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
 ]
 
 export default function NotificationsPage() {
-  const isDevPreview = isDevAuthBypassEnabled()
+  const isDevPreview = isDevPreviewClientSession()
   const [items, setItems] = useState<NotificationRow[]>([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)

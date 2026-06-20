@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { CalendarClock, ChevronLeft, ChevronRight, Loader2, Sparkles, Users } from 'lucide-react'
-import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import NotificationBell from '@/components/NotificationBell'
 
 interface MatchRow {
@@ -47,7 +47,7 @@ const DEV_MATCHES: MatchRow[] = [
 ]
 
 export default function MatchesPage() {
-  const isDevPreview = isDevAuthBypassEnabled()
+  const isDevPreview = isDevPreviewClientSession()
   const [matches, setMatches] = useState<MatchRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -89,7 +89,7 @@ export default function MatchesPage() {
     <main className="min-h-screen booting-band px-5 pb-28 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-6 sm:max-w-md">
         <header className="mb-5 flex items-center gap-3">
-          <Link href="/group/create" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
+          <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary" aria-label="홈으로 돌아가기">
             <ChevronLeft size={18} />
           </Link>
           <div className="flex-1">
@@ -137,10 +137,10 @@ export default function MatchesPage() {
               그룹을 만들고 매칭 큐에 들어가면 이곳에 카드가 생겨요.
             </p>
             <Link
-              href="/group/create"
+              href="/match/start"
               className="mt-4 inline-block rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
             >
-              그룹 만들러 가기
+              매칭 찾기 시작
             </Link>
           </section>
         ) : (

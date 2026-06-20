@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, Loader2, LockKeyhole, MapPin, MessageCircle, Navigation, Phone, Sparkles, Users } from 'lucide-react'
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
-import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
   buildDailyCardSubmissionText,
   countCompletedDailyCardItems,
@@ -220,7 +220,7 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
-  const isDevPreview = isDevAuthBypassEnabled() || matchId.startsWith('dev-match')
+  const isDevPreview = isDevPreviewClientSession() || matchId.startsWith('dev-match')
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -442,6 +442,31 @@ export default function MatchDetailPage() {
 
   async function confirmMatch() {
     if (saving || !match?.my_group_ready) return
+
+    if (isDevPreview) {
+      const start = new Date(Date.now() + 1000 * 60 * 60 * 26)
+      const end = new Date(start.getTime() + 1000 * 60 * 90)
+      const now = new Date().toISOString()
+      setMatch((current) => current
+        ? {
+            ...current,
+            match_status: 'confirmed',
+            confirmed_at: now,
+            my_confirmed_at: now,
+            opp_confirmed_at: now,
+            scheduled_start: start.toISOString(),
+            scheduled_end: end.toISOString(),
+            venue_name: 'PNU Station Cafe',
+            venue_address: 'Busan National University',
+            venue_map_url: 'https://map.naver.com',
+            my_group_ready: true,
+            opp_group_ready: true,
+          }
+        : current)
+      setError(null)
+      return
+    }
+
     setSaving(true)
     setError(null)
     try {
@@ -462,6 +487,13 @@ export default function MatchDetailPage() {
   async function cancelMatch() {
     if (saving) return
     if (!window.confirm('매칭을 취소할까요?')) return
+
+    if (isDevPreview) {
+      setMatch((current) => current ? { ...current, match_status: 'cancelled' } : current)
+      setError(null)
+      return
+    }
+
     setSaving(true)
     setError(null)
     try {
@@ -482,10 +514,34 @@ export default function MatchDetailPage() {
   async function saveCard() {
     if (cardSaving || !match) return
     const trimmed = buildDailyCardSubmissionText(cardDraft).trim()
-    if (trimmed.length < 10 || trimmed.length > 500) {
+    if (
+      completedDailyCardItemCount < MINIMUM_DAILY_CARD_ITEMS_TO_SAVE
+      || trimmed.length < 10
+      || trimmed.length > 500
+    ) {
       setError('사전 힌트는 4개 이상 작성하고, 전체 길이는 500자 이하로 맞춰주세요.')
       return
     }
+
+    if (isDevPreview) {
+      const now = new Date().toISOString()
+      setMatch((current) => {
+        if (!current) return current
+        const nextCardCount = Math.max(current.my_group_card_submitted_count, current.my_group_active_count)
+        const nextReady = nextCardCount >= current.my_group_active_count
+          && current.my_group_deposit_paid_count >= current.my_group_active_count
+        return {
+          ...current,
+          my_card_content_text: trimmed,
+          my_card_submitted_at: now,
+          my_group_card_submitted_count: nextCardCount,
+          my_group_ready: nextReady,
+        }
+      })
+      setError(null)
+      return
+    }
+
     setCardSaving(true)
     setError(null)
     try {
@@ -551,6 +607,23 @@ export default function MatchDetailPage() {
 
   async function payDeposit() {
     if (depositSaving || !match) return
+
+    if (isDevPreview) {
+      setMatch((current) => {
+        if (!current) return current
+        const nextDepositCount = Math.max(current.my_group_deposit_paid_count, current.my_group_active_count)
+        const nextReady = current.my_group_card_submitted_count >= current.my_group_active_count
+          && nextDepositCount >= current.my_group_active_count
+        return {
+          ...current,
+          my_group_deposit_paid_count: nextDepositCount,
+          my_group_ready: nextReady,
+        }
+      })
+      setError(null)
+      return
+    }
+
     setDepositSaving(true)
     setError(null)
     try {
@@ -675,7 +748,7 @@ export default function MatchDetailPage() {
     && !dailyCardTooLong
 
   return (
-    <main className="min-h-screen px-5 pb-10">
+    <main className="min-h-screen px-5 pb-28">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
           <Link href="/match" className="p-2 glass rounded-xl">

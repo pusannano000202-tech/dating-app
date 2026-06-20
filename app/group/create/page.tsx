@@ -4,7 +4,11 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Loader2, LockKeyhole } from 'lucide-react'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
-import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import {
+  EMPTY_MATCH_SETUP_STATUS,
+  type MatchSetupStatus,
+} from '@/lib/matching/match-setup-status'
 import QueueRadarCard from '@/components/matching/QueueRadarCard'
 import {
   DEV_DEPOSIT_SUMMARY,
@@ -31,7 +35,7 @@ import type {
 } from '@/components/matching/group-create/types'
 
 export default function GroupCreatePage() {
-  const isDevPreview = isDevAuthBypassEnabled()
+  const isDevPreview = isDevPreviewClientSession()
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(true)
@@ -42,26 +46,38 @@ export default function GroupCreatePage() {
   const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
   const [showTransferPanel, setShowTransferPanel] = useState(false)
   const [queueVisualState, setQueueVisualState] = useState<QueueVisualState>(DEV_QUEUE_VISUAL)
+  const [devCurrentSetupStatus, setDevCurrentSetupStatus] =
+    useState<MatchSetupStatus>(EMPTY_MATCH_SETUP_STATUS)
 
   const group = state.group
   const members = state.members
   const currentUserId = state.current_user_id ?? null
   const pendingInvites = state.invites.filter((invite) => invite.status === 'pending')
   const capacity = group?.size ?? 3
+  const groupIsFull = members.length >= capacity
   const openSlots = Math.max(0, capacity - members.length)
   const isLeader = Boolean(group && currentUserId && group.leader_user_id === currentUserId)
   const inQueue = group?.status === 'ready' || group?.status === 'in_pool'
   const groupId = group?.id
+  const currentUserMatchSetup = isDevPreview
+    ? devCurrentSetupStatus
+    : state.current_user_match_setup ?? EMPTY_MATCH_SETUP_STATUS
   const memberMatchReadyByUserId = useMemo(
-    () => new Map(members.map((member) => [member.user_id, isDevPreview || member.match_setup_ready])),
-    [isDevPreview, members]
+    () => new Map(members.map((member) => [
+      member.user_id,
+      member.user_id === currentUserId ? currentUserMatchSetup.allDone : member.match_setup_ready,
+    ])),
+    [currentUserId, currentUserMatchSetup.allDone, members]
   )
   const readyMemberCount = members.filter((member) => memberMatchReadyByUserId.get(member.user_id)).length
   const needsSetupCount = Math.max(0, members.length - readyMemberCount)
+  const currentUserSetupReady = Boolean(
+    currentUserId && memberMatchReadyByUserId.get(currentUserId)
+  )
   const canEnterQueue = Boolean(
     group &&
       isLeader &&
-      members.length >= 2 &&
+      groupIsFull &&
       group.status === 'forming' &&
       needsSetupCount === 0
   )
@@ -117,6 +133,11 @@ export default function GroupCreatePage() {
     ensureGroup()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!isDevPreview) return
+    setDevCurrentSetupStatus(getDevMatchSetupStatusFromClient())
+  }, [isDevPreview])
 
   async function ensureGroup() {
     setLoading(true)
@@ -428,6 +449,7 @@ export default function GroupCreatePage() {
   function translateQueueError(code?: string) {
     switch (code) {
       case 'not_enough_members': return '그룹은 최소 2명 이상이어야 큐에 들어갈 수 있어요.'
+      case 'group_not_full':     return '그룹 정원이 모두 채워져야 큐에 들어갈 수 있어요.'
       case 'already_in_queue':   return '이미 매칭 큐에 들어가 있어요.'
       case 'not_group_leader':   return '리더만 큐 진입/취소를 할 수 있어요.'
       case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
@@ -595,8 +617,11 @@ export default function GroupCreatePage() {
               saving={saving}
               canEnterQueue={canEnterQueue}
               isLeader={isLeader}
+              requiredMemberCount={capacity}
               membersLength={members.length}
               needsSetupCount={needsSetupCount}
+              currentUserSetupStatus={currentUserMatchSetup}
+              currentUserSetupReady={currentUserSetupReady}
               myDepositPaid={myDepositPaid}
               depositSummary={depositSummary}
               groupStats={groupStats}

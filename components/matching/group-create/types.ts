@@ -1,3 +1,5 @@
+import type { MatchSetupStatus } from '../../../lib/matching/match-setup-status'
+
 export type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 export type GroupRole = 'leader' | 'member'
 export type FriendGroupStatus = 'available' | 'invited' | 'in_group'
@@ -49,6 +51,7 @@ export interface GroupState {
   invites: GroupInviteRecord[]
   friends: FriendSummary[]
   current_user_id?: string
+  current_user_match_setup?: MatchSetupStatus
 }
 
 export type QueueVisualState = {

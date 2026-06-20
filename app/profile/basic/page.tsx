@@ -80,7 +80,7 @@ export default function BasicInfoPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col px-5 pb-10">
+    <div className="flex min-h-screen flex-col px-5 pb-28">
       <div className="mb-6">
         <p className="mb-2 text-xs font-black text-boot-primary">1단계 / 내 정보</p>
         <h1 className="text-2xl font-black gradient-fate-text">내 정보 등록</h1>

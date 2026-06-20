@@ -50,13 +50,13 @@ const progressItems = [
   },
   {
     title: '데일리 카드/Q&A',
-    desc: '16~20시 사용자가 직접 뽑는 방식으로 유지',
-    state: '다음 단계',
+    desc: '사전 힌트 작성, 논쟁카드, 16~20시 직접 뽑기 흐름을 확인',
+    state: '점검 중',
   },
   {
     title: '채팅',
-    desc: 'UI 아이디어만 보관하고 실제 구현은 보류',
-    state: '보류',
+    desc: '확정 매칭 상세에서 채팅방으로 들어가는 흐름까지 확인 가능',
+    state: '반영',
   },
 ]
 
@@ -117,7 +117,7 @@ export default function DevPreviewPage() {
           <div className="flex items-start gap-3">
             <MessageCircle size={18} className="mt-0.5 flex-shrink-0 text-amber-700" />
             <p className="text-xs leading-5 text-amber-800">
-              채팅은 이번 병합에서 제외합니다. 성준 채팅 UI는 참고만 하고, 실제 구현은 매칭 확정 후 접근권한까지 설계한 뒤 진행합니다.
+              채팅은 확정 매칭 상세에서 확인합니다. 미리보기에서는 매칭 상세, 오늘의 카드, 채팅 진입까지 한 흐름으로 눌러볼 수 있어요.
             </p>
           </div>
         </section>

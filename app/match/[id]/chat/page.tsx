@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, Loader2, MessageCircleMore, SendHorizontal } from 'lucide-react'
-import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 
 interface MatchChatMessage {
   id: string
@@ -61,7 +61,7 @@ function formatError(code?: string) {
 export default function MatchChatPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
-  const isDevPreview = isDevAuthBypassEnabled()
+  const isDevPreview = isDevPreviewClientSession() || matchId.startsWith('dev-match')
   const [messages, setMessages] = useState<MatchChatMessage[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [message, setMessage] = useState('')

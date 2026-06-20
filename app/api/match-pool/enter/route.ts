@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getMatchSetupStatus, type MatchSetupProfile } from '@/lib/matching/match-setup-status'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
-interface MatchSetupProfileRow {
+interface MatchSetupProfileRow extends MatchSetupProfile {
   user_id: string
-  personality_preference_completed_at: string | null
-  available_timeslots: { slots?: unknown[] } | null
-  preference_weights: Record<string, unknown> | null
 }
 
 export async function POST(req: NextRequest) {
@@ -31,6 +29,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'member_lookup_failed' }, { status: 400 })
   }
 
+  const { data: group, error: groupError } = await supabase
+    .from('groups')
+    .select('id, size, status')
+    .eq('id', groupId)
+    .maybeSingle()
+
+  if (groupError || !group) {
+    return NextResponse.json({ error: 'group_not_found' }, { status: 404 })
+  }
+  if (group.status !== 'forming') {
+    return NextResponse.json({ error: 'group_not_open' }, { status: 409 })
+  }
+
   const activeMembers = memberRows ?? []
   const isLeader = activeMembers.some((row: { user_id: string; role: string }) => row.user_id === user.id && row.role === 'leader')
   if (!activeMembers.some((row: { user_id: string }) => row.user_id === user.id)) {
@@ -41,6 +52,9 @@ export async function POST(req: NextRequest) {
   }
   if (activeMembers.length < 2) {
     return NextResponse.json({ error: 'not_enough_members' }, { status: 400 })
+  }
+  if (activeMembers.length < group.size) {
+    return NextResponse.json({ error: 'group_not_full' }, { status: 409 })
   }
 
   const userIds = activeMembers.map((row: { user_id: string }) => row.user_id)
@@ -53,7 +67,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'member_profile_lookup_failed' }, { status: 400 })
   }
 
-  const allReady = (profiles as MatchSetupProfileRow[]).every(isMatchSetupComplete)
+  const allReady = (profiles as MatchSetupProfileRow[]).every((profile) => getMatchSetupStatus(profile).allDone)
   if (!allReady) {
     return NextResponse.json({ error: 'member_match_setup_incomplete' }, { status: 409 })
   }
@@ -75,16 +89,4 @@ async function readJson(req: NextRequest): Promise<Record<string, unknown>> {
   } catch {
     return {}
   }
-}
-
-function hasSlots(payload: { slots?: unknown[] } | null): boolean {
-  return Boolean(payload && Array.isArray(payload.slots) && payload.slots.length > 0)
-}
-
-function isMatchSetupComplete(profile: MatchSetupProfileRow): boolean {
-  return Boolean(
-    profile.personality_preference_completed_at &&
-      hasSlots(profile.available_timeslots) &&
-      profile.preference_weights != null
-  )
 }

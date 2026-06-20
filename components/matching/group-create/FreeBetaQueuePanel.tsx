@@ -1,13 +1,26 @@
-import { CalendarClock, CreditCard, Wallet } from 'lucide-react'
+import Link from 'next/link'
+import {
+  CalendarClock,
+  CheckCircle2,
+  CreditCard,
+  HeartHandshake,
+  SlidersHorizontal,
+  UserRoundCheck,
+  Wallet,
+} from 'lucide-react'
 
+import type { MatchSetupStatus } from '@/lib/matching/match-setup-status'
 import type { DepositSummary } from './types'
 
 type FreeBetaQueuePanelProps = {
   saving: boolean
   canEnterQueue: boolean
   isLeader: boolean
+  requiredMemberCount: number
   membersLength: number
   needsSetupCount: number
+  currentUserSetupStatus: MatchSetupStatus
+  currentUserSetupReady: boolean
   myDepositPaid: boolean
   depositSummary: DepositSummary | null
   groupStats: Array<{ label: string; value: string }>
@@ -19,14 +32,82 @@ export function FreeBetaQueuePanel({
   saving,
   canEnterQueue,
   isLeader,
+  requiredMemberCount,
   membersLength,
   needsSetupCount,
+  currentUserSetupStatus,
+  currentUserSetupReady,
   myDepositPaid,
   depositSummary,
   groupStats,
   onConfirmParticipation,
   onEnterQueue,
 }: FreeBetaQueuePanelProps) {
+  const groupIsFull = membersLength >= requiredMemberCount
+  const allMembersReady = needsSetupCount === 0
+  const missingMembers = Math.max(0, requiredMemberCount - membersLength)
+  const setupSteps = [
+    {
+      key: 'personality',
+      label: '성향 선호',
+      desc: '어떤 성향의 상대와 편한지',
+      done: currentUserSetupStatus.personality,
+      href: '/profile/personality-preference?redirect=%2Fmatch%2Fstart',
+      Icon: HeartHandshake,
+    },
+    {
+      key: 'schedule',
+      label: '가능 시간',
+      desc: '이번 주 만날 수 있는 시간',
+      done: currentUserSetupStatus.schedule,
+      href: '/profile/schedule?redirect=%2Fmatch%2Fstart',
+      Icon: CalendarClock,
+    },
+    {
+      key: 'preferences',
+      label: '매칭 비중',
+      desc: '외모, 성격, 키, 체형 비율',
+      done: currentUserSetupStatus.preferences,
+      href: '/profile/preferences?redirect=%2Fmatch%2Fstart',
+      Icon: SlidersHorizontal,
+    },
+  ]
+  const nextSetupStep = setupSteps.find((step) => !step.done)
+  const requirements = [
+    {
+      label: '내 매칭 설정',
+      desc: currentUserSetupReady
+        ? '성향 선호, 가능 시간, 매칭 비중 입력 완료'
+        : `${nextSetupStep?.label ?? '매칭 설정'}부터 완료하면 돼요`,
+      done: currentUserSetupReady,
+      href: nextSetupStep?.href ?? '/match/start',
+      cta: nextSetupStep ? `${nextSetupStep.label} 하기` : '입력하러 가기',
+    },
+    {
+      label: `${requiredMemberCount}명 그룹 완성`,
+      desc: groupIsFull
+        ? '그룹 정원이 모두 채워졌어요'
+        : `친구 ${missingMembers}명이 더 들어와야 해요`,
+      done: groupIsFull,
+      href: '/friends',
+      cta: '친구 추가',
+    },
+    {
+      label: '그룹원 매칭 준비',
+      desc: allMembersReady
+        ? '모든 멤버가 매칭 설정을 끝냈어요'
+        : `${needsSetupCount}명이 성향/시간/비중 입력을 끝내야 해요`,
+      done: allMembersReady,
+      href: '/match/start',
+      cta: '내 설정 보기',
+    },
+    {
+      label: '리더 큐 진입',
+      desc: isLeader ? '리더 권한으로 큐에 들어갈 수 있어요' : '리더만 큐 진입 버튼을 누를 수 있어요',
+      done: isLeader,
+    },
+  ]
+
   return (
     <>
       <section className="glass mb-5 rounded-3xl p-4">
@@ -47,6 +128,84 @@ export function FreeBetaQueuePanel({
             <div key={stat.label} className="rounded-2xl bg-white/80 px-3 py-3">
               <p className="text-lg font-black">{stat.value}</p>
               <p className="mt-1 text-[10px] leading-snug text-boot-muted">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
+        <div className="mb-3 flex items-start gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+            <UserRoundCheck size={18} />
+          </div>
+          <div>
+            <h2 className="text-sm font-black">매칭찾기 버튼이 켜지는 조건</h2>
+            <p className="mt-0.5 text-xs leading-5 text-boot-muted">
+              아래 항목을 순서대로 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="rounded-2xl border border-boot-hairline bg-boot-soft/50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-black text-boot-ink">내가 먼저 끝낼 3단계</p>
+              <p className="text-[11px] font-bold text-boot-muted">
+                {setupSteps.filter((step) => step.done).length}/{setupSteps.length}
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {setupSteps.map((step) => {
+                const StepIcon = step.Icon
+                return (
+                  <Link
+                    key={step.key}
+                    href={step.href}
+                    className={[
+                      'min-h-[86px] rounded-2xl border px-2.5 py-3 text-center transition-colors',
+                      step.done
+                        ? 'border-emerald-300/30 bg-emerald-50 text-emerald-800'
+                        : 'border-boot-hairline bg-white text-boot-body hover:border-boot-primary/30 hover:text-boot-primary',
+                    ].join(' ')}
+                  >
+                    <span className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+                      {step.done ? <CheckCircle2 size={16} strokeWidth={2.7} /> : <StepIcon size={16} />}
+                    </span>
+                    <span className="block text-[11px] font-black">{step.label}</span>
+                    <span className="mt-1 block text-[10px] leading-4 text-boot-muted">{step.desc}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {requirements.map((item) => (
+            <div
+              key={item.label}
+              className={[
+                'flex items-center gap-3 rounded-2xl border px-3 py-3',
+                item.done
+                  ? 'border-emerald-300/30 bg-emerald-50'
+                  : 'border-boot-hairline bg-white',
+              ].join(' ')}
+            >
+              <CheckCircle2
+                size={17}
+                className={item.done ? 'text-emerald-700' : 'text-boot-muted'}
+                strokeWidth={2.5}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-black text-boot-ink">{item.label}</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-boot-muted">{item.desc}</p>
+              </div>
+              {!item.done && item.href && (
+                <Link
+                  href={item.href}
+                  className="flex-shrink-0 rounded-xl border border-boot-primary/20 bg-boot-soft px-3 py-2 text-[11px] font-bold text-boot-primary"
+                >
+                  {item.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>
@@ -117,8 +276,10 @@ export function FreeBetaQueuePanel({
 
       {!canEnterQueue && (
         <p className="mt-3 text-center text-xs text-boot-muted">
-          {membersLength < 2
-            ? '친구 1명이 그룹에 참여하면 큐 진입 단계로 넘어갈 수 있어요.'
+          {!currentUserSetupReady
+            ? '내 성향 선호, 가능 시간, 매칭 비중을 먼저 입력해 주세요.'
+            : !groupIsFull
+              ? `${requiredMemberCount}명 그룹이 완성되면 큐 진입 단계로 넘어갈 수 있어요.`
             : !isLeader
               ? '리더만 큐 진입을 시작할 수 있어요.'
               : needsSetupCount > 0

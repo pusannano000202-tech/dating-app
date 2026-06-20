@@ -17,7 +17,11 @@ export function getQueueStatusText({
   needsSetupCount: number
 }) {
   if (!group) return '그룹 상태를 불러오지 못했어요.'
-  if (membersLength < 2) return '친구 1명이 더 필요해요'
+  const requiredMembers = group.size
+  const missingMembers = Math.max(0, requiredMembers - membersLength)
+  if (missingMembers > 0) {
+    return missingMembers === 1 ? '친구 1명이 더 필요해요' : `친구 ${missingMembers}명이 더 필요해요`
+  }
   if (needsSetupCount > 0) return '멤버마다 성향/시간/비중 입력이 필요해요'
   return '매칭 큐 진입 준비 완료'
 }

@@ -36,14 +36,18 @@ test('getQueueStatusText explains the blocking setup state before queue entry', 
   )
   assert.equal(
     getQueueStatusText({ group, membersLength: 1, needsSetupCount: 0 }),
-    '친구 1명이 더 필요해요',
-  )
-  assert.equal(
-    getQueueStatusText({ group, membersLength: 2, needsSetupCount: 1 }),
-    '멤버마다 성향/시간/비중 입력이 필요해요',
+    '친구 2명이 더 필요해요',
   )
   assert.equal(
     getQueueStatusText({ group, membersLength: 2, needsSetupCount: 0 }),
+    '친구 1명이 더 필요해요',
+  )
+  assert.equal(
+    getQueueStatusText({ group, membersLength: 3, needsSetupCount: 1 }),
+    '멤버마다 성향/시간/비중 입력이 필요해요',
+  )
+  assert.equal(
+    getQueueStatusText({ group, membersLength: 3, needsSetupCount: 0 }),
     '매칭 큐 진입 준비 완료',
   )
 })

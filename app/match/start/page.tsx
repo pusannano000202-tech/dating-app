@@ -12,14 +12,13 @@ import {
 } from 'lucide-react'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { DEV_MATCH_SETUP_COOKIES, getDevMatchSetupCookieValue } from '@/lib/dev-match-setup'
+import {
+  DEFAULT_MATCH_PREFERENCE_WEIGHTS,
+  getMatchSetupStatus,
+  type MatchSetupProfile,
+} from '@/lib/matching/match-setup-status'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { isSupabaseConfigured } from '@/lib/utils'
-
-type MatchSetupProfile = {
-  available_timeslots: { slots?: unknown[] } | null
-  preference_weights: unknown | null
-  personality_preference_completed_at: string | null
-}
 
 type SetupStep = {
   href: string
@@ -32,30 +31,28 @@ type SetupStep = {
 const REDIRECT_TO = '/match/start'
 
 function buildSetupSteps(profile: MatchSetupProfile | null): SetupStep[] {
-  const hasPersonalityPreference = Boolean(profile?.personality_preference_completed_at)
-  const hasTimeslots = Boolean(profile?.available_timeslots?.slots?.length)
-  const hasPreferenceWeights = Boolean(profile?.preference_weights)
+  const status = getMatchSetupStatus(profile)
 
   return [
     {
       href: `/profile/personality-preference?redirect=${encodeURIComponent(REDIRECT_TO)}`,
       label: '성향 선호',
       desc: '어떤 성향의 상대와 편한지 선택합니다.',
-      done: hasPersonalityPreference,
+      done: status.personality,
       Icon: HeartHandshake,
     },
     {
       href: `/profile/schedule?redirect=${encodeURIComponent(REDIRECT_TO)}`,
       label: '가능 시간',
       desc: '이번 주 만날 수 있는 시간대를 고릅니다.',
-      done: hasTimeslots,
+      done: status.schedule,
       Icon: CalendarClock,
     },
     {
       href: `/profile/preferences?redirect=${encodeURIComponent(REDIRECT_TO)}`,
       label: '매칭 비중',
       desc: '외모, 성격, 키, 체형 중 무엇을 더 볼지 정합니다.',
-      done: hasPreferenceWeights,
+      done: status.preferences,
       Icon: SlidersHorizontal,
     },
   ]
@@ -67,8 +64,10 @@ function buildDevMatchSetupProfile(cookieStore: ReturnType<typeof cookies>): Mat
 
   return {
     personality_preference_completed_at: isDone('personality') ? 'dev-preview' : null,
-    available_timeslots: isDone('schedule') ? { slots: [{}] } : null,
-    preference_weights: isDone('preferences') ? { dev: true } : null,
+    available_timeslots: isDone('schedule')
+      ? { slots: [{ day: 'friday', start: '18:00', end: '22:00' }] }
+      : null,
+    preference_weights: isDone('preferences') ? DEFAULT_MATCH_PREFERENCE_WEIGHTS : null,
   }
 }
 
