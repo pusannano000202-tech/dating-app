@@ -466,6 +466,37 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - 기존 production/staging DB에 이미 있는 phone invite row를 어떻게 정리할지는 성준 리뷰와 운영 데이터 확인 후 결정해야 한다.
 - 이번 수정은 “신규 앱 API에서 전화번호 그룹 초대를 만들지 못하게 막는 것”까지다.
 
+## 2026-06-22 검증 재실행 및 로컬 서버 상태
+
+### 검증 결과
+
+- `npm run test:config` 통과.
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:profile` 통과.
+- `npm run test:matching` 통과.
+- `npm run build` 통과.
+
+### build 재시도 기록
+
+- 첫 `npm run build`는 `.next/static/webpack/*.hot-update.json` 정리 중 `readlink EINVAL`로 실패했다.
+- 원인은 dev server가 만든 HMR 캐시와 Windows/OneDrive 파일 처리 충돌로 판단했다.
+- 3004 dev server를 멈춘 뒤, workspace 내부 `.next` 경로를 확인하고 `.next`만 삭제했다.
+- clean 상태에서 `npm run build`를 다시 실행해 성공했다.
+
+### 로컬 route 확인
+
+- dev server를 다시 `http://localhost:3004`에 띄웠다.
+- 확인 결과:
+  - `/` 200
+  - `/match` 200, 미로그인 상태에서는 `/login`으로 이동
+  - `/group/create` 200, 미로그인 상태에서는 `/login`으로 이동
+  - `/group/invite/dev-preview` 200
+  - `/notifications` 200
+  - `/profile/basic` 200
+  - `/match/dev-match-pending` 200
+  - `/match/dev-match-1` 200
+
 ## 리셋 후 재개 명령
 
 ```text
