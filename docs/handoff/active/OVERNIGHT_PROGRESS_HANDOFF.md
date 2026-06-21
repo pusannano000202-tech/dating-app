@@ -390,6 +390,55 @@ production Supabase/Vercel/Toss는 건드리지 마.
 4. `/match/[id]/refund`의 DB 정산과 내부 Toss cancel route를 어떤 운영 트리거로 연결할지 설계한다.
 5. 새 migration 2개를 local/staging Supabase에 적용 검증한다.
 
+## 2026-06-22 새 migration 2개 로컬 DB 적용 검증
+
+### 검증 환경
+
+- production Supabase는 건드리지 않았다.
+- 로컬에 `supabase` CLI와 `supabase/config.toml`은 없었다.
+- Docker Desktop은 켜져 있었고, 기존 Phase 5 로컬 Supabase 컨테이너가 살아 있었다.
+  - DB 컨테이너: `supabase_db_phase5-local-supabase`
+  - Postgres: 17.6
+- 호스트에는 `psql`이 없어서 컨테이너 내부 `psql`로 검증했다.
+
+### 적용한 migration
+
+1. `supabase/migrations/20260622_matching_pre_match_card_drafts.sql`
+2. `supabase/migrations/20260622_profile_display_name_claims.sql`
+
+### 검증 결과
+
+- 두 SQL 모두 로컬 DB에 오류 없이 적용됐다.
+- 생성 객체 확인:
+  - `public.pre_match_card_drafts`
+  - `public.profile_display_name_claims`
+  - `public.get_group_pre_match_card_readiness`
+  - `public.normalize_profile_display_name`
+  - `public.is_profile_display_name_available`
+  - `public.resolve_profile_display_name`
+  - `public.claim_profile_display_name`
+- RLS policy 확인:
+  - `pre_match_card_drafts` select/insert/update/delete self policy 존재.
+  - `profile_display_name_claims` select self policy 존재.
+- 동작 검증:
+  - 테스트 auth user 2명을 만들고 같은 닉네임을 공백 정규화 기준으로 넣었을 때 `nickname_taken`으로 차단됐다.
+  - 같은 그룹 2명 중 한 명은 사전 카드 `completed_items = 4`, 다른 한 명은 `3`으로 넣은 뒤 `get_group_pre_match_card_readiness()`를 호출했을 때 준비 완료 1명으로 계산됐다.
+  - 테스트 데이터는 삭제했고, 임시 auth user 잔여 수 0을 확인했다.
+
+### 남은 한계
+
+- 이 검증은 `supabase` CLI의 `db reset` 검증은 아니다.
+- existing Phase 5 local Supabase DB에 SQL을 직접 적용한 검증이다.
+- production Supabase에는 적용하지 않았다.
+- 성준 리뷰 후 staging/production 적용이 필요하다.
+
+### 다음 우선순위 갱신
+
+1. Toss sandbox key가 있는 별도 환경에서 checkout/confirm/cancel 실제 호출 검증.
+2. `/match/[id]/refund`의 DB 정산과 내부 Toss cancel route 연결 설계.
+3. 데일리카드 정책 합의: 16~20 직접 뽑기 vs gwating 자동분배.
+4. `preference_weights` 4개/7개 계약 합의.
+
 ## 리셋 후 재개 명령
 
 ```text

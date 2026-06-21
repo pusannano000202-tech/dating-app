@@ -2,7 +2,7 @@
 
 ## 1. 한 줄 결론
 
-현재 브랜치는 사용자 검토용 프론트와 mock 흐름을 넘어서, 큐 진입 전 사전 카드 초안 DB 저장과 닉네임 중복 DB 강제 구조까지 추가했다. 그래도 배포 기준 핵심인 Toss 실승인, 데일리카드/채팅 정책 합의는 아직 끝난 상태가 아니다. 새로 추가한 `pre_match_card_drafts`, `profile_display_name_claims` migration은 production 적용 전 성준 리뷰가 필요하다.
+현재 브랜치는 사용자 검토용 프론트와 mock 흐름을 넘어서, 큐 진입 전 사전 카드 초안 DB 저장과 닉네임 중복 DB 강제 구조까지 추가했다. 두 migration은 Phase 5 로컬 Supabase에서 적용/동작 검증까지 완료했다. 그래도 배포 기준 핵심인 Toss sandbox 실검증, 데일리카드/채팅 정책 합의는 아직 끝난 상태가 아니다. 새로 추가한 `pre_match_card_drafts`, `profile_display_name_claims` migration은 production 적용 전 성준 리뷰가 필요하다.
 
 ## 2. 결제 코드리뷰
 
@@ -72,7 +72,7 @@
 
 우리 브랜치에는 일부 route, migration, 문서가 이미 이 이름들을 쓰고 있다. 그래서 지금 새 migration을 추가하거나 공용 타입을 바꾸면 성준 스키마와 우리 스키마가 따로 생기는 위험이 있다.
 
-예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`과 `닉네임 중복 DB 강제`가 사용자 동선과 직접 연결되어 있어 migration 2개를 새로 추가했다. `pre_match_card_drafts`는 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. `profile_display_name_claims`는 기존 중복 데이터를 터뜨리지 않고 신규 닉네임 claim만 고유하게 강제한다. 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
+예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`과 `닉네임 중복 DB 강제`가 사용자 동선과 직접 연결되어 있어 migration 2개를 새로 추가했다. `pre_match_card_drafts`는 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. `profile_display_name_claims`는 기존 중복 데이터를 터뜨리지 않고 신규 닉네임 claim만 고유하게 강제한다. Phase 5 로컬 Supabase에서 SQL 적용, 닉네임 중복 차단, 사전 카드 readiness RPC 동작을 확인했다. production 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
 
 ## 5. 결정 필요
 
@@ -85,8 +85,8 @@
 
 ## 6. 바로 가능한 다음 작업
 
-- 새 `pre_match_card_drafts` migration을 local/staging에서 적용해 `/profile/match-card` 저장과 `/api/match-pool/enter` 멤버 전원 gate를 실제 DB로 확인.
-- 새 `profile_display_name_claims` migration을 local/staging에서 적용해 동시 닉네임 중복 저장이 DB에서 막히는지 확인.
+- 새 `pre_match_card_drafts` migration은 Phase 5 로컬 Supabase에서 SQL 적용과 readiness RPC 동작 검증 완료. 다음은 staging/production 적용 전 성준 리뷰.
+- 새 `profile_display_name_claims` migration은 Phase 5 로컬 Supabase에서 SQL 적용과 닉네임 중복 차단 검증 완료. 다음은 staging/production 적용 전 성준 리뷰.
 - `/profile/basic` 브라우저 확인: 학과 검색 후보가 실제로 뜨는지 확인.
 - 결제 흡수 표 보강: 성준 Toss route 이름과 우리 route 이름을 1:1로 매핑.
 - 홈/매칭/그룹 로컬 route 확인: 같은 멤버가 보이는지 확인.
@@ -101,7 +101,7 @@
 | --- | --- | --- |
 | 닉네임 중복 확인 | `app/api/profiles/check-nickname/route.ts`가 `is_profile_display_name_available` RPC 호출 | API + DB claim 기준 |
 | 친구 요청 생성 | `app/api/friend-requests/route.ts`가 `receiver_nickname`으로 receiver를 찾고 `receiver_phone: null`로 insert | 전화번호 중심 흐름은 신규 요청 기준에서 빠져 있음 |
-| DB unique | `profile_display_name_claims` + `trg_profiles_guard_display_name_claim` 추가 | 신규 중복 저장은 DB에서 막는 구조. migration 적용 검증 필요 |
+| DB unique | `profile_display_name_claims` + `trg_profiles_guard_display_name_claim` 추가 | 신규 중복 저장은 DB에서 막는 구조. Phase 5 로컬 Supabase 검증 완료 |
 
 ### 매칭 찾기 gate
 

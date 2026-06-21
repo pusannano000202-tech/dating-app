@@ -71,7 +71,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 1 | 이메일/Google 로그인 | 부분 구현 | `app/(auth)/login/page.tsx`, `app/auth/callback/route.ts` | 앱 코드는 있으나 Supabase/Google/Vercel 설정이 없으면 배포에서 실패 | 대시보드 설정 체크리스트 별도 작성 |
 | 2 | 기본정보 입력 | 실제 구현됨 | `app/profile/basic/page.tsx`, `components/profile/BasicInfoForm.tsx` | 학과 목록이 사용자가 준 최신 목록보다 짧다 | `lib/pnu-departments.ts` 보강 |
-| 3 | 닉네임 중복 확인 | DB 강제 구현, 적용 검증 필요 | `app/api/profiles/check-nickname/route.ts`, `app/api/profiles/claim-nickname/route.ts`, `supabase/migrations/20260622_profile_display_name_claims.sql` | 정규화 claim 테이블과 profiles trigger로 신규 중복 저장을 막는다. production Supabase 적용은 아직 하지 않음 | migration 리뷰/적용 후 실제 DB 검증 |
+| 3 | 닉네임 중복 확인 | DB 강제 구현, 로컬 적용 검증 완료 | `app/api/profiles/check-nickname/route.ts`, `app/api/profiles/claim-nickname/route.ts`, `supabase/migrations/20260622_profile_display_name_claims.sql` | 정규화 claim 테이블과 profiles trigger로 신규 중복 저장을 막는다. Phase 5 로컬 Supabase에서 중복 차단 검증 완료. production Supabase 적용은 아직 하지 않음 | 성준 리뷰 후 staging/production 적용 |
 | 4 | 학과 검색/선택 | 구현 후 검증 일부 완료 | `components/profile/BasicInfoForm.tsx`, `lib/pnu-departments.ts`, `tests/profile/pnu-departments.test.ts` | 학과 source와 검색 함수는 보강됨. 실제 브라우저 화면 검증은 아직 필요 | `/profile/basic` 브라우저 확인 |
 | 5 | 이상형 월드컵 | 실제 구현됨에 가까움 | `app/profile/worldcup/page.tsx`, `components/profile/IdealWorldcup.tsx` | 기본정보 성별을 반대로 바꿔 후보를 고르는 코드가 있으나 화면 검증 필요 | 남자/여자 양쪽 route 검증 |
 | 6 | 성격 검사 | 부분 구현 | `app/profile/survey/page.tsx`, `lib/matching/score.ts` | 성격 제거 여부가 아직 정책 결정 필요 | 결정 전 제거 금지 |
@@ -79,7 +79,7 @@
 | 8 | 사진 업로드 | 실제 구현됨 | `app/profile/photos/page.tsx` | Storage bucket 설정/권한은 배포 설정 확인 필요 | Supabase Storage 설정 체크 |
 | 9 | 가능 시간 입력 | 실제 구현됨 | `app/profile/schedule/page.tsx` | UI/문구는 현재 dirty 변경 있음 | 화면 검증 필요 |
 | 10 | 매칭 비중/선호 나이 | 실제 구현됨에 가까움 | `app/profile/preferences/page.tsx`, `lib/matching/score.ts` | 나이 점수 계산 함수는 있으나 실제 매칭 엔진 입력까지 검증 필요 | 나이 loader/RPC 확인 |
-| 11 | 사전 카드 | DB 저장 구현, 적용 검증 필요 | `app/profile/match-card/page.tsx`, `app/api/profile/match-card-draft/route.ts`, `supabase/migrations/20260622_matching_pre_match_card_drafts.sql` | 로그인 사용자는 `pre_match_card_drafts`에 저장한다. production Supabase 적용은 아직 하지 않음 | migration 리뷰/적용 후 실제 DB 검증 |
+| 11 | 사전 카드 | DB 저장 구현, 로컬 적용 검증 완료 | `app/profile/match-card/page.tsx`, `app/api/profile/match-card-draft/route.ts`, `supabase/migrations/20260622_matching_pre_match_card_drafts.sql` | 로그인 사용자는 `pre_match_card_drafts`에 저장한다. Phase 5 로컬 Supabase에서 readiness RPC 검증 완료. production Supabase 적용은 아직 하지 않음 | 성준 리뷰 후 staging/production 적용 |
 | 12 | 친구 요청 | 부분 구현 | `app/api/friend-requests/route.ts`, `app/friends/page.tsx` | 닉네임 기반 API는 있으나 DB 중복/초대 UX 검증 필요 | 브라우저 route 확인 |
 | 13 | 그룹 생성/초대 | 부분 구현 | `app/group/create/page.tsx`, `components/matching/group-create/*` | dev preview와 실제 그룹 상태가 섞일 위험 | source 통일 확인 |
 | 14 | 매칭 찾기 gate | 실제 구현됨에 가까움 | `app/match/start/page.tsx`, `app/api/match-pool/enter/route.ts`, `lib/matching/match-setup-status.ts` | 성향/시간/비중과 멤버별 사전 카드 DB 완료를 함께 검사한다. 단 migration 적용 전 production에서는 검증 불가 | migration 적용 후 실제 그룹으로 확인 |
@@ -103,7 +103,7 @@
 ## 5. 부분 구현됨
 
 - 로그인: 이메일 OTP와 Google OAuth 코드는 있으나 Supabase/Google/Vercel 대시보드 설정이 필요하다.
-- 닉네임 중복 확인: DB claim 구조는 추가됐지만 migration 적용 전까지 운영 DB에서는 검증할 수 없다.
+- 닉네임 중복 확인: DB claim 구조는 Phase 5 로컬 Supabase에서 적용/동작 검증 완료. 운영 DB에서는 아직 검증할 수 없다.
 - 친구 요청: 닉네임 기반 요청 생성은 있으나 실제 화면 검증이 필요하다.
 - 매칭 찾기 gate: 서버 route가 그룹 멤버 전원의 성향/시간/비중/사전 카드 완료를 검사한다. 단 새 migration이 실제 Supabase에 적용되어야 운영 검증 가능하다.
 - 보증금/결제: mock provider는 동작하도록 설계되어 있고, Toss checkout/confirm/cancel 서버 route도 추가됐다. 다만 sandbox key로 실제 end-to-end 호출한 증거는 아직 없다.
@@ -123,8 +123,8 @@
 
 - 부산대 학과 source는 사용자 제공 목록으로 보강했고 `npm run test:profile`에서 검증했다. 실제 UI 브라우저 확인은 아직 필요하다.
 - 환불 페이지는 `0~10,000원`, `1,000원 단위`, `3,000원 -> 2,000원 -> 1,000원` 제안 흐름까지 코드에 반영됐다. 실제 refund RPC 결과와 사용자 화면 확인은 아직 필요하다.
-- 사전 카드 DB 저장 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
-- 닉네임 DB claim 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
+- 사전 카드 DB 저장 코드는 Phase 5 로컬 Supabase에서 적용/동작 검증 완료. production Supabase에는 적용하지 않았다.
+- 닉네임 DB claim 코드는 Phase 5 로컬 Supabase에서 적용/동작 검증 완료. production Supabase에는 적용하지 않았다.
 - Toss checkout/confirm/cancel 서버 호출 코드는 추가됐다. Kakao/PortOne은 성준 회신 기준 이번 흡수 기본 대상이 아니며, provider 목록에서도 제외했다.
 - `app/api/payments/deposit/confirm/route.ts`는 Toss `paymentKey/orderId/amount`를 서버에서 확인하고 `deposits.status = paid`로 바꾼다. 단, sandbox key로 실제 호출한 증거는 아직 없다.
 - `app/api/payments/deposit/cancel/route.ts`는 `PAYMENT_INTERNAL_SECRET`이 맞을 때만 Toss cancel을 실행하고 service role로 deposit을 `refunded` 처리한다. 단, `/match/[id]/refund` 화면과 운영 트리거 연결은 아직 남아 있다.
