@@ -131,14 +131,20 @@ test('matching readiness gates include nickname and pre-match card checks', () =
   const basicInfoForm = readSource('components/profile/BasicInfoForm.tsx')
   const enterRoute = readSource('app/api/match-pool/enter/route.ts')
   const groupCreate = readSource('app/group/create/page.tsx')
+  const draftRoute = readSource('app/api/profile/match-card-draft/route.ts')
+  const draftMigration = readSource('supabase/migrations/20260622_matching_pre_match_card_drafts.sql')
 
   assert.match(basicInfoForm, /\/api\/profiles\/check-nickname\?nickname=/)
   assert.match(basicInfoForm, /await checkNicknameAvailability\(trimmedName\)/)
   assert.match(basicInfoForm, /다른 닉네임을 입력해 주세요/)
 
-  assert.match(enterRoute, /PRE_MATCH_CARD_DRAFT_COOKIE/)
-  assert.match(enterRoute, /isPreMatchCardDraftCookieDone/)
+  assert.match(draftRoute, /pre_match_card_drafts/)
+  assert.match(draftRoute, /countCompletedDailyCardItems/)
+  assert.match(draftMigration, /CREATE TABLE IF NOT EXISTS public\.pre_match_card_drafts/)
+  assert.match(draftMigration, /get_group_pre_match_card_readiness/)
+  assert.match(enterRoute, /get_group_pre_match_card_readiness/)
   assert.match(enterRoute, /pre_match_card_required/)
+  assert.match(enterRoute, /member_pre_match_card_incomplete/)
   assert.match(groupCreate, /pre_match_card_required/)
 })
 

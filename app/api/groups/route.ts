@@ -30,6 +30,7 @@ interface GroupMemberRecord {
   joined_at: string
   left_at: string | null
   match_setup_ready: boolean
+  pre_match_card_ready: boolean
 }
 
 interface GroupInviteRecord {
@@ -186,6 +187,7 @@ async function loadMembers(
     joined_at: row.joined_at,
     left_at: null,
     match_setup_ready: false,
+    pre_match_card_ready: false,
   }))
 
   if (members.length === 0) {
@@ -203,9 +205,20 @@ async function loadMembers(
       .map((row) => row.user_id)
   )
 
+  const { data: cardReadiness } = await supabase
+    .rpc('get_group_pre_match_card_readiness', { p_group_id: groupId })
+
+  type CardReadinessRow = { user_id: string; has_pre_match_card: boolean }
+  const cardReadySet = new Set<string>(
+    ((cardReadiness ?? []) as CardReadinessRow[])
+      .filter((row) => row.has_pre_match_card)
+      .map((row) => row.user_id)
+  )
+
   return members.map((member) => ({
     ...member,
-    match_setup_ready: readySet.has(member.user_id),
+    pre_match_card_ready: cardReadySet.has(member.user_id),
+    match_setup_ready: readySet.has(member.user_id) && cardReadySet.has(member.user_id),
   }))
 }
 

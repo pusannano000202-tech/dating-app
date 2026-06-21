@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getMatchSetupStatus, type MatchSetupProfile } from '@/lib/matching/match-setup-status'
-import {
-  PRE_MATCH_CARD_DRAFT_COOKIE,
-  isPreMatchCardDraftCookieDone,
-} from '@/lib/matching/pre-match-card-draft'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 interface MatchSetupProfileRow extends MatchSetupProfile {
   user_id: string
+}
+
+type PreMatchCardReadinessRow = {
+  user_id: string
+  has_pre_match_card: boolean
 }
 
 export async function POST(req: NextRequest) {
@@ -76,11 +77,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'member_match_setup_incomplete' }, { status: 409 })
   }
 
-  const currentUserCardReady = isPreMatchCardDraftCookieDone(
-    req.cookies.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
+  const { data: cardReadiness, error: cardReadinessError } = await supabase
+    .rpc('get_group_pre_match_card_readiness', { p_group_id: groupId })
+
+  if (cardReadinessError) {
+    return NextResponse.json({ error: 'member_card_lookup_failed' }, { status: 400 })
+  }
+
+  const cardReadySet = new Set(
+    ((cardReadiness ?? []) as PreMatchCardReadinessRow[])
+      .filter((row) => row.has_pre_match_card)
+      .map((row) => row.user_id)
   )
-  if (!currentUserCardReady) {
-    return NextResponse.json({ error: 'pre_match_card_required' }, { status: 409 })
+  const allCardsReady = userIds.every((id) => cardReadySet.has(id))
+  if (!allCardsReady) {
+    const currentUserCardReady = cardReadySet.has(user.id)
+    return NextResponse.json(
+      { error: currentUserCardReady ? 'member_pre_match_card_incomplete' : 'pre_match_card_required' },
+      { status: 409 },
+    )
   }
 
   const { data, error } = await supabase

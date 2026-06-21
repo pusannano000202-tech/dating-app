@@ -32,6 +32,8 @@ export default function ProfileMatchCardPage() {
   const [submittedAt, setSubmittedAt] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [savedToServer, setSavedToServer] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     const savedText = window.localStorage.getItem(STORAGE_KEY)
@@ -39,6 +41,33 @@ export default function ProfileMatchCardPage() {
       setDraft(createDailyCardDraftFromSubmissionText(savedText))
     }
     setSubmittedAt(window.localStorage.getItem(SUBMITTED_AT_KEY))
+
+    let alive = true
+    async function loadServerDraft() {
+      try {
+        const res = await fetch('/api/profile/match-card-draft', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json() as {
+          draft?: { content_text?: string; submitted_at?: string | null } | null
+        }
+        if (!alive || !data.draft?.content_text) return
+        window.localStorage.setItem(STORAGE_KEY, data.draft.content_text)
+        if (data.draft.submitted_at) {
+          window.localStorage.setItem(SUBMITTED_AT_KEY, data.draft.submitted_at)
+        }
+        document.cookie = getPreMatchCardDraftCookie()
+        setDraft(createDailyCardDraftFromSubmissionText(data.draft.content_text))
+        setSubmittedAt(data.draft.submitted_at ?? null)
+        setSavedToServer(true)
+      } catch {
+        // 로그인 전 preview나 네트워크 오류에서는 기존 로컬 초안을 그대로 사용한다.
+      }
+    }
+
+    void loadServerDraft()
+    return () => {
+      alive = false
+    }
   }, [])
 
   const completedCount = countCompletedDailyCardItems(draft)
@@ -49,6 +78,7 @@ export default function ProfileMatchCardPage() {
   function updateDailyCardDraft(fieldId: DailyCardFieldId, value: string) {
     setDraft((current) => ({ ...current, [fieldId]: value }))
     setSaved(false)
+    setSaveError(null)
   }
 
   function updateDailyCardDebateAnswer(promptId: string, value: string) {
@@ -63,21 +93,49 @@ export default function ProfileMatchCardPage() {
       }
     })
     setSaved(false)
+    setSaveError(null)
   }
 
-  function saveDraft() {
+  async function saveDraft() {
     if (!canSave || saving) return
 
     setSaving(true)
-    window.setTimeout(() => {
-      const now = new Date().toISOString()
-      window.localStorage.setItem(STORAGE_KEY, submissionText)
-      window.localStorage.setItem(SUBMITTED_AT_KEY, now)
-      document.cookie = getPreMatchCardDraftCookie()
-      setSubmittedAt(now)
-      setSaved(true)
-      setSaving(false)
-    }, 250)
+    setSaveError(null)
+
+    const now = new Date().toISOString()
+    let persistedSubmittedAt = now
+    let persistedToServer = false
+
+    try {
+      const res = await fetch('/api/profile/match-card-draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_text: submissionText }),
+      })
+
+      if (res.ok) {
+        const data = await res.json() as {
+          draft?: { submitted_at?: string | null } | null
+        }
+        persistedSubmittedAt = data.draft?.submitted_at ?? now
+        persistedToServer = true
+      } else if (res.status !== 401) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setSaveError(translateSaveError(data.error))
+        setSaving(false)
+        return
+      }
+    } catch {
+      // 로컬 preview에서는 API 없이도 화면 검토가 가능해야 하므로 임시 저장으로 fallback한다.
+    }
+
+    window.localStorage.setItem(STORAGE_KEY, submissionText)
+    window.localStorage.setItem(SUBMITTED_AT_KEY, persistedSubmittedAt)
+    document.cookie = getPreMatchCardDraftCookie()
+    setSubmittedAt(persistedSubmittedAt)
+    setSavedToServer(persistedToServer)
+    setSaved(true)
+    setSaving(false)
   }
 
   function getRedirectTarget() {
@@ -145,7 +203,14 @@ export default function ProfileMatchCardPage() {
       <div className="mt-4 grid gap-2">
         {saved && (
           <p className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-xs font-bold text-emerald-700">
-            사전 카드 초안이 저장됐어요. 이제 매칭 찾기 준비로 돌아갈 수 있어요.
+            {savedToServer
+              ? '사전 카드 초안이 DB에 저장됐어요. 이제 매칭 찾기 준비로 돌아갈 수 있어요.'
+              : '사전 카드 초안이 현재 기기에 임시 저장됐어요. 로컬 검토용으로 다음 단계를 볼 수 있어요.'}
+          </p>
+        )}
+        {saveError && (
+          <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-xs font-bold text-red-700">
+            {saveError}
           </p>
         )}
         <ButtonLink
@@ -153,7 +218,7 @@ export default function ProfileMatchCardPage() {
           onClick={(event) => {
             if (!saved) {
               event.preventDefault()
-              saveDraft()
+              void saveDraft()
             }
           }}
           variant={canSave ? 'gradient' : 'ghost'}
@@ -166,11 +231,23 @@ export default function ProfileMatchCardPage() {
           <ArrowRight size={17} />
         </ButtonLink>
         <p className="text-center text-[11px] leading-5 text-boot-muted">
-          이 초안은 현재 기기에 임시 저장돼요. 실제 상대 공개용 카드는 가매칭 후 확정 카드 단계에서 DB에 저장됩니다.
+          로그인 상태에서는 이 초안이 DB에 저장되어 그룹원이 모두 준비됐는지 확인하는 데 쓰여요.
+          상대 공개용 카드는 가매칭 후 확정 카드 단계에서 따로 제출합니다.
         </p>
       </div>
     </PageShell>
   )
+}
+
+function translateSaveError(code?: string): string {
+  switch (code) {
+    case 'card_incomplete':
+      return '사전 카드 항목을 4개 이상 채워야 저장할 수 있어요.'
+    case 'invalid_card_content':
+      return '카드 내용은 10자 이상 500자 이하로 작성해 주세요.'
+    default:
+      return '사전 카드 초안을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.'
+  }
 }
 
 function formatSubmittedAt(iso: string): string {

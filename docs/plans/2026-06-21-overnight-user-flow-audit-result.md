@@ -79,10 +79,10 @@
 | 8 | 사진 업로드 | 실제 구현됨 | `app/profile/photos/page.tsx` | Storage bucket 설정/권한은 배포 설정 확인 필요 | Supabase Storage 설정 체크 |
 | 9 | 가능 시간 입력 | 실제 구현됨 | `app/profile/schedule/page.tsx` | UI/문구는 현재 dirty 변경 있음 | 화면 검증 필요 |
 | 10 | 매칭 비중/선호 나이 | 실제 구현됨에 가까움 | `app/profile/preferences/page.tsx`, `lib/matching/score.ts` | 나이 점수 계산 함수는 있으나 실제 매칭 엔진 입력까지 검증 필요 | 나이 loader/RPC 확인 |
-| 11 | 사전 카드 | 로컬/mock만 있음 | `app/profile/match-card/page.tsx`, `lib/matching/pre-match-card-draft.ts` | localStorage/cookie 기반이며 DB 저장이 아니다 | DB 승격 여부 결정 필요 |
+| 11 | 사전 카드 | DB 저장 구현, 적용 검증 필요 | `app/profile/match-card/page.tsx`, `app/api/profile/match-card-draft/route.ts`, `supabase/migrations/20260622_matching_pre_match_card_drafts.sql` | 로그인 사용자는 `pre_match_card_drafts`에 저장한다. production Supabase 적용은 아직 하지 않음 | migration 리뷰/적용 후 실제 DB 검증 |
 | 12 | 친구 요청 | 부분 구현 | `app/api/friend-requests/route.ts`, `app/friends/page.tsx` | 닉네임 기반 API는 있으나 DB 중복/초대 UX 검증 필요 | 브라우저 route 확인 |
 | 13 | 그룹 생성/초대 | 부분 구현 | `app/group/create/page.tsx`, `components/matching/group-create/*` | dev preview와 실제 그룹 상태가 섞일 위험 | source 통일 확인 |
-| 14 | 매칭 찾기 gate | 실제 구현됨에 가까움 | `app/match/start/page.tsx`, `app/api/match-pool/enter/route.ts`, `lib/matching/match-setup-status.ts` | 사전 카드는 cookie 기준이라 DB 준비 조건과 분리됨 | 사전 카드 DB화 여부 결정 |
+| 14 | 매칭 찾기 gate | 실제 구현됨에 가까움 | `app/match/start/page.tsx`, `app/api/match-pool/enter/route.ts`, `lib/matching/match-setup-status.ts` | 성향/시간/비중과 멤버별 사전 카드 DB 완료를 함께 검사한다. 단 migration 적용 전 production에서는 검증 불가 | migration 적용 후 실제 그룹으로 확인 |
 | 15 | 보증금 결제 | mock 구현 + Toss 흡수 후보 | `app/api/deposits/route.ts`, `app/api/payments/deposit/*`, `lib/payments/deposit.ts` | 성준 회신 기준 실결제는 Toss 단일이다. provider 목록은 `mock`, `toss`만 유지한다 | Toss 기준 env/confirm/cancel만 별도 정리 |
 | 16 | 환불/앱 기여금 | 부분 구현 | `app/match/[id]/refund/page.tsx`, `app/api/matches/[id]/refund/route.ts`, `lib/refund/fee-flow.ts` | 0~10,000원 앱 기여금 선택, 1,000원 단위 slider/preset, 3천-2천-1천 제안 흐름은 코드에 반영됨. 다만 실제 DB RPC 결과와 브라우저 UX 검증은 남음 | refund route와 실제 화면 검증 |
 | 17 | 데일리카드 | 우리 브랜치 일부 구현 + 성준 gwating 프로토타입 존재 | `app/api/matches/[id]/daily-cards/route.ts`, `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`, `gwating-app/app/match/qa` 계열 | 성준 `gwating-app`은 자동 분배/localStorage/mock이고, 우리 16~20 직접 뽑기와 정책이 다르다 | 정책 합의 전 DB 확장 금지 |
@@ -97,13 +97,14 @@
 - 매칭 비중/선호 나이 저장: `app/profile/preferences/page.tsx`에서 `profiles.preference_weights`, `preferred_age_min`, `preferred_age_max`를 저장한다.
 - 월드컵 성별 분기 코드: `app/profile/worldcup/page.tsx`에서 저장된 `profiles.gender`를 읽고 반대 성별 후보를 `IdealWorldcup`에 넘긴다.
 - 나이 점수 함수: `lib/matching/score.ts`에 `ageFitScore`가 있고 선호 나이 범위를 반영한다.
+- 사전 카드 초안 DB 저장: `app/api/profile/match-card-draft/route.ts`가 `pre_match_card_drafts`에 user별 초안을 upsert한다.
 
 ## 5. 부분 구현됨
 
 - 로그인: 이메일 OTP와 Google OAuth 코드는 있으나 Supabase/Google/Vercel 대시보드 설정이 필요하다.
 - 닉네임 중복 확인: `profiles.display_name` 조회는 있으나 DB unique constraint는 추가 확인이 필요하다.
 - 친구 요청: 닉네임 기반 요청 생성은 있으나 실제 화면 검증이 필요하다.
-- 매칭 찾기 gate: 성향 선호/가능 시간/매칭 비중은 서버와 프론트에서 확인하지만, 사전 카드는 cookie/localStorage 기반이다.
+- 매칭 찾기 gate: 서버 route가 그룹 멤버 전원의 성향/시간/비중/사전 카드 완료를 검사한다. 단 새 migration이 실제 Supabase에 적용되어야 운영 검증 가능하다.
 - 보증금/결제: mock provider는 동작하도록 설계되어 있으나 실결제 provider 호출은 아직 준비 단계다.
 - 결제 provider: 현재 우리 코드의 `lib/payments/deposit.ts`는 성준 회신 반영 후 `mock`, `toss`만 유지한다. 실제 외부 승인 호출은 아직 없고, Toss 단일 흡수 대상이다.
 - 환불/앱 기여금: backend 계산 구조와 사용자 요구의 1,000원 단위, 3천/2천/1천 제안 흐름은 반영됐다. 실제 RPC 결과와 브라우저 UX 검증은 남아 있다.
@@ -111,8 +112,8 @@
 
 ## 6. 로컬/mock만 있음
 
-- `app/profile/match-card/page.tsx`: localStorage 저장.
-- `lib/matching/pre-match-card-draft.ts`: cookie 기반 완료 여부.
+- `app/profile/match-card/page.tsx`: dev/비로그인 preview에서는 localStorage fallback을 유지한다.
+- `lib/matching/pre-match-card-draft.ts`: dev preview와 구버전 local 상태 호환용 cookie helper로 남아 있다.
 - `lib/matching/dev-preview-group.ts`: 홈/매칭/그룹 preview source.
 - Supabase 미설정 시 닉네임 중복 확인은 `mode: local-preview`로 available 처리.
 - mock 보증금 결제는 `mock_pay_deposit` RPC로 paid 상태만 만든다.
@@ -121,7 +122,7 @@
 
 - 부산대 학과 source는 사용자 제공 목록으로 보강했고 `npm run test:profile`에서 검증했다. 실제 UI 브라우저 확인은 아직 필요하다.
 - 환불 페이지는 `0~10,000원`, `1,000원 단위`, `3,000원 -> 2,000원 -> 1,000원` 제안 흐름까지 코드에 반영됐다. 실제 refund RPC 결과와 사용자 화면 확인은 아직 필요하다.
-- 사전 카드가 실제 DB에 저장되는 구조는 아직 없다.
+- 사전 카드 DB 저장 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
 - 실제 Toss 승인 호출은 아직 없다. Kakao/PortOne은 성준 회신 기준 이번 흡수 기본 대상이 아니며, provider 목록에서도 제외했다.
 - `app/api/payments/deposit/confirm/route.ts`는 `provider !== 'mock'`일 때 실제 승인 검증 대신 `awaiting_provider_webhook` 응답을 반환한다.
 - `app/api/payments/deposit/webhook/route.ts`도 provider payload를 실제 서명 검증하거나 DB에 반영하지 않고 수신 자리만 둔 상태다.
@@ -135,7 +136,7 @@
 2. 앱 기여금 UI를 슬라이더, 스텝 버튼, 스크롤 선택 중 무엇으로 갈지.
 3. 3,000원만요 -> 2,000원만요 -> 1,000원만요 구걸 UX를 어느 정도 강하게 보여줄지.
 4. 성격 검사를 제거할지, 입력 부담만 줄이고 내부 점수로 유지할지.
-5. 사전 카드 localStorage 기능을 DB 저장 기능으로 승격할지.
+5. 사전 카드 DB 저장 migration을 성준 리뷰 후 적용할지.
 6. “비슷한 나이” 기준을 동갑, +-1세, +-2세, 나이대 중 무엇으로 표현할지.
 7. 연락처 공개 시점이 매칭 확정 직후인지, 만남 당일인지, `scheduled_start` 도달 시점인지.
 8. `preference_weights`를 우리 현재 4개 기준으로 유지할지, 성준 회신의 7개 기준으로 다시 합의할지.

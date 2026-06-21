@@ -22,6 +22,7 @@ export interface GroupMemberRecord {
   joined_at: string
   left_at: string | null
   match_setup_ready: boolean
+  pre_match_card_ready?: boolean
 }
 
 export interface GroupInviteRecord {

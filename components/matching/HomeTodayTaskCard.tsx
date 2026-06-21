@@ -39,6 +39,10 @@ interface MatchesResponse {
   matches: MatchRow[]
 }
 
+interface PreMatchCardDraftResponse {
+  draft?: { completed_items?: number | null } | null
+}
+
 export default function HomeTodayTaskCard() {
   const isDevPreview = isDevPreviewClientSession()
   const [loading, setLoading] = useState(true)
@@ -65,9 +69,10 @@ export default function HomeTodayTaskCard() {
     }
 
     try {
-      const [groupRes, matchRes] = await Promise.all([
+      const [groupRes, matchRes, cardDraftRes] = await Promise.all([
         fetch('/api/groups'),
         fetch('/api/matches'),
+        fetch('/api/profile/match-card-draft'),
       ])
 
       if (groupRes.ok) {
@@ -77,11 +82,16 @@ export default function HomeTodayTaskCard() {
         setGroupMembers(data.members ?? [])
         setCurrentUserId(data.current_user_id ?? null)
         setMatchSetupStatus(data.current_user_match_setup ?? EMPTY_MATCH_SETUP_STATUS)
-        setPreMatchCardDone(hasPreMatchCardDraftCookie())
       }
       if (matchRes.ok) {
         const data = await matchRes.json() as MatchesResponse
         setMatches(data.matches ?? [])
+      }
+      if (cardDraftRes.ok) {
+        const data = await cardDraftRes.json() as PreMatchCardDraftResponse
+        setPreMatchCardDone(Number(data.draft?.completed_items ?? 0) >= 4)
+      } else {
+        setPreMatchCardDone(hasPreMatchCardDraftCookie())
       }
     } catch {
       // 홈의 오늘 할 일 카드는 실패해도 기본 CTA를 보여준다.

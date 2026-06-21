@@ -250,9 +250,15 @@ export default async function MatchStartPage() {
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const cardDraftDone = isPreMatchCardDraftCookieDone(
-    cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
-  )
+  const { data: cardDraft } = await supabase
+    .from('pre_match_card_drafts')
+    .select('completed_items')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const cardDraftDone =
+    typeof cardDraft?.completed_items === 'number' &&
+    cardDraft.completed_items >= 4
   const steps = buildSetupSteps((profile as MatchSetupProfile | null) ?? null, cardDraftDone)
   if (steps.every((step) => step.done)) redirect('/group/create')
 

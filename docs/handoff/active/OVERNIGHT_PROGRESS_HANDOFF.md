@@ -338,3 +338,81 @@ production Supabase/Vercel/Toss는 건드리지 마.
 우선 실제 브라우저에서 `/`, `/match`, `/notifications`, `/profile/basic`, `/group/create`를 확인해서 이번 프론트 변경이 사용자 체감상 자연스러운지 검증해. 브라우저 자동화가 계속 막히면 curl/문서 근거로 검증 한계를 기록해.
 그다음 git status를 분류하고 커밋에 넣을 파일/보류할 파일 후보를 보고해. 아직 커밋은 하지 마.
 ```
+
+## 2026-06-22 사전 카드 DB 저장 승격
+
+### 추가 수정
+
+33. 큐 진입 전 사전 카드 초안 전용 DB 테이블을 추가했다.
+   - `supabase/migrations/20260622_matching_pre_match_card_drafts.sql`
+   - `pre_match_card_drafts`는 user별 1개 초안을 저장한다.
+   - 내용(`content_text`)은 RLS로 본인만 읽고 쓸 수 있다.
+   - 그룹 준비 확인은 `get_group_pre_match_card_readiness(group_id)` RPC가 완료 여부만 반환한다.
+   - 친구/그룹원이 상대 카드 내용을 큐 진입 전에 미리 보는 구조가 아니다.
+34. 사전 카드 초안 API를 추가했다.
+   - `app/api/profile/match-card-draft/route.ts`
+   - GET: 내 초안 조회.
+   - POST: 10~500자, 6개 항목 중 4개 이상 완료 검증 후 upsert.
+   - 완료 개수는 서버에서 `daily-card-authoring` helper로 다시 계산한다.
+35. `/profile/match-card` 저장 흐름을 DB 우선으로 바꿨다.
+   - 로그인 사용자는 API를 통해 DB에 저장한다.
+   - dev/비로그인 preview에서는 로컬 임시 저장 fallback을 유지한다.
+   - 저장 성공 문구도 `DB 저장`과 `현재 기기 임시 저장`을 구분한다.
+36. `/match/start`, 홈 오늘 할 일, 그룹 화면이 cookie가 아니라 DB 초안 완료 여부를 읽도록 조정했다.
+   - `app/match/start/page.tsx`
+   - `components/matching/HomeTodayTaskCard.tsx`
+   - `app/group/create/page.tsx`
+37. 그룹 준비 상태와 큐 진입 서버 gate를 멤버 전원 사전 카드 기준으로 강화했다.
+   - `app/api/groups/route.ts`
+   - `app/api/match-pool/enter/route.ts`
+   - 이제 큐 진입은 그룹원 모두 `성향/시간/비중/사전 카드`를 끝내야 가능하다.
+   - 현재 사용자 카드가 없으면 `pre_match_card_required`.
+   - 다른 멤버 카드가 없으면 `member_pre_match_card_incomplete`.
+38. 관련 문구와 테스트를 새 기준으로 고정했다.
+   - `components/matching/group-create/FreeBetaQueuePanel.tsx`
+   - `components/matching/group-create/status.ts`
+   - `tests/config/booting-branding.test.ts`
+   - `tests/matching/group-create-status.test.ts`
+
+### 검증 결과
+
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 30개 테스트 통과.
+- `npm run test:profile` 통과. 14개 테스트 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+- `npm run build` 통과.
+- 3004 dev server 재시작 후 route 확인:
+  - `/dev/preview` 200.
+  - `/` 200.
+  - `/match` 200.
+  - `/notifications` 200.
+  - `/profile/basic` 200.
+  - `/profile/match-card` 200.
+  - `/group/create` 200.
+  - `/match/start` 200.
+  - `/match/dev-match-pending` 200.
+  - `/match/dev-match-1` 200.
+
+### 남은 완료 기준
+
+- 새 migration은 코드에 추가했지만 production Supabase에는 적용하지 않았다.
+  - 협업 규칙상 성준/상대방 리뷰 후 적용해야 한다.
+- 닉네임 중복 DB 강제는 아직 API 조회 게이트 수준이다.
+  - `profiles.display_name` unique 또는 normalized nickname 테이블 설계가 다음 우선순위다.
+- Toss sandbox confirm/cancel/webhook은 아직 placeholder가 남아 있다.
+  - production Toss 실결제는 건드리지 않았다.
+- 데일리카드 정책은 여전히 합의 필요다.
+  - 충현안 `16~20시 직접 뽑기`와 성준 gwating `자동분배` 중 하나를 선택해야 한다.
+- `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
+
+### 다음 사람이 바로 이어갈 명령
+
+```text
+팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 사전 카드 DB 저장 승격"부터 읽고 이어서 진행해.
+현재 우선순위는:
+1. 닉네임 중복 DB 강제 설계/구현.
+2. Toss sandbox confirm/cancel/webhook 흡수 범위 구현 또는 성준 결제 레이어 기준 차이 보고.
+3. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책 결정 질문 정리.
+production Supabase/Vercel/Toss는 건드리지 마.
+```

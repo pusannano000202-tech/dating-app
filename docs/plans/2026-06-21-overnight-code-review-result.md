@@ -2,7 +2,7 @@
 
 ## 1. 한 줄 결론
 
-현재 브랜치는 사용자 검토용 프론트와 mock 흐름은 많이 붙어 있지만, 배포 기준 핵심인 결제 실승인, 그룹/매칭 스키마, 데일리카드/채팅의 Supabase 연결은 아직 확정된 한 줄 흐름이 아니다. 지금 안전하게 할 일은 공용 스키마를 더 늘리는 것이 아니라, 프론트 source 불일치를 줄이고 성준 Toss 결제 기준과 우리 placeholder route의 차이를 명확히 고정하는 것이다.
+현재 브랜치는 사용자 검토용 프론트와 mock 흐름을 넘어서, 큐 진입 전 사전 카드 초안까지 DB 저장 구조로 승격했다. 그래도 배포 기준 핵심인 Toss 실승인, 닉네임 DB unique, 데일리카드/채팅 정책 합의는 아직 끝난 상태가 아니다. 새로 추가한 `pre_match_card_drafts` migration은 production 적용 전 성준 리뷰가 필요하다.
 
 ## 2. 결제 코드리뷰
 
@@ -72,6 +72,8 @@
 
 우리 브랜치에는 일부 route, migration, 문서가 이미 이 이름들을 쓰고 있다. 그래서 지금 새 migration을 추가하거나 공용 타입을 바꾸면 성준 스키마와 우리 스키마가 따로 생기는 위험이 있다.
 
+예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`이 큐 진입 gate와 직접 연결되어 있어 `pre_match_card_drafts` migration을 새로 추가했다. 이 migration은 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
+
 ## 5. 결정 필요
 
 1. `preference_weights`는 4개 기준으로 유지할지, 성준 회신의 7개 기준으로 바꿀지.
@@ -79,9 +81,11 @@
 3. `match_meetings`, `venues`, `connections`를 우리 브랜치 기준으로 살릴지, 성준 기준에 맞춰 새 계약부터 잡을지.
 4. Toss 결제는 webhook 없이 confirm 중심으로 갈지.
 5. Toss confirm/cancel 구현 시 `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`를 어떤 route에서만 읽게 할지.
+6. `pre_match_card_drafts`를 현재 브랜치 기준으로 적용할지, 성준 스키마에 맞춰 이름/위치를 조정할지.
 
 ## 6. 바로 가능한 다음 작업
 
+- 새 `pre_match_card_drafts` migration을 local/staging에서 적용해 `/profile/match-card` 저장과 `/api/match-pool/enter` 멤버 전원 gate를 실제 DB로 확인.
 - `/profile/basic` 브라우저 확인: 학과 검색 후보가 실제로 뜨는지 확인.
 - 결제 흡수 표 보강: 성준 Toss route 이름과 우리 route 이름을 1:1로 매핑.
 - 홈/매칭/그룹 로컬 route 확인: 같은 멤버가 보이는지 확인.
@@ -107,8 +111,9 @@
 - 활성 멤버 2명 이상.
 - 활성 멤버 수가 `groups.size`에 도달.
 - 모든 멤버의 성향 선호, 가능 시간, 매칭 비중 완료.
+- 모든 멤버의 사전 카드 초안 DB 저장 완료.
 
-따라서 사용자가 걱정한 "입력 안 해도 바로 매칭 큐로 들어가는 문제"는 서버 route 기준으로는 막고 있다. 다만 이 route가 부르는 `enter_match_pool` RPC는 성준 최신 회신 기준에는 없다고 했으므로, 우리 브랜치 구현 후보와 성준 기준 계약을 분리해야 한다.
+따라서 사용자가 걱정한 "입력 안 해도 바로 매칭 큐로 들어가는 문제"는 서버 route 기준으로는 막고 있다. 다만 이 route가 부르는 `enter_match_pool` RPC와 새 `pre_match_card_drafts` migration은 성준 최신 회신 기준에는 없다고 했으므로, 우리 브랜치 구현 후보와 성준 기준 계약을 분리해야 한다.
 
 ### 이상형 월드컵 성별 분기
 

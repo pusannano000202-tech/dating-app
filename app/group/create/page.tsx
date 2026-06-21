@@ -146,7 +146,8 @@ export default function GroupCreatePage() {
   }, [isDevPreview])
 
   useEffect(() => {
-    setPreMatchCardDone(hasPreMatchCardDraftCookie())
+    void refreshPreMatchCardStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function ensureGroup() {
@@ -180,6 +181,7 @@ export default function GroupCreatePage() {
 
       const data = await res.json() as GroupState
       setState(data)
+      await refreshPreMatchCardStatus()
       if (data.group?.id) {
         await refreshDeposit(data.group.id)
       }
@@ -197,8 +199,30 @@ export default function GroupCreatePage() {
     if (!res.ok) return
     const data = await res.json() as GroupState
     setState(data)
+    await refreshPreMatchCardStatus()
     if (data.group?.id) {
       await refreshDeposit(data.group.id)
+    }
+  }
+
+  async function refreshPreMatchCardStatus() {
+    if (isDevPreview) {
+      setPreMatchCardDone(hasPreMatchCardDraftCookie())
+      return
+    }
+
+    try {
+      const res = await fetch('/api/profile/match-card-draft', { cache: 'no-store' })
+      if (!res.ok) {
+        setPreMatchCardDone(false)
+        return
+      }
+      const data = await res.json() as {
+        draft?: { completed_items?: number | null } | null
+      }
+      setPreMatchCardDone(Number(data.draft?.completed_items ?? 0) >= 4)
+    } catch {
+      setPreMatchCardDone(false)
     }
   }
 
@@ -435,9 +459,13 @@ export default function GroupCreatePage() {
       case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
       case 'deposit_not_paid':   return '매칭 확정 전에는 모든 멤버의 보증금 결제가 필요해요.'
       case 'pre_match_card_required':
-        return '내 사전 카드 초안을 먼저 저장해야 큐에 들어갈 수 있어요.'
+        return '내 사전 카드 초안을 먼저 DB에 저장해야 큐에 들어갈 수 있어요.'
+      case 'member_pre_match_card_incomplete':
+        return '그룹 멤버 모두 사전 카드 초안을 저장해야 큐에 들어갈 수 있어요.'
+      case 'member_card_lookup_failed':
+        return '멤버의 사전 카드 준비 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.'
       case 'member_match_setup_incomplete':
-        return '멤버의 성향 선호/가능 시간/매칭 비중 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
+        return '멤버의 성향 선호/가능 시간/매칭 비중/사전 카드 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
       case 'member_profile_lookup_failed':
         return '멤버 준비 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'
       default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해 주세요.'

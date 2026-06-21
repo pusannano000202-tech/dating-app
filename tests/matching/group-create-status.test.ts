@@ -44,7 +44,7 @@ test('getQueueStatusText explains the blocking setup state before queue entry', 
   )
   assert.equal(
     getQueueStatusText({ group, membersLength: 3, needsSetupCount: 1 }),
-    '멤버마다 성향/시간/비중 입력이 필요해요',
+    '멤버마다 성향/시간/비중/사전 카드 준비가 필요해요',
   )
   assert.equal(
     getQueueStatusText({ group, membersLength: 3, needsSetupCount: 0 }),

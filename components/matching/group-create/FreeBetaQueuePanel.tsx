@@ -107,7 +107,7 @@ export function FreeBetaQueuePanel({
       label: '그룹원 매칭 준비',
       desc: allMembersReady
         ? '모든 멤버가 매칭 설정을 끝냈어요'
-        : `${needsSetupCount}명이 성향/시간/비중 입력을 끝내야 해요`,
+        : `${needsSetupCount}명이 성향/시간/비중/사전 카드 준비를 끝내야 해요`,
       done: allMembersReady,
       href: '/match/start',
       cta: '내 설정 보기',
@@ -294,7 +294,7 @@ export function FreeBetaQueuePanel({
             : !isLeader
               ? '리더만 큐 진입을 시작할 수 있어요.'
               : needsSetupCount > 0
-                ? '매칭 준비 항목(성향, 시간, 비중)을 아직 입력해야 하는 멤버가 있어요.'
+                ? '매칭 준비 항목(성향, 시간, 비중, 사전 카드)을 아직 입력해야 하는 멤버가 있어요.'
                 : '큐 진입 조건이 맞으면 버튼이 활성화됩니다.'}
         </p>
       )}

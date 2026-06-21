@@ -22,7 +22,7 @@ export function getQueueStatusText({
   if (missingMembers > 0) {
     return missingMembers === 1 ? '친구 1명이 더 필요해요' : `친구 ${missingMembers}명이 더 필요해요`
   }
-  if (needsSetupCount > 0) return '멤버마다 성향/시간/비중 입력이 필요해요'
+  if (needsSetupCount > 0) return '멤버마다 성향/시간/비중/사전 카드 준비가 필요해요'
   return '매칭 큐 진입 준비 완료'
 }
 
