@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import {
+  buildDepositPaymentRequestDraft,
+  getDepositPaymentReadiness,
+  resolveDepositPaymentProvider,
+} from '@/lib/payments/deposit'
 
 interface DepositRow {
   id: string
@@ -58,7 +63,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'group_id_required' }, { status: 400 })
   }
 
-  // mock 결제: 토스 통합 전 임시
+  const provider = resolveDepositPaymentProvider(body.provider)
+  const readiness = getDepositPaymentReadiness(provider)
+  if (!readiness.ok) {
+    return NextResponse.json({
+      error: readiness.error,
+      provider: readiness.provider,
+    }, { status: 503 })
+  }
+
+  if (provider !== 'mock') {
+    return NextResponse.json({
+      status: 'external_checkout_required',
+      provider,
+      payment: buildDepositPaymentRequestDraft({
+        provider,
+        groupId,
+        userId: user.id,
+        origin: req.nextUrl.origin,
+      }),
+    }, { status: 202 })
+  }
+
+  // 로컬/검토용 mock 결제: 실제 결제사 호출 없이 보증금 paid 상태만 만든다.
   const { data, error } = await supabase
     .rpc('mock_pay_deposit', { p_group_id: groupId, p_amount: DEPOSIT_AMOUNT })
     .maybeSingle()
@@ -67,7 +94,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message || 'pay_failed' }, { status: 400 })
   }
 
-  return NextResponse.json({ deposit: data }, { status: 201 })
+  return NextResponse.json({ provider, deposit: data }, { status: 201 })
 }
 
 async function readJson(req: NextRequest): Promise<Record<string, unknown>> {

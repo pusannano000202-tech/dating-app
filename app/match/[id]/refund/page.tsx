@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Loader2 } from 'lucide-react'
-import { DEPOSIT_AMOUNT, FREE_BETA_ENABLED } from '@/lib/constants'
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import {
   appFeeToRefundAmount,
   getAppFeeFlowDecision,
@@ -14,7 +14,7 @@ import { createClient } from '@/lib/supabase'
 import { isSupabaseConfigured } from '@/lib/utils'
 import SanjiCharacter, { type SanjiMood } from '@/components/SanjiCharacter'
 
-type Stage = 'select' | 'beg_3000' | 'confirm_low_fee' | 'confirm_zero' | 'notify_zero' | 'done'
+type Stage = 'select' | 'ask_min_fee' | 'confirm_low_fee' | 'confirm_zero' | 'notify_zero' | 'done'
 type UserGender = 'male' | 'female' | null
 
 export default function RefundPage() {
@@ -22,6 +22,8 @@ export default function RefundPage() {
   const router = useRouter()
   const matchId = params.id
   const total = DEPOSIT_AMOUNT
+  const totalLabel = `${total.toLocaleString()}원`
+  const presetAmounts = [0, Math.round(total * 0.3), Math.round(total * 0.5), Math.round(total * 0.7), total]
   const [appFee, setAppFee] = useState<number>(MIN_PRIVATE_APP_FEE)
   const [pendingAppFee, setPendingAppFee] = useState<number>(MIN_PRIVATE_APP_FEE)
   const [stage, setStage] = useState<Stage>('select')
@@ -47,37 +49,6 @@ export default function RefundPage() {
         })
     }).catch(() => undefined)
   }, [])
-
-  if (FREE_BETA_ENABLED) {
-    return (
-      <main className="min-h-screen px-5 pb-10">
-        <div className="max-w-md mx-auto pt-6">
-          <header className="mb-6 flex items-center gap-3">
-            <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
-              <ChevronLeft size={18} />
-            </Link>
-            <div>
-              <h1 className="text-xl font-black">무료 베타 진행 중</h1>
-              <p className="text-xs text-gray-500 mt-0.5">지금은 매칭비 정산을 받지 않아요</p>
-            </div>
-          </header>
-
-          <section className="glass-card rounded-3xl p-6 text-center">
-            <p className="text-lg font-black gradient-fate-text">정산할 금액이 없어요</p>
-            <p className="mt-3 text-sm leading-relaxed text-gray-500">
-              사용자 확보를 우선하기 위해 무료 베타 기간에는 보증금, 환불, 앱 매칭비 선택을 모두 비활성화합니다.
-            </p>
-            <Link
-              href={`/match/${encodeURIComponent(matchId)}`}
-              className="btn-gradient mt-5 block w-full rounded-2xl py-3 text-sm font-bold"
-            >
-              매칭 상세로 돌아가기
-            </Link>
-          </section>
-        </div>
-      </main>
-    )
-  }
 
   async function submit(finalAppFee: number) {
     if (busy) return
@@ -116,7 +87,7 @@ export default function RefundPage() {
       submit(decision.normalizedAppFee)
       return
     }
-    setStage('beg_3000')
+    setStage('ask_min_fee')
   }
 
   function handleBegReject() {
@@ -158,7 +129,7 @@ export default function RefundPage() {
               type="range"
               min={0}
               max={total}
-              step={1000}
+              step={100}
               value={appFee}
               onChange={(e) => setAppFee(parseInt(e.target.value, 10))}
               className="w-full accent-violet-500"
@@ -170,7 +141,7 @@ export default function RefundPage() {
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-2">
-              {[0, 1000, 2000, 3000, 5000, 10000].map((value) => (
+              {presetAmounts.map((value) => (
                 <button
                   key={value}
                   type="button"
@@ -192,7 +163,7 @@ export default function RefundPage() {
                 <span className="font-black text-white">{refundAmount.toLocaleString()}원</span>
               </div>
               <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
-                {MIN_PRIVATE_APP_FEE.toLocaleString()}원 이상이면 조용히 정산돼요. 0원을 선택하면 최종 확인 후 상대방에게 0원 지불 알림이 갑니다.
+                보증금은 기본 환불이고, 이어가기를 서로 선택한 경우에만 앱 기여금을 정해요. 0원을 선택하면 최종 확인 후 상대방에게 0원 지불 알림이 갑니다.
               </p>
             </div>
 
@@ -207,12 +178,12 @@ export default function RefundPage() {
           </section>
         )}
 
-        {stage === 'beg_3000' && (
+        {stage === 'ask_min_fee' && (
           <SanjiCard
             mood="pleading"
-            speech="잠깐만요!! 3,000원만 주면 안돼요?! 🥺"
-            sub="여기부터는 상대에게 매칭비 금액 알림 없이 조용히 정산돼요."
-            acceptLabel="3,000원 줄게요"
+            speech={`보증금 ${totalLabel} 전액을 앱 기여금으로 남길까요?`}
+            sub="전액 기여를 선택하면 환불 없이 정산되고, 낮은 금액은 한 번 더 확인해요."
+            acceptLabel={`${totalLabel} 기여`}
             rejectLabel={pendingAppFee === 0 ? '그래도 0원' : `${pendingAppFee.toLocaleString()}원만 줄래요`}
             onAccept={() => submit(MIN_PRIVATE_APP_FEE)}
             onReject={handleBegReject}
@@ -223,9 +194,9 @@ export default function RefundPage() {
         {stage === 'confirm_low_fee' && (
           <ConfirmCard
             title={`${pendingAppFee.toLocaleString()}원으로 진행할까요?`}
-            body={`3,000원부터는 상대방에게 매칭비로 얼마를 지불했는지 알림이 안 갑니다. 그래도 ${pendingAppFee.toLocaleString()}원으로 정산할까요?`}
+            body={`보증금 ${totalLabel} 중 ${pendingAppFee.toLocaleString()}원만 앱 기여금으로 남기고 나머지를 환불할까요?`}
             primaryLabel={`${pendingAppFee.toLocaleString()}원으로 정산`}
-            secondaryLabel="3,000원 줄게요"
+            secondaryLabel={`${totalLabel} 기여`}
             onPrimary={() => submit(pendingAppFee)}
             onSecondary={() => submit(MIN_PRIVATE_APP_FEE)}
             busy={busy}
@@ -237,7 +208,7 @@ export default function RefundPage() {
             title="그래도 0원 주겠습니까?"
             body="0원을 선택하면 상대방이 서운할 수 있어요. 아래처럼 보일 수 있다는 걸 먼저 확인해주세요."
             primaryLabel="그래도 0원"
-            secondaryLabel="3,000원 줄게요"
+            secondaryLabel={`${totalLabel} 기여`}
             onPrimary={() => setStage('notify_zero')}
             onSecondary={() => submit(MIN_PRIVATE_APP_FEE)}
             busy={busy}
@@ -251,7 +222,7 @@ export default function RefundPage() {
             title="0원 알림이 상대방에게 갑니다"
             body="상대방에게 매칭비로 0원을 지불했다는 사실이 알림으로 갑니다. 그래도 0원을 지불하겠습니까?"
             primaryLabel="0원으로 확정"
-            secondaryLabel="3,000원 줄게요"
+            secondaryLabel={`${totalLabel} 기여`}
             danger
             onPrimary={() => submit(0)}
             onSecondary={() => submit(MIN_PRIVATE_APP_FEE)}

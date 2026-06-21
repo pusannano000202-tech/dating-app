@@ -403,7 +403,7 @@ export default function MatchDetailPage() {
 
   async function handleFinalize() {
     if (gpsBusy) return
-    if (!window.confirm('미도착 처리를 할까요? 무료 베타 기간에는 결제 차감 없이 상태만 기록됩니다.')) return
+    if (!window.confirm('미도착 처리를 할까요? 노쇼로 확정되면 보증금 환불이 제한될 수 있습니다.')) return
     setGpsBusy(true)
     setGpsMessage(null)
     try {
@@ -632,6 +632,10 @@ export default function MatchDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ group_id: match.my_group_id }),
       })
+      if (res.status === 202) {
+        setError('외부 결제창 연결 준비 상태예요. 로컬 검토에서는 mock 결제로 확인해 주세요.')
+        return
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => ({})) as { error?: string }
         setError(translateMatchError(data.error))
@@ -639,7 +643,7 @@ export default function MatchDetailPage() {
       }
       await refresh()
     } catch {
-      setError('무료 참여 확인에 실패했어요. 잠시 뒤 다시 시도해 주세요.')
+      setError('보증금 결제 확인에 실패했어요. 잠시 뒤 다시 시도해 주세요.')
     } finally {
       setDepositSaving(false)
     }
@@ -651,10 +655,12 @@ export default function MatchDetailPage() {
       case 'match_not_pending':   return '이미 처리된 매칭이에요.'
       case 'match_not_cancelable': return '지금은 취소할 수 없는 매칭이에요.'
       case 'match_card_incomplete': return '우리 그룹 카드 작성이 끝나야 확정할 수 있어요.'
-      case 'deposit_not_paid':    return '우리 그룹의 무료 참여 확인이 끝나야 확정할 수 있어요.'
+      case 'deposit_not_paid':    return '우리 그룹의 보증금 결제가 끝나야 확정할 수 있어요.'
       case 'invalid_card_content': return '카드는 10자 이상 500자 이하로 작성해 주세요.'
-      case 'deposit_already_exists': return '이미 무료 참여가 확인됐어요.'
-      case 'not_group_member':    return '그룹 멤버만 참여 확인을 할 수 있어요.'
+      case 'deposit_already_exists': return '이미 보증금 결제가 확인됐어요.'
+      case 'not_group_member':    return '그룹 멤버만 보증금 결제를 할 수 있어요.'
+      case 'invalid_deposit_amount': return '보증금 금액이 올바르지 않아요.'
+      case 'payment_provider_not_configured': return '결제 제공자 설정이 아직 연결되지 않았어요.'
       default:                     return '처리에 실패했어요. 잠시 뒤 다시 시도해 주세요.'
     }
   }
@@ -763,7 +769,7 @@ export default function MatchDetailPage() {
         <section className="mb-4 rounded-2xl border border-boot-primary/25 bg-white/90 px-4 py-3">
           <p className="text-xs font-black text-boot-primary">지금 이 화면에서 할 수 있는 것</p>
           <p className="mt-1 text-xs text-boot-muted leading-relaxed">
-            준비 중인 매칭은 카드 작성과 무료 참여 확인을 먼저 끝내고, 확정된 매칭은 오늘 공개 카드를 뽑아보면 돼요.
+            준비 중인 매칭은 카드 작성과 보증금 결제를 먼저 끝내고, 확정된 매칭은 오늘 공개 카드를 뽑아보면 돼요.
           </p>
           <p className="mt-1 text-[11px] text-boot-muted">
             아래 카드와 버튼은 실제 동선 검토용으로 바로 눌러볼 수 있게 정리했습니다.
@@ -881,7 +887,7 @@ export default function MatchDetailPage() {
               <div>
                 <p className="text-xs font-black text-emerald-700">매칭 진행 가이드</p>
                 <p className="mt-0.5 text-[11px] text-boot-muted leading-relaxed">
-                  이 화면에서 카드 작성, 무료 참여 확인, 매칭 확정을 순서대로 눌러볼 수 있어요.
+                  이 화면에서 카드 작성, 보증금 결제, 매칭 확정을 순서대로 눌러볼 수 있어요.
                 </p>
               </div>
             </section>
@@ -892,7 +898,7 @@ export default function MatchDetailPage() {
                   <p className="text-sm font-bold">매칭 준비하기</p>
                   <p className="mt-1 text-xs text-boot-muted leading-relaxed">
                     상대가 확정한 뒤에 누르는 흐름이 아니라, 지금부터 내 준비를 먼저 만들어요.
-                    카드 입력과 무료 참여 확인이 모두 준비되어야 확정 버튼이 활성화돼요.
+                    카드 입력과 보증금 결제가 모두 준비되어야 확정 버튼이 활성화돼요.
                   </p>
                 </div>
 
@@ -903,7 +909,7 @@ export default function MatchDetailPage() {
                     total={match.my_group_active_count}
                   />
                   <ProgressPill
-                    label="우리 참여"
+                    label="우리 보증금"
                     current={match.my_group_deposit_paid_count}
                     total={match.my_group_active_count}
                   />
@@ -913,7 +919,7 @@ export default function MatchDetailPage() {
                     total={match.opp_group_active_count}
                   />
                   <ProgressPill
-                    label="상대 참여"
+                    label="상대 보증금"
                     current={match.opp_group_deposit_paid_count}
                     total={match.opp_group_active_count}
                   />
@@ -953,8 +959,8 @@ export default function MatchDetailPage() {
                   className="mt-4 w-full py-3 rounded-2xl text-sm font-bold border border-emerald-400/30 bg-emerald-500/10 text-emerald-700 disabled:opacity-40"
                 >
                   {match.my_group_deposit_paid_count >= match.my_group_active_count
-                    ? '우리 그룹 무료 참여 완료'
-                    : '무료 참여 확인하기'}
+                    ? '우리 그룹 보증금 결제 완료'
+                    : '보증금 결제하기'}
                 </button>
 
                 {!match.my_group_ready && (
@@ -1022,8 +1028,8 @@ export default function MatchDetailPage() {
                     </p>
                     <p className="mt-1.5 text-xs text-boot-muted leading-relaxed">
                       {attendance.caller_is_no_show
-                        ? '약속 장소 체크인이 확인되지 않았어요. 무료 베타 기간에는 결제 차감 없이 상태만 기록됩니다.'
-                        : '상대 쪽 미도착으로 만남이 정상 진행되지 않았어요. 무료 베타 기간에는 환불이나 차감 없이 기록만 남겨요.'}
+                        ? '약속 장소 체크인이 확인되지 않았어요. 노쇼 확정 시 보증금 환불이 제한될 수 있어요.'
+                        : '상대 쪽 미도착으로 만남이 정상 진행되지 않았어요. 노쇼 확정 시 상대 보증금이 몰수되고 우리 쪽 정산으로 이어져요.'}
                     </p>
                     <p className="mt-2 text-[11px] text-boot-muted">
                       자세한 내역은 알림에서 확인할 수 있어요.
@@ -1045,6 +1051,9 @@ export default function MatchDetailPage() {
                 >
                   만남 평가 작성
                 </Link>
+                <p className="text-center text-[11px] leading-5 text-boot-muted">
+                  환불/정산은 이어가기 선택 결과에 따라 자동으로 안내돼요.
+                </p>
               </div>
             ) : null}
 
