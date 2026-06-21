@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase-server'
+import { getSessionUser } from '@/lib/payments/auth'
 import { confirmPayment } from '@/lib/payments/toss'
 import { assertAmountMatches } from '@/lib/payments/orders'
 
@@ -13,6 +14,11 @@ function tableFor(orderId: string): 'deposits' | 'tips' | null {
 }
 
 export async function POST(req: Request) {
+  const user = await getSessionUser()
+  if (!user) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
   const { paymentKey, orderId, amount } = await req.json()
   const table = tableFor(orderId)
   if (!paymentKey || !orderId || typeof amount !== 'number' || !table) {
@@ -24,6 +30,11 @@ export async function POST(req: Request) {
     .from(table).select('*').eq('order_id', orderId).single()
   if (readErr || !row) {
     return NextResponse.json({ error: 'order not found' }, { status: 404 })
+  }
+
+  // 호출자-주문 바인딩: 주문을 시작한 본인만 confirm 가능(주문 상태 프로빙 차단).
+  if (row.payer_user_id !== user.id) {
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
 
   // 멱등: 이미 결제 완료면 그대로 성공 반환
@@ -51,12 +62,14 @@ export async function POST(req: Request) {
   if (payment.status !== 'DONE') {
     return NextResponse.json({ error: `unexpected payment status: ${payment.status}` }, { status: 402 })
   }
-  if (typeof payment.totalAmount === 'number') {
-    try {
-      assertAmountMatches(row.amount, payment.totalAmount)
-    } catch (e) {
-      return NextResponse.json({ error: (e as Error).message }, { status: 400 })
-    }
+  // 실제 청구 금액 교차검증. totalAmount 부재 시에도 통과시키지 않는다.
+  if (typeof payment.totalAmount !== 'number') {
+    return NextResponse.json({ error: 'toss response missing totalAmount' }, { status: 402 })
+  }
+  try {
+    assertAmountMatches(row.amount, payment.totalAmount)
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 400 })
   }
 
   const patch =

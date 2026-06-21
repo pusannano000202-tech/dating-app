@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS deposits (
   canceled_at   TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_deposits_match ON deposits(match_id);
+-- 같은 (match_id, group_id)에 pending 보증금은 하나만(중복 prepare로 orphan 행 방지).
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_deposits_pending
+  ON deposits(match_id, group_id) WHERE status = 'pending';
 
 CREATE TABLE IF NOT EXISTS tips (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -63,10 +66,15 @@ CREATE TABLE IF NOT EXISTS attendances (
   created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- RLS: 결제 기록은 서버(service_role)만 쓴다. service_role은 RLS를 우회하므로
--- 클라이언트(anon)에는 정책을 부여하지 않아 기본 거부 상태로 둔다.
-ALTER TABLE deposits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tips     ENABLE ROW LEVEL SECURITY;
+-- RLS: 결제/매칭 관련 테이블은 서버(service_role)만 접근한다. service_role은 RLS를
+-- 우회하므로, 모든 테이블에 RLS를 켜고 정책을 두지 않아 anon/authenticated는 기본 거부.
+-- (grant 부재에만 의존하지 않고 RLS로도 이중 방어 — 향후 grant가 추가돼도 안전.)
+ALTER TABLE groups           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE matches          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE deposits         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tips             ENABLE ROW LEVEL SECURITY;
+ALTER TABLE noshow_penalties ENABLE ROW LEVEL SECURITY;
+ALTER TABLE attendances      ENABLE ROW LEVEL SECURITY;
 -- TODO(충현): 참가자 본인 SELECT 허용 정책은 매칭 참가자 모델 확정 후 추가.
 
 -- 결제 라우트는 service_role(서버)로 모든 결제 테이블에 접근한다.

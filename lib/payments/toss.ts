@@ -18,6 +18,18 @@ function authHeader(secretKey: string): string {
   return 'Basic ' + Buffer.from(secretKey + ':').toString('base64')
 }
 
+/** 토스 API 에러. `code`로 ALREADY_CANCELED 등 분기 가능. */
+export class TossError extends Error {
+  code?: string
+  status: number
+  constructor(message: string, status: number, code?: string) {
+    super(message)
+    this.name = 'TossError'
+    this.status = status
+    this.code = code
+  }
+}
+
 async function postToss(
   url: string,
   body: Record<string, unknown>,
@@ -31,9 +43,19 @@ async function postToss(
     },
     body: JSON.stringify(body),
   })
-  const data = await res.json()
+  // 비JSON 응답(502/504 HTML, 빈 본문 등)에서 파싱 예외로 실제 상태가 가려지지 않도록 안전 파싱.
+  const text = await res.text()
+  let data: Record<string, unknown> = {}
+  if (text) {
+    try {
+      data = JSON.parse(text)
+    } catch {
+      data = { message: text.slice(0, 200) }
+    }
+  }
   if (!res.ok) {
-    throw new Error(data?.message ?? 'Toss API error')
+    const message = (data.message as string) ?? `Toss API error ${res.status}`
+    throw new TossError(message, res.status, data.code as string | undefined)
   }
   return data as TossPayment
 }
