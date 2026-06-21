@@ -64,7 +64,7 @@
 - 성준 기준에는 `match_meetings`, `venues`, `enter_match_pool`, `connections` RPC/테이블, `16~20시 직접 뽑기`가 없다고 봐야 한다.
 - `gwating-app`의 일정 조율/데일리 Q&A/당일 채팅은 UX 참고용 localStorage/mock 프로토타입이다.
 - `preference_weights`는 우리 로컬 계약 문서가 4개 기준이고 성준 회신은 7개 기준이라, 코드 수정 전 계약 합의가 필요하다.
-- 현재 우리 결제 provider 목록은 성준 회신 반영 후 `mock`, `toss`만 유지한다. 실제 외부 승인 검증은 아직 없고, `toss`도 checkout 준비/placeholder 응답 중심이다. KakaoPay/PortOne은 이번 흡수 대상에서 제외했다.
+- 현재 우리 결제 provider 목록은 성준 회신 반영 후 `mock`, `toss`만 유지한다. Toss checkout/confirm/cancel/webhook 서버 코드는 들어왔지만, sandbox env와 dashboard 설정이 없어 실제 외부 E2E 검증은 아직 없다. KakaoPay/PortOne은 이번 흡수 대상에서 제외했다.
 - 홈과 매칭은 이미 `DEV_PREVIEW_GROUP_MEMBERS`를 공유하고 있었다. 그룹 생성 화면도 멤버는 같은 source였지만 보증금 요약만 `dev-user-1`, `dev-user-2`를 써서 불일치가 있었다.
 - 이번 수정으로 group-create dev 보증금 요약은 `DEV_PREVIEW_CURRENT_USER_ID`, `DEV_PREVIEW_FRIEND_MINJI_ID`를 사용한다.
 - 현재 우리 브랜치에는 `venues`, `match_meetings`, `enter_match_pool`, `connections`, `group_members`, `friend_requests`, `deposits`가 migration/API로 존재한다.
@@ -307,8 +307,8 @@
   - 기존 `match_card_submissions`는 `match_id`가 있어야 저장 가능하므로, 큐 진입 전 카드 저장에는 새 테이블/API 합의가 필요하다.
 - Toss 실결제:
   - 현재 production Toss 실결제는 실행하지 않았다.
-  - `mock`은 로컬 검토용이고, `toss` route는 checkout/confirm/webhook placeholder가 남아 있다.
-  - sandbox confirm/cancel/webhook까지 연결하려면 성준 결제 레이어와 env/dashboard 설정 합의가 필요하다.
+  - `mock`은 로컬 검토용이고, `toss` route는 checkout/confirm/cancel/webhook 서버 코드가 들어와 있다.
+  - sandbox confirm/cancel/webhook까지 실제로 검증하려면 Toss sandbox key, Vercel 또는 ngrok webhook URL, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` 설정이 필요하다.
 - 연락처/채팅 공개:
   - route/API 표면은 있지만 실제 공개 조건은 `match_meetings`, `connections`, 채팅 스키마 최종 합의가 필요하다.
 - 데일리카드 정책:
@@ -439,9 +439,9 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - Toss sandbox 실제 E2E는 아직 검증하지 못했다.
   - 현재 로컬 env에 `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`가 없다.
   - production Toss 실결제는 건드리지 않았다.
-- webhook route는 아직 실제 서명 검증/DB reconciliation까지 구현된 상태가 아니다.
-  - 현재는 provider readiness와 body 수신 상태만 확인하는 보류 route다.
-  - MVP 기준은 동기 confirm 중심이므로, webhook 실연동은 별도 phase 또는 성준 결제 레이어 기준 합의가 필요하다.
+- webhook route는 Toss 일반 결제 기준에 맞춰 `paymentKey/orderId`로 Toss Payment Query API를 재조회한 뒤 DB reconciliation을 수행한다.
+  - Toss 일반 결제 webhook은 `tosspayments-webhook-signature` 검증 대상이 아니다.
+  - 실제 dashboard webhook 등록과 sandbox E2E 검증은 아직 남아 있다.
 - 새 migration 2개는 production Supabase에는 적용하지 않았다.
   - `20260622_matching_pre_match_card_drafts.sql`
   - `20260622_profile_display_name_claims.sql`
@@ -453,7 +453,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
 ```text
 팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 환불 route 외부 Toss settlement 보강"부터 읽고 이어서 진행해.
 현재 우선순위는:
-1. Toss webhook 실제 서명 검증/DB reconciliation은 성준 결제 레이어 기준과 env/dashboard 설정 가능 여부를 보고한 뒤 별도 phase로 진행.
+1. Toss webhook sandbox E2E 검증은 성준 결제 레이어 기준과 env/dashboard 설정 가능 여부를 보고한 뒤 별도 phase로 진행.
 2. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책을 확정한다.
 3. 새 migration 2개를 local/staging Supabase에서 적용 검증한다.
 production Supabase/Vercel/Toss는 건드리지 마.
@@ -508,7 +508,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - 운영자 환불 트리거 또는 만남 인증 완료 트리거가 이 내부 cancel route를 호출하는 연결은 아직 남아 있다.
 - webhook은 여전히 MVP 핵심 경로가 아니다.
   - 성준 회신 기준은 webhook보다 동기 confirm 중심이다.
-  - 별도 webhook 서명 검증/DB 재조정은 후속 phase로 남긴다.
+  - webhook route는 Query API reconciliation 코드까지 들어왔지만, 실제 Toss dashboard 등록과 sandbox event 수신 검증은 후속 phase로 남긴다.
 - Toss dashboard, Vercel env, Supabase service role env 설정은 사용자가 직접 해야 한다.
 
 ### 다음 우선순위
@@ -777,7 +777,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
 
 ## 2026-06-22 최신 이어갈 지점
 
-현재 가장 최신 작업은 `Toss webhook Query API reconciliation 보강`이다.
+현재 가장 최신 작업은 `닉네임 claim migration 로컬 DB 재검증과 ambiguity 수정`이다.
 
 중요 정정:
 
@@ -787,6 +787,10 @@ production Supabase/Vercel/Toss는 건드리지 마.
 
 최신 수정 파일:
 
+- `supabase/migrations/20260622_profile_display_name_claims.sql`
+- `tests/config/booting-branding.test.ts`
+- `docs/plans/2026-06-21-overnight-user-flow-audit-result.md`
+- `docs/plans/2026-06-21-overnight-code-review-result.md`
 - `lib/payments/toss.ts`
 - `app/api/payments/deposit/webhook/route.ts`
 - `tests/config/deposit-payment-routes.test.ts`
@@ -794,12 +798,24 @@ production Supabase/Vercel/Toss는 건드리지 마.
 
 최신 검증:
 
+- Docker의 `supabase_db_phase5-local-supabase`에 `psql`로 직접 접속해 `pre_match_card_drafts`, `profile_display_name_claims`, `group_members`, `profiles`, `users` 존재 확인.
+- `20260622_profile_display_name_claims.sql` 재적용 성공.
+- 트랜잭션 rollback 방식으로 실제 DB 동작 검증:
+  - `claim_profile_display_name(' Minji ')`가 `Minji/minji`를 반환.
+  - 같은 사용자는 `is_profile_display_name_available('minji') = true`.
+  - 다른 사용자는 `is_profile_display_name_available('minji') = false`.
+  - 다른 사용자의 `claim_profile_display_name('minji')`는 `nickname_taken`으로 차단.
+  - `get_group_pre_match_card_readiness()`는 completed_items 4인 멤버만 `has_pre_match_card = true`, 3인 멤버는 false로 반환.
+- 위 검증 중 `claim_profile_display_name`의 `normalized_name` 반환 컬럼과 SQL 컬럼이 충돌하는 ambiguity를 발견했고, migration에서 컬럼 참조를 `public.profile_display_name_claims.normalized_name` 및 `ON CONFLICT ON CONSTRAINT profile_display_name_claims_pkey`로 수정.
 - `npm run typecheck` 통과.
 - `npm run lint` 통과.
 - `npm run test:config` 통과. 33개 테스트 통과.
 - `npm run test:profile` 통과. 14개 테스트 통과.
 - `npm run test:matching` 통과. 38개 테스트 통과.
 - `.next`를 현재 workspace 내부 경로로 확인 후 삭제하고 `npm run build` 재실행 통과.
+- `npm run build` 이후 기존 dev server가 같은 `.next`를 물고 있어 `/dev/preview`에서 `Cannot find module './9276.js'` 500을 냈다.
+  - root cause: 코드 오류가 아니라 build가 dev server의 chunk cache를 덮어쓴 상태.
+  - 조치: 3004 dev server를 중지하고 `.next`가 workspace 내부임을 확인한 뒤 삭제, dev server 재시작.
 - 3004 dev server 재시작 후 route 확인:
   - `/dev/preview` 200.
   - `/` 200.
@@ -817,6 +833,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
 
 다음에 바로 할 일:
 
-1. 현재 변경분을 stage하고 커밋한다.
-2. 이후 남은 큰 항목은 Toss 실제 sandbox E2E, 데일리카드 정책 확정, `preference_weights` 4개/7개 계약 확정이다.
-3. production Supabase/Vercel/Toss는 성준 리뷰와 dashboard/env 준비 전까지 건드리지 않는다.
+1. `npm run test:config`부터 다시 돌려 migration 회귀 테스트가 통과하는지 확인한다.
+2. 전체 검증이 통과하면 현재 변경분을 stage하고 커밋한다.
+3. 이후 남은 큰 항목은 Toss 실제 sandbox E2E, 데일리카드 정책 확정, `preference_weights` 4개/7개 계약 확정이다.
+4. production Supabase/Vercel/Toss는 성준 리뷰와 dashboard/env 준비 전까지 건드리지 않는다.

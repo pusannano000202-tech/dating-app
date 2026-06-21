@@ -106,7 +106,7 @@ BEGIN
 
   DELETE FROM public.profile_display_name_claims
    WHERE user_id = NEW.user_id
-     AND normalized_name <> v_normalized;
+     AND public.profile_display_name_claims.normalized_name <> v_normalized;
 
   INSERT INTO public.profile_display_name_claims (
     normalized_name,
@@ -118,7 +118,7 @@ BEGIN
     NEW.user_id,
     btrim(NEW.display_name)
   )
-  ON CONFLICT (normalized_name) DO UPDATE
+  ON CONFLICT ON CONSTRAINT profile_display_name_claims_pkey DO UPDATE
     SET user_id = EXCLUDED.user_id,
         display_name = EXCLUDED.display_name
     WHERE public.profile_display_name_claims.user_id = NEW.user_id;
@@ -231,7 +231,7 @@ BEGIN
 
   DELETE FROM public.profile_display_name_claims
    WHERE user_id = v_caller
-     AND normalized_name <> v_normalized;
+     AND public.profile_display_name_claims.normalized_name <> v_normalized;
 
   INSERT INTO public.profile_display_name_claims (
     normalized_name,
@@ -243,7 +243,7 @@ BEGIN
     v_caller,
     v_display_name
   )
-  ON CONFLICT (normalized_name) DO UPDATE
+  ON CONFLICT ON CONSTRAINT profile_display_name_claims_pkey DO UPDATE
     SET user_id = EXCLUDED.user_id,
         display_name = EXCLUDED.display_name
     WHERE public.profile_display_name_claims.user_id = v_caller;

@@ -12,7 +12,7 @@
 | 결제 시작 | `/api/deposits`, `/api/payments/deposit`에서 mock이면 즉시 paid, Toss면 pending deposit row를 만들고 checkout URL 반환 | Toss prepare route에서 결제 요청 생성 | 코드 보강, sandbox 검증 필요 | route 이름/응답 형태 매핑표 필요 |
 | 결제 승인 | `/api/payments/deposit/confirm`에서 Toss `paymentKey/orderId/amount`를 서버 helper로 승인 검증하고 paid 처리 | Toss 승인값 서버 검증 후 `deposits` paid 처리 | 코드 보강, sandbox 검증 필요 | production 호출은 안 했고, sandbox key로 end-to-end 검증 필요 |
 | 결제 취소 | `/api/payments/deposit/cancel`은 checkout 실패 redirect와 내부 secret 기반 Toss cancel을 분리 | 성준 cancel route + 내부 secret 환불 호출 | 코드 보강, 운영 트리거 미연결 | `PAYMENT_INTERNAL_SECRET` 없이는 실제 cancel 불가. refund 화면과 내부 route 연결은 남음 |
-| webhook | body 수신 placeholder, 서명 검증/DB 반영 없음 | 성준 기준 webhook 없음, 동기 confirm 중심 | 보류 | MVP는 webhook보다 confirm 검증 우선 |
+| webhook | Toss 일반 결제 webhook에서 `paymentKey/orderId`를 추출하고 Query API 재조회 후 DB reconciliation | 성준 기준 webhook 없음, 동기 confirm 중심 | 코드 보강, sandbox E2E 미검증 | MVP는 confirm 중심으로 두되 dashboard/ngrok 또는 preview URL로 webhook 수신 검증 필요 |
 | 환경변수 | `TOSS_SECRET_KEY`, `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` | `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` | 코드 기준 일치, 대시보드 설정 필요 | Vercel/Supabase/Toss dashboard 설정 필요 |
 | 금액 | `DEPOSIT_AMOUNT = 10000`, mock RPC도 10,000원 검증 | 10,000원 | 일치 | 유지 |
 
@@ -72,7 +72,7 @@
 
 우리 브랜치에는 일부 route, migration, 문서가 이미 이 이름들을 쓰고 있다. 그래서 지금 새 migration을 추가하거나 공용 타입을 바꾸면 성준 스키마와 우리 스키마가 따로 생기는 위험이 있다.
 
-예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`과 `닉네임 중복 DB 강제`가 사용자 동선과 직접 연결되어 있어 migration 2개를 새로 추가했다. `pre_match_card_drafts`는 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. `profile_display_name_claims`는 기존 중복 데이터를 터뜨리지 않고 신규 닉네임 claim만 고유하게 강제한다. Phase 5 로컬 Supabase에서 SQL 적용, 닉네임 중복 차단, 사전 카드 readiness RPC 동작을 확인했다. production 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
+예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`과 `닉네임 중복 DB 강제`가 사용자 동선과 직접 연결되어 있어 migration 2개를 새로 추가했다. `pre_match_card_drafts`는 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. `profile_display_name_claims`는 기존 중복 데이터를 터뜨리지 않고 신규 닉네임 claim만 고유하게 강제한다. Phase 5 로컬 Supabase에서 SQL 적용, 닉네임 중복 차단, 사전 카드 readiness RPC 동작을 확인했다. 이 검증 중 `claim_profile_display_name`의 `normalized_name` 컬럼/반환값 ambiguity를 발견해 migration을 수정했고, 로컬 DB에 다시 적용한 뒤 재검증했다. production 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
 
 ## 5. 결정 필요
 
@@ -145,7 +145,7 @@
 
 - `supabase/migrations/`는 이번 재개 작업에서 새 파일 2개를 추가했다. production 적용 전 리뷰 필요.
 - `lib/types.ts` 수정 안 함.
-- 실제 Toss API 호출 구현 안 함.
+- 실제 Toss sandbox end-to-end 호출 검증은 아직 안 함. 서버 helper와 route 코드는 들어왔지만, env/dashboard/ngrok 또는 preview URL 준비가 필요하다.
 - KakaoPay/PortOne 실결제 구현 안 함.
 - 성격 기능 제거 안 함.
 

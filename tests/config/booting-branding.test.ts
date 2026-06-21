@@ -146,6 +146,10 @@ test('matching readiness gates include nickname and pre-match card checks', () =
   assert.match(claimNicknameRoute, /claim_profile_display_name/)
   assert.match(nicknameMigration, /CREATE TABLE IF NOT EXISTS public\.profile_display_name_claims/)
   assert.match(nicknameMigration, /CREATE TRIGGER trg_profiles_guard_display_name_claim/)
+  assert.match(nicknameMigration, /public\.profile_display_name_claims\.normalized_name <> v_normalized/)
+  assert.match(nicknameMigration, /ON CONFLICT ON CONSTRAINT profile_display_name_claims_pkey/)
+  assert.doesNotMatch(nicknameMigration, /AND normalized_name <> v_normalized/)
+  assert.doesNotMatch(nicknameMigration, /ON CONFLICT \(normalized_name\)/)
 
   assert.match(draftRoute, /pre_match_card_drafts/)
   assert.match(draftRoute, /countCompletedDailyCardItems/)

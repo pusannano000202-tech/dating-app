@@ -128,8 +128,9 @@
 - Toss checkout/confirm/cancel 서버 호출 코드는 추가됐다. Kakao/PortOne은 성준 회신 기준 이번 흡수 기본 대상이 아니며, provider 목록에서도 제외했다.
 - `app/api/payments/deposit/confirm/route.ts`는 Toss `paymentKey/orderId/amount`를 서버에서 확인하고 `deposits.status = paid`로 바꾼다. 단, sandbox key로 실제 호출한 증거는 아직 없다.
 - `app/api/payments/deposit/cancel/route.ts`는 `PAYMENT_INTERNAL_SECRET`이 맞을 때만 Toss cancel을 실행하고 service role로 deposit을 `refunded` 처리한다. 단, `/match/[id]/refund` 화면과 운영 트리거 연결은 아직 남아 있다.
-- `app/api/payments/deposit/webhook/route.ts`는 provider payload를 실제 서명 검증하거나 DB에 반영하지 않고 수신 자리만 둔 상태다.
-- 결제 webhook이 실제 provider 이벤트를 검증해 DB를 맞추는지는 미완성이다. 성준 회신 기준 MVP는 동기 confirm 중심이라 webhook은 후속으로 남긴다.
+- `app/api/payments/deposit/webhook/route.ts`는 Toss 일반 결제 webhook body에서 `paymentKey` 또는 `orderId`를 추출하고, Toss Payment Query API로 재조회한 결과를 기준으로 `deposits`를 `paid/refunded`로 맞추는 reconciliation 코드까지 보강했다.
+- Toss 일반 결제 webhook은 `tosspayments-webhook-signature` 검증 대상이 아니므로, 현재 구현은 서명 검증이 아니라 Query API 재조회 검증 방식이다.
+- 단, 실제 Toss dashboard webhook 등록, ngrok 또는 Vercel preview URL, sandbox key를 사용한 end-to-end webhook 수신 검증은 아직 못 했다.
 - 인증사진 기반 노쇼 판단은 구현 증거가 부족하다.
 - 홈/매칭/그룹/알림이 같은 상태 source로 완전히 통일됐는지는 브라우저 검증 필요하다.
 
@@ -157,8 +158,8 @@
 
 - 사전 카드 DB 저장은 코드/migration 추가 완료. local/staging 적용 검증 필요.
 - 결제 provider 실연동.
-- 결제 webhook provider signature 검증.
-- 성준 Toss confirm/cancel 방식과 현재 `checkout_ready`/`awaiting_provider_webhook` 임시 route의 차이 정리.
+- Toss webhook sandbox end-to-end 검증.
+- 성준 Toss prepare/confirm/cancel route 이름과 현재 `/api/deposits`, `/api/payments/deposit` 중복 진입점 정리.
 - 닉네임 DB claim 정책은 코드/migration 추가 완료. local/staging 적용 검증 필요.
 - 인증사진 기반 노쇼 판정.
 - 성격 제거 시 `match_setup_status`, 매칭 score, onboarding 흐름 재설계.
@@ -198,8 +199,8 @@
 
 ### 결제/환불
 
-- `app/api/payments/deposit/confirm/route.ts`는 `provider !== 'mock'`일 때 실제 Toss 승인 검증 대신 `awaiting_provider_webhook`을 반환한다.
-- `app/api/payments/deposit/webhook/route.ts`는 provider readiness와 payload 수신 자리만 있고, 서명 검증과 DB 반영은 없다.
+- `app/api/payments/deposit/confirm/route.ts`는 `provider !== 'mock'`일 때 `confirmTossPayment`를 호출하고, Toss 응답의 `orderId`, `totalAmount`, `status = DONE`을 확인한 뒤 `deposits.status = paid`로 바꾼다.
+- `app/api/payments/deposit/webhook/route.ts`는 Toss Query API 재조회 기반 reconciliation을 수행한다. 이미 `refunded`인 deposit에 늦게 온 `DONE` webhook은 `ignored_already_refunded`로 무시한다.
 - `app/api/matches/[id]/refund/route.ts`는 `app_fee_amount`를 받아 `refund_amount = DEPOSIT_AMOUNT - app_fee_amount`로 계산한 뒤 `submit_refund_request` RPC를 호출한다.
 - 따라서 환불 금액 계산 연결은 있지만, 실제 환불/정산의 최종 상태 전이는 DB RPC 검증이 필요하다.
 
