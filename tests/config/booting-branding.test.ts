@@ -127,6 +127,21 @@ test('onboarding and match setup are separate product flows', () => {
   assert.match(preferencesPage, /markDevMatchSetupStepComplete\('preferences'\)/)
 })
 
+test('matching readiness gates include nickname and pre-match card checks', () => {
+  const basicInfoForm = readSource('components/profile/BasicInfoForm.tsx')
+  const enterRoute = readSource('app/api/match-pool/enter/route.ts')
+  const groupCreate = readSource('app/group/create/page.tsx')
+
+  assert.match(basicInfoForm, /\/api\/profiles\/check-nickname\?nickname=/)
+  assert.match(basicInfoForm, /await checkNicknameAvailability\(trimmedName\)/)
+  assert.match(basicInfoForm, /다른 닉네임을 입력해 주세요/)
+
+  assert.match(enterRoute, /PRE_MATCH_CARD_DRAFT_COOKIE/)
+  assert.match(enterRoute, /isPreMatchCardDraftCookieDone/)
+  assert.match(enterRoute, /pre_match_card_required/)
+  assert.match(groupCreate, /pre_match_card_required/)
+})
+
 test('profile onboarding pages allow dev preview without Supabase user redirects', () => {
   const basic = readSource('app/profile/basic/page.tsx')
   const worldcup = readSource('app/profile/worldcup/page.tsx')

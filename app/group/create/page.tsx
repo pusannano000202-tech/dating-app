@@ -271,26 +271,29 @@ export default function GroupCreatePage() {
     if (!group || saving || friend.group_status !== 'available') return
 
     if (isDevPreview) {
+      const now = new Date().toISOString()
       setState((current) => ({
         ...current,
-        invites: current.invites,
-        friends: current.friends.map((item) =>
-          item.user_id === friend.user_id ? { ...item, group_status: 'in_group' } : item
-        ),
-        members: current.members.some((item) => item.user_id === friend.user_id)
-          ? current.members
+        invites: current.invites.some((invite) => invite.invited_user_id === friend.user_id)
+          ? current.invites
           : [
-              ...current.members,
+              ...current.invites,
               {
+                id: `dev-invite-${friend.user_id}`,
                 group_id: group.id,
-                user_id: friend.user_id,
-                display_name: friend.display_name,
-                role: 'member',
-                joined_at: new Date().toISOString(),
-                left_at: null,
-                match_setup_ready: true,
+                invited_phone: null,
+                invited_user_id: friend.user_id,
+                invite_kind: 'user',
+                token: `dev-${friend.user_id}`,
+                status: 'pending',
+                expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+                created_at: now,
               },
             ],
+        friends: current.friends.map((item) =>
+          item.user_id === friend.user_id ? { ...item, group_status: 'invited' } : item
+        ),
+        members: current.members,
       }))
       return
     }
@@ -431,6 +434,8 @@ export default function GroupCreatePage() {
       case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
       case 'deposit_not_paid':   return '매칭 확정 전에는 모든 멤버의 보증금 결제가 필요해요.'
+      case 'pre_match_card_required':
+        return '내 사전 카드 초안을 먼저 저장해야 큐에 들어갈 수 있어요.'
       case 'member_match_setup_incomplete':
         return '멤버의 성향 선호/가능 시간/매칭 비중 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
       case 'member_profile_lookup_failed':

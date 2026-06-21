@@ -7,8 +7,8 @@
 ## 현재 브랜치
 
 - `profile/post-worldcup-decisions-2026-05-21`
-- 원격 대비 2커밋 앞섬
-- 커밋 금지: 아직 보고 전이므로 커밋하지 않는다.
+- 원격 대비 3커밋 앞섬
+- 현재 추가 수정분은 아직 커밋하지 않았다.
 
 ## 현재까지 진행
 
@@ -246,6 +246,89 @@
    - 보증금 결제 시점: 큐 진입 전인지, 가매칭 후인지.
    - `match_meetings`, `venues`, `connections`, `enter_match_pool`의 최종 스키마.
    - 16~20시 직접 뽑기와 gwating 자동분배 중 어떤 정책을 채택할지.
+
+## 2026-06-22 전체 완료 기준 재개 점검
+
+### 이번 추가 수정
+
+28. 기본정보 저장 전 닉네임 중복 확인을 더 강하게 걸었다.
+   - `components/profile/BasicInfoForm.tsx`
+   - 사용자가 `중복 확인`을 누르지 않고 저장해도 `/api/profiles/check-nickname`으로 실제 DB 기준 확인을 먼저 수행한다.
+   - 중복이거나 조회가 실패하면 저장하지 않고 사용자에게 다시 입력하라고 안내한다.
+   - DB unique constraint는 아직 없으므로 최종 중복 방지는 별도 migration 합의가 필요하다.
+29. 로컬 preview에서 친구 초대가 바로 그룹 합류처럼 보이던 동작을 제거했다.
+   - `app/group/create/page.tsx`
+   - 친구 목록에서 초대를 누르면 dev 상태에서도 `in_group`이 아니라 `invited`가 되고, pending invite만 추가된다.
+   - 즉 친구가 로그인/회원가입 후 수락해야 그룹에 들어온다는 실제 흐름과 맞춘다.
+30. 사전 카드 문구를 실제 저장 상태에 맞게 낮췄다.
+   - `app/profile/match-card/page.tsx`
+   - `app/match/start/page.tsx`
+   - `components/matching/group-create/FreeBetaQueuePanel.tsx`
+   - 현재 단계는 `사전 카드 초안`이며 현재 기기에 임시 저장된다.
+   - 상대 공개용 카드는 가매칭 후 확정 카드 단계에서 DB에 저장해야 한다고 명확히 분리했다.
+31. 큐 진입 서버 route에 현재 사용자 사전 카드 초안 검사를 추가했다.
+   - `app/api/match-pool/enter/route.ts`
+   - 기존에는 프론트 버튼만 사전 카드 초안을 요구했고 서버 route는 성향/시간/비중만 검사했다.
+   - 이제 현재 사용자 cookie 기준 사전 카드 초안이 없으면 `pre_match_card_required`로 거절한다.
+   - 단, 다른 멤버의 사전 카드까지 서버에서 검사하려면 DB 저장 구조가 필요하다.
+32. 위 핵심 gate를 `tests/config/booting-branding.test.ts`에 고정했다.
+   - 닉네임 DB 조회 게이트.
+   - 매칭 큐 진입 전 사전 카드 초안 cookie gate.
+
+### 이번 추가 검증 결과
+
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 30개 테스트 통과.
+- `npm run test:profile` 통과. 14개 테스트 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+- `npm run build` 통과.
+- 3004 dev server 재시작 후 route 확인:
+  - `/dev/preview` 200.
+  - `/` 200.
+  - `/match` 200.
+  - `/notifications` 200.
+  - `/profile/basic` 200.
+  - `/profile/worldcup` 200.
+  - `/profile/preferences` 200.
+  - `/profile/schedule` 200.
+  - `/profile/match-card` 200.
+  - `/group/create` 200.
+  - `/match/dev-match-pending` 200.
+  - `/match/dev-match-1` 200.
+
+### 전체 완료 기준에서 아직 막힌 것
+
+- 닉네임 중복의 최종 DB 강제:
+  - 현재는 API 조회 + 프론트 저장 게이트다.
+  - `profiles.display_name` unique 또는 별도 normalized nickname 컬럼은 migration 합의가 필요하다.
+- 사전 카드 DB 저장:
+  - 현재 `/profile/match-card`는 pre-match 초안 localStorage/cookie다.
+  - 기존 `match_card_submissions`는 `match_id`가 있어야 저장 가능하므로, 큐 진입 전 카드 저장에는 새 테이블/API 합의가 필요하다.
+- Toss 실결제:
+  - 현재 production Toss 실결제는 실행하지 않았다.
+  - `mock`은 로컬 검토용이고, `toss` route는 checkout/confirm/webhook placeholder가 남아 있다.
+  - sandbox confirm/cancel/webhook까지 연결하려면 성준 결제 레이어와 env/dashboard 설정 합의가 필요하다.
+- 연락처/채팅 공개:
+  - route/API 표면은 있지만 실제 공개 조건은 `match_meetings`, `connections`, 채팅 스키마 최종 합의가 필요하다.
+- 데일리카드 정책:
+  - 충현안 `16~20시 직접 뽑기`와 성준 gwating `자동분배`가 아직 충돌한다.
+  - 정책 결정 전 DB/API로 밀면 이중 구현이 생긴다.
+- `preference_weights`:
+  - 현재 로컬 계약은 4개 기준이다.
+  - 성준 회신에는 7개 기준이 있었으므로 계약 확정 전 변경 금지.
+
+### 다음 사람이 바로 이어갈 명령
+
+```text
+팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 전체 완료 기준 재개 점검"부터 읽고 이어서 진행해.
+현재 변경분은 아직 커밋하지 말고, 먼저 git status를 분류한 뒤 staged diff 요약을 보고해.
+그 다음 우선순위는:
+1. 닉네임 중복 DB 강제를 migration으로 갈지 별도 profiles nickname table로 갈지 설계 보고.
+2. 사전 카드 초안을 DB에 저장할 새 pre_match_card_drafts 스키마/API 설계 보고.
+3. Toss sandbox confirm/cancel/webhook을 성준 결제 레이어 기준으로 흡수할 범위 보고.
+production Supabase/Vercel/Toss는 건드리지 마.
+```
 
 ## 리셋 후 재개 명령
 

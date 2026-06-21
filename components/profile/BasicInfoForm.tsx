@@ -72,7 +72,53 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
   const cardOff = 'border-boot-hairline bg-white text-boot-body hover:border-boot-primary/35 hover:bg-boot-soft/60'
   const cardOn = 'border-boot-primary bg-boot-soft text-boot-primary shadow-sm'
 
-  const handleSubmit = useCallback(function handleSubmit() {
+  const checkNicknameAvailability = useCallback(async function checkNicknameAvailability(value = displayName.trim()): Promise<boolean> {
+    const trimmedName = value.trim()
+    if (trimmedName.length < 2 || trimmedName.length > 20) {
+      setNicknameCheck(null)
+      setError('닉네임은 2~20자 사이로 입력해 주세요.')
+      return false
+    }
+
+    setCheckingNickname(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/profiles/check-nickname?nickname=${encodeURIComponent(trimmedName)}`)
+      if (!res.ok) {
+        setNicknameCheck({
+          value: trimmedName,
+          available: false,
+          message: '중복 확인 DB 적용이 아직 필요해요.',
+        })
+        return false
+      }
+
+      const data = await res.json() as { available?: boolean; duplicate_count?: number }
+      const available = Boolean(data.available)
+      setNicknameCheck({
+        value: trimmedName,
+        available,
+        message: available
+          ? '사용 가능한 닉네임이에요.'
+          : '이미 사용 중인 닉네임이에요.',
+      })
+      if (!available) {
+        setError('다른 닉네임을 입력해 주세요.')
+      }
+      return available
+    } catch {
+      setNicknameCheck({
+        value: trimmedName,
+        available: false,
+        message: '중복 확인을 잠시 할 수 없어요.',
+      })
+      return false
+    } finally {
+      setCheckingNickname(false)
+    }
+  }, [displayName])
+
+  const handleSubmit = useCallback(async function handleSubmit() {
     const trimmedName = displayName.trim()
     const normalizedPhone = normalizePhone(phone)
     if (!trimmedName) {
@@ -107,6 +153,13 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       setError('학교를 입력해 주세요.')
       return
     }
+    const nicknameReady =
+      nicknameCheck?.value === trimmedName && nicknameCheck.available
+
+    if (!nicknameReady) {
+      const available = await checkNicknameAvailability(trimmedName)
+      if (!available) return
+    }
 
     setError(null)
     onSubmit({
@@ -121,48 +174,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       department: department.trim() || null,
       year,
     })
-  }, [displayName, phone, gender, age, height, bodyType, hairDensity, school, department, year, onSubmit])
-
-  async function checkNicknameAvailability() {
-    const trimmedName = displayName.trim()
-    if (trimmedName.length < 2 || trimmedName.length > 20) {
-      setNicknameCheck(null)
-      setError('닉네임은 2~20자 사이로 입력해 주세요.')
-      return
-    }
-
-    setCheckingNickname(true)
-    setError(null)
-    try {
-      const res = await fetch(`/api/profiles/check-nickname?nickname=${encodeURIComponent(trimmedName)}`)
-      if (!res.ok) {
-        setNicknameCheck({
-          value: trimmedName,
-          available: false,
-          message: '중복 확인 DB 적용이 아직 필요해요.',
-        })
-        return
-      }
-
-      const data = await res.json() as { available?: boolean; duplicate_count?: number }
-      const available = Boolean(data.available)
-      setNicknameCheck({
-        value: trimmedName,
-        available,
-        message: available
-          ? '사용 가능한 닉네임이에요.'
-          : '이미 사용 중인 닉네임이에요.',
-      })
-    } catch {
-      setNicknameCheck({
-        value: trimmedName,
-        available: false,
-        message: '중복 확인을 잠시 할 수 없어요.',
-      })
-    } finally {
-      setCheckingNickname(false)
-    }
-  }
+  }, [displayName, phone, gender, age, height, bodyType, hairDensity, school, department, year, nicknameCheck, checkNicknameAvailability, onSubmit])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -170,7 +182,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       if (e.key !== 'Enter') return
       const tag = (e.target as HTMLElement).tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
-      handleSubmit()
+      void handleSubmit()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -216,7 +228,9 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
           />
           <button
             type="button"
-            onClick={checkNicknameAvailability}
+            onClick={() => {
+              void checkNicknameAvailability()
+            }}
             disabled={saving || checkingNickname || displayName.trim().length < 2}
             aria-label="닉네임 중복 확인"
             className="w-[104px] flex-shrink-0 rounded-2xl border border-boot-primary/25 bg-boot-soft px-3 py-2 text-xs font-black leading-4 text-boot-primary disabled:opacity-40"
@@ -438,11 +452,13 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
 
       <button
         type="button"
-        onClick={handleSubmit}
-        disabled={saving}
+        onClick={() => {
+          void handleSubmit()
+        }}
+        disabled={saving || checkingNickname}
         className="btn-gradient w-full rounded-2xl py-4 text-base font-bold shadow-lg shadow-violet-900/30 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {saving ? '저장 중...' : '저장하고 이상형 월드컵으로'}
+        {saving ? '저장 중...' : checkingNickname ? '닉네임 확인 중...' : '저장하고 이상형 월드컵으로'}
       </button>
     </div>
   )

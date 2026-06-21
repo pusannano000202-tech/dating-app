@@ -76,7 +76,7 @@ export function FreeBetaQueuePanel({
     },
     {
       key: 'match-card',
-      label: '사전 카드',
+      label: '사전 카드 초안',
       desc: '하루 한 장 카드 초안',
       done: currentUserCardReady,
       href: '/profile/match-card?redirect=%2Fmatch%2Fstart',
@@ -88,7 +88,7 @@ export function FreeBetaQueuePanel({
     {
       label: '내 매칭 설정',
       desc: currentUserSetupReady
-        ? '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 완료'
+        ? '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안 완료'
         : `${nextSetupStep?.label ?? '매칭 설정'}부터 완료하면 돼요`,
       done: currentUserSetupReady,
       href: nextSetupStep?.href ?? '/match/start',
@@ -288,7 +288,7 @@ export function FreeBetaQueuePanel({
       {!canEnterQueue && (
         <p className="mt-3 text-center text-xs text-boot-muted">
           {!currentUserSetupReady
-            ? '내 성향 선호, 안 되는 시간, 매칭 비중, 사전 카드를 먼저 입력해 주세요.'
+            ? '내 성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안을 먼저 입력해 주세요.'
             : !groupIsFull
               ? `${requiredMemberCount}명 그룹이 완성되면 큐 진입 단계로 넘어갈 수 있어요.`
             : !isLeader

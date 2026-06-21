@@ -63,7 +63,7 @@ function buildSetupSteps(profile: MatchSetupProfile | null, cardDraftDone: boole
     },
     {
       href: `/profile/match-card?redirect=${encodeURIComponent(REDIRECT_TO)}`,
-      label: '사전 카드',
+      label: '사전 카드 초안',
       desc: '매칭 후 하루 한 장씩 공개될 내 카드 초안을 미리 적습니다.',
       done: cardDraftDone,
       Icon: StickyNote,

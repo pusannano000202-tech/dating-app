@@ -100,10 +100,10 @@ export default function ProfileMatchCardPage() {
           <ChevronLeft size={18} />
         </Link>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-black text-boot-primary">사전 카드</p>
-          <h1 className="text-2xl font-black">하루 한 장씩 열릴 내 카드</h1>
+          <p className="text-xs font-black text-boot-primary">사전 카드 초안</p>
+          <h1 className="text-2xl font-black">하루 한 장씩 열릴 대화 재료</h1>
           <p className="mt-0.5 text-xs leading-5 text-boot-muted">
-            매칭 전에 6개 항목 중 4개 이상만 채우면 다음 단계로 넘어갈 수 있어요.
+            매칭 전에 6개 항목 중 4개 이상을 채우면 준비 단계로 넘어갈 수 있어요.
           </p>
         </div>
       </header>
@@ -145,7 +145,7 @@ export default function ProfileMatchCardPage() {
       <div className="mt-4 grid gap-2">
         {saved && (
           <p className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-xs font-bold text-emerald-700">
-            사전 카드가 저장됐어요. 이제 매칭 찾기 준비로 돌아갈 수 있어요.
+            사전 카드 초안이 저장됐어요. 이제 매칭 찾기 준비로 돌아갈 수 있어요.
           </p>
         )}
         <ButtonLink
@@ -166,7 +166,7 @@ export default function ProfileMatchCardPage() {
           <ArrowRight size={17} />
         </ButtonLink>
         <p className="text-center text-[11px] leading-5 text-boot-muted">
-          지금은 프론트 검토용으로 로컬에 저장하고, 실제 DB 저장은 매칭 확정 카드 API와 연결하면 됩니다.
+          이 초안은 현재 기기에 임시 저장돼요. 실제 상대 공개용 카드는 가매칭 후 확정 카드 단계에서 DB에 저장됩니다.
         </p>
       </div>
     </PageShell>

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getMatchSetupStatus, type MatchSetupProfile } from '@/lib/matching/match-setup-status'
+import {
+  PRE_MATCH_CARD_DRAFT_COOKIE,
+  isPreMatchCardDraftCookieDone,
+} from '@/lib/matching/pre-match-card-draft'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 interface MatchSetupProfileRow extends MatchSetupProfile {
@@ -70,6 +74,13 @@ export async function POST(req: NextRequest) {
   const allReady = (profiles as MatchSetupProfileRow[]).every((profile) => getMatchSetupStatus(profile).allDone)
   if (!allReady) {
     return NextResponse.json({ error: 'member_match_setup_incomplete' }, { status: 409 })
+  }
+
+  const currentUserCardReady = isPreMatchCardDraftCookieDone(
+    req.cookies.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
+  )
+  if (!currentUserCardReady) {
+    return NextResponse.json({ error: 'pre_match_card_required' }, { status: 409 })
   }
 
   const { data, error } = await supabase
