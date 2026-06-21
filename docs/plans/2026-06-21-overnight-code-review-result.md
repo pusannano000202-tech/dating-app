@@ -149,6 +149,25 @@
 - KakaoPay/PortOne 실결제 구현 안 함.
 - 성격 기능 제거 안 함.
 
+## 7.1 데일리카드 정책 회귀 방지 보강
+
+현재 우리 브랜치의 데일리카드 구현은 `16:00-20:00 직접 뽑기` 쪽이다.
+
+- DB 정책 근거: `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`
+  - `reveal_window_start`, `reveal_window_end`, `selected_at`, `selected_slot`, `forfeited_at`을 사용한다.
+  - `Asia/Seoul` 기준으로 16시 시작, 20시 종료 window를 만든다.
+  - `pick_match_daily_card`는 아직 뽑지 않았고 놓치지 않은 카드만 `FOR UPDATE`로 잡아 중복 뽑기를 막는다.
+  - `get_match_daily_cards`는 `selected_at IS NOT NULL`일 때만 `content_text`를 반환한다.
+- API 근거: `app/api/matches/[id]/daily-cards/route.ts`
+  - GET은 `get_match_daily_cards`를 호출한다.
+  - POST는 `pick_match_daily_card`를 호출한다.
+- 화면 근거: `app/match/[id]/page.tsx`
+  - `16:00-20:00` 안내, `no_draw_available` 안내, `selected_at`/`forfeited_at` 상태를 사용한다.
+- 회귀 테스트: `tests/config/daily-card-policy.test.ts`
+  - 09:00 자동 공개형으로 되돌아가지 않도록 마이그레이션/API/화면의 핵심 문자열을 고정한다.
+
+단, 이것은 "우리 브랜치 구현 방향"을 고정한 것이고, 성준 `gwating-app`의 자동분배 UX와 최종 정책이 합의됐다는 뜻은 아니다. 최종 제품 정책은 여전히 `16~20 직접 뽑기`와 `자동분배` 중 선택이 필요하다.
+
 ## 9. 하위 에이전트 감사 반영
 
 ### DB/API

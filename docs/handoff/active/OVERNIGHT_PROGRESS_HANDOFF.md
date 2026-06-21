@@ -837,3 +837,50 @@ production Supabase/Vercel/Toss는 건드리지 마.
 2. 전체 검증이 통과하면 현재 변경분을 stage하고 커밋한다.
 3. 이후 남은 큰 항목은 Toss 실제 sandbox E2E, 데일리카드 정책 확정, `preference_weights` 4개/7개 계약 확정이다.
 4. production Supabase/Vercel/Toss는 성준 리뷰와 dashboard/env 준비 전까지 건드리지 않는다.
+
+## 2026-06-22 데일리카드 정책 회귀 방지
+
+이번 이어달리기에서 추가 확인한 결론:
+
+- 우리 현재 브랜치의 데일리카드 구현은 `16:00-20:00 직접 뽑기`다.
+- DB 근거는 `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`이다.
+  - `reveal_window_start`, `reveal_window_end`, `selected_at`, `selected_by_user_id`, `selected_slot`, `forfeited_at`을 사용한다.
+  - `Asia/Seoul` 기준 16시~20시 window를 만든다.
+  - `pick_match_daily_card`는 아직 선택되지 않고 놓치지 않은 카드만 `FOR UPDATE`로 잠근 뒤 `selected_at`을 기록한다.
+  - `get_match_daily_cards`는 `selected_at IS NOT NULL`일 때만 상대 카드 `content_text`를 반환한다.
+- API 근거는 `app/api/matches/[id]/daily-cards/route.ts`다.
+  - GET은 `get_match_daily_cards`.
+  - POST는 `pick_match_daily_card`.
+- 화면 근거는 `app/match/[id]/page.tsx`다.
+  - `16:00-20:00`, `no_draw_available`, `selected_at`, `forfeited_at` 상태를 사용한다.
+- 회귀 방지 테스트를 추가했다.
+  - `tests/config/daily-card-policy.test.ts`
+  - 목적: 09:00 자동공개형이나 단순 조회 공개형으로 되돌아가는 것을 막는다.
+
+중요:
+
+- 이 테스트는 "우리 브랜치 구현 방향"을 고정하는 장치다.
+- 성준 `gwating-app`의 자동분배 UX와 최종 제품 정책이 합의됐다는 뜻은 아니다.
+- 최종 정책은 여전히 `16~20 직접 뽑기`와 `자동분배` 중 선택이 필요하다.
+
+다음에 바로 할 일:
+
+1. `npm run test:config` 실행.
+2. 필요하면 `npm run test:matching` 실행.
+3. 통과하면 변경분을 커밋한다.
+4. 그 다음 남은 큰 항목은 Toss sandbox 실제 E2E와 `preference_weights` 4개/7개 계약 합의다.
+
+검증:
+
+- `npm run test:config` 통과. 35개 테스트 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+
+남은 완료 기준:
+
+- Toss sandbox 실제 checkout/confirm/cancel/webhook E2E는 아직 못 했다.
+  - 필요한 값: `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`.
+  - 필요한 외부 설정: Toss sandbox 상점, webhook URL, Vercel preview 또는 ngrok.
+- 데일리카드 최종 제품 정책은 아직 합의 필요다.
+  - 우리 현재 브랜치: 16~20 직접 뽑기.
+  - 성준 `gwating-app`: 자동분배 UX 프로토타입.
+- `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.

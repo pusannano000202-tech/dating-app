@@ -204,6 +204,15 @@
 - `app/api/matches/[id]/refund/route.ts`는 `app_fee_amount`를 받아 `refund_amount = DEPOSIT_AMOUNT - app_fee_amount`로 계산한 뒤 `submit_refund_request` RPC를 호출한다.
 - 따라서 환불 금액 계산 연결은 있지만, 실제 환불/정산의 최종 상태 전이는 DB RPC 검증이 필요하다.
 
+### 데일리카드
+
+- 현재 우리 브랜치의 실제 구현은 `16:00-20:00 직접 뽑기` 쪽이다.
+- `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`은 `reveal_window_start`, `reveal_window_end`, `selected_at`, `selected_slot`, `forfeited_at`을 사용한다.
+- `pick_match_daily_card`는 아직 뽑지 않은 카드만 선택하고, `get_match_daily_cards`는 `selected_at`이 있을 때만 `content_text`를 공개한다.
+- `app/api/matches/[id]/daily-cards/route.ts`는 GET에서 조회 RPC, POST에서 뽑기 RPC를 호출한다.
+- `tests/config/daily-card-policy.test.ts`를 추가해 이 정책이 09:00 자동공개형으로 되돌아가지 않게 고정했다.
+- 단, 성준 `gwating-app`의 자동분배 UX와 최종 정책 합의는 아직 끝나지 않았으므로 production 기준 완료로 보지 않는다.
+
 ## 10.6 하위 에이전트 읽기 전용 감사 반영
 
 ### Noether: DB/API 스키마 감사
