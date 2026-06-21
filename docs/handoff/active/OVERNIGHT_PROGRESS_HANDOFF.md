@@ -870,6 +870,43 @@ production Supabase/Vercel/Toss는 건드리지 마.
 3. 통과하면 변경분을 커밋한다.
 4. 그 다음 남은 큰 항목은 Toss sandbox 실제 E2E와 `preference_weights` 4개/7개 계약 합의다.
 
+## 2026-06-22 완료 감사와 route 검증 명령 추가
+
+### 추가 수정
+
+1. 장시간 계획 전체 완료 여부를 요구사항별로 다시 분류했다.
+   - `docs/plans/2026-06-22-overnight-completion-audit.md`
+   - 결론은 "앱 내부 구현/검증은 상당 부분 완료, 전체 목표는 외부 설정과 팀 합의 때문에 아직 완료 아님"이다.
+2. 로컬 route 검증 스크립트를 추가했다.
+   - `scripts/check-local-routes.mjs`
+   - `npm run check:routes -- --base=http://localhost:3004`
+   - `booting_dev_auth=1` cookie로 주요 preview route가 로그인으로 튕기지 않는지 확인한다.
+3. `package.json`에 `check:routes` 명령을 추가했다.
+4. 계획 허브에 완료 감사 문서를 연결했다.
+
+### 아직 완료가 아닌 항목
+
+- Toss sandbox checkout/confirm/cancel/webhook 실제 E2E.
+- 새 Supabase migration 2개 production 적용.
+- `preference_weights` 4개/7개 계약 확정.
+- 데일리카드 `16~20 직접 뽑기` vs `자동분배` 정책 확정.
+- 연락처/채팅 공개 시점과 노쇼/환불 운영 정책 확정.
+
+### 검증 결과
+
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 37개 테스트 통과.
+- `npm run test:profile` 통과. 14개 테스트 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+- `npm run check:payment-env` 통과. mock provider 기준 Supabase 공개 env 설정 확인.
+- `npm run build` 통과.
+- dev server를 `http://localhost:3004`에 다시 띄운 뒤 `npm run check:routes -- --base=http://localhost:3004` 통과.
+  - `/dev/preview`, `/`, `/match`, `/notifications`, `/profile/basic`, `/profile/worldcup`, `/profile/preferences`, `/profile/schedule`, `/profile/match-card`, `/group/create`, `/group/invite/dev-preview`, `/match/start`, `/match/dev-match-pending`, `/match/dev-match-1` 모두 200.
+- `npm run check:payment-env -- --provider=toss`는 예상대로 실패.
+  - 누락: `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`.
+  - 이 실패는 Toss sandbox E2E가 아직 외부 설정 없이는 완료될 수 없다는 증거다.
+
 검증:
 
 - `npm run test:config` 통과. 35개 테스트 통과.

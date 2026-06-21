@@ -31,6 +31,7 @@ This folder is the canonical entry point for active product and implementation p
 - [Operator Console Plan (매칭 승인·근거 보고·외모 점수 보정)](./2026-06-02-operator-console-plan.md)
 - [Preference Weight Number Input Plan](./2026-06-12-preference-weight-number-input-plan.md)
 - [Overnight External Completion Gates](./2026-06-22-overnight-external-completion-gates.md)
+- [Overnight Completion Audit](./2026-06-22-overnight-completion-audit.md)
 
 ## Manager Room Operating Order
 
