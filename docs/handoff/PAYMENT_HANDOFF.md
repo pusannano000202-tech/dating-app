@@ -47,8 +47,9 @@
 4. QnA 게이팅: `matches.status==='confirmed'`에서만 접근
 5. 뽀찌 UX: 자율 금액 입력 → tip/prepare → 결제위젯 → confirm
 6. RLS: 참가자 본인 SELECT 정책(매칭 참가자 모델 확정 후)
-7. `app/match/payment-test/` 임시 페이지 제거
+7. `app/match/payment-test/` 임시 페이지 제거 + `middleware.ts`의 `isTestBypass`(결제 테스트 인증 우회) 함께 제거
 
-## 검증 방법
-- `.env.local`에 Supabase 실키 + 토스 테스트키 입력 후 `npm run dev`
-- `/match/payment-test`에서 prepare→결제위젯(카카오페이/토스페이)→confirm→DB paid→cancel→DB refunded 라운드트립 확인.
+## 검증 방법 (✅ 2026-06-21 실키 검증 완료)
+- `.env.local`에 Supabase 실키 + 토스 위젯 테스트키(`test_gck_docs_…`/`test_gsk_docs_…`) 입력 후 `npm run dev`
+- 마이그레이션에 `GRANT … TO service_role` 포함(일부 프로젝트는 신규 테이블 grant 자동부여 안 됨)
+- `/match/payment-test`에서 prepare→결제위젯(카카오페이/토스페이)→confirm→DB `paid`→cancel→DB `refunded` 라운드트립 **실제 동작 확인됨**(method=간편결제, payment_key 저장, paid_at/canceled_at 기록).

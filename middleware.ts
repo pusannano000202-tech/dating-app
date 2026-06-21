@@ -35,7 +35,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
+  // 임시: 결제 연결 테스트 페이지는 인증 없이 접근 (충현 인수 후 테스트 페이지와 함께 제거)
+  const isTestBypass = pathname.startsWith('/match/payment-test')
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p)) && !isTestBypass
 
   if (isProtected && !user) {
     const loginUrl = new URL('/login', request.url)
