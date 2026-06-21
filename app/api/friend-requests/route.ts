@@ -95,24 +95,18 @@ export async function POST(req: NextRequest) {
     : null
 
   if (!receiverUserId && receiverNickname) {
-    const { data: matches, error: lookupError } = await supabase
-      .from('profiles')
-      .select('user_id, display_name')
-      .eq('display_name', receiverNickname)
-      .limit(3)
+    const { data: match, error: lookupError } = await supabase
+      .rpc('resolve_profile_display_name', { p_display_name: receiverNickname })
+      .maybeSingle()
 
     if (lookupError) {
       return NextResponse.json({ error: 'nickname_lookup_unavailable' }, { status: 501 })
     }
 
-    const rows = matches ?? []
-    if (rows.length === 0) {
+    if (!match) {
       return NextResponse.json({ error: 'nickname_not_found' }, { status: 404 })
     }
-    if (rows.length > 1) {
-      return NextResponse.json({ error: 'nickname_not_unique' }, { status: 409 })
-    }
-    receiverUserId = rows[0].user_id
+    receiverUserId = (match as { user_id: string }).user_id
   }
 
   if (!receiverUserId) {

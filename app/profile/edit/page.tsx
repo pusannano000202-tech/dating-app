@@ -132,14 +132,20 @@ export default function ProfileEditPage() {
     setSavingName(true)
     setNameError(null)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
-      const { error } = await supabase
-        .from('profiles')
-        .update({ display_name: trimmed })
-        .eq('user_id', user.id)
-      if (error) throw error
+      const res = await fetch('/api/profiles/claim-nickname', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname: trimmed }),
+      })
+      if (res.status === 401) {
+        router.push('/login')
+        return
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setNameError(translateNicknameClaimError(data.error))
+        return
+      }
       setSummary((s) => s ? { ...s, display_name: trimmed } : s)
       setEditingName(false)
     } catch {
@@ -330,4 +336,15 @@ export default function ProfileEditPage() {
       </div>
     </div>
   )
+}
+
+function translateNicknameClaimError(code?: string): string {
+  switch (code) {
+    case 'nickname_taken':
+      return '이미 사용 중인 이름이에요.'
+    case 'invalid_nickname':
+      return '이름은 2~20자 사이로 입력해줘.'
+    default:
+      return '저장에 실패했어요. 잠시 후 다시 시도해줘.'
+  }
 }

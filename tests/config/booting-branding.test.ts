@@ -129,14 +129,23 @@ test('onboarding and match setup are separate product flows', () => {
 
 test('matching readiness gates include nickname and pre-match card checks', () => {
   const basicInfoForm = readSource('components/profile/BasicInfoForm.tsx')
+  const basicInfoPage = readSource('app/profile/basic/page.tsx')
   const enterRoute = readSource('app/api/match-pool/enter/route.ts')
   const groupCreate = readSource('app/group/create/page.tsx')
+  const checkNicknameRoute = readSource('app/api/profiles/check-nickname/route.ts')
+  const claimNicknameRoute = readSource('app/api/profiles/claim-nickname/route.ts')
   const draftRoute = readSource('app/api/profile/match-card-draft/route.ts')
+  const nicknameMigration = readSource('supabase/migrations/20260622_profile_display_name_claims.sql')
   const draftMigration = readSource('supabase/migrations/20260622_matching_pre_match_card_drafts.sql')
 
   assert.match(basicInfoForm, /\/api\/profiles\/check-nickname\?nickname=/)
   assert.match(basicInfoForm, /await checkNicknameAvailability\(trimmedName\)/)
   assert.match(basicInfoForm, /다른 닉네임을 입력해 주세요/)
+  assert.match(basicInfoPage, /\/api\/profiles\/claim-nickname/)
+  assert.match(checkNicknameRoute, /is_profile_display_name_available/)
+  assert.match(claimNicknameRoute, /claim_profile_display_name/)
+  assert.match(nicknameMigration, /CREATE TABLE IF NOT EXISTS public\.profile_display_name_claims/)
+  assert.match(nicknameMigration, /CREATE TRIGGER trg_profiles_guard_display_name_claim/)
 
   assert.match(draftRoute, /pre_match_card_drafts/)
   assert.match(draftRoute, /countCompletedDailyCardItems/)

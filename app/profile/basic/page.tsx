@@ -60,6 +60,11 @@ export default function BasicInfoPage() {
       }
 
       const { phone, ...profileData } = data
+      const nicknameClaim = await claimNickname(profileData.display_name)
+      if (!nicknameClaim.ok) {
+        setServerError(translateNicknameClaimError(nicknameClaim.error))
+        return
+      }
 
       const { error } = await supabase
         .from('profiles')
@@ -121,4 +126,31 @@ export default function BasicInfoPage() {
       )}
     </div>
   )
+}
+
+async function claimNickname(nickname: string): Promise<{ ok: true } | { ok: false; error?: string }> {
+  try {
+    const res = await fetch('/api/profiles/claim-nickname', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname }),
+    })
+
+    if (res.ok) return { ok: true }
+    const data = await res.json().catch(() => ({})) as { error?: string }
+    return { ok: false, error: data.error }
+  } catch {
+    return { ok: false, error: 'nickname_claim_failed' }
+  }
+}
+
+function translateNicknameClaimError(code?: string): string {
+  switch (code) {
+    case 'nickname_taken':
+      return '이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.'
+    case 'invalid_nickname':
+      return '닉네임은 2~20자 사이로 입력해 주세요.'
+    default:
+      return '닉네임을 확정하지 못했어요. 잠시 후 다시 시도해 주세요.'
+  }
 }

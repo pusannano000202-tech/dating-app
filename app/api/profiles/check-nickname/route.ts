@@ -24,12 +24,17 @@ export async function GET(request: Request) {
   const supabase = createSupabaseServerClient()
   const { data: authData } = await supabase.auth.getUser()
   const currentUserId = authData.user?.id ?? null
+  if (!currentUserId) {
+    return NextResponse.json({
+      available: true,
+      duplicate_count: 0,
+      mode: 'unauthenticated-preview',
+    })
+  }
 
   const { data, error } = await supabase
-    .from('profiles')
-    .select('user_id')
-    .eq('display_name', nickname)
-    .limit(3)
+    .rpc('is_profile_display_name_available', { p_display_name: nickname })
+    .maybeSingle()
 
   if (error) {
     return NextResponse.json(
@@ -38,10 +43,10 @@ export async function GET(request: Request) {
     )
   }
 
-  const duplicateCount = (data ?? []).filter((row) => row.user_id !== currentUserId).length
+  const available = Boolean(data)
 
   return NextResponse.json({
-    available: duplicateCount === 0,
-    duplicate_count: duplicateCount,
+    available,
+    duplicate_count: available ? 0 : 1,
   })
 }

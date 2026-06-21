@@ -71,7 +71,7 @@
 - 단, 성준 최신 회신 기준에는 위 이름 중 일부가 없다고 했으므로 `우리 로컬 구현 후보 / 합의 필요 스키마`로 분리해야 한다.
 - `app/api/match-pool/enter/route.ts`는 그룹 멤버 여부, 리더 여부, 최소 2명, 정원 충족, 모든 멤버의 성향/시간/비중 완료를 검사한다.
 - 하지만 z50의 `enter_match_pool` RPC 자체는 보증금 선결제를 요구하지 않는다.
-- 닉네임 친구요청은 `profiles.display_name` 조회 기반으로 구현되어 있고 전화번호 중심 신규 요청은 아니다. 다만 `profiles.display_name` unique 제약은 없어서 DB 레벨 중복 방지는 미완이다.
+- 닉네임 친구요청은 현재 `profile_display_name_claims` 기준 RPC로 닉네임을 user_id로 해석한다. 전화번호 중심 신규 요청은 아니다.
 - `/match`, `/notifications`의 pending/match_created 단계 결과성 정보 과노출은 이번 수정으로 낮췄다.
 - 홈 랜딩의 `MatchingPool` 큐 숫자 노출과 "큐/상대 카드는 매칭 화면에서" 설명 충돌은 `MatchingPool` 제거와 3단계 흐름 안내로 정리했다.
 
@@ -414,5 +414,67 @@ production Supabase/Vercel/Toss는 건드리지 마.
 1. 닉네임 중복 DB 강제 설계/구현.
 2. Toss sandbox confirm/cancel/webhook 흡수 범위 구현 또는 성준 결제 레이어 기준 차이 보고.
 3. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책 결정 질문 정리.
+production Supabase/Vercel/Toss는 건드리지 마.
+```
+
+## 2026-06-22 닉네임 중복 DB 강제
+
+### 추가 수정
+
+39. 닉네임 고유 claim 테이블과 DB guard를 추가했다.
+   - `supabase/migrations/20260622_profile_display_name_claims.sql`
+   - `profile_display_name_claims`는 정규화된 닉네임을 primary key로 보관한다.
+   - 기존 `profiles.display_name`에 중복이 있어도 migration이 실패하지 않도록, backfill은 정규화 이름별 1명만 claim한다.
+   - `profiles.display_name` 직접 insert/update도 trigger가 claim 테이블을 확인해서 중복이면 `nickname_taken`으로 막는다.
+40. 닉네임 API를 claim 구조로 바꿨다.
+   - `app/api/profiles/check-nickname/route.ts`
+   - `app/api/profiles/claim-nickname/route.ts`
+   - 중복 확인은 `is_profile_display_name_available`.
+   - 저장 확정은 `claim_profile_display_name`.
+41. 기본정보와 내정보 닉네임 저장 경로를 claim API로 통일했다.
+   - `app/profile/basic/page.tsx`
+   - `app/profile/edit/page.tsx`
+   - claim 실패 시 profile 저장을 진행하지 않는다.
+42. 친구 요청 닉네임 검색도 claim 테이블 기준 RPC로 바꿨다.
+   - `app/api/friend-requests/route.ts`
+   - `resolve_profile_display_name`으로 닉네임을 user_id로 해석한다.
+43. 설정 테스트에 닉네임 DB claim 증거를 추가했다.
+   - `tests/config/booting-branding.test.ts`
+
+### 검증 결과
+
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 30개 테스트 통과.
+- `npm run test:profile` 통과. 14개 테스트 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+- `npm run build` 통과.
+- 3004 dev server 재시작 후 route 확인:
+  - `/dev/preview` 200.
+  - `/` 200.
+  - `/profile/basic` 200.
+  - `/profile/edit` 200.
+  - `/friends` 200.
+  - `/group/create` 200.
+  - `/match/start` 200.
+
+### 남은 완료 기준
+
+- 새 migration 2개는 코드에 추가됐지만 production Supabase에는 적용하지 않았다.
+  - `20260622_matching_pre_match_card_drafts.sql`
+  - `20260622_profile_display_name_claims.sql`
+  - 둘 다 공용 DB 변경이므로 성준 리뷰 후 적용해야 한다.
+- Toss sandbox confirm/cancel/webhook은 아직 placeholder가 남아 있다.
+- 데일리카드 정책은 여전히 `16~20 직접 뽑기`와 `gwating 자동분배` 중 선택이 필요하다.
+- `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
+
+### 다음 사람이 바로 이어갈 명령
+
+```text
+팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 닉네임 중복 DB 강제"부터 읽고 이어서 진행해.
+현재 우선순위는:
+1. Toss sandbox confirm/cancel/webhook 흡수 범위 구현 또는 성준 결제 레이어 기준 차이 보고.
+2. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책 결정 질문 정리.
+3. 새 migration 2개를 local/staging Supabase에서 적용 검증.
 production Supabase/Vercel/Toss는 건드리지 마.
 ```

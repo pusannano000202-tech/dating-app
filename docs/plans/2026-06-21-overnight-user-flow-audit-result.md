@@ -71,7 +71,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 1 | 이메일/Google 로그인 | 부분 구현 | `app/(auth)/login/page.tsx`, `app/auth/callback/route.ts` | 앱 코드는 있으나 Supabase/Google/Vercel 설정이 없으면 배포에서 실패 | 대시보드 설정 체크리스트 별도 작성 |
 | 2 | 기본정보 입력 | 실제 구현됨 | `app/profile/basic/page.tsx`, `components/profile/BasicInfoForm.tsx` | 학과 목록이 사용자가 준 최신 목록보다 짧다 | `lib/pnu-departments.ts` 보강 |
-| 3 | 닉네임 중복 확인 | 부분 구현 | `app/api/profiles/check-nickname/route.ts` | DB unique constraint는 확인 필요. Supabase 미설정이면 local-preview로 available 처리 | DB 제약 여부 감사 |
+| 3 | 닉네임 중복 확인 | DB 강제 구현, 적용 검증 필요 | `app/api/profiles/check-nickname/route.ts`, `app/api/profiles/claim-nickname/route.ts`, `supabase/migrations/20260622_profile_display_name_claims.sql` | 정규화 claim 테이블과 profiles trigger로 신규 중복 저장을 막는다. production Supabase 적용은 아직 하지 않음 | migration 리뷰/적용 후 실제 DB 검증 |
 | 4 | 학과 검색/선택 | 구현 후 검증 일부 완료 | `components/profile/BasicInfoForm.tsx`, `lib/pnu-departments.ts`, `tests/profile/pnu-departments.test.ts` | 학과 source와 검색 함수는 보강됨. 실제 브라우저 화면 검증은 아직 필요 | `/profile/basic` 브라우저 확인 |
 | 5 | 이상형 월드컵 | 실제 구현됨에 가까움 | `app/profile/worldcup/page.tsx`, `components/profile/IdealWorldcup.tsx` | 기본정보 성별을 반대로 바꿔 후보를 고르는 코드가 있으나 화면 검증 필요 | 남자/여자 양쪽 route 검증 |
 | 6 | 성격 검사 | 부분 구현 | `app/profile/survey/page.tsx`, `lib/matching/score.ts` | 성격 제거 여부가 아직 정책 결정 필요 | 결정 전 제거 금지 |
@@ -98,11 +98,12 @@
 - 월드컵 성별 분기 코드: `app/profile/worldcup/page.tsx`에서 저장된 `profiles.gender`를 읽고 반대 성별 후보를 `IdealWorldcup`에 넘긴다.
 - 나이 점수 함수: `lib/matching/score.ts`에 `ageFitScore`가 있고 선호 나이 범위를 반영한다.
 - 사전 카드 초안 DB 저장: `app/api/profile/match-card-draft/route.ts`가 `pre_match_card_drafts`에 user별 초안을 upsert한다.
+- 닉네임 claim: `profile_display_name_claims`와 `trg_profiles_guard_display_name_claim`이 신규 중복 닉네임 저장을 막는다.
 
 ## 5. 부분 구현됨
 
 - 로그인: 이메일 OTP와 Google OAuth 코드는 있으나 Supabase/Google/Vercel 대시보드 설정이 필요하다.
-- 닉네임 중복 확인: `profiles.display_name` 조회는 있으나 DB unique constraint는 추가 확인이 필요하다.
+- 닉네임 중복 확인: DB claim 구조는 추가됐지만 migration 적용 전까지 운영 DB에서는 검증할 수 없다.
 - 친구 요청: 닉네임 기반 요청 생성은 있으나 실제 화면 검증이 필요하다.
 - 매칭 찾기 gate: 서버 route가 그룹 멤버 전원의 성향/시간/비중/사전 카드 완료를 검사한다. 단 새 migration이 실제 Supabase에 적용되어야 운영 검증 가능하다.
 - 보증금/결제: mock provider는 동작하도록 설계되어 있으나 실결제 provider 호출은 아직 준비 단계다.
@@ -115,7 +116,7 @@
 - `app/profile/match-card/page.tsx`: dev/비로그인 preview에서는 localStorage fallback을 유지한다.
 - `lib/matching/pre-match-card-draft.ts`: dev preview와 구버전 local 상태 호환용 cookie helper로 남아 있다.
 - `lib/matching/dev-preview-group.ts`: 홈/매칭/그룹 preview source.
-- Supabase 미설정 시 닉네임 중복 확인은 `mode: local-preview`로 available 처리.
+- Supabase 미설정 또는 인증 없는 preview에서 닉네임 중복 확인은 preview mode로 available 처리한다.
 - mock 보증금 결제는 `mock_pay_deposit` RPC로 paid 상태만 만든다.
 
 ## 7. 미구현 또는 증거 부족
@@ -123,6 +124,7 @@
 - 부산대 학과 source는 사용자 제공 목록으로 보강했고 `npm run test:profile`에서 검증했다. 실제 UI 브라우저 확인은 아직 필요하다.
 - 환불 페이지는 `0~10,000원`, `1,000원 단위`, `3,000원 -> 2,000원 -> 1,000원` 제안 흐름까지 코드에 반영됐다. 실제 refund RPC 결과와 사용자 화면 확인은 아직 필요하다.
 - 사전 카드 DB 저장 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
+- 닉네임 DB claim 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
 - 실제 Toss 승인 호출은 아직 없다. Kakao/PortOne은 성준 회신 기준 이번 흡수 기본 대상이 아니며, provider 목록에서도 제외했다.
 - `app/api/payments/deposit/confirm/route.ts`는 `provider !== 'mock'`일 때 실제 승인 검증 대신 `awaiting_provider_webhook` 응답을 반환한다.
 - `app/api/payments/deposit/webhook/route.ts`도 provider payload를 실제 서명 검증하거나 DB에 반영하지 않고 수신 자리만 둔 상태다.
@@ -136,7 +138,7 @@
 2. 앱 기여금 UI를 슬라이더, 스텝 버튼, 스크롤 선택 중 무엇으로 갈지.
 3. 3,000원만요 -> 2,000원만요 -> 1,000원만요 구걸 UX를 어느 정도 강하게 보여줄지.
 4. 성격 검사를 제거할지, 입력 부담만 줄이고 내부 점수로 유지할지.
-5. 사전 카드 DB 저장 migration을 성준 리뷰 후 적용할지.
+5. 사전 카드/닉네임 claim migration을 성준 리뷰 후 적용할지.
 6. “비슷한 나이” 기준을 동갑, +-1세, +-2세, 나이대 중 무엇으로 표현할지.
 7. 연락처 공개 시점이 매칭 확정 직후인지, 만남 당일인지, `scheduled_start` 도달 시점인지.
 8. `preference_weights`를 우리 현재 4개 기준으로 유지할지, 성준 회신의 7개 기준으로 다시 합의할지.
@@ -152,11 +154,11 @@
 
 ## 10. DB/API 변경이 필요한 항목
 
-- 사전 카드 DB 저장.
+- 사전 카드 DB 저장은 코드/migration 추가 완료. local/staging 적용 검증 필요.
 - 결제 provider 실연동.
 - 결제 webhook provider signature 검증.
 - 성준 Toss confirm/cancel 방식과 현재 `checkout_ready`/`awaiting_provider_webhook` 임시 route의 차이 정리.
-- 닉네임 unique constraint 또는 display name 정책 확정.
+- 닉네임 DB claim 정책은 코드/migration 추가 완료. local/staging 적용 검증 필요.
 - 인증사진 기반 노쇼 판정.
 - 성격 제거 시 `match_setup_status`, 매칭 score, onboarding 흐름 재설계.
 - `preference_weights` 4개/7개 계약 합의.
@@ -167,10 +169,11 @@
 
 ### 닉네임/친구 요청
 
-- `app/api/profiles/check-nickname/route.ts`는 `profiles.display_name`을 조회해 현재 사용자 외 중복 여부를 반환한다.
-- `app/api/friend-requests/route.ts`는 `receiver_nickname`으로 `profiles.display_name`을 찾아 친구 요청을 생성한다.
+- `app/api/profiles/check-nickname/route.ts`는 `is_profile_display_name_available` RPC로 정규화 claim 기준 가능 여부를 반환한다.
+- `app/api/profiles/claim-nickname/route.ts`는 `claim_profile_display_name` RPC로 닉네임을 확정한다.
+- `app/api/friend-requests/route.ts`는 `receiver_nickname`으로 `resolve_profile_display_name` RPC를 호출해 친구 요청 대상을 찾는다.
 - `receiver_phone`은 insert 시 `null`로 들어가므로, 현재 신규 요청 흐름은 전화번호 중심이 아니라 닉네임 중심에 가깝다.
-- 다만 `rg` 기준으로 `profiles.display_name`에 대한 DB unique constraint는 찾지 못했다. 그래서 닉네임 중복은 API 조회로 막고 있지만 DB 레벨 고정은 아직 증거 부족이다.
+- `profile_display_name_claims`와 `trg_profiles_guard_display_name_claim`이 신규 중복 닉네임 저장을 DB에서 막는다.
 
 ### 매칭 찾기 gate
 
@@ -210,7 +213,7 @@
 - 따라서 "성준 기준에는 없음"과 "우리 현재 브랜치에는 있음"이 동시에 맞다. 결론은 삭제가 아니라 `우리 로컬 구현 후보 / 합의 필요 스키마`로 분리하는 것이다.
 - `enter_match_pool` RPC 자체는 z50 기준 보증금 선결제를 요구하지 않는다. 보증금 선결제 정책을 큐 진입 조건으로 둘 경우 RPC 또는 route를 다시 설계해야 한다.
 - 현재 `preference_weights` 코드 근거는 4키다. DB는 JSONB라 4키/7키 제약이 없다.
-- `profiles.display_name`은 닉네임처럼 쓰이지만 unique 제약/unique index가 없으므로, API 조회만으로는 동시 중복 생성 race를 완전히 막지 못한다.
+- `profiles.display_name`은 사용자 표시값으로 남기고, 신규 중복 방지는 `profile_display_name_claims`와 profiles trigger가 담당한다.
 
 ### McClintock: 프론트 동선 감사
 

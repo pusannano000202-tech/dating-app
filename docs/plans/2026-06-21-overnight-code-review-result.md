@@ -2,7 +2,7 @@
 
 ## 1. 한 줄 결론
 
-현재 브랜치는 사용자 검토용 프론트와 mock 흐름을 넘어서, 큐 진입 전 사전 카드 초안까지 DB 저장 구조로 승격했다. 그래도 배포 기준 핵심인 Toss 실승인, 닉네임 DB unique, 데일리카드/채팅 정책 합의는 아직 끝난 상태가 아니다. 새로 추가한 `pre_match_card_drafts` migration은 production 적용 전 성준 리뷰가 필요하다.
+현재 브랜치는 사용자 검토용 프론트와 mock 흐름을 넘어서, 큐 진입 전 사전 카드 초안 DB 저장과 닉네임 중복 DB 강제 구조까지 추가했다. 그래도 배포 기준 핵심인 Toss 실승인, 데일리카드/채팅 정책 합의는 아직 끝난 상태가 아니다. 새로 추가한 `pre_match_card_drafts`, `profile_display_name_claims` migration은 production 적용 전 성준 리뷰가 필요하다.
 
 ## 2. 결제 코드리뷰
 
@@ -72,7 +72,7 @@
 
 우리 브랜치에는 일부 route, migration, 문서가 이미 이 이름들을 쓰고 있다. 그래서 지금 새 migration을 추가하거나 공용 타입을 바꾸면 성준 스키마와 우리 스키마가 따로 생기는 위험이 있다.
 
-예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`이 큐 진입 gate와 직접 연결되어 있어 `pre_match_card_drafts` migration을 새로 추가했다. 이 migration은 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
+예외적으로 이번 재개 작업에서는 계획서 전체 완료 기준에서 `사전 카드 DB 저장`과 `닉네임 중복 DB 강제`가 사용자 동선과 직접 연결되어 있어 migration 2개를 새로 추가했다. `pre_match_card_drafts`는 기존 `match_card_submissions`를 바꾸지 않고, match_id가 생기기 전 user-level 초안만 저장한다. `profile_display_name_claims`는 기존 중복 데이터를 터뜨리지 않고 신규 닉네임 claim만 고유하게 강제한다. 적용 전에는 공용 DB 변경이므로 성준 리뷰가 필요하다.
 
 ## 5. 결정 필요
 
@@ -81,11 +81,12 @@
 3. `match_meetings`, `venues`, `connections`를 우리 브랜치 기준으로 살릴지, 성준 기준에 맞춰 새 계약부터 잡을지.
 4. Toss 결제는 webhook 없이 confirm 중심으로 갈지.
 5. Toss confirm/cancel 구현 시 `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`를 어떤 route에서만 읽게 할지.
-6. `pre_match_card_drafts`를 현재 브랜치 기준으로 적용할지, 성준 스키마에 맞춰 이름/위치를 조정할지.
+6. `pre_match_card_drafts`와 `profile_display_name_claims`를 현재 브랜치 기준으로 적용할지, 성준 스키마에 맞춰 이름/위치를 조정할지.
 
 ## 6. 바로 가능한 다음 작업
 
 - 새 `pre_match_card_drafts` migration을 local/staging에서 적용해 `/profile/match-card` 저장과 `/api/match-pool/enter` 멤버 전원 gate를 실제 DB로 확인.
+- 새 `profile_display_name_claims` migration을 local/staging에서 적용해 동시 닉네임 중복 저장이 DB에서 막히는지 확인.
 - `/profile/basic` 브라우저 확인: 학과 검색 후보가 실제로 뜨는지 확인.
 - 결제 흡수 표 보강: 성준 Toss route 이름과 우리 route 이름을 1:1로 매핑.
 - 홈/매칭/그룹 로컬 route 확인: 같은 멤버가 보이는지 확인.
@@ -98,9 +99,9 @@
 
 | 항목 | 현재 코드 | 판단 |
 | --- | --- | --- |
-| 닉네임 중복 확인 | `app/api/profiles/check-nickname/route.ts`가 `profiles.display_name` 조회 | API 검사는 있음 |
+| 닉네임 중복 확인 | `app/api/profiles/check-nickname/route.ts`가 `is_profile_display_name_available` RPC 호출 | API + DB claim 기준 |
 | 친구 요청 생성 | `app/api/friend-requests/route.ts`가 `receiver_nickname`으로 receiver를 찾고 `receiver_phone: null`로 insert | 전화번호 중심 흐름은 신규 요청 기준에서 빠져 있음 |
-| DB unique | `profiles.display_name` unique constraint는 `rg` 기준 찾지 못함 | API race를 막으려면 DB 제약 또는 별도 정책 필요 |
+| DB unique | `profile_display_name_claims` + `trg_profiles_guard_display_name_claim` 추가 | 신규 중복 저장은 DB에서 막는 구조. migration 적용 검증 필요 |
 
 ### 매칭 찾기 gate
 
@@ -142,7 +143,7 @@
 
 ## 7. 이번 코드리뷰에서 하지 않은 것
 
-- `supabase/migrations/` 수정 안 함.
+- `supabase/migrations/`는 이번 재개 작업에서 새 파일 2개를 추가했다. production 적용 전 리뷰 필요.
 - `lib/types.ts` 수정 안 함.
 - 실제 Toss API 호출 구현 안 함.
 - KakaoPay/PortOne 실결제 구현 안 함.
@@ -155,7 +156,7 @@
 - 현재 우리 브랜치에는 `venues`, `match_meetings`, `enter_match_pool`, `connections` 등이 실제 migration/API로 존재한다.
 - 성준 최신 회신 기준에는 이 이름들이 없다고 했으므로, 현재 브랜치의 해당 스키마는 `합의된 성준 기준`이 아니라 `우리 로컬 구현 후보`로 봐야 한다.
 - `enter_match_pool` route는 그룹/멤버/준비 완료 조건을 검사하지만, z50 RPC 자체는 보증금 선결제를 요구하지 않는다.
-- 닉네임은 `profiles.display_name`을 쓰며 API 조회는 있지만 DB unique 제약은 없다.
+- 닉네임은 `profiles.display_name`을 사용자 표시값으로 유지하되, 신규 중복 방지는 `profile_display_name_claims`와 profiles trigger가 담당한다.
 
 ### 프론트 UX
 
