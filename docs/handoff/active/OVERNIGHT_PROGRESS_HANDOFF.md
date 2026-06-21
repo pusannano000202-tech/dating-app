@@ -330,6 +330,77 @@
 production Supabase/Vercel/Toss는 건드리지 마.
 ```
 
+## 2026-06-22 환불 route 외부 Toss settlement 보강
+
+### 추가 수정
+
+44. `/api/matches/[id]/refund`가 DB 환불 처리 이후 외부 결제 settlement 상태를 함께 보고하도록 보강했다.
+   - `app/api/matches/[id]/refund/route.ts`
+   - 기존 `submit_refund_request` RPC는 계속 사용한다.
+   - RPC 처리 후 응답에 `external_refund`를 추가한다.
+   - `refund_amount = 0`이면 외부 결제 취소가 필요 없으므로 `not_required/refund_amount_zero`를 반환한다.
+   - mock 결제(`MOCK_` payment key) 또는 결제키가 없는 경우 `not_required/mock_or_missing_payment_key`를 반환한다.
+   - `SUPABASE_SERVICE_ROLE_KEY` 또는 Supabase URL이 없으면 Toss 취소를 시도하지 않고 `not_checked/server_settlement_not_configured`를 반환한다.
+   - Toss 설정이 부족하면 `pending_provider_configuration`으로 분리한다.
+   - Toss 취소가 실제로 가능하면 서버 helper `cancelTossPayment()`를 통해 취소하고, deposit notes에 `external_refund=toss:...`를 남긴다.
+45. 설정 테스트에 환불 route가 외부 Toss settlement를 별도 상태로 보고한다는 정적 증거를 추가했다.
+   - `tests/config/deposit-payment-routes.test.ts`
+
+### 검증 결과
+
+- `npm run typecheck` 1차 실패:
+  - 원인: Supabase service client의 local DB 타입 generic이 지나치게 넓거나 좁게 추론됨.
+  - 조치: route 안에서 필요한 `matches`, `deposits`만 최소 DB 타입으로 정의하고 `SupabaseClient<SettlementDatabase, 'public'>`로 명시.
+- `npm run typecheck` 재실행 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 32개 테스트 통과.
+- 추가 전체 검증:
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run test:config` 통과. 32개 테스트 통과.
+  - `npm run test:profile` 통과. 14개 테스트 통과.
+  - `npm run test:matching` 통과. 38개 테스트 통과.
+  - `npm run build` 통과.
+- 3004 dev preview 세션 route 확인:
+  - `/dev/preview` 200.
+  - `/` 200.
+  - `/match` 200.
+  - `/notifications` 200.
+  - `/profile/basic` 200.
+  - `/profile/worldcup` 200.
+  - `/profile/preferences` 200.
+  - `/profile/schedule` 200.
+  - `/profile/match-card` 200.
+  - `/group/create` 200.
+  - `/match/start` 200.
+  - `/match/dev-match-pending` 200.
+  - `/match/dev-match-1` 200.
+
+### 남은 완료 기준
+
+- Toss sandbox 실제 E2E는 아직 검증하지 못했다.
+  - 현재 로컬 env에 `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`가 없다.
+  - production Toss 실결제는 건드리지 않았다.
+- webhook route는 아직 실제 서명 검증/DB reconciliation까지 구현된 상태가 아니다.
+  - 현재는 provider readiness와 body 수신 상태만 확인하는 보류 route다.
+  - MVP 기준은 동기 confirm 중심이므로, webhook 실연동은 별도 phase 또는 성준 결제 레이어 기준 합의가 필요하다.
+- 새 migration 2개는 production Supabase에는 적용하지 않았다.
+  - `20260622_matching_pre_match_card_drafts.sql`
+  - `20260622_profile_display_name_claims.sql`
+- 데일리카드 정책은 여전히 `16~20 직접 뽑기`와 `gwating 자동분배` 중 선택이 필요하다.
+- `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
+
+### 다음 사람이 바로 이어갈 명령
+
+```text
+팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 환불 route 외부 Toss settlement 보강"부터 읽고 이어서 진행해.
+현재 우선순위는:
+1. Toss webhook 실제 서명 검증/DB reconciliation은 성준 결제 레이어 기준과 env/dashboard 설정 가능 여부를 보고한 뒤 별도 phase로 진행.
+2. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책을 확정한다.
+3. 새 migration 2개를 local/staging Supabase에서 적용 검증한다.
+production Supabase/Vercel/Toss는 건드리지 마.
+```
+
 ## 2026-06-22 Toss sandbox 결제 승인/취소 route 보강
 
 ### 추가 수정

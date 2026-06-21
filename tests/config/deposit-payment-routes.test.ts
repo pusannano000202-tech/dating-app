@@ -71,3 +71,16 @@ test('deposit payment request draft sends failed checkout back through cancel ro
   assert.match(paymentLib, /failUrl/)
   assert.match(paymentLib, /\/api\/payments\/deposit\/cancel/)
 })
+
+test('match refund route reports external Toss settlement separately from DB refund request', () => {
+  const refundRoute = readSource('app/api/matches/[id]/refund/route.ts')
+
+  assert.match(refundRoute, /submit_refund_request/)
+  assert.match(refundRoute, /external_refund/)
+  assert.match(refundRoute, /cancelTossPayment/)
+  assert.match(refundRoute, /SUPABASE_SERVICE_ROLE_KEY/)
+  assert.match(refundRoute, /pending_provider_configuration/)
+  assert.match(refundRoute, /server_settlement_not_configured/)
+  assert.match(refundRoute, /refund_amount_zero/)
+  assert.doesNotMatch(refundRoute, /missing:/)
+})
