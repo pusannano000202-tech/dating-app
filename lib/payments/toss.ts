@@ -89,24 +89,51 @@ export async function cancelTossPayment(params: {
   })
 }
 
-async function requestTossPayment(path: string, options: {
-  method: 'POST'
-  body: Record<string, unknown>
-  idempotencyKey: string
-}): Promise<TossPaymentObject> {
+export async function getTossPayment(paymentKey: string): Promise<TossPaymentObject> {
+  return requestTossPayment(`/payments/${encodeURIComponent(paymentKey)}`, {
+    method: 'GET',
+  })
+}
+
+export async function getTossPaymentByOrderId(orderId: string): Promise<TossPaymentObject> {
+  return requestTossPayment(`/payments/orders/${encodeURIComponent(orderId)}`, {
+    method: 'GET',
+  })
+}
+
+type TossPaymentRequestOptions =
+  | {
+      method: 'POST'
+      body: Record<string, unknown>
+      idempotencyKey: string
+    }
+  | {
+      method: 'GET'
+    }
+
+async function requestTossPayment(path: string, options: TossPaymentRequestOptions): Promise<TossPaymentObject> {
   const secretKey = process.env.TOSS_SECRET_KEY
   if (!secretKey) {
     throw new TossPaymentError('Toss secret key is not configured.', 503, 'payment_provider_not_configured')
   }
 
-  const res = await fetch(`${TOSS_API_BASE_URL}${path}`, {
+  const headers: Record<string, string> = {
+    Authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`,
+  }
+
+  const init: RequestInit = {
     method: options.method,
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`,
-      'Content-Type': 'application/json',
-      'Idempotency-Key': options.idempotencyKey.slice(0, 300),
-    },
-    body: JSON.stringify(options.body),
+    headers,
+  }
+
+  if (options.method === 'POST') {
+    headers['Content-Type'] = 'application/json'
+    headers['Idempotency-Key'] = options.idempotencyKey.slice(0, 300)
+    init.body = JSON.stringify(options.body)
+  }
+
+  const res = await fetch(`${TOSS_API_BASE_URL}${path}`, {
+    ...init,
   })
 
   const json = await readJson(res)

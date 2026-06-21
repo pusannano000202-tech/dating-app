@@ -330,6 +330,64 @@
 production Supabase/Vercel/Toss는 건드리지 마.
 ```
 
+## 2026-06-22 Toss webhook Query API reconciliation 보강
+
+### 공식 문서 기준 정정
+
+- Toss 일반 결제 웹훅(`PAYMENT_STATUS_CHANGED`, `DEPOSIT_CALLBACK`, `CANCEL_STATUS_CHANGED`)은 `tosspayments-webhook-signature`를 검증하는 방식이 아니다.
+- Toss 공식 LLM quick reference 기준으로 일반 결제 웹훅은 `paymentKey`로 Payment Query API를 다시 호출해서 상태를 검증해야 한다.
+- `tosspayments-webhook-signature`는 payout/seller 웹훅 쪽에 해당한다.
+- 따라서 이번 작업은 "서명 검증 구현"이 아니라 "웹훅 body에서 식별자만 추출 → Toss Query API 재조회 → DB reconciliation"으로 구현했다.
+
+### 추가 수정
+
+46. Toss Query API helper를 추가했다.
+   - `lib/payments/toss.ts`
+   - `getTossPayment(paymentKey)`
+   - `getTossPaymentByOrderId(orderId)`
+   - GET 요청에는 `Idempotency-Key`를 붙이지 않도록 POST 요청과 분리했다.
+47. `/api/payments/deposit/webhook`을 placeholder에서 실제 reconciliation route로 바꿨다.
+   - `app/api/payments/deposit/webhook/route.ts`
+   - body에서 `paymentKey` 또는 `orderId`만 추출한다.
+   - Toss Query API로 결제 상태를 다시 조회한다.
+   - 조회된 `totalAmount`가 `DEPOSIT_AMOUNT`와 다르면 거절한다.
+   - Toss `DONE`은 deposit `paid`로 반영한다.
+   - Toss `CANCELED`, `PARTIAL_CANCELED`는 deposit `refunded`로 반영한다.
+   - 이미 `refunded`인 deposit에 늦게 도착한 `DONE` webhook은 `ignored_already_refunded`로 무시해서 paid로 되돌리지 않는다.
+   - 기존 deposit notes는 덮어쓰지 않고 webhook note를 append한다.
+   - DB 반영은 `SUPABASE_SERVICE_ROLE_KEY`가 있을 때만 가능하다.
+48. 설정 테스트에 webhook Query API 재조회 방식을 고정했다.
+   - `tests/config/deposit-payment-routes.test.ts`
+   - 일반 결제 webhook에서 `tosspayments-webhook-signature`를 쓰지 않는다는 점도 테스트로 고정했다.
+
+### 검증 결과
+
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 33개 테스트 통과.
+
+### 남은 완료 기준
+
+- Toss sandbox 실제 E2E는 아직 검증하지 못했다.
+  - 현재 로컬 env에 `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`가 없다.
+  - production Toss 실결제는 건드리지 않았다.
+- webhook route는 Query API reconciliation 코드까지 들어갔지만, 실제 Toss dashboard webhook 등록/ngrok 또는 배포 URL 테스트는 아직 못 했다.
+- 새 migration 2개는 production Supabase에는 적용하지 않았다.
+- 데일리카드 정책은 여전히 `16~20 직접 뽑기`와 `gwating 자동분배` 중 선택이 필요하다.
+- `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
+
+### 다음 사람이 바로 이어갈 명령
+
+```text
+팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 Toss webhook Query API reconciliation 보강"부터 읽고 이어서 진행해.
+현재 우선순위는:
+1. 전체 검증(typecheck/lint/test:config/test:profile/test:matching/build) 재실행.
+2. 3004 route 200 확인.
+3. 현재 변경분 커밋 정리.
+4. Toss sandbox env/dashboard/ngrok 또는 Vercel preview URL로 실제 webhook E2E 검증 준비 목록 작성.
+production Supabase/Vercel/Toss는 건드리지 마.
+```
+
 ## 2026-06-22 환불 route 외부 Toss settlement 보강
 
 ### 추가 수정
@@ -638,7 +696,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - 협업 규칙상 성준/상대방 리뷰 후 적용해야 한다.
 - 닉네임 중복 DB 강제는 아직 API 조회 게이트 수준이다.
   - `profiles.display_name` unique 또는 normalized nickname 테이블 설계가 다음 우선순위다.
-- Toss sandbox confirm/cancel/webhook은 아직 placeholder가 남아 있다.
+- Toss sandbox confirm/cancel은 성준 결제 레이어 기준 차이 검토가 남아 있고, webhook은 Query API reconciliation 코드까지 보강했지만 실제 sandbox E2E는 아직 검증하지 않았다.
   - production Toss 실결제는 건드리지 않았다.
 - 데일리카드 정책은 여전히 합의 필요다.
   - 충현안 `16~20시 직접 뽑기`와 성준 gwating `자동분배` 중 하나를 선택해야 한다.
@@ -650,7 +708,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
 팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 사전 카드 DB 저장 승격"부터 읽고 이어서 진행해.
 현재 우선순위는:
 1. 닉네임 중복 DB 강제 설계/구현.
-2. Toss sandbox confirm/cancel/webhook 흡수 범위 구현 또는 성준 결제 레이어 기준 차이 보고.
+2. Toss sandbox confirm/cancel 흡수 범위와 webhook sandbox E2E 준비 목록을 성준 결제 레이어 기준으로 보고.
 3. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책 결정 질문 정리.
 production Supabase/Vercel/Toss는 건드리지 마.
 ```
@@ -702,7 +760,7 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - `20260622_matching_pre_match_card_drafts.sql`
   - `20260622_profile_display_name_claims.sql`
   - 둘 다 공용 DB 변경이므로 성준 리뷰 후 적용해야 한다.
-- Toss sandbox confirm/cancel/webhook은 아직 placeholder가 남아 있다.
+- Toss sandbox confirm/cancel은 성준 결제 레이어 기준 차이 검토가 남아 있고, webhook은 Query API reconciliation 코드까지 보강했지만 실제 sandbox E2E는 아직 검증하지 않았다.
 - 데일리카드 정책은 여전히 `16~20 직접 뽑기`와 `gwating 자동분배` 중 선택이 필요하다.
 - `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
 
@@ -711,8 +769,54 @@ production Supabase/Vercel/Toss는 건드리지 마.
 ```text
 팀장방, docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md의 "2026-06-22 닉네임 중복 DB 강제"부터 읽고 이어서 진행해.
 현재 우선순위는:
-1. Toss sandbox confirm/cancel/webhook 흡수 범위 구현 또는 성준 결제 레이어 기준 차이 보고.
+1. Toss sandbox confirm/cancel 흡수 범위와 webhook sandbox E2E 준비 목록을 성준 결제 레이어 기준으로 보고.
 2. 데일리카드 16~20 직접뽑기 vs gwating 자동분배 정책 결정 질문 정리.
 3. 새 migration 2개를 local/staging Supabase에서 적용 검증.
 production Supabase/Vercel/Toss는 건드리지 마.
 ```
+
+## 2026-06-22 최신 이어갈 지점
+
+현재 가장 최신 작업은 `Toss webhook Query API reconciliation 보강`이다.
+
+중요 정정:
+
+- Toss 일반 결제 웹훅은 `tosspayments-webhook-signature` 검증 대상이 아니다.
+- 공식 기준은 `paymentKey` 또는 `orderId`로 Toss Payment Query API를 다시 호출해서 상태를 검증하는 방식이다.
+- 이 기준에 맞춰 `app/api/payments/deposit/webhook/route.ts`와 `lib/payments/toss.ts`를 보강했다.
+
+최신 수정 파일:
+
+- `lib/payments/toss.ts`
+- `app/api/payments/deposit/webhook/route.ts`
+- `tests/config/deposit-payment-routes.test.ts`
+- `docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md`
+
+최신 검증:
+
+- `npm run typecheck` 통과.
+- `npm run lint` 통과.
+- `npm run test:config` 통과. 33개 테스트 통과.
+- `npm run test:profile` 통과. 14개 테스트 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+- `.next`를 현재 workspace 내부 경로로 확인 후 삭제하고 `npm run build` 재실행 통과.
+- 3004 dev server 재시작 후 route 확인:
+  - `/dev/preview` 200.
+  - `/` 200.
+  - `/match` 200.
+  - `/notifications` 200.
+  - `/profile/basic` 200.
+  - `/profile/worldcup` 200.
+  - `/profile/preferences` 200.
+  - `/profile/schedule` 200.
+  - `/profile/match-card` 200.
+  - `/group/create` 200.
+  - `/match/start` 200.
+  - `/match/dev-match-pending` 200.
+  - `/match/dev-match-1` 200.
+
+다음에 바로 할 일:
+
+1. 현재 변경분을 stage하고 커밋한다.
+2. 이후 남은 큰 항목은 Toss 실제 sandbox E2E, 데일리카드 정책 확정, `preference_weights` 4개/7개 계약 확정이다.
+3. production Supabase/Vercel/Toss는 성준 리뷰와 dashboard/env 준비 전까지 건드리지 않는다.
