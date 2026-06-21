@@ -34,6 +34,18 @@ test('match setup status rejects placeholder timeslots and loose weight objects'
   assert.equal(hasAvailableTimeslots({ slots: [{}] }), false)
   assert.equal(hasPreferenceWeights({ dev: true }), false)
   assert.equal(hasPreferenceWeights({ appearance: 1 }), false)
+  assert.equal(
+    hasPreferenceWeights({
+      appearance: 0.25,
+      personality: 0.25,
+      height: 0.25,
+      body_type: 0.25,
+      school: 0,
+      hobby: 0,
+      time_fit: 0,
+    }),
+    false,
+  )
 
   assert.deepEqual(
     getMatchSetupStatus({

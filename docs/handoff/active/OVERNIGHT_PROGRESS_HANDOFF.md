@@ -901,3 +901,5 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - 우리 현재 브랜치: 16~20 직접 뽑기.
   - 성준 `gwating-app`: 자동분배 UX 프로토타입.
 - `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
+  - 현재 서버 준비 조건은 `appearance`, `personality`, `height`, `body_type` 정확히 4개만 통과시킨다.
+  - `school`, `hobby`, `time_fit`이 섞인 7키 데이터는 합의 전에는 매칭 준비 완료로 처리하지 않는다.

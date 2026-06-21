@@ -27,6 +27,7 @@ export const EMPTY_MATCH_SETUP_STATUS: MatchSetupStatus = {
 }
 
 const REQUIRED_WEIGHT_KEYS = ['appearance', 'personality', 'height', 'body_type'] as const
+const REQUIRED_WEIGHT_KEY_SET = new Set<string>(REQUIRED_WEIGHT_KEYS)
 
 export function hasAvailableTimeslots(payload: MatchSetupProfile['available_timeslots']): boolean {
   if (!payload || typeof payload !== 'object' || !Array.isArray(payload.slots)) return false
@@ -49,6 +50,11 @@ export function hasPreferenceWeights(payload: unknown): payload is PreferenceWei
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false
 
   const row = payload as Record<string, unknown>
+  const keys = Object.keys(row)
+  if (keys.length !== REQUIRED_WEIGHT_KEYS.length || keys.some((key) => !REQUIRED_WEIGHT_KEY_SET.has(key))) {
+    return false
+  }
+
   let total = 0
 
   for (const key of REQUIRED_WEIGHT_KEYS) {
