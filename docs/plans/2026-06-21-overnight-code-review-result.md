@@ -40,6 +40,11 @@
 - 지금은 Toss 결제 "코드 경로 보강" 수준이다. sandbox 환경변수로 실제 checkout/confirm/cancel을 검증해야 "승인 검증 완료"라고 말할 수 있다.
 - 성준 코드를 흡수할 때 필요한 `confirm`, `cancel`, `toss helper`, `internal secret`은 코드에 반영했다. `orders` 전용 레이어와 운영 환불 트리거는 남아 있다.
 - 프론트에서 결제 완료처럼 보이는 UI를 먼저 강화하면 실제 DB paid 판정과 어긋날 수 있다.
+- `.env.local.example`에 mock/Toss sandbox/provider/server-only secret 항목을 추가했다.
+  - `NEXT_PUBLIC_PAYMENT_PROVIDER=mock`, `PAYMENT_PROVIDER=mock`
+  - `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`
+  - `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`
+  - 실제 값은 넣지 않았고, 공개 키와 서버 전용 키 구분만 문서화했다.
 
 ## 3. 홈/매칭/그룹 preview source 점검
 

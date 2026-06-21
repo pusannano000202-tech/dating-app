@@ -72,6 +72,22 @@ test('deposit payment routes do not expose missing provider environment variable
   }
 })
 
+test('local env example documents mock and Toss sandbox payment settings without secrets', () => {
+  const envExample = readSource('.env.local.example')
+
+  assert.match(envExample, /NEXT_PUBLIC_PAYMENT_PROVIDER=mock/)
+  assert.match(envExample, /PAYMENT_PROVIDER=mock/)
+  assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY=/)
+  assert.match(envExample, /TOSS_SECRET_KEY=/)
+  assert.match(envExample, /PAYMENT_INTERNAL_SECRET=/)
+  assert.match(envExample, /SUPABASE_SERVICE_ROLE_KEY=/)
+  assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY is safe for the browser/)
+  assert.match(envExample, /TOSS_SECRET_KEY is server-only/)
+  assert.match(envExample, /Never expose these with NEXT_PUBLIC_/)
+  assert.doesNotMatch(envExample, /TOSS_SECRET_KEY=gsk_/)
+  assert.doesNotMatch(envExample, /SUPABASE_SERVICE_ROLE_KEY=eyJ/)
+})
+
 test('deposit payment request draft sends failed checkout back through cancel route', () => {
   const paymentLib = readSource('lib/payments/deposit.ts')
 

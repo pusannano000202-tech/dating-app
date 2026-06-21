@@ -880,6 +880,12 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - Toss sandbox 실제 checkout/confirm/cancel/webhook E2E는 아직 못 했다.
   - 필요한 값: `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`.
   - 필요한 외부 설정: Toss sandbox 상점, webhook URL, Vercel preview 또는 ngrok.
+- `.env.local.example`에는 위 값을 넣을 자리를 추가했다.
+  - 기본 provider는 로컬 검토용 `mock`이다.
+  - Toss sandbox를 실제로 볼 때만 `NEXT_PUBLIC_PAYMENT_PROVIDER=toss` / `PAYMENT_PROVIDER=toss`로 바꾼다.
+  - 실제 비밀값은 예시 파일에 넣지 않는다.
+  - `tests/config/deposit-payment-routes.test.ts`에 env 예시 회귀 테스트를 추가했다.
+  - `npm run test:config` 재실행 통과. 36개 테스트 통과.
 - 데일리카드 최종 제품 정책은 아직 합의 필요다.
   - 우리 현재 브랜치: 16~20 직접 뽑기.
   - 성준 `gwating-app`: 자동분배 UX 프로토타입.
