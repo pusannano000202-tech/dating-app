@@ -68,3 +68,9 @@ CREATE TABLE IF NOT EXISTS attendances (
 ALTER TABLE deposits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tips     ENABLE ROW LEVEL SECURITY;
 -- TODO(충현): 참가자 본인 SELECT 허용 정책은 매칭 참가자 모델 확정 후 추가.
+
+-- 결제 라우트는 service_role(서버)로 모든 결제 테이블에 접근한다.
+-- 일부 프로젝트는 신규 테이블에 service_role grant가 자동 부여되지 않으므로 명시적으로 부여.
+GRANT SELECT, INSERT, UPDATE, DELETE
+  ON groups, matches, deposits, tips, noshow_penalties, attendances
+  TO service_role;
