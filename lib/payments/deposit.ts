@@ -15,6 +15,7 @@ export interface DepositPaymentRequestDraft {
   userId: string
   amount: number
   orderId: string
+  orderName: string
   successUrl: string
   failUrl: string
 }
@@ -48,9 +49,10 @@ export function buildDepositPaymentRequestDraft(params: {
   userId: string
   origin: string
   amount?: number
+  orderId?: string
 }): DepositPaymentRequestDraft {
   const amount = params.amount ?? DEPOSIT_AMOUNT
-  const orderId = buildDepositOrderId(params.groupId, params.userId)
+  const orderId = params.orderId ?? buildDepositOrderId(params.groupId, params.userId)
   const base = params.origin.replace(/\/$/, '')
 
   return {
@@ -59,6 +61,7 @@ export function buildDepositPaymentRequestDraft(params: {
     userId: params.userId,
     amount,
     orderId,
+    orderName: `부팅 보증금 ${amount.toLocaleString('ko-KR')}원`,
     successUrl: `${base}/api/payments/deposit/confirm?provider=${params.provider}&group_id=${encodeURIComponent(params.groupId)}`,
     failUrl: `${base}/api/payments/deposit/cancel?provider=${params.provider}&group_id=${encodeURIComponent(params.groupId)}&reason=checkout_failed`,
   }
@@ -80,4 +83,10 @@ function buildDepositOrderId(groupId: string, userId: string) {
   const compactGroup = groupId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
   const compactUser = userId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
   return `deposit_${compactGroup}_${compactUser}_${Date.now()}`
+}
+
+export function isDepositOrderIdForContext(orderId: string, groupId: string, userId: string) {
+  const compactGroup = groupId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
+  const compactUser = userId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
+  return orderId.startsWith(`deposit_${compactGroup}_${compactUser}_`)
 }

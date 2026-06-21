@@ -83,7 +83,7 @@
 | 12 | 친구 요청 | 부분 구현 | `app/api/friend-requests/route.ts`, `app/friends/page.tsx` | 닉네임 기반 API는 있으나 DB 중복/초대 UX 검증 필요 | 브라우저 route 확인 |
 | 13 | 그룹 생성/초대 | 부분 구현 | `app/group/create/page.tsx`, `components/matching/group-create/*` | dev preview와 실제 그룹 상태가 섞일 위험 | source 통일 확인 |
 | 14 | 매칭 찾기 gate | 실제 구현됨에 가까움 | `app/match/start/page.tsx`, `app/api/match-pool/enter/route.ts`, `lib/matching/match-setup-status.ts` | 성향/시간/비중과 멤버별 사전 카드 DB 완료를 함께 검사한다. 단 migration 적용 전 production에서는 검증 불가 | migration 적용 후 실제 그룹으로 확인 |
-| 15 | 보증금 결제 | mock 구현 + Toss 흡수 후보 | `app/api/deposits/route.ts`, `app/api/payments/deposit/*`, `lib/payments/deposit.ts` | 성준 회신 기준 실결제는 Toss 단일이다. provider 목록은 `mock`, `toss`만 유지한다 | Toss 기준 env/confirm/cancel만 별도 정리 |
+| 15 | 보증금 결제 | mock 구현 + Toss 서버 route 보강 | `app/api/deposits/route.ts`, `app/api/payments/deposit/*`, `lib/payments/deposit.ts`, `lib/payments/toss.ts` | 성준 회신 기준 실결제는 Toss 단일이다. checkout/confirm/cancel helper와 route는 추가됐다 | sandbox key로 실제 checkout/confirm/cancel 검증 필요 |
 | 16 | 환불/앱 기여금 | 부분 구현 | `app/match/[id]/refund/page.tsx`, `app/api/matches/[id]/refund/route.ts`, `lib/refund/fee-flow.ts` | 0~10,000원 앱 기여금 선택, 1,000원 단위 slider/preset, 3천-2천-1천 제안 흐름은 코드에 반영됨. 다만 실제 DB RPC 결과와 브라우저 UX 검증은 남음 | refund route와 실제 화면 검증 |
 | 17 | 데일리카드 | 우리 브랜치 일부 구현 + 성준 gwating 프로토타입 존재 | `app/api/matches/[id]/daily-cards/route.ts`, `supabase/migrations/20260602_z54_daily_card_draw_policy.sql`, `gwating-app/app/match/qa` 계열 | 성준 `gwating-app`은 자동 분배/localStorage/mock이고, 우리 16~20 직접 뽑기와 정책이 다르다 | 정책 합의 전 DB 확장 금지 |
 | 18 | 연락처/채팅 공개 | 우리 브랜치 일부 구현 + 성준 gwating 프로토타입 존재 | `app/api/matches/[id]/connections/route.ts`, `app/api/matches/[id]/chat/route.ts`, `gwating-app/app/match/chat` | 성준 기준 `connections` RPC/테이블과 `match_meetings` 실체가 없다고 회신함 | 실제 공개 시점/스키마 합의 필요 |
@@ -106,8 +106,8 @@
 - 닉네임 중복 확인: DB claim 구조는 추가됐지만 migration 적용 전까지 운영 DB에서는 검증할 수 없다.
 - 친구 요청: 닉네임 기반 요청 생성은 있으나 실제 화면 검증이 필요하다.
 - 매칭 찾기 gate: 서버 route가 그룹 멤버 전원의 성향/시간/비중/사전 카드 완료를 검사한다. 단 새 migration이 실제 Supabase에 적용되어야 운영 검증 가능하다.
-- 보증금/결제: mock provider는 동작하도록 설계되어 있으나 실결제 provider 호출은 아직 준비 단계다.
-- 결제 provider: 현재 우리 코드의 `lib/payments/deposit.ts`는 성준 회신 반영 후 `mock`, `toss`만 유지한다. 실제 외부 승인 호출은 아직 없고, Toss 단일 흡수 대상이다.
+- 보증금/결제: mock provider는 동작하도록 설계되어 있고, Toss checkout/confirm/cancel 서버 route도 추가됐다. 다만 sandbox key로 실제 end-to-end 호출한 증거는 아직 없다.
+- 결제 provider: 현재 우리 코드의 `lib/payments/deposit.ts`는 성준 회신 반영 후 `mock`, `toss`만 유지한다. Toss 단일 흡수 대상이다.
 - 환불/앱 기여금: backend 계산 구조와 사용자 요구의 1,000원 단위, 3천/2천/1천 제안 흐름은 반영됐다. 실제 RPC 결과와 브라우저 UX 검증은 남아 있다.
 - 데일리카드/연락처/채팅: route와 migration은 있으나 실제 화면 흐름 검증이 필요하다.
 
@@ -125,10 +125,11 @@
 - 환불 페이지는 `0~10,000원`, `1,000원 단위`, `3,000원 -> 2,000원 -> 1,000원` 제안 흐름까지 코드에 반영됐다. 실제 refund RPC 결과와 사용자 화면 확인은 아직 필요하다.
 - 사전 카드 DB 저장 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
 - 닉네임 DB claim 코드는 추가됐지만 production Supabase에는 적용하지 않았다.
-- 실제 Toss 승인 호출은 아직 없다. Kakao/PortOne은 성준 회신 기준 이번 흡수 기본 대상이 아니며, provider 목록에서도 제외했다.
-- `app/api/payments/deposit/confirm/route.ts`는 `provider !== 'mock'`일 때 실제 승인 검증 대신 `awaiting_provider_webhook` 응답을 반환한다.
-- `app/api/payments/deposit/webhook/route.ts`도 provider payload를 실제 서명 검증하거나 DB에 반영하지 않고 수신 자리만 둔 상태다.
-- 결제 webhook이 실제 provider 이벤트를 검증해 DB를 맞추는지는 미완성이다.
+- Toss checkout/confirm/cancel 서버 호출 코드는 추가됐다. Kakao/PortOne은 성준 회신 기준 이번 흡수 기본 대상이 아니며, provider 목록에서도 제외했다.
+- `app/api/payments/deposit/confirm/route.ts`는 Toss `paymentKey/orderId/amount`를 서버에서 확인하고 `deposits.status = paid`로 바꾼다. 단, sandbox key로 실제 호출한 증거는 아직 없다.
+- `app/api/payments/deposit/cancel/route.ts`는 `PAYMENT_INTERNAL_SECRET`이 맞을 때만 Toss cancel을 실행하고 service role로 deposit을 `refunded` 처리한다. 단, `/match/[id]/refund` 화면과 운영 트리거 연결은 아직 남아 있다.
+- `app/api/payments/deposit/webhook/route.ts`는 provider payload를 실제 서명 검증하거나 DB에 반영하지 않고 수신 자리만 둔 상태다.
+- 결제 webhook이 실제 provider 이벤트를 검증해 DB를 맞추는지는 미완성이다. 성준 회신 기준 MVP는 동기 confirm 중심이라 webhook은 후속으로 남긴다.
 - 인증사진 기반 노쇼 판단은 구현 증거가 부족하다.
 - 홈/매칭/그룹/알림이 같은 상태 source로 완전히 통일됐는지는 브라우저 검증 필요하다.
 

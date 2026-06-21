@@ -633,7 +633,12 @@ export default function MatchDetailPage() {
         body: JSON.stringify({ group_id: match.my_group_id }),
       })
       if (res.status === 202) {
-        setError('외부 결제창 연결 준비 상태예요. 로컬 검토에서는 mock 결제로 확인해 주세요.')
+        const data = await res.json().catch(() => ({})) as { payment?: { checkoutUrl?: string | null } }
+        if (data.payment?.checkoutUrl) {
+          window.location.href = data.payment.checkoutUrl
+          return
+        }
+        setError('결제창 주소를 만들지 못했어요. Toss 테스트 키와 결제 설정을 확인해 주세요.')
         return
       }
       if (!res.ok) {

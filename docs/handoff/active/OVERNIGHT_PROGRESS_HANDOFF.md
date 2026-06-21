@@ -330,6 +330,66 @@
 production Supabase/Vercel/Toss는 건드리지 마.
 ```
 
+## 2026-06-22 Toss sandbox 결제 승인/취소 route 보강
+
+### 추가 수정
+
+44. Toss 서버 helper를 추가했다.
+   - `lib/payments/toss.ts`
+   - 공식 Toss Payments API 기준으로 서버에서만 `POST /v1/payments`, `POST /v1/payments/confirm`, `POST /v1/payments/{paymentKey}/cancel`을 호출한다.
+   - `TOSS_SECRET_KEY`는 서버 helper 안에서만 읽고, 프론트에는 노출하지 않는다.
+   - 각 POST 요청에는 `Idempotency-Key`를 붙인다.
+45. Toss 보증금 결제 시작 흐름을 `pending deposit -> checkout` 구조로 보강했다.
+   - `app/api/payments/deposit/route.ts`
+   - `app/api/deposits/route.ts`
+   - 사용자가 그룹 멤버인지 확인한 뒤 `deposits.status = pending` row와 `toss_order_id`를 확보한다.
+   - 이후 Toss checkout URL을 만들고 프론트에 반환한다.
+   - 이미 `paid`/`held` 상태면 새 결제창을 만들지 않고 기존 상태를 반환한다.
+46. Toss 승인 confirm 흐름을 placeholder에서 실제 서버 검증 구조로 바꿨다.
+   - `app/api/payments/deposit/confirm/route.ts`
+   - `paymentKey`, `orderId`, `amount`가 필요하다.
+   - `orderId`가 현재 `group_id + user_id` 맥락과 맞는지 확인한다.
+   - DB의 pending deposit row와 `toss_order_id`가 일치해야 한다.
+   - Toss 승인 응답의 `orderId`, `totalAmount`, `status = DONE`을 확인한 뒤 `deposits.status = paid`로 바꾼다.
+47. Toss 취소/cancel route를 내부 전용 환불 호출용으로 보강했다.
+   - `app/api/payments/deposit/cancel/route.ts`
+   - 브라우저 checkout 실패 GET redirect는 기존대로 유지한다.
+   - 실제 `paymentKey` 취소 POST는 `PAYMENT_INTERNAL_SECRET`이 맞을 때만 실행한다.
+   - `SUPABASE_SERVICE_ROLE_KEY`가 있어야 `toss_payment_key` 기준으로 deposit을 `refunded` 처리한다.
+   - 사용자가 이 route를 직접 눌러서 임의 환불하는 구조가 아니다.
+48. `/match/[id]` 보증금 버튼은 Toss checkout URL이 오면 결제창으로 이동하도록 바꿨다.
+   - `app/match/[id]/page.tsx`
+   - checkout URL이 없으면 설정 미완료 안내를 보여준다.
+49. 설정 테스트를 새 결제 구조에 맞게 바꿨다.
+   - `tests/config/deposit-payment-routes.test.ts`
+   - route가 Toss를 직접 fetch하지 않고 `lib/payments/toss.ts` helper로 위임하는지 고정했다.
+   - `tsconfig.config-tests.json`에 `lib/payments/**/*.ts`를 포함했다.
+
+### 이번 검증 결과
+
+- `npm run typecheck` 통과.
+- `npm run test:config` 통과. 30개 테스트 통과.
+
+### 여전히 남은 결제/환불 완료 기준
+
+- production Toss 실결제는 실행하지 않았다.
+- Toss sandbox key가 실제로 들어간 상태에서 checkout/confirm/cancel을 끝까지 호출해 본 것은 아니다.
+- `/match/[id]/refund` 화면은 아직 `submit_refund_request` RPC로 DB 정산을 처리한다.
+  - 실제 Toss 취소 호출은 `app/api/payments/deposit/cancel/route.ts`에 내부 전용 route로 마련했다.
+  - 운영자 환불 트리거 또는 만남 인증 완료 트리거가 이 내부 cancel route를 호출하는 연결은 아직 남아 있다.
+- webhook은 여전히 MVP 핵심 경로가 아니다.
+  - 성준 회신 기준은 webhook보다 동기 confirm 중심이다.
+  - 별도 webhook 서명 검증/DB 재조정은 후속 phase로 남긴다.
+- Toss dashboard, Vercel env, Supabase service role env 설정은 사용자가 직접 해야 한다.
+
+### 다음 우선순위
+
+1. `npm run lint`, `npm run test:profile`, `npm run test:matching`, `npm run build`까지 전체 검증한다.
+2. 로컬 route 200을 다시 확인한다.
+3. Toss sandbox key가 있는 별도 환경에서 checkout/confirm/cancel을 실제로 검증한다.
+4. `/match/[id]/refund`의 DB 정산과 내부 Toss cancel route를 어떤 운영 트리거로 연결할지 설계한다.
+5. 새 migration 2개를 local/staging Supabase에 적용 검증한다.
+
 ## 리셋 후 재개 명령
 
 ```text

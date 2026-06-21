@@ -15,6 +15,7 @@ test('deposit payment API has explicit start, confirm, cancel, and webhook surfa
     'app/api/payments/deposit/confirm/route.ts',
     'app/api/payments/deposit/cancel/route.ts',
     'app/api/payments/deposit/webhook/route.ts',
+    'lib/payments/toss.ts',
   ]
 
   for (const route of routes) {
@@ -22,11 +23,12 @@ test('deposit payment API has explicit start, confirm, cancel, and webhook surfa
   }
 })
 
-test('deposit payment routes use provider readiness and never call external APIs directly', () => {
+test('deposit payment routes use provider readiness and delegate Toss calls to the server helper', () => {
   const startRoute = readSource('app/api/payments/deposit/route.ts')
   const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
   const cancelRoute = readSource('app/api/payments/deposit/cancel/route.ts')
   const webhookRoute = readSource('app/api/payments/deposit/webhook/route.ts')
+  const tossHelper = readSource('lib/payments/toss.ts')
 
   for (const source of [startRoute, confirmRoute, cancelRoute, webhookRoute]) {
     assert.match(source, /getDepositPaymentReadiness/)
@@ -34,9 +36,19 @@ test('deposit payment routes use provider readiness and never call external APIs
   }
 
   assert.match(startRoute, /mock_pay_deposit/)
+  assert.match(startRoute, /createTossPaymentWindow/)
   assert.match(confirmRoute, /isDepositPaymentAmountValid/)
+  assert.match(confirmRoute, /confirmTossPayment/)
+  assert.doesNotMatch(confirmRoute, /awaiting_provider_webhook/)
   assert.match(cancelRoute, /payment_cancelled/)
+  assert.match(cancelRoute, /PAYMENT_INTERNAL_SECRET/)
+  assert.match(cancelRoute, /cancelTossPayment/)
   assert.match(webhookRoute, /payment_provider_not_configured/)
+  assert.match(tossHelper, /https:\/\/api\.tosspayments\.com\/v1/)
+  assert.match(tossHelper, /\/payments\/confirm/)
+  assert.match(tossHelper, /encodeURIComponent\(params\.paymentKey\).*\/cancel/)
+  assert.match(tossHelper, /Authorization/)
+  assert.match(tossHelper, /Idempotency-Key/)
 })
 
 test('deposit payment routes do not expose missing provider environment variable names', () => {

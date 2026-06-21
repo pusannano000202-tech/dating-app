@@ -9,36 +9,36 @@
 | 항목 | 현재 우리 코드 | 성준 회신 기준 | 판단 | 다음 조치 |
 | --- | --- | --- | --- | --- |
 | 결제사 | `mock`, `toss` provider만 유지 | Toss 단일 | 로컬 mock 제외 일치 | `mock`은 로컬/검토용, 실결제 흡수 대상은 Toss만 유지 |
-| 결제 시작 | `/api/deposits`, `/api/payments/deposit`에서 mock이면 즉시 paid, 외부 provider면 checkout draft 반환 | Toss prepare route에서 결제 요청 생성 | 부분 | route 이름/응답 형태 매핑표 필요 |
-| 결제 승인 | `/api/payments/deposit/confirm`에서 mock만 `mock_pay_deposit`, provider가 mock이 아니면 `awaiting_provider_webhook` | Toss 승인값 서버 검증 후 `deposits` paid 처리 | 미완 | Toss confirm 구현 전까지 실결제 완료로 보면 안 됨 |
-| 결제 취소 | `/api/payments/deposit/cancel`은 취소 결과/redirect 자리 | 성준 cancel route + 내부 secret 환불 호출 | 부분 | 사용자 직접 환불 호출 차단 기준 확인 필요 |
+| 결제 시작 | `/api/deposits`, `/api/payments/deposit`에서 mock이면 즉시 paid, Toss면 pending deposit row를 만들고 checkout URL 반환 | Toss prepare route에서 결제 요청 생성 | 코드 보강, sandbox 검증 필요 | route 이름/응답 형태 매핑표 필요 |
+| 결제 승인 | `/api/payments/deposit/confirm`에서 Toss `paymentKey/orderId/amount`를 서버 helper로 승인 검증하고 paid 처리 | Toss 승인값 서버 검증 후 `deposits` paid 처리 | 코드 보강, sandbox 검증 필요 | production 호출은 안 했고, sandbox key로 end-to-end 검증 필요 |
+| 결제 취소 | `/api/payments/deposit/cancel`은 checkout 실패 redirect와 내부 secret 기반 Toss cancel을 분리 | 성준 cancel route + 내부 secret 환불 호출 | 코드 보강, 운영 트리거 미연결 | `PAYMENT_INTERNAL_SECRET` 없이는 실제 cancel 불가. refund 화면과 내부 route 연결은 남음 |
 | webhook | body 수신 placeholder, 서명 검증/DB 반영 없음 | 성준 기준 webhook 없음, 동기 confirm 중심 | 보류 | MVP는 webhook보다 confirm 검증 우선 |
-| 환경변수 | `TOSS_SECRET_KEY`, `NEXT_PUBLIC_TOSS_CLIENT_KEY` readiness | `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` | 부분 불일치 | 내부 secret/service role 기준을 다음 결제 phase에서 매핑 |
+| 환경변수 | `TOSS_SECRET_KEY`, `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` | `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` | 코드 기준 일치, 대시보드 설정 필요 | Vercel/Supabase/Toss dashboard 설정 필요 |
 | 금액 | `DEPOSIT_AMOUNT = 10000`, mock RPC도 10,000원 검증 | 10,000원 | 일치 | 유지 |
 
 결제 쪽 핵심 위험:
 
-- 현재 테스트는 "외부 API를 직접 호출하지 않는다"를 고정하고 있어서, Toss 실승인 구현 완료를 증명하지 않는다.
+- 현재 테스트는 route가 외부 API를 직접 호출하지 않고 `lib/payments/toss.ts` 서버 helper에 위임하는 구조를 고정한다.
 - `kakao` provider 이름은 결제 provider 목록에서 제거했다. 과거 문서에 남은 KakaoPay/PortOne 언급은 레거시 참고로만 본다.
-- `confirm` route가 provider 실제 승인값을 검증하지 않으므로, 배포 결제 완료 판정은 아직 미완성이다.
+- `confirm` route는 Toss 승인 응답의 `orderId`, `totalAmount`, `status = DONE`을 확인한다. 다만 sandbox key로 실제 checkout/confirm을 끝까지 검증한 증거는 아직 없다.
 
 ## 2.1 성준 Toss 기준과 우리 route 매핑표
 
 | 성준 회신 기준 | 현재 우리 코드 대응 | 현재 차이 | 판단 |
 | --- | --- | --- | --- |
 | `app/api/payments/deposit/prepare` | `app/api/payments/deposit/route.ts`, `app/api/deposits/route.ts` | 우리 쪽은 prepare라는 이름이 아니라 POST route에서 checkout draft를 반환 | 이름/응답 통합 필요 |
-| `app/api/payments/deposit/confirm` | `app/api/payments/deposit/confirm/route.ts` | mock이면 paid, Toss면 실제 승인 검증 없이 `awaiting_provider_webhook` | 핵심 미완 |
-| `app/api/payments/deposit/cancel` | `app/api/payments/deposit/cancel/route.ts` | 취소 redirect/JSON 자리만 있음 | 내부 secret 환불 호출과 별도 |
+| `app/api/payments/deposit/confirm` | `app/api/payments/deposit/confirm/route.ts` | mock이면 paid, Toss면 `confirmTossPayment` 후 DB paid 처리 | sandbox 실검증 필요 |
+| `app/api/payments/deposit/cancel` | `app/api/payments/deposit/cancel/route.ts` | checkout 실패 redirect + 내부 secret 기반 Toss cancel | refund/운영 트리거 연결 필요 |
 | `app/api/payments/tip/prepare` 등 | 대응 없음 또는 미확인 | 앱 기여금/팁 결제를 보증금 환불 UX와 섞으면 안 됨 | 별도 phase |
-| `lib/payments/toss.ts` | `lib/payments/deposit.ts` 안에 provider readiness만 존재 | Toss 클라이언트/승인 검증 helper 없음 | 신규 helper 필요 |
+| `lib/payments/toss.ts` | `lib/payments/toss.ts` 추가 | Toss checkout/confirm/cancel 서버 helper 존재 | sandbox 실검증 필요 |
 | `lib/payments/orders.ts` | `buildDepositOrderId()`만 존재 | 주문/멱등 처리 레이어 부족 | 보강 필요 |
-| `PAYMENT_INTERNAL_SECRET` | 직접 사용 증거 없음 | 환불/cancel 내부 호출 보호 장치 부족 | 보강 필요 |
-| `SUPABASE_SERVICE_ROLE_KEY` | 현재 payment route는 server client/user auth 중심 | 서버 전용 status 갱신 권한 설계 미흡 | 보강 필요 |
+| `PAYMENT_INTERNAL_SECRET` | `app/api/payments/deposit/cancel/route.ts`에서 실제 cancel POST 보호 | 환불/cancel 내부 호출 보호 | 추가 완료, 운영 트리거 필요 |
+| `SUPABASE_SERVICE_ROLE_KEY` | `app/api/payments/deposit/cancel/route.ts`에서 내부 환불 후 deposit 상태 갱신에 사용 | 서버 전용 status 갱신 권한 | 추가 완료, env 설정 필요 |
 
 결론:
 
-- 지금은 Toss 결제 "버튼 연결 준비" 수준이지, Toss 결제 "승인 검증 완료" 수준이 아니다.
-- 성준 코드를 흡수할 때는 `prepare`, `confirm`, `cancel`, `orders`, `toss helper`, `internal secret`을 한 묶음으로 가져와야 한다.
+- 지금은 Toss 결제 "코드 경로 보강" 수준이다. sandbox 환경변수로 실제 checkout/confirm/cancel을 검증해야 "승인 검증 완료"라고 말할 수 있다.
+- 성준 코드를 흡수할 때 필요한 `confirm`, `cancel`, `toss helper`, `internal secret`은 코드에 반영했다. `orders` 전용 레이어와 운영 환불 트리거는 남아 있다.
 - 프론트에서 결제 완료처럼 보이는 UI를 먼저 강화하면 실제 DB paid 판정과 어긋날 수 있다.
 
 ## 3. 홈/매칭/그룹 preview source 점검
