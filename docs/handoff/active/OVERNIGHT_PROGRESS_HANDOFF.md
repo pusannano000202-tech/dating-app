@@ -439,6 +439,29 @@ production Supabase/Vercel/Toss는 건드리지 마.
 3. 데일리카드 정책 합의: 16~20 직접 뽑기 vs gwating 자동분배.
 4. `preference_weights` 4개/7개 계약 합의.
 
+## 2026-06-22 전화번호 그룹 초대 신규 생성 차단
+
+### 추가 수정
+
+1. `app/api/group-invites/route.ts`에서 신규 전화번호 기반 그룹 초대 생성을 막았다.
+   - `invited_phone`이 들어오면 `phone_invites_disabled`로 400을 반환한다.
+   - 새 초대 생성은 기존 회원 `invited_user_id` 또는 공개 `link` 초대만 허용한다.
+   - DB의 레거시 `invited_phone` 컬럼과 기존 row 조회는 그대로 둬서 공용 migration 충돌은 피했다.
+2. `tests/config/booting-branding.test.ts`에 회귀 테스트를 추가했다.
+   - 서버 route가 `phone` invite를 새로 만들지 않는지 확인한다.
+   - 초대 패널 문구가 “로그인/회원가입 후 초대 수락” 흐름을 유지하는지 확인한다.
+
+### 검증 결과
+
+- `npm run test:config` 통과.
+- `npm run typecheck` 통과.
+
+### 남은 한계
+
+- DB 마이그레이션에는 과거 `invite_kind = 'phone'` 구조가 남아 있다.
+- 기존 production/staging DB에 이미 있는 phone invite row를 어떻게 정리할지는 성준 리뷰와 운영 데이터 확인 후 결정해야 한다.
+- 이번 수정은 “신규 앱 API에서 전화번호 그룹 초대를 만들지 못하게 막는 것”까지다.
+
 ## 리셋 후 재개 명령
 
 ```text

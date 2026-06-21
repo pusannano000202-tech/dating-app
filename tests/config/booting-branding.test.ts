@@ -157,6 +157,17 @@ test('matching readiness gates include nickname and pre-match card checks', () =
   assert.match(groupCreate, /pre_match_card_required/)
 })
 
+test('group invite creation no longer creates phone-based invites', () => {
+  const groupInviteRoute = readSource('app/api/group-invites/route.ts')
+  const invitePanel = readSource('components/matching/group-create/InviteFriendPanel.tsx')
+
+  assert.match(groupInviteRoute, /phone_invites_disabled/)
+  assert.match(groupInviteRoute, /const inviteKind: 'user' \| 'link'/)
+  assert.match(groupInviteRoute, /invited_phone:\s*null/)
+  assert.doesNotMatch(groupInviteRoute, /inviteKind: 'user' \| 'phone' \| 'link'/)
+  assert.match(invitePanel, /로그인\/회원가입 후 초대를 수락해야 그룹에 들어옵니다/)
+})
+
 test('profile onboarding pages allow dev preview without Supabase user redirects', () => {
   const basic = readSource('app/profile/basic/page.tsx')
   const worldcup = readSource('app/profile/worldcup/page.tsx')

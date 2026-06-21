@@ -55,7 +55,11 @@ export async function POST(req: NextRequest) {
     return jsonError('group_id_required', 400)
   }
 
-  if (!isLinkInvite && !invitedUserId && !invitedPhone) {
+  if (invitedPhone) {
+    return jsonError('phone_invites_disabled', 400)
+  }
+
+  if (!isLinkInvite && !invitedUserId) {
     return jsonError('invite_target_required', 400)
   }
 
@@ -63,11 +67,9 @@ export async function POST(req: NextRequest) {
     return jsonError('cannot_invite_self', 400)
   }
 
-  const inviteKind: 'user' | 'phone' | 'link' = isLinkInvite
+  const inviteKind: 'user' | 'link' = isLinkInvite
     ? 'link'
-    : invitedUserId
-      ? 'user'
-      : 'phone'
+    : 'user'
 
   const token = randomUUID().replace(/-/g, '')
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -78,7 +80,7 @@ export async function POST(req: NextRequest) {
       group_id: groupId,
       invited_by_user_id: user.id,
       invited_user_id: invitedUserId,
-      invited_phone: isLinkInvite ? null : invitedPhone,
+      invited_phone: null,
       invite_kind: inviteKind,
       token,
       status: 'pending',
