@@ -160,12 +160,20 @@ test('matching readiness gates include nickname and pre-match card checks', () =
 test('group invite creation no longer creates phone-based invites', () => {
   const groupInviteRoute = readSource('app/api/group-invites/route.ts')
   const invitePanel = readSource('components/matching/group-create/InviteFriendPanel.tsx')
+  const invitePage = readSource('app/group/invite/[token]/page.tsx')
+  const acceptRoute = readSource('app/api/group-invites/accept/route.ts')
 
   assert.match(groupInviteRoute, /phone_invites_disabled/)
   assert.match(groupInviteRoute, /const inviteKind: 'user' \| 'link'/)
   assert.match(groupInviteRoute, /invited_phone:\s*null/)
   assert.doesNotMatch(groupInviteRoute, /inviteKind: 'user' \| 'phone' \| 'link'/)
   assert.match(invitePanel, /로그인\/회원가입 후 초대를 수락해야 그룹에 들어옵니다/)
+  assert.match(invitePage, /booting-band/)
+  assert.match(invitePage, /초대 링크만으로 바로 그룹에 들어가지 않아요/)
+  assert.match(invitePage, /\/login\?next=/)
+  assert.match(acceptRoute, /supabase\.auth\.getUser\(\)/)
+  assert.match(acceptRoute, /Unauthorized/)
+  assert.match(acceptRoute, /accept_group_invite_by_token/)
 })
 
 test('profile onboarding pages allow dev preview without Supabase user redirects', () => {

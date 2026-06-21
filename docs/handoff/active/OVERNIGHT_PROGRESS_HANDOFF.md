@@ -450,11 +450,15 @@ production Supabase/Vercel/Toss는 건드리지 마.
 2. `tests/config/booting-branding.test.ts`에 회귀 테스트를 추가했다.
    - 서버 route가 `phone` invite를 새로 만들지 않는지 확인한다.
    - 초대 패널 문구가 “로그인/회원가입 후 초대 수락” 흐름을 유지하는지 확인한다.
+3. `app/group/invite/[token]/page.tsx`를 Booting 톤으로 정리했다.
+   - 초대 링크만으로 바로 그룹에 들어가지 않고, 로그인/회원가입 후 수락해야 참여된다는 문구를 명확히 했다.
+   - 보라/회색 계열의 옛 스타일 대신 `booting-band`, `glass-card`, 코랄/크림톤 위계로 맞췄다.
 
 ### 검증 결과
 
 - `npm run test:config` 통과.
 - `npm run typecheck` 통과.
+- `npm run lint` 통과.
 
 ### 남은 한계
 
