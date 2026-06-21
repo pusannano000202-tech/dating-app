@@ -30,6 +30,7 @@ This folder is the canonical entry point for active product and implementation p
 - [Pre-Meeting Excitement Info Plan](./2026-06-02-pre-meeting-excitement-info-plan.md)
 - [Operator Console Plan (매칭 승인·근거 보고·외모 점수 보정)](./2026-06-02-operator-console-plan.md)
 - [Preference Weight Number Input Plan](./2026-06-12-preference-weight-number-input-plan.md)
+- [Overnight External Completion Gates](./2026-06-22-overnight-external-completion-gates.md)
 
 ## Manager Room Operating Order
 
@@ -43,9 +44,9 @@ Current baseline decisions:
 
 - `/dev/preview` is the local design review entry and must not bounce protected onboarding screens back to login.
 - MVP auth follows the current email verification/email OTP direction; phone OTP is deferred for later review.
-- Preference weights are 4 keys only: `appearance`, `personality`, `height`, `body_type`.
-- Daily cards use a user-driven 16:00-20:00 draw window.
-- Initial launch is a free beta; deposit/refund/app-fee UX is deferred.
+- Current local preference weights are 4 keys: `appearance`, `personality`, `height`, `body_type`. Sungjun's 7-key contract still needs agreement before shared contract changes.
+- Daily cards currently use a user-driven 16:00-20:00 draw window in this branch. Sungjun's automatic-distribution prototype still needs product-policy agreement.
+- Initial launch now keeps a 10,000 KRW refundable deposit direction, with mock for local UI review and Toss sandbox as the real-payment target.
 - Daily-card DB migration work is split into a DB worker/phase.
 
 ## Management Rules

@@ -88,6 +88,24 @@ test('local env example documents mock and Toss sandbox payment settings without
   assert.doesNotMatch(envExample, /SUPABASE_SERVICE_ROLE_KEY=eyJ/)
 })
 
+test('payment env checker supports mock review and Toss sandbox preflight without printing secrets', () => {
+  const packageJson = readSource('package.json')
+  const checker = readSource('scripts/check-payment-env.mjs')
+
+  assert.match(packageJson, /"check:payment-env": "node scripts\/check-payment-env\.mjs"/)
+  assert.match(checker, /--provider=/)
+  assert.match(checker, /NEXT_PUBLIC_PAYMENT_PROVIDER/)
+  assert.match(checker, /PAYMENT_PROVIDER/)
+  assert.match(checker, /NEXT_PUBLIC_TOSS_CLIENT_KEY/)
+  assert.match(checker, /TOSS_SECRET_KEY/)
+  assert.match(checker, /PAYMENT_INTERNAL_SECRET/)
+  assert.match(checker, /SUPABASE_SERVICE_ROLE_KEY/)
+  assert.match(checker, /console\.table\(rows\)/)
+  assert.doesNotMatch(checker, /console\.log\(env/)
+  assert.doesNotMatch(checker, /console\.log\(fileEnv/)
+  assert.doesNotMatch(checker, /console\.table\(env/)
+})
+
 test('deposit payment request draft sends failed checkout back through cancel route', () => {
   const paymentLib = readSource('lib/payments/deposit.ts')
 

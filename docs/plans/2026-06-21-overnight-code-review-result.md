@@ -45,6 +45,11 @@
   - `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`
   - `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`
   - 실제 값은 넣지 않았고, 공개 키와 서버 전용 키 구분만 문서화했다.
+- `scripts/check-payment-env.mjs`와 `npm run check:payment-env`를 추가했다.
+  - 기본 mock 모드는 Supabase 공개 설정만 확인한다.
+  - `npm run check:payment-env -- --provider=toss`는 Toss sandbox E2E에 필요한 secret이 빠지면 실패한다.
+  - 현재 로컬은 Toss 관련 4개 값이 없어 Toss 강제 모드가 실패한다. 이 상태에서는 실제 checkout/confirm/cancel/webhook 완료를 주장할 수 없다.
+- 외부 완료 게이트는 `docs/plans/2026-06-22-overnight-external-completion-gates.md`에 분리했다.
 
 ## 3. 홈/매칭/그룹 preview source 점검
 

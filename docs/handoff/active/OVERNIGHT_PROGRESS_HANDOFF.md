@@ -886,6 +886,17 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - 실제 비밀값은 예시 파일에 넣지 않는다.
   - `tests/config/deposit-payment-routes.test.ts`에 env 예시 회귀 테스트를 추가했다.
   - `npm run test:config` 재실행 통과. 36개 테스트 통과.
+- Toss sandbox 전용 preflight 명령을 추가했다.
+  - `npm run check:payment-env`
+  - `npm run check:payment-env -- --provider=toss`
+  - 기본 mock 모드는 통과했다.
+  - Toss 강제 모드는 현재 `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`가 없어 실패한다. 이 실패는 정상 차단이다.
+  - 검증: `npm run check:payment-env` 통과.
+  - 검증: `npm run check:payment-env -- --provider=toss`는 예상대로 위 4개 키 누락을 보고하고 차단.
+  - 검증: `npm run test:config` 통과. 37개 테스트 통과.
+- 외부 완료 게이트 문서를 추가했다.
+  - `docs/plans/2026-06-22-overnight-external-completion-gates.md`
+  - Toss E2E 순서, 사용자/성준 합의 질문, 완료 조건을 한 문서로 정리했다.
 - 데일리카드 최종 제품 정책은 아직 합의 필요다.
   - 우리 현재 브랜치: 16~20 직접 뽑기.
   - 성준 `gwating-app`: 자동분배 UX 프로토타입.
