@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { ChevronLeft, Heart, HeartCrack, Loader2 } from 'lucide-react'
-import { FREE_BETA_ENABLED } from '@/lib/constants'
 
 interface State {
   my_choice: 'continue' | 'end' | null
@@ -75,7 +74,7 @@ export default function ContinuationPage() {
           <div>
             <h1 className="text-xl font-black">이 만남, 이어갈까요?</h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              {FREE_BETA_ENABLED ? '무료 베타 기간에는 정산 없이 선택만 기록해요' : '이어가기 선택 시 매칭비 정산으로 이동'}
+              둘 다 이어가면 앱 기여금 정산으로 이동하고, 한쪽이라도 종료하면 보증금을 환불해요.
             </p>
           </div>
         </header>
@@ -99,16 +98,16 @@ export default function ContinuationPage() {
                 <p className="text-lg font-black gradient-fate-text">양쪽 모두 이어가기로 했어요 💜</p>
                 <p className="mt-3 text-sm text-gray-300 leading-relaxed">
                   서로 더 만나보고 싶은 상태예요.<br />
-                  지금은 무료 베타라 결제나 환불 절차 없이 바로 마무리됩니다.
+                  이제 보증금 중 앱 기여금을 정하고 나머지를 환불받을 수 있어요.
                 </p>
                 <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
-                  사용자 확보가 우선이라 매칭비 정산 UX는 비활성화해뒀어요.
+                  서로 계속 만나기로 한 경우에만 정산을 요청합니다.
                 </p>
                 <Link
-                  href={`/match/${encodeURIComponent(matchId)}`}
+                  href={`/match/${encodeURIComponent(matchId)}/refund`}
                   className="btn-gradient w-full block py-3 rounded-2xl text-sm font-bold mt-5"
                 >
-                  매칭 상세로 돌아가기
+                  환불/정산하기
                 </Link>
               </section>
             )}
@@ -121,8 +120,8 @@ export default function ContinuationPage() {
                   이 만남은 여기서 마무리됐어요
                 </p>
                 <p className="mt-2 text-xs text-gray-500 text-center leading-relaxed">
-                  무료 베타라 정산이나 환불 절차는 없어요.<br />
-                  좋은 만남 되시길.
+                  한쪽이라도 종료를 선택하면 보증금은 전액 환불 처리돼요.<br />
+                  노쇼가 없는 정상 종료 기준입니다.
                 </p>
                 <Link
                   href={`/match/${encodeURIComponent(matchId)}/review`}
@@ -146,7 +145,7 @@ export default function ContinuationPage() {
                 </p>
                 <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
                   • 양쪽 모두 ‘이어갈래요’ → 이어가기 상태만 기록<br />
-                  • 한 명이라도 ‘충분’ → 무료 베타라 정산 없이 종료
+                  • 한 명이라도 ‘충분’ → 보증금 전액 환불 후 종료
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -168,7 +167,7 @@ export default function ContinuationPage() {
                   >
                     <HeartCrack size={28} className="mx-auto mb-2 text-gray-400" />
                     <p className="text-sm font-bold">한 번이면 충분</p>
-                    <p className="text-[10px] text-gray-500 mt-1">정산 없이 종료</p>
+                    <p className="text-[10px] text-gray-500 mt-1">환불 후 종료</p>
                   </button>
                 </div>
 
@@ -188,8 +187,8 @@ export default function ContinuationPage() {
                   상대 응답 대기 중 — {state.continue_count}/{state.total_participants} 이어가기.
                 </p>
                 <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
-                  무료 베타 기간에는 양쪽 선택만 기록해요.<br />
-                  한 명이라도 ‘충분’ 누르면 정산 없이 종료됩니다.
+                  양쪽 모두 이어가기를 선택하면 환불/정산 화면이 열려요.<br />
+                  한 명이라도 ‘충분’ 누르면 보증금은 전액 환불됩니다.
                 </p>
               </section>
             )}

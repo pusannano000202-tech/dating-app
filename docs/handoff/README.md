@@ -9,6 +9,7 @@
 | `SUNGJUN_FRONTEND_HANDOFF_2026-06-01.md` | 성준용 프론트엔드 전체 공유 + 데일리카드 템플릿 |
 | `SUNGJUN_PERSONALITY_VECTOR_HANDOFF.md` | 성준 성격 벡터 설계 |
 | `ADMIN_APPEARANCE_SCORE_OVERRIDE.md` | 운영자 외모 점수 보정 |
+| `SIDECHAT_GOOGLE_VERCEL_PAYMENT_HANDOFF_2026-06-20.md` | Google 로그인, Vercel 환경변수/배포, 결제 연결 사이드채팅 인수인계 |
 
 ## archive/ — 과거 덤프 (보존용)
 

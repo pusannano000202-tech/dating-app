@@ -1,24 +1,18 @@
-import { Copy, Link as LinkIcon, Send, UserPlus } from 'lucide-react'
+import { Copy, Link as LinkIcon, UserPlus } from 'lucide-react'
 
 import type { GroupInviteRecord } from './types'
 
 type InviteFriendPanelProps = {
-  phone: string
   copied: boolean
   saving: boolean
   pendingInvites: GroupInviteRecord[]
-  onPhoneChange: (value: string) => void
-  onInviteByPhone: () => void
   onCopyInviteLink: () => void
 }
 
 export function InviteFriendPanel({
-  phone,
   copied,
   saving,
   pendingInvites,
-  onPhoneChange,
-  onInviteByPhone,
   onCopyInviteLink,
 }: InviteFriendPanelProps) {
   return (
@@ -27,7 +21,7 @@ export function InviteFriendPanel({
         <div>
           <h2 className="text-sm font-black">친구 초대하기</h2>
           <p className="mt-0.5 text-xs text-boot-muted">
-            링크를 복사해서 카카오톡이나 메시지로 보내는 방식이 가장 빠릅니다.
+            링크를 받은 친구는 로그인/회원가입 후 초대를 수락해야 그룹에 들어옵니다.
           </p>
         </div>
         <UserPlus size={18} className="text-boot-primary" />
@@ -49,25 +43,8 @@ export function InviteFriendPanel({
         </span>
       </button>
 
-      <div className="flex gap-2">
-        <input
-          value={phone}
-          onChange={(event) => onPhoneChange(event.target.value)}
-          placeholder="010-0000-0000"
-          className="glass min-w-0 flex-1 rounded-2xl border border-boot-hairline px-4 py-3 text-sm text-boot-ink placeholder-boot-muted focus:border-boot-primary focus:outline-none"
-        />
-        <button
-          type="button"
-          onClick={onInviteByPhone}
-          disabled={saving || !phone.trim()}
-          className="btn-gradient flex h-12 w-12 items-center justify-center rounded-2xl disabled:opacity-40"
-          aria-label="전화번호로 초대하기"
-        >
-          <Send size={17} />
-        </button>
-      </div>
-      <p className="mt-2 text-[11px] leading-4 text-boot-muted">
-        전화번호 초대는 이미 서로 번호를 알고 있을 때 보조로 사용합니다.
+      <p className="mt-2 rounded-2xl bg-white/75 px-3 py-2 text-[11px] leading-4 text-boot-muted">
+        친구가 이미 회원이면 아래 친구 목록에서 바로 초대하고, 아직 친구가 아니라면 링크를 먼저 보내세요.
       </p>
 
       {pendingInvites.length > 0 && (
@@ -79,9 +56,9 @@ export function InviteFriendPanel({
                   ? '공개 초대 링크'
                   : invite.invited_user_id
                     ? `친구 ${invite.invited_user_id.slice(0, 8)}`
-                    : invite.invited_phone ?? '대상 없음'}
+                    : '초대 대상 확인 중'}
               </span>
-              <span className="text-[10px] font-bold text-amber-700">초대 중</span>
+              <span className="text-[10px] font-bold text-amber-700">수락 대기</span>
             </div>
           ))}
         </div>

@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { CheckCircle2, GraduationCap, Phone, Ruler, UserRound } from 'lucide-react'
+import { CheckCircle2, GraduationCap, Loader2, Phone, Ruler, UserRound } from 'lucide-react'
 import type { BodyType, Gender, HairDensity } from '@/lib/types'
-import { searchDepartments } from '@/lib/pnu-departments'
+import { getDepartmentCollege, searchDepartments } from '@/lib/pnu-departments'
 
 export interface BasicInfoData {
   display_name: string
@@ -45,6 +45,8 @@ const GENDER_OPTIONS: { key: Gender; label: string; description: string }[] = [
 
 export default function BasicInfoForm({ initialValue, onSubmit, saving, serverError }: Props) {
   const [displayName, setDisplayName] = useState(initialValue?.display_name ?? '')
+  const [nicknameCheck, setNicknameCheck] = useState<{ value: string; available: boolean; message: string } | null>(null)
+  const [checkingNickname, setCheckingNickname] = useState(false)
   const [phone, setPhone] = useState(initialValue?.phone ?? '')
   const [gender, setGender] = useState<Gender | null>(initialValue?.gender ?? null)
   const [age, setAge] = useState(initialValue?.age?.toString() ?? '')
@@ -121,6 +123,47 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
     })
   }, [displayName, phone, gender, age, height, bodyType, hairDensity, school, department, year, onSubmit])
 
+  async function checkNicknameAvailability() {
+    const trimmedName = displayName.trim()
+    if (trimmedName.length < 2 || trimmedName.length > 20) {
+      setNicknameCheck(null)
+      setError('닉네임은 2~20자 사이로 입력해 주세요.')
+      return
+    }
+
+    setCheckingNickname(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/profiles/check-nickname?nickname=${encodeURIComponent(trimmedName)}`)
+      if (!res.ok) {
+        setNicknameCheck({
+          value: trimmedName,
+          available: false,
+          message: '중복 확인 DB 적용이 아직 필요해요.',
+        })
+        return
+      }
+
+      const data = await res.json() as { available?: boolean; duplicate_count?: number }
+      const available = Boolean(data.available)
+      setNicknameCheck({
+        value: trimmedName,
+        available,
+        message: available
+          ? '사용 가능한 닉네임이에요.'
+          : '이미 사용 중인 닉네임이에요.',
+      })
+    } catch {
+      setNicknameCheck({
+        value: trimmedName,
+        available: false,
+        message: '중복 확인을 잠시 할 수 없어요.',
+      })
+    } finally {
+      setCheckingNickname(false)
+    }
+  }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (saving) return
@@ -153,21 +196,40 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
         </div>
       </section>
 
-      <label className="block">
+      <div className="block">
         <span className="mb-3 block text-sm font-bold">
-          이름 <span className="text-rose-500">*</span>
-          <span className="ml-2 text-xs font-normal text-boot-muted">친구와 그룹원에게 보여져요</span>
+          닉네임 <span className="text-rose-500">*</span>
+          <span className="ml-2 text-xs font-normal text-boot-muted">친구 검색과 그룹원 표시 이름이에요</span>
         </span>
-        <input
-          type="text"
-          placeholder="예: 충현"
-          value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
-          disabled={saving}
-          maxLength={20}
-          className={inputClass}
-        />
-      </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="예: 충현"
+            value={displayName}
+            onChange={(event) => {
+              setDisplayName(event.target.value)
+              setNicknameCheck(null)
+            }}
+            disabled={saving}
+            maxLength={20}
+            className={inputClass}
+          />
+          <button
+            type="button"
+            onClick={checkNicknameAvailability}
+            disabled={saving || checkingNickname || displayName.trim().length < 2}
+            aria-label="닉네임 중복 확인"
+            className="w-[104px] flex-shrink-0 rounded-2xl border border-boot-primary/25 bg-boot-soft px-3 py-2 text-xs font-black leading-4 text-boot-primary disabled:opacity-40"
+          >
+            {checkingNickname ? <Loader2 size={15} className="mx-auto animate-spin" /> : '중복 확인'}
+          </button>
+        </div>
+        {nicknameCheck && (
+          <p className={`mt-2 text-xs font-bold ${nicknameCheck.available ? 'text-emerald-600' : 'text-amber-700'}`}>
+            {nicknameCheck.message}
+          </p>
+        )}
+      </div>
 
       <label className="block">
         <span className="mb-3 block text-sm font-bold">
@@ -251,7 +313,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
         <label className="mb-3 block text-sm font-bold">
           체형 <span className="text-xs font-normal text-boot-muted">(선택)</span>
         </label>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {BODY_TYPES.map((item) => (
             <button
               key={item.key}
@@ -308,7 +370,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
         </div>
       </label>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className="mb-3 block text-sm font-bold">
             학과 <span className="text-xs font-normal text-boot-muted">(선택)</span>
@@ -316,18 +378,19 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
           <div ref={deptRef} className="relative">
             <input
               type="text"
-              placeholder="컴퓨터공학과"
+              placeholder="컴퓨터공학전공"
               value={department}
               onChange={(event) => {
                 setDepartment(event.target.value)
                 setDeptSuggestions(searchDepartments(event.target.value))
               }}
+              onFocus={() => setDeptSuggestions(searchDepartments(department))}
               onBlur={() => setTimeout(() => setDeptSuggestions([]), 150)}
               disabled={saving}
               className={inputClass}
             />
             {deptSuggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-2xl border border-boot-hairline bg-white shadow-lg">
+              <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-2xl border border-boot-hairline bg-white shadow-lg">
                 {deptSuggestions.map((suggestion) => (
                   <button
                     key={suggestion}
@@ -336,9 +399,12 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
                       setDepartment(suggestion)
                       setDeptSuggestions([])
                     }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-boot-ink transition-colors hover:bg-boot-soft"
+                    className="w-full px-4 py-2.5 text-left transition-colors hover:bg-boot-soft"
                   >
-                    {suggestion}
+                    <span className="block text-sm font-black text-boot-ink">{suggestion}</span>
+                    <span className="mt-0.5 block text-[11px] font-bold text-boot-muted">
+                      {getDepartmentCollege(suggestion) ?? '부산대학교'}
+                    </span>
                   </button>
                 ))}
               </div>

@@ -202,7 +202,7 @@ export default function DailyCardHintWizard({
               {nextIncompleteField ? '다음 작성할 카드' : '모든 카드 작성 완료'}
             </p>
             <p className="mt-0.5 truncate text-xs font-bold text-boot-ink">
-              {nextIncompleteField ? nextIncompleteField.title : '이제 저장하고 참여 확인으로 넘어가면 돼요'}
+              {nextIncompleteField ? nextIncompleteField.title : '이제 저장하고 보증금 결제로 넘어가면 돼요'}
             </p>
           </div>
           {nextIncompleteField && nextIncompleteIndex !== activeIndex && (
@@ -217,7 +217,7 @@ export default function DailyCardHintWizard({
         </div>
       </div>
 
-      <div className="mb-4 grid grid-cols-6 gap-1.5">
+      <div className="mb-4 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
         {DAILY_CARD_FIELDS.map((item, index) => {
           const selected = index === activeIndex
           const done = isFieldComplete(item.id)
@@ -358,7 +358,7 @@ export default function DailyCardHintWizard({
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {PNU_RESTAURANT_SUGGESTIONS.map((restaurant) => {
               const selected = value.trim() === restaurant.name
               return (

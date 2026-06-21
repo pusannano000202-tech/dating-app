@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Info } from 'lucide-react'
 import SchedulePicker from '@/components/profile/SchedulePicker'
 import { getSafeClientRedirect } from '@/lib/client-redirect'
 import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
@@ -37,7 +38,7 @@ export default function SchedulePage() {
   }, [])
 
   async function handleNext() {
-    if (timeslots.slots.length === 0) { setError('가능한 시간대를 1개 이상 선택해줘.'); return }
+    if (timeslots.slots.length === 0) { setError('모든 시간이 막혀 있어요. 최소 한 시간은 가능하게 남겨줘.'); return }
     setSaving(true); setError(null)
     try {
       const supabase = createClient()
@@ -59,10 +60,21 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pb-10">
+    <main className="min-h-screen booting-band px-5 pb-28 pt-7 text-boot-ink">
+      <div className="mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-[calc(100vw-2.5rem)] flex-col sm:max-w-md">
       <div className="mb-7">
-        <h1 className="text-2xl font-black gradient-fate-text">언제 시간 돼?</h1>
-        <p className="text-sm text-gray-500 mt-1">과팅 가능한 요일과 시간을 골라줘</p>
+        <h1 className="text-2xl font-black gradient-fate-text">언제 절대 안 돼?</h1>
+        <p className="text-sm text-gray-500 mt-1">기본은 가능으로 보고, 안 되는 시간만 체크해줘</p>
+        <details className="mt-3 rounded-2xl border border-boot-primary/15 bg-white/85 px-4 py-3 shadow-sm">
+          <summary className="flex cursor-pointer items-center gap-2 text-xs font-black text-boot-ink">
+            <Info size={15} className="text-boot-primary" />
+            왜 안 되는 시간을 고르나요?
+          </summary>
+          <p className="mt-2 text-xs leading-5 text-boot-muted">
+            대부분의 시간은 가능하다고 보고, 수업이나 알바처럼 절대 안 되는 시간만 막는 방식이에요.
+            18시를 누르면 “시작 18:00부터 그 구간은 안 됨”으로 저장됩니다.
+          </p>
+        </details>
       </div>
 
       {loaded ? (
@@ -88,7 +100,7 @@ export default function SchedulePage() {
       {timeslots.slots.length > 0 && (
         <div className="mt-4 glass rounded-2xl px-4 py-3 border border-violet-500/30">
           <p className="text-sm text-violet-300 font-medium">
-            {timeslots.slots.length}개 시간대 선택됨 ✓
+            {timeslots.slots.length}개 가능 시간 구간 저장 준비됨 ✓
           </p>
         </div>
       )}
@@ -101,6 +113,7 @@ export default function SchedulePage() {
           {saving ? '저장 중...' : '다음'}
         </button>
       </div>
-    </div>
+      </div>
+    </main>
   )
 }

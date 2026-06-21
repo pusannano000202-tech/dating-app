@@ -17,9 +17,8 @@ import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '
 import { isSupabaseConfigured } from '@/lib/utils'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
+import HomeInfoButton from '@/components/matching/HomeInfoButton'
 import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
-import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
-import { aggregateMatchPoolStats, type MatchPoolStatsRow } from '@/lib/match-pool-stats'
 
 type ServerSupabaseClient = ReturnType<typeof createSupabaseServerClient>
 
@@ -27,19 +26,6 @@ type ProfileGate = {
   gender: string | null
   appearance_type: string | null
   big5_openness: number | null
-}
-
-const EMPTY_POOL: PoolStats = {
-  female: 0,
-  male: 0,
-  bySize: { '2': { female: 0, male: 0 }, '3': { female: 0, male: 0 } },
-}
-
-async function loadPoolStats(supabase: ServerSupabaseClient | null): Promise<PoolStats> {
-  if (!supabase) return EMPTY_POOL
-  const { data, error } = await supabase.rpc('get_match_pool_stats')
-  if (error) return EMPTY_POOL
-  return aggregateMatchPoolStats((data ?? []) as MatchPoolStatsRow[])
 }
 
 async function getOnboardingRedirect(
@@ -66,7 +52,7 @@ async function getOnboardingRedirect(
   return null
 }
 
-function LandingPage({ poolStats }: { poolStats: PoolStats }) {
+function LandingPage() {
   return (
     <main className="min-h-screen bg-white px-7 pb-10 pt-14 text-boot-ink">
       <div className="mx-auto flex min-h-[calc(100vh-6rem)] w-full max-w-[calc(100vw-3.5rem)] flex-col sm:max-w-md">
@@ -112,33 +98,76 @@ function LandingPage({ poolStats }: { poolStats: PoolStats }) {
         </section>
 
         <section className="glass-card rounded-3xl p-5">
-          <MatchingPool stats={poolStats} />
+          <p className="text-xs font-black uppercase tracking-normal text-boot-primary">How it works</p>
+          <h2 className="mt-2 text-lg font-black text-boot-ink">프로필은 가리고, 흐름은 간단하게</h2>
+          <div className="mt-4 space-y-3">
+            <LandingFlowRow
+              Icon={UsersRound}
+              title="친구와 그룹 만들기"
+              desc="초대 링크로 같이 과팅할 친구를 모아요."
+            />
+            <LandingFlowRow
+              Icon={Search}
+              title="조건이 맞을 때 자동 매칭"
+              desc="성향, 시간, 비중이 맞는 그룹을 찾아요."
+            />
+            <LandingFlowRow
+              Icon={LockKeyhole}
+              title="확정 전까지 비공개"
+              desc="상대 정보와 카드는 단계별로 열려요."
+            />
+          </div>
         </section>
       </div>
     </main>
   )
 }
 
-function HomeDashboard({ poolStats }: { poolStats: PoolStats }) {
+function LandingFlowRow({
+  Icon,
+  title,
+  desc,
+}: {
+  Icon: typeof Search
+  title: string
+  desc: string
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-boot-hairline bg-white px-3 py-3">
+      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-boot-soft text-boot-primary">
+        <Icon size={18} />
+      </span>
+      <span className="min-w-0 text-left">
+        <span className="block text-sm font-black text-boot-ink">{title}</span>
+        <span className="mt-0.5 block text-xs leading-5 text-boot-muted">{desc}</span>
+      </span>
+    </div>
+  )
+}
+
+function HomeDashboard() {
   return (
     <main className="min-h-screen booting-band px-5 pb-28 pt-7 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-7 flex items-center justify-between">
           <BootingLogo size="md" />
-          <Link
-            href="/notifications"
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-boot-hairline bg-white/90 text-boot-body shadow-sm"
-            aria-label="알림"
-          >
-            <Bell size={18} />
-          </Link>
+          <div className="flex items-center gap-2">
+            <HomeInfoButton />
+            <Link
+              href="/notifications"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-boot-hairline bg-white/90 text-boot-body shadow-sm"
+              aria-label="알림"
+            >
+              <Bell size={18} />
+            </Link>
+          </div>
         </header>
 
         <section className="mb-5">
           <p className="text-xs font-black uppercase tracking-normal text-boot-primary">Home</p>
           <h1 className="mt-2 text-3xl font-black leading-tight">오늘 해야 할 일만 볼게요</h1>
           <p className="mt-2 text-sm leading-6 text-boot-muted">
-            친구, 매칭, 사전 힌트, 오늘의 카드를 한 흐름으로 이어가요.
+            홈은 앱 흐름과 오늘 할 일을 보여주고, 큐 숫자와 상대 카드는 매칭 화면에서 확인해요.
           </p>
         </section>
 
@@ -160,17 +189,6 @@ function HomeDashboard({ poolStats }: { poolStats: PoolStats }) {
           />
         </section>
 
-        <section className="glass-card mb-5 rounded-3xl border border-boot-hairline p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-black">현재 매칭 큐</h2>
-              <p className="mt-1 text-xs text-boot-muted">이번 주 대기 그룹 기준이에요.</p>
-            </div>
-            <UsersRound size={19} className="text-boot-primary" />
-          </div>
-          <MatchingPool stats={poolStats} />
-        </section>
-
         <div className="grid gap-2.5">
           <UtilityLink
             href="/group/create"
@@ -186,8 +204,8 @@ function HomeDashboard({ poolStats }: { poolStats: PoolStats }) {
           />
           <UtilityLink
             href="/match"
-            label="매칭 결과"
-            desc="확정된 매칭과 약속 정보를 확인"
+            label="매칭 현황"
+            desc="대기 큐와 진행 중인 매칭 확인"
             Icon={CalendarCheck2}
           />
         </div>
@@ -266,17 +284,16 @@ export default async function Home() {
     isDevAuthBypassEnabled() &&
     cookies().get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
 
-  if (devAuthed) return <HomeDashboard poolStats={EMPTY_POOL} />
-  if (!isSupabaseConfigured()) return <LandingPage poolStats={EMPTY_POOL} />
+  if (devAuthed) return <HomeDashboard />
+  if (!isSupabaseConfigured()) return <LandingPage />
 
   const supabase = createSupabaseServerClient()
-  const poolStats = await loadPoolStats(supabase)
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return <LandingPage poolStats={poolStats} />
+  if (!user) return <LandingPage />
 
   const onboardingRedirect = await getOnboardingRedirect(supabase, user.id)
   if (onboardingRedirect) redirect(onboardingRedirect)
 
-  return <HomeDashboard poolStats={poolStats} />
+  return <HomeDashboard />
 }

@@ -6,15 +6,15 @@ import Link from 'next/link'
 import { ChevronLeft, Loader2 } from 'lucide-react'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import {
+  APP_FEE_BEG_STEPS,
   appFeeToRefundAmount,
   getAppFeeFlowDecision,
-  MIN_PRIVATE_APP_FEE,
 } from '@/lib/refund/fee-flow'
 import { createClient } from '@/lib/supabase'
 import { isSupabaseConfigured } from '@/lib/utils'
 import SanjiCharacter, { type SanjiMood } from '@/components/SanjiCharacter'
 
-type Stage = 'select' | 'ask_min_fee' | 'confirm_low_fee' | 'confirm_zero' | 'notify_zero' | 'done'
+type Stage = 'select' | 'ask_support' | 'notify_zero' | 'done'
 type UserGender = 'male' | 'female' | null
 
 export default function RefundPage() {
@@ -23,9 +23,9 @@ export default function RefundPage() {
   const matchId = params.id
   const total = DEPOSIT_AMOUNT
   const totalLabel = `${total.toLocaleString()}원`
-  const presetAmounts = [0, Math.round(total * 0.3), Math.round(total * 0.5), Math.round(total * 0.7), total]
-  const [appFee, setAppFee] = useState<number>(MIN_PRIVATE_APP_FEE)
-  const [pendingAppFee, setPendingAppFee] = useState<number>(MIN_PRIVATE_APP_FEE)
+  const presetAmounts = Array.from({ length: total / 1000 + 1 }, (_, index) => index * 1000)
+  const [appFee, setAppFee] = useState<number>(total)
+  const [begStepIndex, setBegStepIndex] = useState(0)
   const [stage, setStage] = useState<Stage>('select')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -82,23 +82,25 @@ export default function RefundPage() {
 
   function handleSelectClick() {
     const decision = getAppFeeFlowDecision(appFee)
-    setPendingAppFee(decision.normalizedAppFee)
     if (decision.kind === 'submit') {
       submit(decision.normalizedAppFee)
       return
     }
-    setStage('ask_min_fee')
+    setBegStepIndex(0)
+    setStage('ask_support')
   }
 
   function handleBegReject() {
-    if (pendingAppFee === 0) {
-      setStage('confirm_zero')
-    } else {
-      setStage('confirm_low_fee')
+    if (begStepIndex < APP_FEE_BEG_STEPS.length - 1) {
+      setBegStepIndex((current) => current + 1)
+      return
     }
+    setStage('notify_zero')
   }
 
   const refundAmount = appFeeToRefundAmount(appFee, total)
+  const currentBegAmount = APP_FEE_BEG_STEPS[begStepIndex] ?? APP_FEE_BEG_STEPS[APP_FEE_BEG_STEPS.length - 1]
+  const nextBegAmount = APP_FEE_BEG_STEPS[begStepIndex + 1]
 
   return (
     <main className="min-h-screen px-5 pb-10">
@@ -129,7 +131,7 @@ export default function RefundPage() {
               type="range"
               min={0}
               max={total}
-              step={100}
+              step={1000}
               value={appFee}
               onChange={(e) => setAppFee(parseInt(e.target.value, 10))}
               className="w-full accent-violet-500"
@@ -178,54 +180,28 @@ export default function RefundPage() {
           </section>
         )}
 
-        {stage === 'ask_min_fee' && (
+        {stage === 'ask_support' && (
           <SanjiCard
             mood="pleading"
-            speech={`보증금 ${totalLabel} 전액을 앱 기여금으로 남길까요?`}
-            sub="전액 기여를 선택하면 환불 없이 정산되고, 낮은 금액은 한 번 더 확인해요."
-            acceptLabel={`${totalLabel} 기여`}
-            rejectLabel={pendingAppFee === 0 ? '그래도 0원' : `${pendingAppFee.toLocaleString()}원만 줄래요`}
-            onAccept={() => submit(MIN_PRIVATE_APP_FEE)}
+            speech={`${currentBegAmount.toLocaleString()}원만 남겨주실래요?`}
+            sub={`보증금 ${totalLabel} 중 ${currentBegAmount.toLocaleString()}원만 앱 운영비로 남기고 나머지는 환불돼요.`}
+            acceptLabel={`${currentBegAmount.toLocaleString()}원 남기기`}
+            rejectLabel={nextBegAmount ? `${nextBegAmount.toLocaleString()}원도 부담돼요` : '그래도 전액 환불'}
+            onAccept={() => submit(currentBegAmount)}
             onReject={handleBegReject}
             busy={busy}
           />
         )}
 
-        {stage === 'confirm_low_fee' && (
-          <ConfirmCard
-            title={`${pendingAppFee.toLocaleString()}원으로 진행할까요?`}
-            body={`보증금 ${totalLabel} 중 ${pendingAppFee.toLocaleString()}원만 앱 기여금으로 남기고 나머지를 환불할까요?`}
-            primaryLabel={`${pendingAppFee.toLocaleString()}원으로 정산`}
-            secondaryLabel={`${totalLabel} 기여`}
-            onPrimary={() => submit(pendingAppFee)}
-            onSecondary={() => submit(MIN_PRIVATE_APP_FEE)}
-            busy={busy}
-          />
-        )}
-
-        {stage === 'confirm_zero' && (
-          <ConfirmCard
-            title="그래도 0원 주겠습니까?"
-            body="0원을 선택하면 상대방이 서운할 수 있어요. 아래처럼 보일 수 있다는 걸 먼저 확인해주세요."
-            primaryLabel="그래도 0원"
-            secondaryLabel={`${totalLabel} 기여`}
-            onPrimary={() => setStage('notify_zero')}
-            onSecondary={() => submit(MIN_PRIVATE_APP_FEE)}
-            busy={busy}
-          >
-            <ReactionComic userGender={userGender} />
-          </ConfirmCard>
-        )}
-
         {stage === 'notify_zero' && (
           <ConfirmCard
-            title="0원 알림이 상대방에게 갑니다"
-            body="상대방에게 매칭비로 0원을 지불했다는 사실이 알림으로 갑니다. 그래도 0원을 지불하겠습니까?"
-            primaryLabel="0원으로 확정"
-            secondaryLabel={`${totalLabel} 기여`}
+            title="전액 환불로 진행할까요?"
+            body="0원을 선택해도 전액 환불은 가능해요. 다만 운영비 0원 선택 기록은 정산 내역에 남습니다."
+            primaryLabel="전액 환불 확정"
+            secondaryLabel="1,000원 남기기"
             danger
             onPrimary={() => submit(0)}
-            onSecondary={() => submit(MIN_PRIVATE_APP_FEE)}
+            onSecondary={() => submit(1000)}
             busy={busy}
           >
             <ReactionComic userGender={userGender} />

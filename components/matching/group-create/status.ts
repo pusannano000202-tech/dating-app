@@ -49,7 +49,7 @@ export function getFriendMatchLabel(
       : '준비 필요'
   }
   if (friend.group_status === 'invited') {
-    return '초대중'
+    return '수락 대기'
   }
   return '초대 가능'
 }

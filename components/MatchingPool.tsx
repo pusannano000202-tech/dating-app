@@ -51,12 +51,14 @@ export default function MatchingPool({ stats, className = '' }: Props) {
     return [
       {
         label: '2:2 그룹',
+        size: 2,
         male: row2.male,
         female: row2.female,
         active: !empty && (row2.male > 0 || row2.female > 0),
       },
       {
         label: '3:3 그룹',
+        size: 3,
         male: row3.male,
         female: row3.female,
         active: !empty && (row3.male > 0 || row3.female > 0),
@@ -90,27 +92,47 @@ export default function MatchingPool({ stats, className = '' }: Props) {
           <span className="text-2xl font-black text-boot-primary">{totalGroups}</span>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {queueRows.map((row) => {
-            const maleWidth = Math.max(18, Math.min(70, row.male * 13))
-            const femaleWidth = Math.max(18, Math.min(70, row.female * 11))
+            const totalTeams = row.male + row.female
+            const totalPeople = totalTeams * row.size
+            const malePeople = row.male * row.size
+            const femalePeople = row.female * row.size
+            const maleWidth = row.male > 0 ? Math.max(12, Math.min(72, row.male * 12)) : 0
+            const femaleWidth = row.female > 0 ? Math.max(12, Math.min(72, row.female * 12)) : 0
             return (
-              <div key={row.label} className="grid grid-cols-[76px_1fr] items-center gap-3">
-                <span className="text-[11px] font-bold text-boot-muted">{row.label}</span>
-                <div className="flex h-10 items-center gap-2 overflow-hidden rounded-2xl border border-boot-hairline bg-boot-soft px-2">
+              <div key={row.label} className="rounded-2xl border border-boot-hairline bg-boot-soft/60 px-3 py-3">
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black text-boot-ink">{row.label}</p>
+                    <p className="mt-0.5 text-[11px] text-boot-muted">
+                      총 {totalTeams}팀 · 참가 {totalPeople}명
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-boot-primary">
+                    {totalTeams}팀
+                  </span>
+                </div>
+
+                <div className="mb-2 flex h-9 items-center gap-2 overflow-hidden rounded-2xl border border-boot-hairline bg-white px-2">
                   <div
-                    className={`h-6 rounded-xl border border-sky-200 bg-sky-300/60 transition-all duration-700 ${
+                    className={`h-5 rounded-xl border border-sky-200 bg-sky-300/70 transition-all duration-700 ${
                       row.active ? 'shadow-[0_0_18px_rgba(125,211,252,0.26)]' : ''
                     }`}
                     style={{ width: `${maleWidth}%` }}
                   />
                   <div className="h-px flex-1 bg-boot-hairline" />
                   <div
-                    className={`h-6 rounded-xl border border-rose-200 bg-boot-primary/45 transition-all duration-700 ${
+                    className={`h-5 rounded-xl border border-rose-200 bg-boot-primary/50 transition-all duration-700 ${
                       row.active ? 'shadow-[0_0_18px_rgba(255,90,111,0.24)]' : ''
                     }`}
                     style={{ width: `${femaleWidth}%` }}
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <QueuePill label="남자 대표" teams={row.male} people={malePeople} tone="sky" />
+                  <QueuePill label="여자 대표" teams={row.female} people={femalePeople} tone="rose" />
                 </div>
               </div>
             )
@@ -127,9 +149,9 @@ export default function MatchingPool({ stats, className = '' }: Props) {
       <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
         <ShieldCheck size={17} className="mt-0.5 flex-shrink-0 text-emerald-600" />
         <div>
-          <p className="text-xs font-black text-emerald-700">프로필은 비공개로 유지</p>
+          <p className="text-xs font-black text-emerald-700">혼성 그룹도 가능해요</p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
-            그룹 인원, 시간대, 성향, 선호 조건이 맞을 때만 매칭 결과로 공개돼요.
+            친구 성별이 섞인 그룹도 만들 수 있어요. 위 남자/여자 숫자는 매칭 계산에 쓰는 대표 성별 기준입니다.
           </p>
         </div>
       </div>
@@ -138,6 +160,27 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         <LockKeyhole size={12} />
         대기 숫자는 그룹 단위 기준입니다.
       </div>
+    </div>
+  )
+}
+
+function QueuePill({
+  label,
+  teams,
+  people,
+  tone,
+}: {
+  label: string
+  teams: number
+  people: number
+  tone: 'sky' | 'rose'
+}) {
+  const toneClass = tone === 'sky' ? 'text-sky-600 bg-sky-50 border-sky-100' : 'text-boot-primary bg-white border-rose-100'
+
+  return (
+    <div className={`rounded-2xl border px-2.5 py-2 ${toneClass}`}>
+      <p className="text-xs font-black">{teams}팀</p>
+      <p className="mt-0.5 text-[10px] font-bold opacity-75">{label} · {people}명</p>
     </div>
   )
 }

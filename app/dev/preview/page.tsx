@@ -21,7 +21,7 @@ import BootingLogo from '@/components/BootingLogo'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 
 const previewLinks = [
-  { href: '/', label: '홈', detail: '성준식 미니멀 톤을 흡수한 첫 화면', Icon: LayoutDashboard },
+  { href: '/', label: '홈', detail: '우리 톤 기준으로 정리한 첫 화면', Icon: LayoutDashboard },
   { href: '/profile/basic', label: '기본 정보', detail: '프로필 첫 단계', Icon: UserRound },
   { href: '/profile/worldcup', label: '이상형 월드컵', detail: '취향 선택', Icon: Sparkles },
   { href: '/profile/survey', label: '성향 질문', detail: 'Big5 입력', Icon: ClipboardList },
@@ -40,12 +40,12 @@ const previewLinks = [
 const progressItems = [
   {
     title: '성준 장소/만남 DB',
-    desc: 'venues, match_meetings는 Phase 5로 흡수 완료',
-    state: '완료',
+    desc: '우리 브랜치에는 후보 스키마가 있지만 성준 기준과 계약 합의가 필요해요',
+    state: '합의 필요',
   },
   {
-    title: '성준 홈 디자인',
-    desc: '넓은 여백, 중앙 상징, 강한 CTA를 루트 홈에 반영',
+    title: '홈 디자인',
+    desc: '통째 복사가 아니라 따뜻한 톤, 여백, 카드 위계만 우리 방식으로 정리',
     state: '반영 중',
   },
   {

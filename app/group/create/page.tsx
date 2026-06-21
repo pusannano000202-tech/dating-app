@@ -9,6 +9,10 @@ import {
   EMPTY_MATCH_SETUP_STATUS,
   type MatchSetupStatus,
 } from '@/lib/matching/match-setup-status'
+import {
+  PRE_MATCH_CARD_DRAFT_COOKIE,
+  isPreMatchCardDraftCookieDone,
+} from '@/lib/matching/pre-match-card-draft'
 import QueueRadarCard from '@/components/matching/QueueRadarCard'
 import {
   DEV_DEPOSIT_SUMMARY,
@@ -37,7 +41,6 @@ import type {
 export default function GroupCreatePage() {
   const isDevPreview = isDevPreviewClientSession()
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
-  const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -48,6 +51,7 @@ export default function GroupCreatePage() {
   const [queueVisualState, setQueueVisualState] = useState<QueueVisualState>(DEV_QUEUE_VISUAL)
   const [devCurrentSetupStatus, setDevCurrentSetupStatus] =
     useState<MatchSetupStatus>(EMPTY_MATCH_SETUP_STATUS)
+  const [preMatchCardDone, setPreMatchCardDone] = useState(false)
 
   const group = state.group
   const members = state.members
@@ -62,18 +66,20 @@ export default function GroupCreatePage() {
   const currentUserMatchSetup = isDevPreview
     ? devCurrentSetupStatus
     : state.current_user_match_setup ?? EMPTY_MATCH_SETUP_STATUS
+  const currentUserSetupReady = Boolean(
+    currentUserId &&
+      currentUserMatchSetup.allDone &&
+      preMatchCardDone
+  )
   const memberMatchReadyByUserId = useMemo(
     () => new Map(members.map((member) => [
       member.user_id,
-      member.user_id === currentUserId ? currentUserMatchSetup.allDone : member.match_setup_ready,
+      member.user_id === currentUserId ? currentUserSetupReady : member.match_setup_ready,
     ])),
-    [currentUserId, currentUserMatchSetup.allDone, members]
+    [currentUserId, currentUserSetupReady, members]
   )
   const readyMemberCount = members.filter((member) => memberMatchReadyByUserId.get(member.user_id)).length
   const needsSetupCount = Math.max(0, members.length - readyMemberCount)
-  const currentUserSetupReady = Boolean(
-    currentUserId && memberMatchReadyByUserId.get(currentUserId)
-  )
   const canEnterQueue = Boolean(
     group &&
       isLeader &&
@@ -138,6 +144,10 @@ export default function GroupCreatePage() {
     if (!isDevPreview) return
     setDevCurrentSetupStatus(getDevMatchSetupStatusFromClient())
   }, [isDevPreview])
+
+  useEffect(() => {
+    setPreMatchCardDone(hasPreMatchCardDraftCookie())
+  }, [])
 
   async function ensureGroup() {
     setLoading(true)
@@ -229,6 +239,10 @@ export default function GroupCreatePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ group_id: group.id }),
       })
+      if (res.status === 202) {
+        setError('외부 결제창 연결 준비 상태예요. 로컬 검토에서는 mock 결제로 확인해 주세요.')
+        return
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => ({})) as { error?: string }
         setError(translateDepositError(data.error))
@@ -236,7 +250,7 @@ export default function GroupCreatePage() {
       }
       await refreshDeposit(group.id)
     } catch {
-      setError('무료 베타 참여 확인에 실패했어요.')
+      setError('보증금 결제 확인에 실패했어요.')
     } finally {
       setSaving(false)
     }
@@ -244,50 +258,12 @@ export default function GroupCreatePage() {
 
   function translateDepositError(code?: string) {
     switch (code) {
-      case 'deposit_already_exists': return '이미 무료 베타 참여가 확인됐어요.'
-      case 'not_group_member':       return '그룹 멤버만 참여 확인을 할 수 있어요.'
-      case 'invalid_amount':         return '참여 확인 값이 올바르지 않아요.'
-      default:                        return '무료 베타 참여 확인에 실패했어요. 잠시 후 다시 시도해 주세요.'
-    }
-  }
-
-  async function inviteByPhone() {
-    const clean = phone.trim()
-    if (!clean || !group || saving) return
-
-    if (isDevPreview) {
-      setState((current) => ({
-        ...current,
-        invites: [
-          ...current.invites,
-          {
-            id: `dev-invite-${Date.now()}`,
-            group_id: group.id,
-            invited_phone: clean,
-            invited_user_id: null,
-            invite_kind: 'phone',
-            token: 'dev-preview',
-            status: 'pending',
-            expires_at: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
-            created_at: new Date().toISOString(),
-          },
-        ],
-      }))
-      setPhone('')
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-
-    try {
-      await createInvite({ invited_phone: clean })
-      setPhone('')
-      await refreshGroup()
-    } catch {
-      setError('초대를 만들지 못했어요.')
-    } finally {
-      setSaving(false)
+      case 'deposit_already_exists': return '이미 보증금 결제가 확인됐어요.'
+      case 'not_group_member':       return '그룹 멤버만 보증금 결제를 할 수 있어요.'
+      case 'invalid_amount':         return '보증금 금액이 올바르지 않아요.'
+      case 'invalid_deposit_amount': return '보증금 금액이 올바르지 않아요.'
+      case 'payment_provider_not_configured': return '결제 제공자 설정이 아직 연결되지 않았어요.'
+      default:                        return '보증금 결제 확인에 실패했어요. 잠시 후 다시 시도해 주세요.'
     }
   }
 
@@ -454,7 +430,7 @@ export default function GroupCreatePage() {
       case 'not_group_leader':   return '리더만 큐 진입/취소를 할 수 있어요.'
       case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
-      case 'deposit_not_paid':   return '매칭 확정 전에는 모든 멤버의 무료 베타 참여 확인이 필요해요.'
+      case 'deposit_not_paid':   return '매칭 확정 전에는 모든 멤버의 보증금 결제가 필요해요.'
       case 'member_match_setup_incomplete':
         return '멤버의 성향 선호/가능 시간/매칭 비중 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
       case 'member_profile_lookup_failed':
@@ -596,12 +572,9 @@ export default function GroupCreatePage() {
             />
 
             <InviteFriendPanel
-              phone={phone}
               copied={copied}
               saving={saving || !group}
               pendingInvites={pendingInvites}
-              onPhoneChange={setPhone}
-              onInviteByPhone={inviteByPhone}
               onCopyInviteLink={copyInviteLink}
             />
 
@@ -622,6 +595,7 @@ export default function GroupCreatePage() {
               needsSetupCount={needsSetupCount}
               currentUserSetupStatus={currentUserMatchSetup}
               currentUserSetupReady={currentUserSetupReady}
+              currentUserCardReady={preMatchCardDone}
               myDepositPaid={myDepositPaid}
               depositSummary={depositSummary}
               groupStats={groupStats}
@@ -661,6 +635,16 @@ export default function GroupCreatePage() {
       </div>
     </main>
   )
+}
+
+function hasPreMatchCardDraftCookie(): boolean {
+  if (typeof document === 'undefined') return false
+  const value = document.cookie
+    .split(';')
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith(`${PRE_MATCH_CARD_DRAFT_COOKIE}=`))
+    ?.split('=')[1]
+  return isPreMatchCardDraftCookieDone(value)
 }
 
 

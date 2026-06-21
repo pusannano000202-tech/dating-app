@@ -41,7 +41,7 @@ export function GroupMemberStatusPanel({
       </div>
 
       <p className="mb-2 mt-5 text-xs font-bold text-boot-muted">그룹 멤버</p>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         {members.map((member) => {
           const isSelf = currentUserId != null && member.user_id === currentUserId
           const name = isSelf ? '나' : member.display_name ?? `친구 ${member.user_id.slice(0, 4)}`

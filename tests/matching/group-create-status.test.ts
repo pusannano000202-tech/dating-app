@@ -81,6 +81,6 @@ test('friend match labels preserve invited, in-group, and available copy', () =>
     getFriendMatchLabel(friend({ user_id: 'friend-setup', group_status: 'in_group' }), readyByUserId),
     '준비 필요',
   )
-  assert.equal(getFriendMatchLabel(friend({ group_status: 'invited' }), readyByUserId), '초대중')
+  assert.equal(getFriendMatchLabel(friend({ group_status: 'invited' }), readyByUserId), '수락 대기')
   assert.equal(getFriendMatchLabel(friend({ group_status: 'available' }), readyByUserId), '초대 가능')
 })

@@ -7,7 +7,9 @@ import {
   Check,
   ChevronLeft,
   HeartHandshake,
+  Info,
   SlidersHorizontal,
+  StickyNote,
   UsersRound,
 } from 'lucide-react'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
@@ -17,6 +19,10 @@ import {
   getMatchSetupStatus,
   type MatchSetupProfile,
 } from '@/lib/matching/match-setup-status'
+import {
+  PRE_MATCH_CARD_DRAFT_COOKIE,
+  isPreMatchCardDraftCookieDone,
+} from '@/lib/matching/pre-match-card-draft'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { isSupabaseConfigured } from '@/lib/utils'
 
@@ -30,7 +36,7 @@ type SetupStep = {
 
 const REDIRECT_TO = '/match/start'
 
-function buildSetupSteps(profile: MatchSetupProfile | null): SetupStep[] {
+function buildSetupSteps(profile: MatchSetupProfile | null, cardDraftDone: boolean): SetupStep[] {
   const status = getMatchSetupStatus(profile)
 
   return [
@@ -43,8 +49,8 @@ function buildSetupSteps(profile: MatchSetupProfile | null): SetupStep[] {
     },
     {
       href: `/profile/schedule?redirect=${encodeURIComponent(REDIRECT_TO)}`,
-      label: '가능 시간',
-      desc: '이번 주 만날 수 있는 시간대를 고릅니다.',
+      label: '안 되는 시간',
+      desc: '이번 주 만날 수 없는 시간만 눌러서 막아둡니다.',
       done: status.schedule,
       Icon: CalendarClock,
     },
@@ -54,6 +60,13 @@ function buildSetupSteps(profile: MatchSetupProfile | null): SetupStep[] {
       desc: '외모, 성격, 키, 체형 중 무엇을 더 볼지 정합니다.',
       done: status.preferences,
       Icon: SlidersHorizontal,
+    },
+    {
+      href: `/profile/match-card?redirect=${encodeURIComponent(REDIRECT_TO)}`,
+      label: '사전 카드',
+      desc: '매칭 후 하루 한 장씩 공개될 내 카드 초안을 미리 적습니다.',
+      done: cardDraftDone,
+      Icon: StickyNote,
     },
   ]
 }
@@ -107,7 +120,7 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             </div>
             <h2 className="text-xl font-black">설정이 모두 끝났어요</h2>
             <p className="mt-2 text-sm leading-6 text-boot-muted">
-              성향 선호, 가능 시간, 매칭 비중이 모두 저장되었습니다.
+              성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안이 준비됐습니다.
             </p>
           </section>
 
@@ -140,7 +153,18 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
           </div>
         </header>
 
-        <div className="mb-5 grid grid-cols-3 gap-2">
+        <details className="mb-5 rounded-2xl border border-boot-primary/15 bg-white/85 px-4 py-3 shadow-sm">
+          <summary className="flex cursor-pointer items-center gap-2 text-xs font-black text-boot-ink">
+            <Info size={15} className="text-boot-primary" />
+            매칭 찾기는 이렇게 진행돼요
+          </summary>
+          <p className="mt-2 text-xs leading-5 text-boot-muted">
+            내 성향, 안 되는 시간, 매칭 비중, 사전 카드 초안을 먼저 끝내고 친구 그룹을 만들어요.
+            그룹원이 준비되면 큐에 들어가고, 매칭이 잡힌 뒤 상대 카드와 오늘의 카드가 보입니다.
+          </p>
+        </details>
+
+        <div className="mb-5 grid grid-cols-4 gap-2">
           {steps.map((step, index) => {
             const active = index === current.currentIndex
             return (
@@ -210,7 +234,10 @@ export default async function MatchStartPage() {
 
   if (devAuthed || !isSupabaseConfigured()) {
     const profile = devAuthed ? buildDevMatchSetupProfile(cookieStore) : null
-    return <MatchStartView steps={buildSetupSteps(profile)} />
+    const cardDraftDone = isPreMatchCardDraftCookieDone(
+      cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
+    )
+    return <MatchStartView steps={buildSetupSteps(profile, cardDraftDone)} />
   }
 
   const supabase = createSupabaseServerClient()
@@ -223,7 +250,10 @@ export default async function MatchStartPage() {
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const steps = buildSetupSteps((profile as MatchSetupProfile | null) ?? null)
+  const cardDraftDone = isPreMatchCardDraftCookieDone(
+    cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
+  )
+  const steps = buildSetupSteps((profile as MatchSetupProfile | null) ?? null, cardDraftDone)
   if (steps.every((step) => step.done)) redirect('/group/create')
 
   return <MatchStartView steps={steps} />

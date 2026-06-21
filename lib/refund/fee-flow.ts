@@ -1,6 +1,6 @@
 import { DEPOSIT_AMOUNT } from '../constants'
 
-export const MIN_PRIVATE_APP_FEE = DEPOSIT_AMOUNT
+export const APP_FEE_BEG_STEPS = [3000, 2000, 1000] as const
 
 export type AppFeeFlowDecision =
   | {
@@ -9,8 +9,9 @@ export type AppFeeFlowDecision =
       requiresPartnerZeroNotification: false
     }
   | {
-      kind: 'ask_for_min_fee'
-      normalizedAppFee: number
+      kind: 'ask_for_support'
+      normalizedAppFee: 0
+      suggestedAppFees: readonly number[]
       requiresPartnerZeroNotification: boolean
     }
 
@@ -25,7 +26,7 @@ export function appFeeToRefundAmount(appFee: number, depositAmount = DEPOSIT_AMO
 
 export function getAppFeeFlowDecision(appFee: number): AppFeeFlowDecision {
   const normalizedAppFee = normalizeAppFeeAmount(appFee)
-  if (normalizedAppFee >= MIN_PRIVATE_APP_FEE) {
+  if (normalizedAppFee > 0) {
     return {
       kind: 'submit',
       normalizedAppFee,
@@ -34,8 +35,9 @@ export function getAppFeeFlowDecision(appFee: number): AppFeeFlowDecision {
   }
 
   return {
-    kind: 'ask_for_min_fee',
-    normalizedAppFee,
-    requiresPartnerZeroNotification: normalizedAppFee === 0,
+    kind: 'ask_for_support',
+    normalizedAppFee: 0,
+    suggestedAppFees: APP_FEE_BEG_STEPS,
+    requiresPartnerZeroNotification: true,
   }
 }

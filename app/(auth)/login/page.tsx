@@ -2,7 +2,7 @@
 
 import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Eye, MailCheck, Send } from 'lucide-react'
+import { Eye, LogIn, MailCheck, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { getSupabaseConfigIssue } from '@/lib/utils'
@@ -26,7 +26,8 @@ function isEmailOtpRateLimitError(error: unknown): boolean {
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') ?? '/profile/basic'
+  const redirectTo = searchParams.get('redirect') ?? searchParams.get('next') ?? '/profile/basic'
+  const authError = searchParams.get('auth_error')
   const supabaseConfigIssue = getSupabaseConfigIssue()
   const devAuthBypassEnabled = isDevAuthBypassEnabled()
 
@@ -34,7 +35,7 @@ function LoginContent() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(authError)
   const [resendCooldown, setResendCooldown] = useState(0)
   const codeRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -143,6 +144,32 @@ function LoginContent() {
     }
   }
 
+  async function signInWithGoogle() {
+    setError(null)
+
+    if (supabaseConfigIssue) {
+      setError(`로그인 설정이 아직 연결되지 않았습니다. ${supabaseConfigIssue}`)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: callbackUrl,
+        },
+      })
+
+      if (err) throw err
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Google 로그인으로 이동하지 못했어요. 다시 시도해줘.')
+      setLoading(false)
+    }
+  }
+
   function handleCodeInput(index: number, value: string) {
     if (!/^\d*$/.test(value)) return
 
@@ -194,38 +221,56 @@ function LoginContent() {
 
         <div className="glass-card rounded-3xl border border-boot-hairline p-6">
           {step === 'email' ? (
-            <form onSubmit={sendEmailCode}>
-              <p className="mb-0.5 text-base font-black">이메일로 시작하기</p>
-              <p className="mb-5 text-xs leading-5 text-boot-muted">
-                가입과 로그인을 같은 인증번호로 처리해요.
-              </p>
-
-              <label className="mb-4 block">
-                <span className="mb-2 block text-xs font-black text-boot-body">이메일</span>
-                <input
-                  type="email"
-                  placeholder="student@example.com"
-                  value={email}
-                  onChange={(event) => {
-                    setEmail(event.target.value)
-                    setError(null)
-                  }}
-                  autoComplete="email"
-                  className="glass w-full rounded-xl border border-boot-hairline px-4 py-3.5 text-sm text-boot-ink placeholder-boot-muted transition-all focus:outline-none focus:ring-1 focus:ring-boot-primary/50"
-                />
-              </label>
-
-              {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
-
+            <div>
               <button
-                type="submit"
+                type="button"
+                onClick={() => void signInWithGoogle()}
                 disabled={loading}
-                className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-black text-white disabled:opacity-70"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-boot-hairline bg-white px-4 py-3.5 text-sm font-black text-boot-ink shadow-sm transition-all hover:border-boot-primary/30 hover:bg-boot-soft disabled:opacity-70"
               >
-                <Send size={15} strokeWidth={2.6} />
-                {loading ? '인증번호 보내는 중...' : '인증번호 받기'}
+                <LogIn size={15} strokeWidth={2.6} />
+                Google 계정으로 계속하기
               </button>
-            </form>
+
+              <div className="my-5 flex items-center gap-3 text-[11px] font-black text-boot-muted">
+                <span className="h-px flex-1 bg-boot-hairline" />
+                또는
+                <span className="h-px flex-1 bg-boot-hairline" />
+              </div>
+
+              <form onSubmit={sendEmailCode}>
+                <p className="mb-0.5 text-base font-black">이메일로 시작하기</p>
+                <p className="mb-5 text-xs leading-5 text-boot-muted">
+                  가입과 로그인을 같은 인증번호로 처리해요.
+                </p>
+
+                <label className="mb-4 block">
+                  <span className="mb-2 block text-xs font-black text-boot-body">이메일</span>
+                  <input
+                    type="email"
+                    placeholder="student@example.com"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value)
+                      setError(null)
+                    }}
+                    autoComplete="email"
+                    className="glass w-full rounded-xl border border-boot-hairline px-4 py-3.5 text-sm text-boot-ink placeholder-boot-muted transition-all focus:outline-none focus:ring-1 focus:ring-boot-primary/50"
+                  />
+                </label>
+
+                {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-black text-white disabled:opacity-70"
+                >
+                  <Send size={15} strokeWidth={2.6} />
+                  {loading ? '인증번호 보내는 중...' : '인증번호 받기'}
+                </button>
+              </form>
+            </div>
           ) : (
             <div>
               <div className="mb-5 text-center">

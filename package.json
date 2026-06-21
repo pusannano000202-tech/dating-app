@@ -9,7 +9,7 @@
     "lint": "next lint",
     "test:auth": "tsc -p tsconfig.auth-tests.json && node --test .tmp/auth-tests/tests/auth/*.test.js",
     "test:config": "tsc -p tsconfig.config-tests.json && node --test .tmp/config-tests/tests/config/*.test.js",
-    "test:matching": "tsc -p tsconfig.matching-tests.json && node --test .tmp/matching-tests/tests/matching/*.test.js",
+    "test:matching": "node -e \"require('fs').rmSync('.tmp/matching-tests',{recursive:true,force:true})\" && tsc -p tsconfig.matching-tests.json && node --test .tmp/matching-tests/tests/matching/*.test.js",
     "test:profile": "tsc -p tsconfig.profile-tests.json && node --test .tmp/profile-tests/tests/profile/*.test.js",
     "typecheck": "tsc --noEmit"
   },

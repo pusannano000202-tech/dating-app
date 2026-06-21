@@ -7,7 +7,7 @@ import {
   ChevronLeft,
   Clock3,
   Loader2,
-  Phone,
+  Search,
   Send,
   UserCheck,
   UserPlus,
@@ -15,6 +15,11 @@ import {
   UserX,
   UsersRound,
 } from 'lucide-react'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import {
+  DEV_PREVIEW_CURRENT_USER_ID,
+  DEV_PREVIEW_GROUP_MEMBERS,
+} from '@/lib/matching/dev-preview-group'
 
 interface FriendRequestRow {
   id: string
@@ -45,10 +50,23 @@ interface FriendsState {
 }
 
 const EMPTY: FriendsState = { sent: [], received: [], friends: [] }
+const DEV_FRIENDS_STATE: FriendsState = {
+  sent: [],
+  received: [],
+  current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
+  friends: DEV_PREVIEW_GROUP_MEMBERS
+    .filter((member) => member.user_id !== DEV_PREVIEW_CURRENT_USER_ID)
+    .map((member) => ({
+      user_id: member.user_id,
+      display_name: member.display_name,
+      status: 'accepted',
+    })),
+}
 
 export default function FriendsPage() {
+  const isDevPreview = isDevPreviewClientSession()
   const [state, setState] = useState<FriendsState>(EMPTY)
-  const [phone, setPhone] = useState('')
+  const [nickname, setNickname] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -57,6 +75,13 @@ export default function FriendsPage() {
   const refresh = useCallback(async () => {
     setLoading(true)
     setError(null)
+
+    if (isDevPreview) {
+      setState(DEV_FRIENDS_STATE)
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch('/api/friend-requests')
       if (res.status === 401) {
@@ -74,24 +99,32 @@ export default function FriendsPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isDevPreview])
 
   useEffect(() => {
     refresh()
   }, [refresh])
 
   async function sendRequest() {
-    const trimmed = phone.trim()
+    const trimmed = nickname.trim()
     if (!trimmed || saving) return
     setSaving(true)
     setError(null)
     setSuccess(null)
 
+    if (isDevPreview) {
+      setSuccess('디자인 확인용으로 친구 요청을 보낸 상태로 표시했어요.')
+      setNickname('')
+      setSaving(false)
+      window.setTimeout(() => setSuccess(null), 2500)
+      return
+    }
+
     try {
       const res = await fetch('/api/friend-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ receiver_phone: trimmed }),
+        body: JSON.stringify({ receiver_nickname: trimmed }),
       })
 
       if (!res.ok) {
@@ -102,7 +135,7 @@ export default function FriendsPage() {
 
       const data = await res.json() as { duplicate?: boolean }
       setSuccess(data.duplicate ? '이미 보낸 요청이 있어요.' : '친구 요청을 보냈어요.')
-      setPhone('')
+      setNickname('')
       window.setTimeout(() => setSuccess(null), 2500)
       await refresh()
     } catch {
@@ -217,12 +250,12 @@ export default function FriendsPage() {
             <div>
               <h2 className="text-lg font-black leading-tight">그룹 초대 링크로 바로 모으기</h2>
               <p className="mt-1 text-sm leading-6 text-boot-muted">
-                친구가 앱에 가입하지 않았어도 링크를 먼저 보내면 됩니다. 친구는 로그인 후 그 링크에서 바로 그룹에 들어옵니다.
+                초대 링크를 받은 친구는 로그인/회원가입 후 초대를 수락하면 그룹에 들어와요.
               </p>
             </div>
           </div>
 
-          <div className="mb-4 grid grid-cols-3 gap-2">
+          <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
             <MiniStep number="1" label="그룹 만들기" />
             <MiniStep number="2" label="링크 보내기" />
             <MiniStep number="3" label="친구 수락" />
@@ -243,27 +276,27 @@ export default function FriendsPage() {
         <section className="mb-5 rounded-3xl border border-boot-hairline bg-white/90 p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-black">전화번호로 친구 요청</h2>
+              <h2 className="text-sm font-black">닉네임으로 친구 찾기</h2>
               <p className="mt-0.5 text-xs leading-5 text-boot-muted">
-                이미 서로 번호를 알고 있을 때만 보조로 사용합니다.
+                친구가 프로필에서 만든 닉네임을 정확히 입력해서 요청을 보내요.
               </p>
             </div>
-            <Phone size={18} className="text-boot-primary" />
+            <Search size={18} className="text-boot-primary" />
           </div>
           <div className="flex gap-2">
             <input
-              type="tel"
-              inputMode="tel"
-              placeholder="010-0000-0000"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
+              type="text"
+              placeholder="예: 충현"
+              value={nickname}
+              onChange={(event) => setNickname(event.target.value)}
               disabled={saving}
+              maxLength={20}
               className="min-w-0 flex-1 rounded-2xl border border-boot-hairline bg-white px-4 py-3 text-sm text-boot-ink placeholder-boot-muted focus:border-boot-primary focus:outline-none"
             />
             <button
               type="button"
               onClick={sendRequest}
-              disabled={saving || !phone.trim()}
+              disabled={saving || !nickname.trim()}
               className="flex h-12 w-12 items-center justify-center rounded-2xl border border-boot-primary/20 bg-boot-soft text-boot-primary disabled:opacity-40"
               aria-label="친구 요청 보내기"
             >
@@ -348,7 +381,7 @@ export default function FriendsPage() {
                 <div className="space-y-2">
                   {pendingSent.map((request) => {
                     const receiverName = request.receiver_display_name
-                      ?? (request.receiver_user_id ? `친구 ${request.receiver_user_id.slice(0, 8)}` : request.receiver_phone ?? '대상 없음')
+                      ?? (request.receiver_user_id ? `친구 ${request.receiver_user_id.slice(0, 8)}` : '닉네임 요청')
                     return (
                       <div key={request.id} className="glass-card flex items-center gap-3 rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 shadow-sm">
                         <InitialBadge value={receiverName} tone="amber" />
@@ -424,7 +457,7 @@ function EmptyFriends() {
       </div>
       <p className="mt-3 text-sm font-black">아직 등록된 친구가 없어요</p>
       <p className="mt-1 text-xs leading-5 text-boot-muted">
-        괜찮아요. 지금은 친구 등록보다 그룹 초대 링크로 바로 초대하는 흐름이 더 빠릅니다.
+        괜찮아요. 닉네임으로 친구를 찾거나, 그룹 초대 링크를 보내고 친구가 로그인 후 수락하면 됩니다.
       </p>
       <Link
         href="/group/create"
@@ -440,7 +473,10 @@ function EmptyFriends() {
 function translateError(code?: string) {
   switch (code) {
     case 'cannot_send_to_self': return '자기 자신에게는 보낼 수 없어요.'
-    case 'receiver_required':   return '전화번호를 입력해주세요.'
+    case 'receiver_required':   return '닉네임을 입력해주세요.'
+    case 'nickname_not_found':  return '그 닉네임의 사용자를 찾지 못했어요.'
+    case 'nickname_not_unique': return '같은 닉네임이 여러 명 있어요. 친구에게 닉네임을 바꿔달라고 안내해 주세요.'
+    case 'nickname_lookup_unavailable': return '닉네임 검색 DB 적용이 아직 필요해요.'
     case 'not_receiver':        return '본인에게 온 요청만 처리할 수 있어요.'
     case 'not_sender':          return '본인이 보낸 요청만 취소할 수 있어요.'
     case 'request_not_pending': return '이미 처리된 요청이에요.'

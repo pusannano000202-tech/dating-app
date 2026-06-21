@@ -2,8 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { CalendarClock, ChevronLeft, ChevronRight, Loader2, Sparkles, Users } from 'lucide-react'
+import { CalendarClock, ChevronLeft, ChevronRight, Loader2, Search, Sparkles, UserPlus, Users } from 'lucide-react'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import {
+  DEV_PREVIEW_CURRENT_USER_ID,
+  DEV_PREVIEW_GROUP,
+  DEV_PREVIEW_GROUP_MEMBERS,
+} from '@/lib/matching/dev-preview-group'
+import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
+import CurrentGroupPreview, { type CurrentGroupMember } from '@/components/matching/CurrentGroupPreview'
 import NotificationBell from '@/components/NotificationBell'
 
 interface MatchRow {
@@ -17,6 +24,12 @@ interface MatchRow {
   confirmed_at: string | null
   scheduled_start: string | null
   venue_name: string | null
+}
+
+interface GroupSummary {
+  group: { size?: number | null; status?: string | null } | null
+  members: CurrentGroupMember[]
+  current_user_id: string | null
 }
 
 const DEV_MATCHES: MatchRow[] = [
@@ -46,9 +59,38 @@ const DEV_MATCHES: MatchRow[] = [
   },
 ]
 
+const EMPTY_POOL: PoolStats = {
+  female: 0,
+  male: 0,
+  bySize: { '2': { female: 0, male: 0 }, '3': { female: 0, male: 0 } },
+}
+
+const DEV_POOL: PoolStats = {
+  female: 6,
+  male: 8,
+  bySize: {
+    '2': { female: 3, male: 5 },
+    '3': { female: 3, male: 3 },
+  },
+}
+
+const EMPTY_GROUP_SUMMARY: GroupSummary = {
+  group: null,
+  members: [],
+  current_user_id: null,
+}
+
+const DEV_GROUP_SUMMARY: GroupSummary = {
+  group: DEV_PREVIEW_GROUP,
+  members: DEV_PREVIEW_GROUP_MEMBERS,
+  current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
+}
+
 export default function MatchesPage() {
   const isDevPreview = isDevPreviewClientSession()
   const [matches, setMatches] = useState<MatchRow[]>([])
+  const [poolStats, setPoolStats] = useState<PoolStats>(EMPTY_POOL)
+  const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -57,22 +99,43 @@ export default function MatchesPage() {
     setError(null)
 
     if (isDevPreview) {
-      setMatches(DEV_MATCHES)
+      const params = new URLSearchParams(window.location.search)
+      setMatches(params.get('sampleMatches') === '1' ? DEV_MATCHES : [])
+      setPoolStats(DEV_POOL)
+      setGroupSummary(DEV_GROUP_SUMMARY)
       setLoading(false)
       return
     }
 
     try {
-      const res = await fetch('/api/matches')
-      if (res.status === 401) {
+      const [matchRes, poolRes, groupRes] = await Promise.all([
+        fetch('/api/matches'),
+        fetch('/api/match-pool/stats'),
+        fetch('/api/groups'),
+      ])
+
+      if (poolRes.ok) {
+        const stats = await poolRes.json() as PoolStats
+        setPoolStats(stats)
+      }
+      if (groupRes.ok) {
+        const groupData = await groupRes.json() as GroupSummary
+        setGroupSummary({
+          group: groupData.group ?? null,
+          members: groupData.members ?? [],
+          current_user_id: groupData.current_user_id ?? null,
+        })
+      }
+
+      if (matchRes.status === 401) {
         setError('로그인이 필요해요.')
         return
       }
-      if (!res.ok) {
+      if (!matchRes.ok) {
         setError('매칭 정보를 불러오지 못했어요.')
         return
       }
-      const data = await res.json() as { matches: MatchRow[] }
+      const data = await matchRes.json() as { matches: MatchRow[] }
       setMatches(data.matches ?? [])
     } catch {
       setError('매칭 정보를 불러오지 못했어요.')
@@ -94,26 +157,53 @@ export default function MatchesPage() {
           </Link>
           <div className="flex-1">
             <p className="text-xs font-black text-boot-primary">매칭 허브</p>
-            <h1 className="text-2xl font-black">진행 중인 매칭</h1>
+            <h1 className="text-2xl font-black">매칭 현황</h1>
             <p className="mt-0.5 text-xs text-boot-muted">
-              준비 중인 매칭과 확정된 만남을 여기서 바로 이어갈 수 있어요.
+              지금 큐에 몇 팀이 있는지 보고, 바로 매칭을 시작할 수 있어요.
             </p>
           </div>
           <NotificationBell />
         </header>
 
-        <section className="mb-4 rounded-3xl border border-boot-primary/20 bg-white px-4 py-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
-              <Sparkles size={19} />
+        <section className="mb-5 rounded-3xl border border-boot-primary/20 bg-white px-4 py-4 shadow-sm">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+              <Search size={21} />
             </div>
-            <div>
-              <p className="text-sm font-black text-boot-ink">카드를 눌러 다음 할 일을 확인하세요</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-black leading-tight text-boot-ink">매칭을 찾아주세요!</p>
               <p className="mt-1 text-xs leading-relaxed text-boot-muted">
-                대기 상태면 준비를 이어가고, 확정 상태면 오늘 공개 카드와 약속 정보를 확인합니다.
+                친구를 초대하고 성향, 시간, 비중을 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
               </p>
             </div>
           </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+            <Link
+              href="/match/start"
+              className="btn-gradient flex h-12 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-black"
+            >
+              매칭 찾기
+              <ChevronRight size={16} />
+            </Link>
+            <Link
+              href="/friends"
+              className="flex h-12 items-center justify-center gap-1.5 rounded-2xl border border-boot-primary/20 bg-boot-soft px-3 text-xs font-black text-boot-primary"
+            >
+              <UserPlus size={15} />
+              친구 초대
+            </Link>
+          </div>
+          <CurrentGroupPreview
+            className="mt-3"
+            members={groupSummary.members}
+            capacity={groupSummary.group?.size ?? 3}
+            currentUserId={groupSummary.current_user_id}
+            hasGroup={groupSummary.group != null || groupSummary.members.length > 0}
+          />
+        </section>
+
+        <section className="mb-5">
+          <MatchingPool stats={poolStats} />
         </section>
 
         {error && (
@@ -134,13 +224,14 @@ export default function MatchesPage() {
             </div>
             <p className="text-sm font-bold text-boot-body">아직 진행 중인 매칭이 없어요</p>
             <p className="mt-1 text-xs text-boot-muted">
-              그룹을 만들고 매칭 큐에 들어가면 이곳에 카드가 생겨요.
+              먼저 매칭 찾기를 눌러 큐에 들어가면, 사전 힌트 작성과 매칭 카드가 이곳에 생겨요.
             </p>
             <Link
               href="/match/start"
-              className="mt-4 inline-block rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
             >
               매칭 찾기 시작
+              <ChevronRight size={14} />
             </Link>
           </section>
         ) : (
@@ -159,7 +250,7 @@ export default function MatchesPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-sm font-black text-boot-ink">
-                          상대 그룹 {m.opp_group_size}명 · {m.opp_group_gender === 'male' ? '남자' : '여자'}
+                          {getMatchCardTitle(m)}
                         </p>
                         <p className="mt-0.5 text-xs text-boot-muted">
                           {formatDate(m.matched_at)} · {translateStatus(m.match_status)}
@@ -236,7 +327,7 @@ function getMatchActionLabel(status: string): string {
 function getMatchActionDescription(match: MatchRow): string {
   switch (match.match_status) {
     case 'pending':
-      return '카드 작성과 무료 참여 확인을 마치면 매칭 확정 단계로 넘어갈 수 있어요.'
+      return '카드 작성과 보증금 결제를 마치면 상대팀 상세와 약속 정보가 단계적으로 열려요.'
     case 'confirmed':
       return '매칭이 확정됐어요. 오늘 공개 카드, 약속 시간, 장소를 확인해 보세요.'
     case 'completed':
@@ -244,6 +335,14 @@ function getMatchActionDescription(match: MatchRow): string {
     default:
       return '매칭 상세에서 다음 단계를 확인해 보세요.'
   }
+}
+
+function getMatchCardTitle(match: MatchRow): string {
+  if (match.match_status === 'pending') {
+    return '가매칭 후보가 도착했어요'
+  }
+
+  return `상대 그룹 ${match.opp_group_size}명 · ${match.opp_group_gender === 'male' ? '남자' : '여자'}`
 }
 
 function getMatchBadgeClass(status: string): string {

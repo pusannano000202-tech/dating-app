@@ -429,6 +429,9 @@ function QueueRadarCardInner({
       <p className="mt-3 text-[11px] text-boot-muted">
         남자 {stats.male}팀 · 여자 {stats.female}팀 · 우리 {stats.myGroupSize}명 대기중
       </p>
+      <p className="mt-1 text-[10px] leading-4 text-boot-muted">
+        혼성 그룹도 참여할 수 있고, 남자/여자 팀 수는 매칭 계산에 쓰는 대표 성별 기준으로 보여줘요.
+      </p>
 
       <Link
         href={homeHref}

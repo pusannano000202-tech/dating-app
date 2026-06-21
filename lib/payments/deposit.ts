@@ -1,6 +1,7 @@
 import { DEPOSIT_AMOUNT } from '../constants'
 
-export const DEPOSIT_PAYMENT_PROVIDERS = ['mock', 'toss', 'kakao'] as const
+// Sungjun's current payment layer is Toss-only. Keep mock for local review.
+export const DEPOSIT_PAYMENT_PROVIDERS = ['mock', 'toss'] as const
 
 export type DepositPaymentProvider = typeof DEPOSIT_PAYMENT_PROVIDERS[number]
 
@@ -32,9 +33,7 @@ export function getDepositPaymentReadiness(provider: DepositPaymentProvider): De
     return { ok: true, provider }
   }
 
-  const missing = provider === 'toss'
-    ? missingEnv(['TOSS_SECRET_KEY', 'NEXT_PUBLIC_TOSS_CLIENT_KEY'])
-    : missingEnv(['KAKAOPAY_SECRET_KEY', 'KAKAOPAY_CID'])
+  const missing = missingEnv(['TOSS_SECRET_KEY', 'NEXT_PUBLIC_TOSS_CLIENT_KEY'])
 
   if (missing.length > 0) {
     return { ok: false, provider, error: 'payment_provider_not_configured', missing }

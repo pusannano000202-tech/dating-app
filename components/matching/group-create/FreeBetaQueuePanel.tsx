@@ -2,9 +2,10 @@ import Link from 'next/link'
 import {
   CalendarClock,
   CheckCircle2,
-  CreditCard,
   HeartHandshake,
+  Radar,
   SlidersHorizontal,
+  StickyNote,
   UserRoundCheck,
   Wallet,
 } from 'lucide-react'
@@ -21,6 +22,7 @@ type FreeBetaQueuePanelProps = {
   needsSetupCount: number
   currentUserSetupStatus: MatchSetupStatus
   currentUserSetupReady: boolean
+  currentUserCardReady: boolean
   myDepositPaid: boolean
   depositSummary: DepositSummary | null
   groupStats: Array<{ label: string; value: string }>
@@ -37,6 +39,7 @@ export function FreeBetaQueuePanel({
   needsSetupCount,
   currentUserSetupStatus,
   currentUserSetupReady,
+  currentUserCardReady,
   myDepositPaid,
   depositSummary,
   groupStats,
@@ -57,8 +60,8 @@ export function FreeBetaQueuePanel({
     },
     {
       key: 'schedule',
-      label: '가능 시간',
-      desc: '이번 주 만날 수 있는 시간',
+      label: '안 되는 시간',
+      desc: '이번 주 절대 안 되는 시간',
       done: currentUserSetupStatus.schedule,
       href: '/profile/schedule?redirect=%2Fmatch%2Fstart',
       Icon: CalendarClock,
@@ -71,13 +74,21 @@ export function FreeBetaQueuePanel({
       href: '/profile/preferences?redirect=%2Fmatch%2Fstart',
       Icon: SlidersHorizontal,
     },
+    {
+      key: 'match-card',
+      label: '사전 카드',
+      desc: '하루 한 장 카드 초안',
+      done: currentUserCardReady,
+      href: '/profile/match-card?redirect=%2Fmatch%2Fstart',
+      Icon: StickyNote,
+    },
   ]
   const nextSetupStep = setupSteps.find((step) => !step.done)
   const requirements = [
     {
       label: '내 매칭 설정',
       desc: currentUserSetupReady
-        ? '성향 선호, 가능 시간, 매칭 비중 입력 완료'
+        ? '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 완료'
         : `${nextSetupStep?.label ?? '매칭 설정'}부터 완료하면 돼요`,
       done: currentUserSetupReady,
       href: nextSetupStep?.href ?? '/match/start',
@@ -118,12 +129,12 @@ export function FreeBetaQueuePanel({
           <div>
             <h2 className="text-sm font-black">이번 주 매칭 큐</h2>
             <p className="text-xs text-boot-muted">
-              그룹 준비가 끝나면 큐에 들어가고, 임시 매칭 후 카드와 참여 확인으로 확정합니다.
+              그룹 준비가 끝나면 큐에 들어가고, 임시 매칭 후 카드와 보증금 결제로 확정합니다.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {groupStats.map((stat) => (
             <div key={stat.label} className="rounded-2xl bg-white/80 px-3 py-3">
               <p className="text-lg font-black">{stat.value}</p>
@@ -149,12 +160,12 @@ export function FreeBetaQueuePanel({
         <div className="space-y-2">
           <div className="rounded-2xl border border-boot-hairline bg-boot-soft/50 p-3">
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-black text-boot-ink">내가 먼저 끝낼 3단계</p>
+              <p className="text-xs font-black text-boot-ink">내가 먼저 끝낼 4단계</p>
               <p className="text-[11px] font-bold text-boot-muted">
                 {setupSteps.filter((step) => step.done).length}/{setupSteps.length}
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {setupSteps.map((step) => {
                 const StepIcon = step.Icon
                 return (
@@ -216,12 +227,12 @@ export function FreeBetaQueuePanel({
           <div className="flex items-center gap-2">
             <Wallet size={16} className={myDepositPaid ? 'text-emerald-700' : 'text-amber-700'} />
             <div>
-              <p className="text-xs font-bold">무료 베타 참여</p>
-              <p className="text-[11px] text-boot-muted">큐 진입은 가능하고, 매칭 확정 전에는 모두 확인해야 해요.</p>
+              <p className="text-xs font-bold">보증금 결제</p>
+              <p className="text-[11px] text-boot-muted">10,000원 보증금은 노쇼가 없으면 환불돼요.</p>
             </div>
           </div>
           {myDepositPaid ? (
-            <span className="text-[11px] font-bold text-emerald-700">참여 확인</span>
+            <span className="text-[11px] font-bold text-emerald-700">결제 확인</span>
           ) : (
             <button
               type="button"
@@ -229,7 +240,7 @@ export function FreeBetaQueuePanel({
               onClick={onConfirmParticipation}
               className="rounded-xl border border-boot-primary/25 bg-violet-400/15 px-3 py-2 text-xs font-bold text-boot-primary disabled:opacity-40"
             >
-              참여 확인
+              결제 확인
             </button>
           )}
         </div>
@@ -239,7 +250,7 @@ export function FreeBetaQueuePanel({
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[11px] text-boot-muted">그룹 전체</p>
               <p className="text-[11px] font-bold text-boot-muted">
-                {depositSummary.paid_count}/{depositSummary.total_active}명 확인
+                {depositSummary.paid_count}/{depositSummary.total_active}명 결제
               </p>
             </div>
             <div className="flex gap-1.5">
@@ -270,14 +281,14 @@ export function FreeBetaQueuePanel({
         onClick={onEnterQueue}
         className="btn-gradient flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
       >
-        <CreditCard size={17} />
+        <Radar size={17} />
         이번 주 매칭 큐에 들어가기
       </button>
 
       {!canEnterQueue && (
         <p className="mt-3 text-center text-xs text-boot-muted">
           {!currentUserSetupReady
-            ? '내 성향 선호, 가능 시간, 매칭 비중을 먼저 입력해 주세요.'
+            ? '내 성향 선호, 안 되는 시간, 매칭 비중, 사전 카드를 먼저 입력해 주세요.'
             : !groupIsFull
               ? `${requiredMemberCount}명 그룹이 완성되면 큐 진입 단계로 넘어갈 수 있어요.`
             : !isLeader
@@ -289,11 +300,11 @@ export function FreeBetaQueuePanel({
       )}
       {canEnterQueue && !myDepositPaid && (
         <p className="mt-3 text-center text-xs text-amber-700/80">
-          큐 진입은 가능해요. 무료 참여 확인은 임시 매칭 후 확정 전에 반드시 끝내면 됩니다.
+          큐 진입은 가능해요. 보증금 결제는 임시 매칭 후 확정 전에 반드시 끝내면 됩니다.
         </p>
       )}
       <p className="mt-2 text-center text-[10px] text-boot-muted">
-        현재는 전면 무료 베타입니다. 결제와 환불 정책은 사용자 확보 후 다시 열어둡니다.
+        보증금 10,000원은 약속이 정상 진행되면 환불되고, 노쇼가 확정되면 환불이 제한됩니다.
       </p>
     </>
   )
