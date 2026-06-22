@@ -126,6 +126,24 @@ test('payment env checker supports mock review and Toss sandbox preflight withou
   assert.doesNotMatch(checker, /console\.table\(env/)
 })
 
+test('deployment readiness checker verifies git, Vercel link, and Toss env without printing secrets', () => {
+  const packageJson = readSource('package.json')
+  const checker = readSource('scripts/check-deploy-readiness.mjs')
+
+  assert.match(packageJson, /"check:deploy-readiness": "node scripts\/check-deploy-readiness\.mjs"/)
+  assert.match(checker, /git status --short --branch/)
+  assert.match(checker, /lines\.length > 1/)
+  assert.match(checker, /\.vercel[\\/]project\.json/)
+  assert.match(checker, /vercel --version/)
+  assert.match(checker, /scripts\/check-payment-env\.mjs/)
+  assert.match(checker, /--provider=toss/)
+  assert.match(checker, /NEXT_PUBLIC_APP_ORIGIN/)
+  assert.match(checker, /localhost/)
+  assert.doesNotMatch(checker, /console\.log\(process\.env/)
+  assert.doesNotMatch(checker, /TOSS_SECRET_KEY=.*test/)
+  assert.doesNotMatch(checker, /SUPABASE_SERVICE_ROLE_KEY=.*eyJ/)
+})
+
 test('payment env checker rejects malformed Toss and service role values without printing secrets', () => {
   const baseEnv = {
     ...process.env,

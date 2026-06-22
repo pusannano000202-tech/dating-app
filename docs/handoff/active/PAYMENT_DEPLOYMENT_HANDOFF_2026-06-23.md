@@ -62,6 +62,7 @@ Toss sandbox를 로컬에서 확인하려면 `.env.local`에 위 환경변수를
 
 ```bash
 npm run check:payment-env -- --provider=toss
+npm run check:deploy-readiness
 npm run test:config
 npm run typecheck
 npm run lint
@@ -70,12 +71,14 @@ npm run build
 
 `npm run check:payment-env -- --provider=toss`가 `MISSING`을 띄우면 키가 빠진 것이다.
 `INVALID`를 띄우면 키 값에 잘못 붙은 문자, 잘못된 접두사, 잘못된 JWT role 같은 문제가 있는 것이다.
+`npm run check:deploy-readiness`는 git 동기화, Vercel CLI, Vercel link, Toss env, `NEXT_PUBLIC_APP_ORIGIN`까지 한 번에 확인한다.
 
 ## 현재 로컬/배포 연결 상태
 
 - `.env.local`에는 Supabase 공개 설정만 있고 Toss 관련 변수는 아직 없다.
 - `vercel` CLI는 현재 작업 환경에서 잡히지 않는다.
 - `.vercel/project.json`도 없어서 이 폴더는 아직 Vercel 프로젝트와 로컬 link가 되어 있지 않다.
+- `npm run check:deploy-readiness` 기준으로 현재 차단점은 Vercel CLI/link, Toss env, 배포 URL origin 설정이다.
 - 따라서 이 상태에서 가능한 검증은 mock 결제, 타입/린트/빌드, 라우트 응답 확인까지다.
 - Toss sandbox 결제창 진입 검증은 Vercel env 또는 로컬 `.env.local`에 실제 테스트 키를 넣은 뒤 진행해야 한다.
 
