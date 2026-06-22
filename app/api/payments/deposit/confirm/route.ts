@@ -4,6 +4,7 @@ import {
   getDepositPaymentReadiness,
   isDepositOrderIdForContext,
   isDepositPaymentAmountValid,
+  normalizeDepositReturnPath,
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
 import { confirmTossPayment, TossPaymentError } from '@/lib/payments/toss'
@@ -16,49 +17,83 @@ interface DepositPaymentRow {
   toss_payment_key: string | null
 }
 
+type ConfirmDepositOptions = {
+  redirectBrowser: boolean
+}
+
 export async function POST(req: NextRequest) {
-  return confirmDeposit(req)
+  return confirmDeposit(req, { redirectBrowser: false })
 }
 
 export async function GET(req: NextRequest) {
-  return confirmDeposit(req)
+  return confirmDeposit(req, { redirectBrowser: true })
 }
 
-async function confirmDeposit(req: NextRequest) {
+async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) {
   const supabase = createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
+    if (options.redirectBrowser) {
+      const target = new URL('/login', req.nextUrl.origin)
+      target.searchParams.set('redirect', '/group/create')
+      target.searchParams.set('payment', 'failed')
+      target.searchParams.set('reason', 'unauthorized')
+      return NextResponse.redirect(target)
+    }
+
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const body = req.method === 'POST' ? await readJson(req) : {}
-  const groupId = readString(body.group_id) ?? req.nextUrl.searchParams.get('group_id') ?? ''
   const provider = resolveDepositPaymentProvider(readString(body.provider) ?? req.nextUrl.searchParams.get('provider'))
+  const groupId = readString(body.group_id) ?? req.nextUrl.searchParams.get('group_id') ?? ''
   const amount = readNumber(body.amount) ?? Number(req.nextUrl.searchParams.get('amount') ?? DEPOSIT_AMOUNT)
   const paymentKey = readString(body.paymentKey) ?? readString(body.payment_key) ?? req.nextUrl.searchParams.get('paymentKey') ?? ''
   const orderId = readString(body.orderId) ?? readString(body.order_id) ?? req.nextUrl.searchParams.get('orderId') ?? ''
 
   if (!groupId) {
-    return NextResponse.json({ error: 'group_id_required' }, { status: 400 })
+    return respondWithPaymentError(req, options, {
+      groupId,
+      provider,
+      error: 'group_id_required',
+      status: 400,
+    })
   }
   if (!isDepositPaymentAmountValid(amount)) {
-    return NextResponse.json({ error: 'invalid_amount' }, { status: 400 })
+    return respondWithPaymentError(req, options, {
+      groupId,
+      provider,
+      error: 'invalid_amount',
+      status: 400,
+    })
   }
 
   const readiness = getDepositPaymentReadiness(provider)
   if (!readiness.ok) {
-    return NextResponse.json({
-      error: readiness.error,
+    return respondWithPaymentError(req, options, {
+      groupId,
       provider: readiness.provider,
-    }, { status: 503 })
+      error: readiness.error,
+      status: 503,
+    })
   }
 
   if (provider !== 'mock') {
     if (!paymentKey || !orderId) {
-      return NextResponse.json({ error: 'payment_key_and_order_id_required' }, { status: 400 })
+      return respondWithPaymentError(req, options, {
+        groupId,
+        provider,
+        error: 'payment_key_and_order_id_required',
+        status: 400,
+      })
     }
     if (!isDepositOrderIdForContext(orderId, groupId, user.id)) {
-      return NextResponse.json({ error: 'invalid_order_id' }, { status: 400 })
+      return respondWithPaymentError(req, options, {
+        groupId,
+        provider,
+        error: 'invalid_order_id',
+        status: 400,
+      })
     }
 
     const depositLookup = await supabase
@@ -71,19 +106,29 @@ async function confirmDeposit(req: NextRequest) {
       .maybeSingle()
 
     if (depositLookup.error) {
-      return NextResponse.json({ error: 'deposit_lookup_failed' }, { status: 500 })
+      return respondWithPaymentError(req, options, {
+        groupId,
+        provider,
+        error: 'deposit_lookup_failed',
+        status: 500,
+      })
     }
     if (!depositLookup.data) {
-      return NextResponse.json({ error: 'deposit_order_not_found' }, { status: 404 })
+      return respondWithPaymentError(req, options, {
+        groupId,
+        provider,
+        error: 'deposit_order_not_found',
+        status: 404,
+      })
     }
 
     const deposit = depositLookup.data as DepositPaymentRow
     if (deposit.status === 'paid' || deposit.status === 'held') {
-      return NextResponse.json({
+      return respondWithPaidDeposit(req, options, groupId, {
         provider,
         status: deposit.status,
         deposit,
-      }, { status: 200 })
+      }, 200)
     }
 
     try {
@@ -95,7 +140,12 @@ async function confirmDeposit(req: NextRequest) {
       })
 
       if (payment.orderId !== orderId || payment.totalAmount !== DEPOSIT_AMOUNT || payment.status !== 'DONE') {
-        return NextResponse.json({ error: 'payment_verification_failed' }, { status: 400 })
+        return respondWithPaymentError(req, options, {
+          groupId,
+          provider,
+          error: 'payment_verification_failed',
+          status: 400,
+        })
       }
 
       const { data, error } = await supabase
@@ -110,10 +160,15 @@ async function confirmDeposit(req: NextRequest) {
         .maybeSingle()
 
       if (error || !data) {
-        return NextResponse.json({ error: error?.message || 'deposit_update_failed' }, { status: 400 })
+        return respondWithPaymentError(req, options, {
+          groupId,
+          provider,
+          error: error?.message || 'deposit_update_failed',
+          status: 400,
+        })
       }
 
-      return NextResponse.json({
+      return respondWithPaidDeposit(req, options, groupId, {
         provider,
         status: 'paid',
         deposit: data,
@@ -123,17 +178,24 @@ async function confirmDeposit(req: NextRequest) {
           status: payment.status,
           method: payment.method ?? null,
         },
-      }, { status: 201 })
+      }, 201)
     } catch (error) {
       if (error instanceof TossPaymentError) {
-        return NextResponse.json({
-          error: error.code,
+        return respondWithPaymentError(req, options, {
+          groupId,
           provider,
+          error: error.code,
           status: 'confirm_failed',
-        }, { status: error.status })
+          httpStatus: error.status,
+        })
       }
 
-      return NextResponse.json({ error: 'confirm_failed', provider }, { status: 502 })
+      return respondWithPaymentError(req, options, {
+        groupId,
+        provider,
+        error: 'confirm_failed',
+        status: 502,
+      })
     }
   }
 
@@ -142,10 +204,68 @@ async function confirmDeposit(req: NextRequest) {
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'pay_failed' }, { status: 400 })
+    return respondWithPaymentError(req, options, {
+      groupId,
+      provider,
+      error: error.message || 'pay_failed',
+      status: 400,
+    })
   }
 
-  return NextResponse.json({ provider, status: 'paid', deposit: data }, { status: 201 })
+  return respondWithPaidDeposit(req, options, groupId, { provider, status: 'paid', deposit: data }, 201)
+}
+
+function respondWithPaidDeposit(
+  req: NextRequest,
+  options: ConfirmDepositOptions,
+  groupId: string,
+  payload: Record<string, unknown>,
+  status: number,
+) {
+  if (options.redirectBrowser) {
+    const target = buildPaymentRedirect(req, groupId)
+    target.searchParams.set('payment', 'paid')
+    return NextResponse.redirect(target)
+  }
+
+  return NextResponse.json(payload, { status })
+}
+
+function respondWithPaymentError(
+  req: NextRequest,
+  options: ConfirmDepositOptions,
+  params: {
+    groupId: string
+    provider: ReturnType<typeof resolveDepositPaymentProvider>
+    error: string
+    status?: number | string
+    httpStatus?: number
+  },
+) {
+  if (options.redirectBrowser) {
+    const target = buildPaymentRedirect(req, params.groupId)
+    target.searchParams.set('payment', 'failed')
+    target.searchParams.set('provider', params.provider)
+    target.searchParams.set('reason', params.error)
+    return NextResponse.redirect(target)
+  }
+
+  return NextResponse.json({
+    error: params.error,
+    provider: params.provider,
+    ...(typeof params.status === 'string' ? { status: params.status } : {}),
+  }, { status: params.httpStatus ?? (typeof params.status === 'number' ? params.status : 400) })
+}
+
+function buildPaymentRedirect(req: NextRequest, groupId: string) {
+  const target = new URL(
+    normalizeDepositReturnPath(req.nextUrl.searchParams.get('return_path')),
+    req.nextUrl.origin,
+  )
+  if (groupId) {
+    target.searchParams.set('group_id', groupId)
+  }
+  return target
 }
 
 async function readJson(req: NextRequest): Promise<Record<string, unknown>> {

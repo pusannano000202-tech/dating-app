@@ -99,7 +99,7 @@ export function FreeBetaQueuePanel({
       label: `${requiredMemberCount}명 그룹 완성`,
       desc: groupIsFull
         ? '그룹 정원이 모두 채워졌어요.'
-        : `친구 ${missingMembers}명이 더 들어와야 해요. 친구가 나가면 이 조건이 다시 잠겨요.`,
+        : `친구 ${missingMembers}명이 더 들어와야 해요. 초대나 내보내기로 인원이 바뀌면 다시 확인해요.`,
       done: groupIsFull,
       href: '/friends',
       cta: '친구 초대',

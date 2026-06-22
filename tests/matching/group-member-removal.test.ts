@@ -35,11 +35,17 @@ test('leader member removal has an API route and database RPC', () => {
 test('member removal is exposed as a real member-card action, not a preview button', () => {
   const page = readSource('app/group/create/page.tsx')
   const panel = readSource('components/matching/group-create/GroupMemberStatusPanel.tsx')
+  const queuePanel = readSource('components/matching/group-create/FreeBetaQueuePanel.tsx')
 
   assert.doesNotMatch(page, /친구가 그룹을 나간 상황 보기/)
   assert.doesNotMatch(page, /simulateFriendLeaving/)
+  assert.doesNotMatch(panel, /친구가 나가면/)
+  assert.doesNotMatch(queuePanel, /친구가 나가면/)
   assert.match(page, /\/api\/groups\/remove-member/)
   assert.match(panel, /내보내기/)
+  assert.match(panel, /그룹에서 내보내기/)
+  assert.match(panel, /aria-label=\{`\$\{name\}님 그룹에서 내보내기`\}/)
+  assert.match(panel, /큐 대기는 취소돼요/)
   assert.match(panel, /onRemoveMember\(member\)/)
 })
 
@@ -57,4 +63,6 @@ test('queue and match display composition is calculated from active member gende
   assert.match(migrations, /WHEN male_members > 0 AND female_members > 0 THEN 'mixed'/)
   assert.match(migrations, /public\.get_group_composition_gender\(mp\.group_id\)/)
   assert.match(migrations, /public\.get_group_composition_gender\(CASE WHEN/)
+  assert.match(migrations, /LEFT JOIN public\.profiles p\s+ON p\.user_id = gm\.user_id/)
+  assert.doesNotMatch(migrations, /opp_group_gender,\s+CASE WHEN[\s\S]+?THEN g[ab]\.gender/)
 })

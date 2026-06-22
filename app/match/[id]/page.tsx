@@ -10,6 +10,10 @@ import MatchFoundSummary from '@/components/matching/MatchFoundSummary'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
+  requestTossPaymentWindow,
+  type TossBrowserPaymentRequest,
+} from '@/lib/payments/toss-browser'
+import {
   buildDailyCardSubmissionText,
   countCompletedDailyCardItems,
   createDailyCardDraftFromSubmissionText,
@@ -672,15 +676,18 @@ export default function MatchDetailPage() {
       const res = await fetch('/api/deposits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ group_id: match.my_group_id }),
+        body: JSON.stringify({
+          group_id: match.my_group_id,
+          return_path: `/match/${match.match_id}`,
+        }),
       })
       if (res.status === 202) {
-        const data = await res.json().catch(() => ({})) as { payment?: { checkoutUrl?: string | null } }
-        if (data.payment?.checkoutUrl) {
-          window.location.href = data.payment.checkoutUrl
+        const data = await res.json().catch(() => ({})) as { payment?: TossBrowserPaymentRequest }
+        if (data.payment) {
+          await requestTossPaymentWindow(data.payment)
           return
         }
-        setError('결제창 주소를 만들지 못했어요. Toss 테스트 키와 결제 설정을 확인해 주세요.')
+        setError('결제창 정보를 만들지 못했어요. Toss 테스트 키와 결제 설정을 확인해 주세요.')
         return
       }
       if (!res.ok) {

@@ -2,6 +2,10 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import {
+  buildDepositCustomerKey,
+  normalizeDepositReturnPath,
+} from '../../lib/payments/deposit'
 
 const ROOT = process.cwd()
 
@@ -15,6 +19,7 @@ test('deposit payment API has explicit start, confirm, cancel, and webhook surfa
     'app/api/payments/deposit/confirm/route.ts',
     'app/api/payments/deposit/cancel/route.ts',
     'app/api/payments/deposit/webhook/route.ts',
+    'lib/payments/toss-browser.ts',
     'lib/payments/toss.ts',
   ]
 
@@ -23,8 +28,9 @@ test('deposit payment API has explicit start, confirm, cancel, and webhook surfa
   }
 })
 
-test('deposit payment routes use provider readiness and delegate Toss calls to the server helper', () => {
+test('deposit payment routes use provider readiness and return Toss browser checkout payloads', () => {
   const startRoute = readSource('app/api/payments/deposit/route.ts')
+  const depositsRoute = readSource('app/api/deposits/route.ts')
   const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
   const cancelRoute = readSource('app/api/payments/deposit/cancel/route.ts')
   const webhookRoute = readSource('app/api/payments/deposit/webhook/route.ts')
@@ -36,7 +42,10 @@ test('deposit payment routes use provider readiness and delegate Toss calls to t
   }
 
   assert.match(startRoute, /mock_pay_deposit/)
-  assert.match(startRoute, /createTossPaymentWindow/)
+  assert.match(startRoute, /clientKey: process\.env\.NEXT_PUBLIC_TOSS_CLIENT_KEY/)
+  assert.match(depositsRoute, /clientKey: process\.env\.NEXT_PUBLIC_TOSS_CLIENT_KEY/)
+  assert.doesNotMatch(startRoute, /createTossPaymentWindow/)
+  assert.doesNotMatch(depositsRoute, /createTossPaymentWindow/)
   assert.match(confirmRoute, /isDepositPaymentAmountValid/)
   assert.match(confirmRoute, /confirmTossPayment/)
   assert.doesNotMatch(confirmRoute, /awaiting_provider_webhook/)
@@ -54,6 +63,7 @@ test('deposit payment routes use provider readiness and delegate Toss calls to t
   assert.match(tossHelper, /\/payments\/orders\/\$\{encodeURIComponent\(orderId\)\}/)
   assert.match(tossHelper, /\/payments\/confirm/)
   assert.match(tossHelper, /encodeURIComponent\(params\.paymentKey\).*\/cancel/)
+  assert.doesNotMatch(tossHelper, /\/payments',/)
   assert.match(tossHelper, /Authorization/)
   assert.match(tossHelper, /Idempotency-Key/)
 })
@@ -70,6 +80,15 @@ test('deposit payment routes do not expose missing provider environment variable
   for (const route of routes) {
     assert.doesNotMatch(readSource(route), /missing:/, `${route} exposes missing env names`)
   }
+})
+
+test('Toss deposit readiness requires checkout, refund, and reconciliation server envs', () => {
+  const paymentLib = readSource('lib/payments/deposit.ts')
+
+  assert.match(paymentLib, /TOSS_SECRET_KEY/)
+  assert.match(paymentLib, /NEXT_PUBLIC_TOSS_CLIENT_KEY/)
+  assert.match(paymentLib, /PAYMENT_INTERNAL_SECRET/)
+  assert.match(paymentLib, /SUPABASE_SERVICE_ROLE_KEY/)
 })
 
 test('local env example documents mock and Toss sandbox payment settings without secrets', () => {
@@ -111,6 +130,80 @@ test('deposit payment request draft sends failed checkout back through cancel ro
 
   assert.match(paymentLib, /failUrl/)
   assert.match(paymentLib, /\/api\/payments\/deposit\/cancel/)
+})
+
+test('Toss checkout browser success callback returns users to the app', () => {
+  const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
+
+  assert.match(confirmRoute, /export async function GET\(req: NextRequest\) \{\s+return confirmDeposit\(req, \{ redirectBrowser: true \}\)/)
+  assert.match(confirmRoute, /NextResponse\.redirect\(target\)/)
+  assert.match(confirmRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
+  assert.match(confirmRoute, /target\.searchParams\.set\('payment', 'paid'\)/)
+  assert.match(confirmRoute, /target\.searchParams\.set\('payment', 'failed'\)/)
+})
+
+test('deposit checkout preserves safe return paths for group and match flows', () => {
+  const paymentLib = readSource('lib/payments/deposit.ts')
+  const depositsRoute = readSource('app/api/deposits/route.ts')
+  const paymentRoute = readSource('app/api/payments/deposit/route.ts')
+  const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
+  const cancelRoute = readSource('app/api/payments/deposit/cancel/route.ts')
+  const groupCreatePage = readSource('app/group/create/page.tsx')
+  const matchDetailPage = readSource('app/match/[id]/page.tsx')
+
+  assert.match(paymentLib, /returnPath\?: string/)
+  assert.match(paymentLib, /normalizeDepositReturnPath/)
+  assert.match(paymentLib, /return_path=\$\{encodeURIComponent\(returnPath\)\}/)
+  assert.match(depositsRoute, /returnPath: typeof body\.return_path === 'string' \? body\.return_path : undefined/)
+  assert.match(paymentRoute, /returnPath: typeof body\.return_path === 'string' \? body\.return_path : undefined/)
+  assert.match(confirmRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
+  assert.match(cancelRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
+  assert.doesNotMatch(cancelRoute, /new URL\('\/match\/start'/)
+  assert.match(groupCreatePage, /return_path: `\/group\/create\?size=\$\{capacity\}`/)
+  assert.match(matchDetailPage, /return_path: `\/match\/\$\{match\.match_id\}`/)
+})
+
+test('client pages open Toss payment window with the browser SDK request payload', () => {
+  const groupCreatePage = readSource('app/group/create/page.tsx')
+  const matchDetailPage = readSource('app/match/[id]/page.tsx')
+  const browserHelper = readSource('lib/payments/toss-browser.ts')
+
+  assert.match(groupCreatePage, /const data = await res\.json\(\)\.catch/)
+  assert.match(groupCreatePage, /await requestTossPaymentWindow\(data\.payment\)/)
+  assert.match(matchDetailPage, /await requestTossPaymentWindow\(data\.payment\)/)
+  assert.match(browserHelper, /https:\/\/js\.tosspayments\.com\/v2\/standard/)
+  assert.match(browserHelper, /payment\.requestPayment/)
+  assert.match(browserHelper, /requestPayment\('카드'/)
+  assert.doesNotMatch(groupCreatePage, /window\.location\.href = data\.payment\.checkoutUrl/)
+  assert.doesNotMatch(matchDetailPage, /window\.location\.href = data\.payment\.checkoutUrl/)
+  assert.doesNotMatch(groupCreatePage, /res\.status === 202\)[\s\S]{0,220}setError\('외부 결제창 연결 준비 상태/)
+})
+
+test('Toss customer key stays within the browser SDK length limit', () => {
+  const longUserId = 'user_' + 'abcdef1234567890'.repeat(10)
+  const customerKey = buildDepositCustomerKey(longUserId)
+
+  assert.ok(customerKey.startsWith('deposit_'))
+  assert.ok(customerKey.length <= 50, `customerKey is too long: ${customerKey.length}`)
+  assert.doesNotMatch(customerKey, /[^a-zA-Z0-9_-]/)
+})
+
+test('deposit return path only allows group and match screens', () => {
+  assert.equal(normalizeDepositReturnPath('/group/create?size=2'), '/group/create?size=2')
+  assert.equal(normalizeDepositReturnPath('/match/dev-match-1'), '/match/dev-match-1')
+  assert.equal(normalizeDepositReturnPath('/api/payments/deposit/cancel'), '/group/create')
+  assert.equal(normalizeDepositReturnPath('/admin'), '/group/create')
+  assert.equal(normalizeDepositReturnPath('//evil.example/path'), '/group/create')
+  assert.equal(normalizeDepositReturnPath('https://evil.example/path'), '/group/create')
+})
+
+test('group create page explains payment callback results after Toss returns', () => {
+  const groupCreatePage = readSource('app/group/create/page.tsx')
+
+  assert.match(groupCreatePage, /const paymentStatus = searchParams\.get\('payment'\)/)
+  assert.match(groupCreatePage, /보증금 결제가 확인됐어요/)
+  assert.match(groupCreatePage, /결제가 완료되지 않았어요/)
+  assert.match(groupCreatePage, /refreshDeposit\(group\.id\)/)
 })
 
 test('match refund route reports external Toss settlement separately from DB refund request', () => {

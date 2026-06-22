@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import {
   buildDepositPaymentRequestDraft,
+  buildDepositCustomerKey,
   getDepositPaymentReadiness,
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
-import { createTossPaymentWindow, TossPaymentError } from '@/lib/payments/toss'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 interface DepositPaymentRow {
@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
     userId: user.id,
     origin: req.nextUrl.origin,
     orderId: pendingOrderId,
+    returnPath: typeof body.return_path === 'string' ? body.return_path : undefined,
   })
 
   let deposit = activeDeposit.data as DepositPaymentRow | null
@@ -125,36 +126,18 @@ export async function POST(req: NextRequest) {
     deposit = updated.data as DepositPaymentRow
   }
 
-  try {
-    const tossPayment = await createTossPaymentWindow({
-      amount: payment.amount,
-      orderId: payment.orderId,
-      orderName: payment.orderName,
-      successUrl: payment.successUrl,
-      failUrl: payment.failUrl,
-      idempotencyKey: payment.orderId,
-    })
-
-    return NextResponse.json({
-      provider,
-      status: 'checkout_ready',
-      deposit,
-      payment: {
-        ...payment,
-        checkoutUrl: tossPayment.checkout?.url ?? null,
-      },
-    }, { status: 202 })
-  } catch (error) {
-    if (error instanceof TossPaymentError) {
-      return NextResponse.json({
-        error: error.code,
-        provider,
-        status: 'checkout_failed',
-      }, { status: error.status })
-    }
-
-    return NextResponse.json({ error: 'checkout_failed', provider }, { status: 502 })
-  }
+  return NextResponse.json({
+    provider,
+    status: 'checkout_ready',
+    deposit,
+    payment: {
+      ...payment,
+      provider: 'toss',
+      clientKey: process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY,
+      method: 'CARD',
+      customerKey: buildDepositCustomerKey(user.id),
+    },
+  }, { status: 202 })
 }
 
 async function readJson(req: NextRequest): Promise<Record<string, unknown>> {

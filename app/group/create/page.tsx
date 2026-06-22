@@ -8,6 +8,10 @@ import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { normalizeGroupSize } from '@/lib/matching/group-size'
 import {
+  requestTossPaymentWindow,
+  type TossBrowserPaymentRequest,
+} from '@/lib/payments/toss-browser'
+import {
   EMPTY_MATCH_SETUP_STATUS,
   type MatchSetupStatus,
 } from '@/lib/matching/match-setup-status'
@@ -44,10 +48,13 @@ export default function GroupCreatePage() {
   const searchParams = useSearchParams()
   const isDevPreview = isDevPreviewClientSession()
   const requestedSize = normalizeGroupSize(searchParams.get('size'))
+  const paymentStatus = searchParams.get('payment')
+  const paymentReason = searchParams.get('reason')
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [myDeposit, setMyDeposit] = useState<MyDeposit | null>(null)
   const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
@@ -155,6 +162,27 @@ export default function GroupCreatePage() {
     void refreshPreMatchCardStatus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (paymentStatus === 'paid') {
+      setNotice('보증금 결제가 확인됐어요. 이제 그룹 준비 상태를 이어서 확인해주세요.')
+      setError(null)
+      if (group?.id) {
+        void refreshDeposit(group.id)
+      }
+      return
+    }
+
+    if (paymentStatus === 'failed' || paymentStatus === 'cancelled') {
+      setNotice(null)
+      setError(
+        paymentReason
+          ? `결제가 완료되지 않았어요. 사유: ${paymentReason}`
+          : '결제가 완료되지 않았어요. 다시 시도해주세요.'
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentStatus, paymentReason, group?.id])
 
   async function ensureGroup() {
     setLoading(true)
@@ -374,14 +402,26 @@ export default function GroupCreatePage() {
 
     setSaving(true)
     setError(null)
+    setNotice(null)
     try {
       const res = await fetch('/api/deposits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ group_id: group.id }),
+        body: JSON.stringify({
+          group_id: group.id,
+          return_path: `/group/create?size=${capacity}`,
+        }),
       })
       if (res.status === 202) {
-        setError('외부 결제창 연결 준비 상태예요. 로컬 검증에서는 mock 결제로 확인해주세요.')
+        const data = await res.json().catch(() => ({})) as {
+          payment?: TossBrowserPaymentRequest
+        }
+        if (data.payment) {
+          await requestTossPaymentWindow(data.payment)
+          return
+        }
+
+        setError('결제창 정보를 받지 못했어요. 잠시 후 다시 시도해주세요.')
         return
       }
       if (!res.ok) {
@@ -700,6 +740,11 @@ export default function GroupCreatePage() {
             {error && (
               <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
+              </div>
+            )}
+            {notice && (
+              <div className="mb-4 rounded-2xl border border-emerald-400/20 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+                {notice}
               </div>
             )}
 

@@ -3,6 +3,7 @@ import { createClient as createSupabaseServiceClient } from '@supabase/supabase-
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import {
   getDepositPaymentReadiness,
+  normalizeDepositReturnPath,
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
 import { cancelTossPayment, TossPaymentError } from '@/lib/payments/toss'
@@ -10,7 +11,10 @@ import { getSupabaseUrl } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   const result = readCancelResult(req)
-  const target = new URL('/match/start', req.nextUrl.origin)
+  const target = new URL(
+    normalizeDepositReturnPath(req.nextUrl.searchParams.get('return_path')),
+    req.nextUrl.origin,
+  )
   target.searchParams.set('payment', 'cancelled')
   target.searchParams.set('provider', result.provider)
   if (result.groupId) {

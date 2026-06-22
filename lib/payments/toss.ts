@@ -7,9 +7,6 @@ export interface TossPaymentObject {
   totalAmount: number
   method?: string
   approvedAt?: string
-  checkout?: {
-    url?: string
-  }
   cancels?: Array<{
     cancelAmount?: number
     cancelReason?: string
@@ -32,28 +29,6 @@ export class TossPaymentError extends Error {
     this.status = status
     this.code = code
   }
-}
-
-export async function createTossPaymentWindow(params: {
-  amount: number
-  orderId: string
-  orderName: string
-  successUrl: string
-  failUrl: string
-  idempotencyKey?: string
-}): Promise<TossPaymentObject> {
-  return requestTossPayment('/payments', {
-    method: 'POST',
-    idempotencyKey: params.idempotencyKey ?? params.orderId,
-    body: {
-      method: 'CARD',
-      amount: params.amount,
-      orderId: params.orderId,
-      orderName: params.orderName,
-      successUrl: params.successUrl,
-      failUrl: params.failUrl,
-    },
-  })
 }
 
 export async function confirmTossPayment(params: {

@@ -59,7 +59,7 @@ export function GroupMemberStatusPanel({
           return (
             <div
               key={member.user_id}
-              className="min-h-[116px] rounded-2xl border border-boot-hairline bg-white/90 px-2 py-3 text-center"
+              className="flex min-h-[148px] flex-col rounded-2xl border border-boot-hairline bg-white/90 px-3 py-3 text-center"
             >
               <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-boot-soft text-boot-primary">
                 {member.role === 'leader' ? <ShieldCheck size={16} /> : <Check size={16} />}
@@ -81,13 +81,19 @@ export function GroupMemberStatusPanel({
               {canRemove && (
                 <button
                   type="button"
+                  aria-label={`${name}님 그룹에서 내보내기`}
                   disabled={saving}
                   onClick={() => onRemoveMember(member)}
-                  className="mx-auto mt-2 inline-flex items-center justify-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[10px] font-black text-red-600 transition-colors hover:bg-red-100 disabled:opacity-40"
+                  className="mt-auto inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-black text-red-600 transition-colors hover:bg-red-100 disabled:opacity-40"
                 >
                   <UserMinus size={12} />
-                  내보내기
+                  그룹에서 내보내기
                 </button>
+              )}
+              {canRemove && (
+                <p className="mt-1 text-[10px] leading-4 text-red-500/80">
+                  내보내면 큐 대기는 취소돼요
+                </p>
               )}
             </div>
           )
@@ -100,7 +106,7 @@ export function GroupMemberStatusPanel({
             <UserPlus size={17} className="text-boot-muted" />
             <p className="mt-2 text-[11px] font-bold text-boot-muted">친구 자리 {index + 1}</p>
             <p className="mt-1 text-[10px] leading-4 text-boot-muted">
-              친구가 나가면 이 자리로 다시 보여요.
+              친구를 초대하면 이 자리에 함께 표시돼요.
             </p>
           </div>
         ))}
