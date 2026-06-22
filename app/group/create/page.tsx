@@ -714,6 +714,7 @@ export default function GroupCreatePage() {
     switch (code) {
       case 'not_group_leader':   return '리더만 그룹을 해체할 수 있어요.'
       case 'leader_cannot_leave': return '리더는 바로 나갈 수 없어요. 해체하거나 리더 위임을 먼저 해야 해요.'
+      case 'cannot_remove_leader': return '리더는 그룹에서 내보낼 수 없어요. 리더 위임이나 그룹 해체를 먼저 선택해주세요.'
       case 'not_active_member':  return '이미 이 그룹의 활성 멤버가 아니에요.'
       case 'group_locked':       return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
       case 'new_leader_required': return '새 리더를 선택해야 해요.'

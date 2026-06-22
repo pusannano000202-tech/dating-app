@@ -29,6 +29,8 @@ test('leader member removal has an API route and database RPC', () => {
   assert.match(migrations, /p_member_user_id UUID/)
   assert.match(migrations, /not_group_leader/)
   assert.match(migrations, /cannot_remove_self/)
+  assert.match(migrations, /cannot_remove_leader/)
+  assert.match(migrations, /v_member\.role = 'leader'/)
   assert.match(migrations, /UPDATE group_members AS gm\s+SET left_at = v_now/)
 })
 
@@ -50,6 +52,9 @@ test('member removal is exposed as a real member-card action, not a preview butt
   assert.match(panel, /대기 중이면 큐는 자동 취소됩니다/)
   assert.match(panel, /onRemoveMember\(member\)/)
   assert.match(panel, /친구 관리/)
+  assert.match(panel, /길게 누르/)
+  assert.match(panel, /onPointerDown/)
+  assert.match(panel, /window\.setTimeout/)
   assert.match(panel, /이 그룹 자리만 비워요/)
   assert.match(panel, /성별 구성/)
   assert.match(types, /gender\?: 'male' \| 'female' \| null/)
@@ -74,6 +79,17 @@ test('removing a group member cancels ready queue state and reopens the group', 
 
   assert.match(migrations, /UPDATE match_pool AS mp\s+SET status = 'cancelled'/)
   assert.match(migrations, /UPDATE groups AS g\s+SET status = 'forming'/)
+})
+
+test('admin match review accepts mixed composition labels', () => {
+  const adminReviewPage = readSource('app/admin/matches/review/page.tsx')
+  const migrations = readAllMigrations()
+
+  assert.match(adminReviewPage, /type GroupCompositionGender = 'male' \| 'female' \| 'mixed'/)
+  assert.match(adminReviewPage, /formatGroupComposition\(m\.group_a_gender\)/)
+  assert.match(adminReviewPage, /case 'mixed': return '혼성'/)
+  assert.match(migrations, /public\.get_group_composition_gender\(m\.group_a_id\)/)
+  assert.match(migrations, /public\.get_group_composition_gender\(m\.group_b_id\)/)
 })
 
 test('queue and match display composition is calculated from active member genders', () => {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Check, MoreHorizontal, ShieldCheck, UserMinus, UserPlus, Users } from 'lucide-react'
 
 import { getGroupCompositionSummary, getMemberStatusLabel } from './status'
@@ -28,8 +28,24 @@ export function GroupMemberStatusPanel({
   onRemoveMember,
 }: GroupMemberStatusPanelProps) {
   const [openMemberId, setOpenMemberId] = useState<string | null>(null)
+  const longPressTimer = useRef<number | null>(null)
   const openSlots = Math.max(0, capacity - members.length)
   const composition = getGroupCompositionSummary(members)
+
+  function clearLongPressTimer() {
+    if (longPressTimer.current == null) return
+    window.clearTimeout(longPressTimer.current)
+    longPressTimer.current = null
+  }
+
+  function startLongPress(canRemove: boolean, memberUserId: string) {
+    if (!canRemove || saving) return
+    clearLongPressTimer()
+    longPressTimer.current = window.setTimeout(() => {
+      setOpenMemberId(memberUserId)
+      longPressTimer.current = null
+    }, 520)
+  }
 
   return (
     <section
@@ -85,6 +101,10 @@ export function GroupMemberStatusPanel({
             <div
               key={member.user_id}
               className="flex min-h-[168px] flex-col rounded-2xl border border-boot-hairline bg-white/90 px-3 py-3 text-center"
+              onPointerDown={() => startLongPress(canRemove, member.user_id)}
+              onPointerUp={clearLongPressTimer}
+              onPointerCancel={clearLongPressTimer}
+              onPointerLeave={clearLongPressTimer}
             >
               <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-boot-soft text-boot-primary">
                 {member.role === 'leader' ? <ShieldCheck size={16} /> : <Check size={16} />}
@@ -134,6 +154,11 @@ export function GroupMemberStatusPanel({
                         그룹에서 내보내기
                       </button>
                     </div>
+                  )}
+                  {!actionOpen && (
+                    <p className="mt-1 text-[10px] leading-4 text-boot-muted">
+                      카드 길게 누르기로도 관리 메뉴를 열 수 있어요.
+                    </p>
                   )}
                 </div>
               )}

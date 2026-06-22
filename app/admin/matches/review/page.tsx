@@ -4,12 +4,14 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Loader2, Check, X } from 'lucide-react'
 
+type GroupCompositionGender = 'male' | 'female' | 'mixed'
+
 interface PendingMatch {
   match_id: string
   group_a_id: string
   group_b_id: string
-  group_a_gender: 'male' | 'female'
-  group_b_gender: 'male' | 'female'
+  group_a_gender: GroupCompositionGender
+  group_b_gender: GroupCompositionGender
   group_a_size: number
   group_b_size: number
   score: number | null
@@ -89,7 +91,7 @@ export default function MatchReviewQueuePage() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-bold">
-                      {m.group_a_size}명({m.group_a_gender === 'male' ? '남' : '여'}) ↔ {m.group_b_size}명({m.group_b_gender === 'male' ? '남' : '여'})
+                      {m.group_a_size}명({formatGroupComposition(m.group_a_gender)}) ↔ {m.group_b_size}명({formatGroupComposition(m.group_b_gender)})
                       {m.is_forced && <span className="ml-2 text-[10px] text-amber-700">강제</span>}
                     </p>
                     <p className="mt-0.5 text-xs text-boot-muted">
@@ -153,4 +155,12 @@ function breakdownRows(b: Record<string, number>): [string, string][] {
   return Object.entries(BREAKDOWN_LABELS)
     .filter(([key]) => b[key] != null)
     .map(([key, label]) => [label, b[key].toFixed(2)])
+}
+
+function formatGroupComposition(gender: GroupCompositionGender): string {
+  switch (gender) {
+    case 'male': return '남'
+    case 'female': return '여'
+    case 'mixed': return '혼성'
+  }
 }
