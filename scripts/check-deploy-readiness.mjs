@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
 const root = process.cwd()
+const env = {
+  ...readLocalEnvFile(),
+  ...process.env,
+}
 const checks = []
 
 checks.push(checkCommand(
@@ -35,7 +39,7 @@ checks.push(checkPaymentEnv())
 
 checks.push({
   key: 'NEXT_PUBLIC_APP_ORIGIN',
-  status: classifyAppOrigin(process.env.NEXT_PUBLIC_APP_ORIGIN),
+  status: classifyAppOrigin(env.NEXT_PUBLIC_APP_ORIGIN),
   purpose: 'public callback origin must be a deployed Vercel URL before production',
 })
 
@@ -85,4 +89,32 @@ function classifyAppOrigin(value) {
   if (/localhost|127\.0\.0\.1/i.test(value)) return 'ACTION_REQUIRED'
   if (!/^https:\/\/.+/.test(value)) return 'INVALID'
   return 'SET'
+}
+
+function readLocalEnvFile() {
+  const envFile = join(root, '.env.local')
+  if (!existsSync(envFile)) return {}
+
+  const parsed = {}
+  const lines = readFileSync(envFile, 'utf8').split(/\r?\n/)
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    const index = trimmed.indexOf('=')
+    if (index === -1) continue
+    const key = trimmed.slice(0, index).trim()
+    const value = stripQuotes(trimmed.slice(index + 1).trim())
+    parsed[key] = value
+  }
+  return parsed
+}
+
+function stripQuotes(value) {
+  if (
+    (value.startsWith('"') && value.endsWith('"'))
+    || (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1)
+  }
+  return value
 }
