@@ -100,7 +100,7 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
 
   if (!currentStep) {
     return (
-      <main className="min-h-screen booting-band px-5 pb-12 pt-7 text-boot-ink">
+      <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
         <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
           <header className="mb-6 flex items-center gap-3">
             <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
@@ -139,7 +139,7 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
   const CurrentIcon = currentStep.Icon
 
   return (
-    <main className="min-h-screen booting-band px-5 pb-12 pt-7 text-boot-ink">
+    <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-6 flex items-center gap-3">
           <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">

@@ -9,6 +9,7 @@ import { loadIdealMetadata, type IdealMetadata } from '@/lib/appearance/metadata
 import type { PreferenceResult } from '@/lib/appearance/preference'
 import { legacyTypeFromBucketWeights } from '@/lib/appearance/bucket-to-legacy'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { normalizeGender, oppositeGenderForWorldcup } from '@/lib/gender'
 import { isSupabaseConfigured } from '@/lib/utils'
 import type { Gender } from '@/lib/types'
 
@@ -54,7 +55,7 @@ export default function WorldcupPage() {
           .eq('user_id', user.id)
           .single()
 
-        const userGender: Gender | null = (profile?.gender as Gender) ?? null
+        const userGender = normalizeGender(profile?.gender)
         if (cancelled) return
         if (!userGender) {
           setLoadError('성별 정보를 먼저 입력해줘.')
@@ -240,7 +241,14 @@ export default function WorldcupPage() {
   }
 
   // 이성 풀에서 골라야 하므로 반대 성별로 전달
-  const oppositeGender: Gender = gender === 'male' ? 'female' : 'male'
+  const oppositeGender = oppositeGenderForWorldcup(gender)
+  if (!oppositeGender) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen px-4">
+        <p className="text-center text-gray-300 text-sm">성별 정보를 다시 확인해줘.</p>
+      </div>
+    )
+  }
 
   return (
     <IdealWorldcup

@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, Loader2, LockKeyhole, MapPin, MessageCircle, Navigation, Phone, Sparkles, Users } from 'lucide-react'
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
+import DepositPaymentPanel from '@/components/matching/DepositPaymentPanel'
+import MatchFoundSummary from '@/components/matching/MatchFoundSummary'
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
   buildDailyCardSubmissionText,
@@ -87,6 +90,35 @@ type DailyCardVisualState = 'available' | 'picked' | 'missed' | 'locked'
 
 const MINIMUM_DAILY_CARD_ITEMS_TO_SAVE = 4
 
+const PENDING_MATCH_STEPS = [
+  {
+    key: 'overview',
+    label: '가매칭',
+    title: '가매칭이 도착했어요',
+    description: '상대 상세는 잠겨 있고, 지금은 우리 팀 준비 상태만 확인해요.',
+  },
+  {
+    key: 'card',
+    label: '사전 카드',
+    title: '우리 팀을 소개해요',
+    description: '상대가 확정 전에 볼 수 있는 최소 힌트를 항목별로 작성해요.',
+  },
+  {
+    key: 'deposit',
+    label: '보증금',
+    title: '보증금을 준비해요',
+    description: '만남 책임감을 위해 10,000원을 걸고, 정상 만남 후 환불돼요.',
+  },
+  {
+    key: 'confirm',
+    label: '확정',
+    title: '준비가 끝나면 확정해요',
+    description: '카드와 보증금이 모두 끝난 뒤에만 매칭을 확정할 수 있어요.',
+  },
+] as const
+
+type PendingMatchStepKey = typeof PENDING_MATCH_STEPS[number]['key']
+
 function createDevMatchDetail(matchId: string): MatchDetail {
   const isPending = getDevMatchPreviewStatus(matchId) === 'pending'
   const start = new Date(Date.now() + 1000 * 60 * 60 * 26)
@@ -113,7 +145,7 @@ function createDevMatchDetail(matchId: string): MatchDetail {
     my_card_content_text: '첫 만남 전에 우리 그룹 분위기를 짧게 적어볼게요.',
     my_group_active_count: 3,
     my_group_card_submitted_count: 2,
-    my_group_deposit_paid_count: 3,
+    my_group_deposit_paid_count: isPending ? 1 : 3,
     my_group_ready: !isPending,
     opp_group_active_count: 3,
     opp_group_card_submitted_count: 2,
@@ -236,6 +268,7 @@ export default function MatchDetailPage() {
   const [dailyCards, setDailyCards] = useState<DailyCard[]>([])
   const [dailyCardsLoading, setDailyCardsLoading] = useState(false)
   const [dailyCardPicking, setDailyCardPicking] = useState<number | null>(null)
+  const [pendingStepIndex, setPendingStepIndex] = useState(0)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -276,6 +309,12 @@ export default function MatchDetailPage() {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  useEffect(() => {
+    if (match?.match_status !== 'pending' && pendingStepIndex !== 0) {
+      setPendingStepIndex(0)
+    }
+  }, [match?.match_status, pendingStepIndex])
 
   const refreshConnections = useCallback(async () => {
     setConnectionsLoading(true)
@@ -539,6 +578,7 @@ export default function MatchDetailPage() {
         }
       })
       setError(null)
+      goToPendingStep(2)
       return
     }
 
@@ -556,6 +596,7 @@ export default function MatchDetailPage() {
         return
       }
       await refresh()
+      goToPendingStep(2)
     } catch {
       setError('카드 저장에 실패했어요.')
     } finally {
@@ -621,6 +662,7 @@ export default function MatchDetailPage() {
         }
       })
       setError(null)
+      goToPendingStep(3)
       return
     }
 
@@ -647,6 +689,7 @@ export default function MatchDetailPage() {
         return
       }
       await refresh()
+      goToPendingStep(3)
     } catch {
       setError('보증금 결제 확인에 실패했어요. 잠시 뒤 다시 시도해 주세요.')
     } finally {
@@ -757,9 +800,203 @@ export default function MatchDetailPage() {
     completedDailyCardItemCount >= MINIMUM_DAILY_CARD_ITEMS_TO_SAVE
     && dailyCardSubmissionText.trim().length >= 10
     && !dailyCardTooLong
+  const pendingStep = PENDING_MATCH_STEPS[pendingStepIndex] ?? PENDING_MATCH_STEPS[0]
+  const isFirstPendingStep = pendingStepIndex === 0
+  const isLastPendingStep = pendingStepIndex === PENDING_MATCH_STEPS.length - 1
+
+  function renderPendingStep(currentMatch: MatchDetail, stepKey: PendingMatchStepKey) {
+    switch (stepKey) {
+      case 'overview':
+        return (
+          <div className="space-y-4">
+            <MatchFoundSummary
+              score={70}
+              department="확정 후 공개"
+              ageRange="20~23세"
+              genderSummary={`${currentMatch.opp_group_gender === 'male' ? '남' : '여'} ${currentMatch.opp_group_size}명`}
+              title="가매칭됐어요!"
+              subtitle="보증금과 사전 카드를 끝내면 확정돼요"
+              lockedMessage="상대팀 이름과 자세한 정보는 확정 후 공개돼요."
+            />
+
+            <div className="rounded-3xl border border-boot-hairline bg-white/80 p-4">
+              <p className="text-xs font-black text-boot-primary">지금 보이는 정보</p>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-2xl bg-boot-soft px-2 py-3">
+                  <p className="text-[11px] text-boot-muted">상대 구성</p>
+                  <p className="mt-1 text-sm font-black text-boot-ink">
+                    {currentMatch.opp_group_gender === 'male' ? '남' : '여'} {currentMatch.opp_group_size}명
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-boot-soft px-2 py-3">
+                  <p className="text-[11px] text-boot-muted">상세 정보</p>
+                  <p className="mt-1 text-sm font-black text-boot-ink">잠금</p>
+                </div>
+                <div className="rounded-2xl bg-boot-soft px-2 py-3">
+                  <p className="text-[11px] text-boot-muted">다음 할 일</p>
+                  <p className="mt-1 text-sm font-black text-boot-ink">카드</p>
+                </div>
+              </div>
+              <p className="mt-3 text-[11px] leading-relaxed text-boot-muted">
+                이 단계에서는 상대팀을 전부 공개하지 않아요. 우리 팀이 카드와 보증금을 끝내면 확정 단계에서 더 많은 정보가 열려요.
+              </p>
+            </div>
+          </div>
+        )
+
+      case 'card':
+        return (
+          <div className="space-y-3">
+            <div className="rounded-2xl border border-boot-hairline bg-white/80 px-3 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-black text-boot-primary">내 카드 항목</p>
+                <p className="text-xs font-black text-boot-ink">
+                  {completedDailyCardItemCount}/6개 완료
+                </p>
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                최소 {MINIMUM_DAILY_CARD_ITEMS_TO_SAVE}개를 채우면 저장할 수 있어요. 저장하면 다음 보증금 단계로 넘어갑니다.
+              </p>
+            </div>
+
+            <DailyCardHintWizard
+              draft={cardDraft}
+              completedCount={completedDailyCardItemCount}
+              minimumToSave={MINIMUM_DAILY_CARD_ITEMS_TO_SAVE}
+              totalCount={6}
+              submittedAt={currentMatch.my_card_submitted_at}
+              canSave={canSaveDailyCard}
+              tooLong={dailyCardTooLong}
+              saving={cardSaving}
+              onTextChange={updateDailyCardDraft}
+              onDebateAnswer={updateDailyCardDebateAnswer}
+              onSave={saveCard}
+              formatSubmittedAt={formatDateTime}
+            />
+
+            <div className="rounded-2xl border border-boot-hairline bg-white/70 px-3 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-black text-boot-primary">그룹 전체 카드 작성</p>
+                <p className="text-xs font-black text-boot-ink">
+                  {currentMatch.my_group_card_submitted_count}/{currentMatch.my_group_active_count}명 완료
+                </p>
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                내 카드 완료율과 그룹 전체 완료율은 따로 봐야 해요. 다른 멤버도 자기 카드 작성을 끝내야 확정할 수 있어요.
+              </p>
+            </div>
+          </div>
+        )
+
+      case 'deposit':
+        return (
+          <div className="space-y-3">
+            <DepositPaymentPanel
+              amount={DEPOSIT_AMOUNT}
+              paidCount={currentMatch.my_group_deposit_paid_count}
+              totalCount={currentMatch.my_group_active_count}
+              saving={depositSaving}
+              onPay={payDeposit}
+            />
+
+            <div className="rounded-2xl border border-emerald-400/15 bg-emerald-500/[0.06] px-4 py-3">
+              <p className="text-xs font-black text-emerald-700">보증금은 결제가 아니라 약속 장치예요</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                정상적으로 만나면 전액 환불을 기본으로 두고, 환불 단계에서 앱 기여금은 사용자가 직접 고를 수 있게 둘 예정이에요.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <ProgressPill
+                label="우리 보증금"
+                current={currentMatch.my_group_deposit_paid_count}
+                total={currentMatch.my_group_active_count}
+              />
+              <ProgressPill
+                label="상대 보증금"
+                current={currentMatch.opp_group_deposit_paid_count}
+                total={currentMatch.opp_group_active_count}
+              />
+            </div>
+          </div>
+        )
+
+      case 'confirm':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <ProgressPill
+                label="내 카드"
+                current={currentMatch.my_group_card_submitted_count}
+                total={currentMatch.my_group_active_count}
+              />
+              <ProgressPill
+                label="우리 보증금"
+                current={currentMatch.my_group_deposit_paid_count}
+                total={currentMatch.my_group_active_count}
+              />
+              <ProgressPill
+                label="상대 카드"
+                current={currentMatch.opp_group_card_submitted_count}
+                total={currentMatch.opp_group_active_count}
+              />
+              <ProgressPill
+                label="상대 보증금"
+                current={currentMatch.opp_group_deposit_paid_count}
+                total={currentMatch.opp_group_active_count}
+              />
+            </div>
+
+            {currentMatch.my_confirmed_at && !currentMatch.opp_confirmed_at ? (
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-700">
+                우리 그룹은 확정 완료. 상대 그룹 리더의 확인을 기다리는 중이에요.
+              </div>
+            ) : (
+              <>
+                {!currentMatch.my_group_ready && (
+                  <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3">
+                    <p className="text-xs font-black text-amber-700">아직 확정할 수 없어요</p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                      사전 카드와 우리 팀 보증금이 모두 완료되면 아래 버튼이 활성화돼요.
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={confirmMatch}
+                    disabled={saving || !currentMatch.my_group_ready}
+                    className="btn-gradient flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40"
+                  >
+                    매칭 확정하기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelMatch}
+                    disabled={saving}
+                    className="flex-1 py-3 rounded-2xl text-sm text-boot-body border border-boot-hairline hover:border-boot-primary/30 disabled:opacity-40"
+                  >
+                    나중에 하기
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )
+    }
+  }
+
+  function goToPendingStep(nextIndex: number) {
+    const clampedIndex = Math.max(0, Math.min(PENDING_MATCH_STEPS.length - 1, nextIndex))
+    setPendingStepIndex(clampedIndex)
+    window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 0)
+  }
 
   return (
-    <main className="min-h-screen px-5 pb-28">
+    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
           <Link href="/match" className="p-2 glass rounded-xl">
@@ -770,16 +1007,6 @@ export default function MatchDetailPage() {
             <p className="text-xs text-boot-muted mt-0.5">오늘 할 일과 공개 카드를 한 번에 확인해요</p>
           </div>
         </header>
-
-        <section className="mb-4 rounded-2xl border border-boot-primary/25 bg-white/90 px-4 py-3">
-          <p className="text-xs font-black text-boot-primary">지금 이 화면에서 할 수 있는 것</p>
-          <p className="mt-1 text-xs text-boot-muted leading-relaxed">
-            준비 중인 매칭은 카드 작성과 보증금 결제를 먼저 끝내고, 확정된 매칭은 오늘 공개 카드를 뽑아보면 돼요.
-          </p>
-          <p className="mt-1 text-[11px] text-boot-muted">
-            아래 카드와 버튼은 실제 동선 검토용으로 바로 눌러볼 수 있게 정리했습니다.
-          </p>
-        </section>
 
         {error && (
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
@@ -794,213 +1021,150 @@ export default function MatchDetailPage() {
           </section>
         ) : match ? (
           <>
-            <section className="glass-card rounded-3xl p-5 mb-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-12 w-12 rounded-2xl bg-boot-soft border border-boot-hairline flex items-center justify-center">
-                  <Users size={22} className="text-boot-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-boot-muted">상대 그룹</p>
-                  <p className="text-lg font-black">
-                    {match.opp_group_size}명 · {match.opp_group_gender === 'male' ? '남자' : '여자'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-sm">
-                <Row label="매칭 생성" value={formatDateTime(match.matched_at)} />
-                <Row
-                  label="우리 그룹 확정"
-                  value={match.my_confirmed_at ? formatDateTime(match.my_confirmed_at) : '미확인'}
-                  highlight={!!match.my_confirmed_at}
-                />
-                <Row
-                  label="상대 그룹 확정"
-                  value={match.opp_confirmed_at ? formatDateTime(match.opp_confirmed_at) : '미확인'}
-                  highlight={!!match.opp_confirmed_at}
-                />
-                {match.confirmed_at && (
-                  <Row label="양쪽 확정" value={formatDateTime(match.confirmed_at)} />
-                )}
-                {match.completed_at && (
-                  <Row label="완료 시간" value={formatDateTime(match.completed_at)} />
-                )}
-                <Row label="상태" value={translateStatus(match.match_status)} highlight />
-              </div>
-            </section>
-
-            <section className="glass rounded-3xl p-4 mb-4">
-              {match.scheduled_start ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-start gap-3">
-                    <CalendarClock size={18} className="text-boot-coral mt-0.5" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-boot-muted">약속 시간</p>
-                      <p className="text-sm font-bold mt-0.5">
-                        {formatDateTime(match.scheduled_start)}
-                      </p>
-                      {match.scheduled_end && (
-                        <p className="text-[11px] text-boot-muted mt-0.5">
-                          ~ {formatDateTime(match.scheduled_end)}
-                        </p>
-                      )}
-                      <p className="text-[11px] text-boot-coral mt-1">
-                        {formatCountdown(match.scheduled_start)}
-                      </p>
-                    </div>
+            {match.match_status === 'pending' ? (
+              <section className="glass-card rounded-3xl p-5 mb-4">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">MATCH FLOW</p>
+                    <h2 className="mt-1 text-xl font-black text-boot-ink">{pendingStep.title}</h2>
+                    <p className="mt-1 text-xs leading-relaxed text-boot-muted">{pendingStep.description}</p>
                   </div>
-                  {match.venue_name && (
-                    <div className="flex items-start gap-3 pt-3 border-t border-boot-hairline">
-                      <MapPin size={18} className="text-boot-primary mt-0.5" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-boot-muted">장소</p>
-                        <p className="text-sm font-bold mt-0.5 truncate">{match.venue_name}</p>
-                        {match.venue_address && (
-                          <p className="text-[11px] text-boot-muted mt-0.5 break-keep">
-                            {match.venue_address}
+                  <div className="rounded-full bg-boot-soft px-3 py-1 text-xs font-black text-boot-primary">
+                    {pendingStepIndex + 1}/{PENDING_MATCH_STEPS.length}
+                  </div>
+                </div>
+
+                <div className="mb-5 grid grid-cols-4 gap-2">
+                  {PENDING_MATCH_STEPS.map((step, index) => {
+                    const active = index === pendingStepIndex
+                    const passed = index < pendingStepIndex
+                    return (
+                      <button
+                        key={step.key}
+                        type="button"
+                        aria-current={active ? 'step' : undefined}
+                        onClick={() => goToPendingStep(index)}
+                        className={`min-h-[66px] rounded-2xl border px-1.5 py-2 text-center transition ${
+                          active
+                            ? 'border-boot-primary/40 bg-boot-soft text-boot-primary shadow-sm'
+                            : passed
+                              ? 'border-emerald-400/20 bg-emerald-500/[0.06] text-emerald-700'
+                              : 'border-boot-hairline bg-white/80 text-boot-muted'
+                        }`}
+                      >
+                        <span className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-white text-[11px] font-black">
+                          {index + 1}
+                        </span>
+                        <span className="mt-1 block text-[10px] font-black leading-tight">{step.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="min-h-[380px]">
+                  {renderPendingStep(match, pendingStep.key)}
+                </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => goToPendingStep(pendingStepIndex - 1)}
+                    disabled={isFirstPendingStep}
+                    className="rounded-2xl border border-boot-hairline bg-white/70 py-3 text-sm font-bold text-boot-body disabled:opacity-40"
+                  >
+                    이전 단계
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goToPendingStep(pendingStepIndex + 1)}
+                    disabled={isLastPendingStep}
+                    className="btn-gradient rounded-2xl py-3 text-sm font-bold disabled:opacity-40"
+                  >
+                    다음 단계
+                  </button>
+                </div>
+              </section>
+            ) : (
+              <>
+                <MatchFoundSummary
+                  className="mb-6"
+                  score={92}
+                  department="경영학과"
+                  ageRange="20~23세"
+                  genderSummary={`${match.opp_group_gender === 'male' ? '남' : '여'} ${match.opp_group_size}명`}
+                  title="매칭됐어요!"
+                  subtitle="딱 맞는 팀을 찾았어요"
+                  lockedMessage="날짜를 정하고 만남 전까지 하루씩 Q&A로 알아가요."
+                />
+
+                <section className="glass rounded-3xl p-4 mb-4">
+                  {match.scheduled_start ? (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-start gap-3">
+                        <CalendarClock size={18} className="text-boot-coral mt-0.5" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-boot-muted">약속 시간</p>
+                          <p className="text-sm font-bold mt-0.5">
+                            {formatDateTime(match.scheduled_start)}
                           </p>
-                        )}
-                        {match.venue_map_url && (
-                          <a
-                            href={match.venue_map_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block mt-1 text-[11px] px-2 py-1 rounded-lg border border-boot-primary/25 bg-boot-soft text-boot-primary hover:bg-boot-soft"
-                          >
-                            지도 열기
-                          </a>
-                        )}
+                          {match.scheduled_end && (
+                            <p className="text-[11px] text-boot-muted mt-0.5">
+                              ~ {formatDateTime(match.scheduled_end)}
+                            </p>
+                          )}
+                          <p className="text-[11px] text-boot-coral mt-1">
+                            {formatCountdown(match.scheduled_start)}
+                          </p>
+                        </div>
+                      </div>
+                      {match.venue_name && (
+                        <div className="flex items-start gap-3 pt-3 border-t border-boot-hairline">
+                          <MapPin size={18} className="text-boot-primary mt-0.5" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-boot-muted">장소</p>
+                            <p className="text-sm font-bold mt-0.5 truncate">{match.venue_name}</p>
+                            {match.venue_address && (
+                              <p className="text-[11px] text-boot-muted mt-0.5 break-keep">
+                                {match.venue_address}
+                              </p>
+                            )}
+                            {match.venue_map_url && (
+                              <a
+                                href={match.venue_map_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block mt-1 text-[11px] px-2 py-1 rounded-lg border border-boot-primary/25 bg-boot-soft text-boot-primary hover:bg-boot-soft"
+                              >
+                                지도 열기
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <CalendarClock size={18} className="text-boot-coral" />
+                      <div>
+                        <p className="text-sm font-bold">만남 정보</p>
+                        <p className="text-xs text-boot-muted mt-0.5">
+                          확정 전에는 시간과 장소가 아직 정해지지 않았어요. 준비를 마치면 다음 단계에서 확인할 수 있어요.
+                        </p>
                       </div>
                     </div>
                   )}
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <CalendarClock size={18} className="text-boot-coral" />
+                </section>
+
+                <section className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] px-4 py-3 flex items-start gap-3 mb-4">
+                  <LockKeyhole size={16} className="text-emerald-700 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm font-bold">만남 정보</p>
-                    <p className="text-xs text-boot-muted mt-0.5">
-                      확정 전에는 시간과 장소가 아직 정해지지 않았어요. 준비를 마치면 다음 단계에서 확인할 수 있어요.
+                    <p className="text-xs font-black text-emerald-700">매칭 진행 가이드</p>
+                    <p className="mt-0.5 text-[11px] text-boot-muted leading-relaxed">
+                      확정된 뒤에는 약속 정보, 하루 카드, 연락처 공개 조건을 순서대로 확인해요.
                     </p>
                   </div>
-                </div>
-              )}
-            </section>
-
-            <section className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.06] px-4 py-3 flex items-start gap-3 mb-4">
-              <LockKeyhole size={16} className="text-emerald-700 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-xs font-black text-emerald-700">매칭 진행 가이드</p>
-                <p className="mt-0.5 text-[11px] text-boot-muted leading-relaxed">
-                  이 화면에서 카드 작성, 보증금 결제, 매칭 확정을 순서대로 눌러볼 수 있어요.
-                </p>
-              </div>
-            </section>
-
-            {match.match_status === 'pending' && (
-              <section className="glass-card rounded-3xl p-5 mb-4">
-                <div className="mb-4">
-                  <p className="text-sm font-bold">매칭 준비하기</p>
-                  <p className="mt-1 text-xs text-boot-muted leading-relaxed">
-                    상대가 확정한 뒤에 누르는 흐름이 아니라, 지금부터 내 준비를 먼저 만들어요.
-                    카드 입력과 보증금 결제가 모두 준비되어야 확정 버튼이 활성화돼요.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  <ProgressPill
-                    label="내 카드"
-                    current={match.my_group_card_submitted_count}
-                    total={match.my_group_active_count}
-                  />
-                  <ProgressPill
-                    label="우리 보증금"
-                    current={match.my_group_deposit_paid_count}
-                    total={match.my_group_active_count}
-                  />
-                  <ProgressPill
-                    label="상대 카드"
-                    current={match.opp_group_card_submitted_count}
-                    total={match.opp_group_active_count}
-                  />
-                  <ProgressPill
-                    label="상대 보증금"
-                    current={match.opp_group_deposit_paid_count}
-                    total={match.opp_group_active_count}
-                  />
-                </div>
-
-                <DailyCardHintWizard
-                  draft={cardDraft}
-                  completedCount={completedDailyCardItemCount}
-                  minimumToSave={MINIMUM_DAILY_CARD_ITEMS_TO_SAVE}
-                  totalCount={6}
-                  submittedAt={match.my_card_submitted_at}
-                  canSave={canSaveDailyCard}
-                  tooLong={dailyCardTooLong}
-                  saving={cardSaving}
-                  onTextChange={updateDailyCardDraft}
-                  onDebateAnswer={updateDailyCardDebateAnswer}
-                  onSave={saveCard}
-                  formatSubmittedAt={formatDateTime}
-                />
-
-                <div className="mt-3 rounded-2xl border border-boot-hairline bg-white/70 px-3 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[11px] font-black text-boot-primary">그룹 전체 카드 작성</p>
-                    <p className="text-xs font-black text-boot-ink">
-                      {match.my_group_card_submitted_count}/{match.my_group_active_count}명 완료
-                    </p>
-                  </div>
-                  <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
-                    지금 화면은 내 카드 항목을 채우는 곳이고, 그룹 전체 완료 여부는 멤버별로 따로 집계됩니다.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={payDeposit}
-                  disabled={depositSaving || match.my_group_deposit_paid_count >= match.my_group_active_count}
-                  className="mt-4 w-full py-3 rounded-2xl text-sm font-bold border border-emerald-400/30 bg-emerald-500/10 text-emerald-700 disabled:opacity-40"
-                >
-                  {match.my_group_deposit_paid_count >= match.my_group_active_count
-                    ? '우리 그룹 보증금 결제 완료'
-                    : '보증금 결제하기'}
-                </button>
-
-                {!match.my_group_ready && (
-                  <p className="mt-3 text-center text-xs text-amber-700/80">
-                    준비가 끝나면 아래 확정 버튼을 누를 수 있어요.
-                  </p>
-                )}
-              </section>
-            )}
-
-            {/* Match actions */}
-            {match.match_status === 'pending' && !match.my_confirmed_at && (
-              <div className="flex gap-2 mb-2">
-                <button
-                  type="button"
-                  onClick={confirmMatch}
-                  disabled={saving || !match.my_group_ready}
-                  className="btn-gradient flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40"
-                >
-                  매칭 확정하기
-                </button>
-                <button
-                  type="button"
-                  onClick={cancelMatch}
-                  disabled={saving}
-                  className="flex-1 py-3 rounded-2xl text-sm text-boot-body border border-boot-hairline hover:border-boot-primary/30 disabled:opacity-40"
-                >
-                  나중에 하기
-                </button>
-              </div>
-            )}
-            {match.match_status === 'pending' && match.my_confirmed_at && !match.opp_confirmed_at && (
-              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-700 mb-2">
-                우리 그룹은 확정 완료. 상대 그룹 리더의 확인을 기다리는 중이에요.
-              </div>
+                </section>
+              </>
             )}
             {(match.match_status === 'confirmed' || match.match_status === 'completed') && (
               <Link

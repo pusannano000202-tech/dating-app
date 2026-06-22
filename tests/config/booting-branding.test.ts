@@ -12,7 +12,7 @@ function readSource(path: string) {
 test('root layout uses Booting production metadata and light theme color', () => {
   const layout = readSource('app/layout.tsx')
 
-  assert.match(layout, /themeColor:\s*'#fff7f3'/)
+  assert.match(layout, /themeColor:\s*'#f8f3ec'/)
   assert.match(layout, /bg-app min-h-screen text-boot-ink/)
   assert.doesNotMatch(layout, /Destiny/)
 })
@@ -39,7 +39,7 @@ test('profile personality flows use Booting surfaces instead of Destiny dark sty
   const preferenceSurvey = readSource('components/profile/PersonalityPreferenceSurvey.tsx')
   const preferenceResult = readSource('components/profile/PersonalityPreferenceResult.tsx')
 
-  assert.match(profileLayout, /booting-band/)
+  assert.match(profileLayout, /booting-paper/)
   assert.match(surveyPage, /booting-band/)
   assert.match(preferencePage, /booting-band/)
 
@@ -61,6 +61,20 @@ test('match result surfaces keep real APIs while using Booting chat-style cards'
   assert.match(matchDetail, /\/api\/matches\/\$\{encodeURIComponent\(matchId\)\}\/daily-cards/)
   assert.match(matchDetail, /rounded-br-\[4px\]/)
   assert.doesNotMatch(matchDetail, /bg-black\/10/)
+})
+
+test('pending match detail uses page steps instead of one long scroll', () => {
+  const matchDetail = readSource('app/match/[id]/page.tsx')
+
+  assert.match(matchDetail, /PENDING_MATCH_STEPS/)
+  assert.match(matchDetail, /pendingStepIndex/)
+  assert.match(matchDetail, /renderPendingStep/)
+  assert.match(matchDetail, /가매칭/)
+  assert.match(matchDetail, /사전 카드/)
+  assert.match(matchDetail, /보증금/)
+  assert.match(matchDetail, /확정/)
+  assert.match(matchDetail, /이전 단계/)
+  assert.match(matchDetail, /다음 단계/)
 })
 
 test('auth and completion entry points use Booting branding', () => {

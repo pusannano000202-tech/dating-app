@@ -16,7 +16,7 @@ export function PageShell({
   return (
     <main
       className={[
-        'min-h-screen booting-band px-5 pt-7 text-boot-ink',
+        'min-h-screen booting-paper px-5 pt-7 text-boot-ink',
         withBottomNavSpace ? 'pb-28' : 'pb-12',
         className,
       ].filter(Boolean).join(' ')}

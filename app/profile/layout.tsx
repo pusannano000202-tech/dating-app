@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ProfileLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen booting-band text-boot-ink">
+    <div className="min-h-screen booting-paper text-boot-ink">
       <StepProgress />
       {children}
     </div>

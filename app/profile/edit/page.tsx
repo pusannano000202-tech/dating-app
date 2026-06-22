@@ -171,7 +171,7 @@ export default function ProfileEditPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen booting-band px-5 pb-10 text-boot-ink">
+    <div className="flex min-h-screen flex-col booting-paper px-5 pb-28 text-boot-ink">
       {/* 헤더 */}
       <div className="relative pt-6 mb-7 flex items-center gap-3">
         <button onClick={() => router.back()} className="p-2 glass rounded-xl border border-boot-hairline text-boot-body hover:text-boot-primary">

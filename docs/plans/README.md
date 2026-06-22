@@ -32,6 +32,7 @@ This folder is the canonical entry point for active product and implementation p
 - [Preference Weight Number Input Plan](./2026-06-12-preference-weight-number-input-plan.md)
 - [Overnight External Completion Gates](./2026-06-22-overnight-external-completion-gates.md)
 - [Overnight Completion Audit](./2026-06-22-overnight-completion-audit.md)
+- [Booting Visual Redesign Execution Plan](./2026-06-22-booting-visual-redesign-execution-plan.md)
 
 ## Manager Room Operating Order
 

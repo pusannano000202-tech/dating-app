@@ -19,6 +19,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
 import HomeInfoButton from '@/components/matching/HomeInfoButton'
 import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
+import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 
 type ServerSupabaseClient = ReturnType<typeof createSupabaseServerClient>
 
@@ -54,23 +55,27 @@ async function getOnboardingRedirect(
 
 function LandingPage() {
   return (
-    <main className="min-h-screen bg-white px-7 pb-10 pt-14 text-boot-ink">
+    <main className="min-h-screen booting-paper px-7 pb-10 pt-14 text-boot-ink">
       <div className="mx-auto flex min-h-[calc(100vh-6rem)] w-full max-w-[calc(100vw-3.5rem)] flex-col sm:max-w-md">
         <header className="text-center">
           <BootingLogo size="md" className="justify-center" />
         </header>
 
         <section className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-          <div className="relative mb-24">
-            <div className="flex h-32 w-32 items-center justify-center rounded-full border-2 border-boot-hairline bg-boot-soft text-5xl shadow-[0_12px_40px_rgba(255,90,111,0.12)]">
-              <Zap size={54} className="text-boot-primary" strokeWidth={2.6} />
+          <div className="booting-deep-card mb-12 w-full rounded-[32px] p-7 text-left">
+            <div className="mb-12 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-black text-white/55">부산대 과팅</p>
+                <h2 className="mt-2 text-3xl font-black text-white">오늘의 매칭</h2>
+              </div>
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-boot-primary to-boot-coral text-white shadow-[0_12px_28px_rgba(255,79,95,0.25)]">
+                <Zap size={28} />
+              </span>
             </div>
-            <span className="absolute -right-3 top-4 text-2xl text-boot-primary">
-              ✦
-            </span>
-            <span className="absolute -bottom-2 -left-4 text-xl text-boot-muted">
-              ◦
-            </span>
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-boot-primary to-boot-coral" />
+            </div>
+            <p className="mt-3 text-sm font-black text-white/60">친구와 프로필을 준비하면 탐색이 시작돼요</p>
           </div>
 
           <h1 className="text-[26px] font-black leading-snug tracking-normal">
@@ -97,7 +102,7 @@ function LandingPage() {
           </div>
         </section>
 
-        <section className="glass-card rounded-3xl p-5">
+        <section className="glass-card rounded-[30px] p-5">
           <p className="text-xs font-black uppercase tracking-normal text-boot-primary">How it works</p>
           <h2 className="mt-2 text-lg font-black text-boot-ink">프로필은 가리고, 흐름은 간단하게</h2>
           <div className="mt-4 space-y-3">
@@ -147,7 +152,7 @@ function LandingFlowRow({
 
 function HomeDashboard() {
   return (
-    <main className="min-h-screen booting-band px-5 pb-28 pt-7 text-boot-ink">
+    <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-7 flex items-center justify-between">
           <BootingLogo size="md" />
@@ -164,14 +169,19 @@ function HomeDashboard() {
         </header>
 
         <section className="mb-5">
-          <p className="text-xs font-black uppercase tracking-normal text-boot-primary">Home</p>
-          <h1 className="mt-2 text-3xl font-black leading-tight">오늘 해야 할 일만 볼게요</h1>
-          <p className="mt-2 text-sm leading-6 text-boot-muted">
-            홈은 앱 흐름과 오늘 할 일을 보여주고, 큐 숫자와 상대 카드는 매칭 화면에서 확인해요.
-          </p>
+          <p className="text-sm font-bold text-boot-muted">좋은 저녁이에요</p>
+          <h1 className="mt-1 text-4xl font-black leading-tight">오늘의 매칭</h1>
         </section>
 
         <HomeTodayTaskCard />
+
+        <LockedOpponentCard
+          className="mb-5"
+          title="추천 상대팀"
+          chemi={92}
+          chips={['차분한', '카페파', '수요일']}
+          description="상대 프로필은 매칭 확정 후에 공개돼요"
+        />
 
         <section className="mb-5 grid grid-cols-2 gap-3">
           <HomeActionCard

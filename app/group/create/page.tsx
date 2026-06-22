@@ -567,7 +567,7 @@ export default function GroupCreatePage() {
   const myDepositPaid = myDeposit?.status === 'paid' || myDeposit?.status === 'held'
 
   return (
-    <main className="min-h-screen px-5 pb-10">
+    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
       <div className="relative mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-7 sm:max-w-md">
         <GroupHeader />
 

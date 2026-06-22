@@ -12,6 +12,8 @@ import {
 import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
 import CurrentGroupPreview, { type CurrentGroupMember } from '@/components/matching/CurrentGroupPreview'
 import NotificationBell from '@/components/NotificationBell'
+import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
+import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 
 interface MatchRow {
   match_id: string
@@ -148,24 +150,47 @@ export default function MatchesPage() {
     refresh()
   }, [refresh])
 
+  const groupMemberNames = groupSummary.members.length > 0
+    ? groupSummary.members.map((member) => member.user_id === groupSummary.current_user_id ? '나' : member.display_name || '친구')
+    : ['나']
+  const readyCount = groupSummary.members.filter((member) => member.match_setup_ready || member.role === 'leader').length
+  const groupCapacity = groupSummary.group?.size ?? 3
+  const progressValue = groupSummary.members.length > 0
+    ? Math.min(100, Math.round((Math.max(readyCount, 1) / Math.max(groupCapacity, 1)) * 100))
+    : 25
+
   return (
-    <main className="min-h-screen booting-band px-5 pb-28 text-boot-ink">
+    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-6 sm:max-w-md">
         <header className="mb-5 flex items-center gap-3">
           <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary" aria-label="홈으로 돌아가기">
             <ChevronLeft size={18} />
           </Link>
           <div className="flex-1">
-            <p className="text-xs font-black text-boot-primary">매칭 허브</p>
-            <h1 className="text-2xl font-black">매칭 현황</h1>
-            <p className="mt-0.5 text-xs text-boot-muted">
-              지금 큐에 몇 팀이 있는지 보고, 바로 매칭을 시작할 수 있어요.
-            </p>
+            <p className="text-sm font-bold text-boot-muted">매칭 허브</p>
+            <h1 className="text-3xl font-black leading-tight">오늘의 매칭</h1>
           </div>
           <NotificationBell />
         </header>
 
-        <section className="mb-5 rounded-3xl border border-boot-primary/20 bg-white px-4 py-4 shadow-sm">
+        <DarkTeamProgressCard
+          className="mb-4"
+          groupName={groupSummary.group ? '내 과팅 팀' : '팀을 먼저 만들어요'}
+          members={groupMemberNames}
+          progressValue={progressValue}
+          progressLabel={`팀 준비 ${Math.min(groupSummary.members.length, groupCapacity)}/${groupCapacity}명 - 조건을 맞추는 중`}
+          status={groupSummary.group?.status === 'in_pool' ? '매칭 탐색 중' : '매칭 준비'}
+        />
+
+        <LockedOpponentCard
+          className="mb-5"
+          title={matches.length > 0 ? '가매칭 후보' : '상대팀은 아직 잠겨 있어요'}
+          chemi={matches.length > 0 ? 92 : 70}
+          chips={matches.length > 0 ? ['차분한', '카페파', '수요일'] : ['친구 필요', '성향 필요', '시간 필요']}
+          description={matches.length > 0 ? '보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요' : '매칭 찾기를 누르기 전에는 상대 카드가 결과처럼 보이지 않아요'}
+        />
+
+        <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
           <div className="mb-4 flex items-start gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
               <Search size={21} />
@@ -180,14 +205,14 @@ export default function MatchesPage() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
             <Link
               href="/match/start"
-              className="btn-gradient flex h-12 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-black"
+              className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-base font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)]"
             >
               매칭 찾기
               <ChevronRight size={16} />
             </Link>
             <Link
               href="/friends"
-              className="flex h-12 items-center justify-center gap-1.5 rounded-2xl border border-boot-primary/20 bg-boot-soft px-3 text-xs font-black text-boot-primary"
+              className="flex h-14 items-center justify-center gap-1.5 rounded-[24px] border border-boot-primary/20 bg-boot-soft px-3 text-xs font-black text-boot-primary"
             >
               <UserPlus size={15} />
               친구 초대

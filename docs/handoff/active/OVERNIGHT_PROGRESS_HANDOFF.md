@@ -940,3 +940,69 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - `preference_weights` 4개/7개 계약 충돌은 아직 수정하지 않았다.
   - 현재 서버 준비 조건은 `appearance`, `personality`, `height`, `body_type` 정확히 4개만 통과시킨다.
   - `school`, `hobby`, `time_fit`이 섞인 7키 데이터는 합의 전에는 매칭 준비 완료로 처리하지 않는다.
+
+## 2026-06-22 Booting visual redesign pass
+
+이번 추가 작업은 production Supabase, Vercel, Toss 실결제를 건드리지 않고 프론트 디자인과 이상형 월드컵 성별 버그만 수정했다.
+
+수정한 핵심:
+
+1. 이상형 월드컵 성별 반전 버그 수정.
+   - `lib/gender.ts` 추가.
+   - `남자/male/man/m/남`은 `male`, `여자/female/woman/f/여`는 `female`로 정규화.
+   - 남자 사용자는 여자 후보, 여자 사용자는 남자 후보가 뜨도록 `app/profile/worldcup/page.tsx` 수정.
+   - `tests/profile/gender-normalization.test.ts` 추가.
+2. 사용자가 준 레퍼런스 색감 반영.
+   - 크림 종이 배경, 짙은 브라운 카드, 코랄-오렌지 포인트로 `tailwind.config.ts`, `app/globals.css` 수정.
+   - `booting-paper`, `booting-deep-card`, `booting-soft-card`, `booting-bottom-nav` 유틸리티 추가.
+3. 공통 매칭 디자인 부품 추가.
+   - `components/matching/ChemiRing.tsx`
+   - `components/matching/DarkTeamProgressCard.tsx`
+   - `components/matching/LockedOpponentCard.tsx`
+   - `components/matching/MatchFoundSummary.tsx`
+4. 홈/매칭/매칭상세/그룹/알림/프로필 편집 화면에 새 톤 적용.
+   - 홈은 `오늘의 매칭` 중심, 짙은 팀 진행 카드와 잠긴 추천 상대 카드 추가.
+   - 매칭 화면은 팀 준비 카드, 잠긴 상대 카드, 매칭 찾기 CTA를 우선 노출.
+   - 매칭 상세는 `MATCH FOUND`, Chemi ring, 정보 pill, 상대 비공개 안내를 상단에 배치.
+   - 하단탭은 홈/매칭/채팅/마이 톤으로 정리.
+   - `/chat` 허브 추가. 실제 채팅은 확정 매칭 상세에서 열리는 구조를 유지.
+
+검증 결과:
+
+- `npm run test:profile` 통과. 18개 테스트 통과.
+- `npm run typecheck` 통과.
+- `npm run test:config` 통과. 37개 테스트 통과.
+- `npm run lint` 통과.
+- `npm run test:matching` 통과. 38개 테스트 통과.
+- `npm run build` 통과.
+- `npm run check:routes -- --base=http://localhost:3004` 통과.
+  - `/dev/preview`, `/`, `/match`, `/notifications`, `/profile/basic`, `/profile/worldcup`, `/profile/preferences`, `/profile/schedule`, `/profile/match-card`, `/group/create`, `/group/invite/dev-preview`, `/match/start`, `/match/dev-match-pending`, `/match/dev-match-1` 모두 200.
+
+주의:
+
+- 인앱 브라우저 자동화는 현재 Codex browser runtime 오류로 실패했다.
+  - 오류 요지: `sandbox-state-meta: missing field sandboxPolicy`
+  - 그래서 Codex 인앱 브라우저 직접 캡처는 못 했다.
+- 대신 Playwright 임시 실행 + Chrome channel로 실제 localhost 화면을 캡처했다.
+  - 수정 전 저장 위치: `C:\Users\82108\AppData\Local\Temp\booting-redesign-before`
+  - 수정 후 저장 위치: `C:\Users\82108\AppData\Local\Temp\booting-redesign-after`
+  - `00-dev-preview.png`
+  - `01-home.png`
+  - `02-match.png`
+  - `03-match-pending.png`
+  - `04-match-confirmed.png`
+  - `05-group-create.png`
+  - `06-notifications.png`
+  - `07-profile-basic.png`
+  - `08-profile-edit.png`
+  - `09-chat.png`
+- 눈검수 결과:
+  - 비포/애프터 비교 기준으로 홈은 설명형 랜딩 느낌에서 실제 앱 대시보드 느낌으로 바뀜.
+  - 비포/애프터 비교 기준으로 매칭 상세는 상태표 카드 중심에서 Chemi 결과 화면 중심으로 바뀜.
+  - 홈은 크림 배경, 딥 브라운 팀 카드, 코랄 CTA로 변경 확인.
+  - 매칭 화면은 팀 준비 카드와 잠긴 상대 카드가 먼저 보임.
+  - 가매칭 상세는 `MATCH FOUND`, Chemi 70, 확정 후 공개 pill 확인.
+  - 확정 상세는 Chemi 92, 학과/나이대/성별 구성 공개 확인.
+  - 그룹/알림/프로필 편집은 새 배경과 카드 톤 적용 확인.
+  - `/profile/basic` 첫 화면은 하단탭이 성별 카드 하단 영역을 살짝 덮는 느낌이 있지만, 스크롤 가능한 고정 탭 구조라 텍스트 자체가 겹치거나 깨지지는 않는다.
+- Toss sandbox 실제 결제, Supabase production 적용, 성준 스키마 합의 항목은 이번 pass에서 건드리지 않았다.

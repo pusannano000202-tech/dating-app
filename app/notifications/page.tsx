@@ -125,7 +125,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <main className="min-h-screen booting-band px-5 pb-28 text-boot-ink">
+    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
           <Link href="/" className="p-2 glass rounded-xl border border-boot-hairline bg-white/80">
@@ -206,10 +206,10 @@ function MatchNotificationCard({
       href={href}
       onClick={onClick}
       className={[
-        'block rounded-3xl border px-4 py-4 shadow-sm transition-colors',
+        'block rounded-[28px] border px-4 py-4 shadow-[0_14px_34px_rgba(23,20,18,0.07)] transition-colors',
         unread
-          ? 'border-boot-primary/25 bg-white/95 hover:border-boot-primary/45'
-          : 'border-boot-hairline bg-white/75 hover:border-boot-primary/30',
+          ? 'border-boot-primary/20 bg-white hover:border-boot-primary/45'
+          : 'border-boot-hairline bg-white/80 hover:border-boot-primary/30',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">

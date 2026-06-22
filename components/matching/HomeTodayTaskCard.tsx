@@ -18,6 +18,7 @@ import {
   DEV_PREVIEW_GROUP_MEMBERS,
 } from '@/lib/matching/dev-preview-group'
 import CurrentGroupPreview, { type CurrentGroupMember } from '@/components/matching/CurrentGroupPreview'
+import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 
@@ -216,54 +217,69 @@ export default function HomeTodayTaskCard() {
   const Icon = task.Icon
   const showGroupPreview = task.href === '/match/start' || task.href === '/group/create'
   const hasGroup = groupStatus != null || groupMembers.length > 0
+  const progressValue = matchSetupStatus.allDone && preMatchCardDone
+    ? 100
+    : [
+        matchSetupStatus.personality,
+        matchSetupStatus.schedule,
+        matchSetupStatus.preferences,
+        preMatchCardDone,
+      ].filter(Boolean).length * 25
+  const progressDone = Math.round(progressValue / 25)
+  const memberNames = groupMembers.length > 0
+    ? groupMembers.map((member) => member.user_id === currentUserId ? '나' : member.display_name || '친구')
+    : ['나']
 
   return (
-    <section className={[
-      'mb-5 overflow-hidden rounded-[30px] border p-5 shadow-sm',
-      task.tone === 'success'
-        ? 'border-emerald-400/25 bg-emerald-50'
-        : task.tone === 'primary'
-          ? 'border-boot-primary/18 bg-boot-soft'
-          : 'border-boot-hairline bg-white/90',
-    ].join(' ')}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-normal text-boot-primary">{task.eyebrow}</p>
-          <h2 className="mt-2 text-xl font-black leading-tight text-boot-ink">{task.title}</h2>
-          <p className="mt-2 text-xs leading-5 text-boot-muted">{task.description}</p>
-        </div>
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-white/80 bg-white text-boot-primary shadow-sm">
-          {loading ? <Loader2 size={19} className="animate-spin" /> : <Icon size={20} />}
-        </div>
-      </div>
+    <section className="mb-6">
+      <DarkTeamProgressCard
+        groupName={hasGroup ? '내 과팅 팀' : '팀을 만들어주세요'}
+        members={memberNames}
+        progressValue={progressValue}
+        progressLabel={`팀 성향 분석 ${progressDone}/4 완료${progressDone < 4 ? ' - 한 명만 더!' : ''}`}
+        status={groupStatus === 'ready' || groupStatus === 'in_pool' ? '매칭 탐색 중' : '준비 중'}
+      />
 
-      <div className={task.secondaryHref ? 'mt-5 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]' : 'mt-5'}>
-        <Link
-          href={task.href}
-          className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-boot-ink px-4 text-sm font-black text-white shadow-sm transition hover:opacity-95"
-        >
-          {task.cta}
-          <ChevronRight size={16} />
-        </Link>
-        {task.secondaryHref && task.secondaryCta && (
+      <div className="mt-4 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.28em] text-boot-primary">{task.eyebrow}</p>
+            <h2 className="mt-3 text-2xl font-black leading-tight text-boot-ink">{task.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-boot-muted">{task.description}</p>
+          </div>
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[24px] bg-boot-soft text-boot-primary shadow-sm">
+            {loading ? <Loader2 size={19} className="animate-spin" /> : <Icon size={22} />}
+          </div>
+        </div>
+
+        <div className={task.secondaryHref ? 'mt-6 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]' : 'mt-6'}>
           <Link
-            href={task.secondaryHref}
-            className="flex h-12 items-center justify-center rounded-2xl border border-boot-primary/20 bg-white px-4 text-xs font-black text-boot-primary shadow-sm"
+            href={task.href}
+            className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-base font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)] transition hover:opacity-95"
           >
-            {task.secondaryCta}
+            {task.cta}
+            <ChevronRight size={18} />
           </Link>
+          {task.secondaryHref && task.secondaryCta && (
+            <Link
+              href={task.secondaryHref}
+              className="flex h-14 items-center justify-center rounded-[24px] border border-boot-primary/20 bg-boot-soft px-4 text-sm font-black text-boot-primary"
+            >
+              {task.secondaryCta}
+            </Link>
+          )}
+        </div>
+
+        {showGroupPreview && (
+          <CurrentGroupPreview
+            className="mt-4"
+            members={groupMembers}
+            capacity={groupSize}
+            currentUserId={currentUserId}
+            hasGroup={hasGroup}
+          />
         )}
       </div>
-
-      {showGroupPreview && (
-        <CurrentGroupPreview
-          className="mt-3"
-          members={groupMembers}
-          capacity={groupSize}
-          currentUserId={currentUserId}
-          hasGroup={hasGroup}
-        />
-      )}
     </section>
   )
 }
