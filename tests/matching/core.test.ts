@@ -147,6 +147,35 @@ test('isMatchable passes valid opposite-gender same-size pair with time overlap'
   assert.deepEqual(result, { ok: true })
 })
 
+test('isMatchable allows mixed groups while still requiring the same group size', () => {
+  assert.deepEqual(
+    isMatchable(
+      group({ groupId: 'mixed-a', gender: 'mixed' }),
+      group({ groupId: 'female-a', gender: 'female', departmentCodes: ['design'] }),
+      MATCHING_CONFIG,
+    ),
+    { ok: true },
+  )
+
+  assert.deepEqual(
+    isMatchable(
+      group({ groupId: 'mixed-a', gender: 'mixed' }),
+      group({ groupId: 'mixed-b', gender: 'mixed', departmentCodes: ['design'] }),
+      MATCHING_CONFIG,
+    ),
+    { ok: true },
+  )
+
+  assert.deepEqual(
+    isMatchable(
+      group({ groupId: 'mixed-a', gender: 'mixed' }),
+      group({ groupId: 'male-a', gender: 'male', departmentCodes: ['design'], size: 3 }),
+      MATCHING_CONFIG,
+    ),
+    { ok: false, reason: 'size_mismatch' },
+  )
+})
+
 test('pairScore rewards mutual preference and exposes score breakdown', () => {
   const male = group({
     gender: 'male',

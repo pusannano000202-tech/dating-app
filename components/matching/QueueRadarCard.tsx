@@ -6,6 +6,7 @@ import Link from 'next/link'
 type QueueStats = {
   male: number
   female: number
+  mixed: number
   myGroupSize: number
   myGroupInQueue: boolean
 }
@@ -55,6 +56,13 @@ const FEMALE_GROOVES: GrooveAnchor[] = [
   { start: { x: 118, y: 20 }, control: { x: 54, y: 2 }, end: { x: 4, y: 96 } },
   { start: { x: 132, y: 74 }, control: { x: 58, y: 50 }, end: { x: 10, y: 128 } },
   { start: { x: 138, y: -120 }, control: { x: 52, y: -88 }, end: { x: 8, y: 2 } },
+]
+
+const MIXED_GROOVES: GrooveAnchor[] = [
+  { start: { x: -88, y: -134 }, control: { x: -24, y: -58 }, end: { x: -4, y: -10 } },
+  { start: { x: 88, y: -134 }, control: { x: 24, y: -58 }, end: { x: 4, y: -10 } },
+  { start: { x: -96, y: 136 }, control: { x: -28, y: 70 }, end: { x: -5, y: 20 } },
+  { start: { x: 96, y: 136 }, control: { x: 28, y: 70 }, end: { x: 5, y: 20 } },
 ]
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
@@ -184,9 +192,10 @@ function QueueRadarCardInner({
 
   const maleDots = buildGrooveDots(stats.male, MALE_GROOVES, stats.myGroupInQueue)
   const femaleDots = buildGrooveDots(stats.female, FEMALE_GROOVES, stats.myGroupInQueue)
+  const mixedDots = buildGrooveDots(stats.mixed, MIXED_GROOVES, stats.myGroupInQueue)
   const myGroupDots = buildMyGroupPoints(stats.myGroupSize)
 
-  const grooveLines = drawGroovePath(MALE_GROOVES.concat(FEMALE_GROOVES))
+  const grooveLines = drawGroovePath(MALE_GROOVES.concat(FEMALE_GROOVES, MIXED_GROOVES))
 
   const handleCancel = () => {
     if (!canCancel || saving) return
@@ -273,6 +282,10 @@ function QueueRadarCardInner({
             <radialGradient id="femaleGradient" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="rgba(252,165,165,0.95)" />
               <stop offset="100%" stopColor="rgba(244,114,182,0.18)" />
+            </radialGradient>
+            <radialGradient id="mixedGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(253,230,138,0.96)" />
+              <stop offset="100%" stopColor="rgba(245,158,11,0.16)" />
             </radialGradient>
             <linearGradient id="grooveTrace" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="rgba(148,163,184,0.18)" />
@@ -389,6 +402,48 @@ function QueueRadarCardInner({
             )
           })}
 
+          {mixedDots.map((dot, index) => {
+            const animateIn = dot.flowTarget && stats.myGroupInQueue && dot.accented && !reducedMotion
+            const duration = 2.7 + (index % 4) * 0.24
+            return (
+              <circle
+                key={`mixed-${index}`}
+                cx={dot.x}
+                cy={dot.y}
+                r={dot.radius * 0.96}
+                fill="url(#mixedGradient)"
+                opacity={dot.opacity}
+                filter="url(#dropletGlow)"
+              >
+                {animateIn ? (
+                  <>
+                    <animate
+                      attributeName="cx"
+                      dur={`${duration}s`}
+                      values={`${dot.x};${dot.flowTarget?.x ?? dot.x};${dot.x}`}
+                      repeatCount="indefinite"
+                      begin={`${(index * 0.19) % 5.8}s`}
+                    />
+                    <animate
+                      attributeName="cy"
+                      dur={`${duration}s`}
+                      values={`${dot.y};${dot.flowTarget?.y ?? dot.y};${dot.y}`}
+                      repeatCount="indefinite"
+                      begin={`${(index * 0.16) % 5.5}s`}
+                    />
+                    <animate
+                      attributeName="r"
+                      dur={`${1.35 + (index % 4) * 0.16}s`}
+                      values={`${dot.radius * 0.96};${Math.max(dot.radius * 0.84, 1.2)};${dot.radius * 0.96}`}
+                      repeatCount="indefinite"
+                      begin={`${(index * 0.18) % 5.4}s`}
+                    />
+                  </>
+                ) : null}
+              </circle>
+            )
+          })}
+
           <g>
             <circle cx={CENTER.x} cy={CENTER.y} r="5.2" fill="none" stroke="rgba(244,114,182,0.9)" strokeWidth="1.9" />
             <circle
@@ -427,10 +482,10 @@ function QueueRadarCardInner({
       </div>
 
       <p className="mt-3 text-[11px] text-boot-muted">
-        남자 {stats.male}팀 · 여자 {stats.female}팀 · 우리 {stats.myGroupSize}명 대기중
+        남자 {stats.male}팀 · 여자 {stats.female}팀 · 혼성 {stats.mixed}팀 · 우리 {stats.myGroupSize}명 대기중
       </p>
       <p className="mt-1 text-[10px] leading-4 text-boot-muted">
-        혼성 그룹도 참여할 수 있고, 남자/여자 팀 수는 매칭 계산에 쓰는 대표 성별 기준으로 보여줘요.
+        혼성 그룹도 참여할 수 있고, 2:2와 3:3은 같은 인원 규모끼리 먼저 탐색해요.
       </p>
 
       <Link

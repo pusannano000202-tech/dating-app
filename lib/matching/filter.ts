@@ -7,7 +7,7 @@ export function isMatchable(
   b: GroupSummary,
   config: MatchingConfig,
 ): MatchableResult {
-  if (a.gender === b.gender) return { ok: false, reason: 'same_gender' }
+  if (isStrictSameSingleGender(a.gender, b.gender)) return { ok: false, reason: 'same_gender' }
   if (a.size !== b.size) return { ok: false, reason: 'size_mismatch' }
   if (sharesDepartment(a, b)) return { ok: false, reason: 'department_blocked' }
   if (a.excludedGroupIds.includes(b.groupId) || b.excludedGroupIds.includes(a.groupId)) {
@@ -26,6 +26,10 @@ export function isMatchable(
   }
 
   return { ok: true }
+}
+
+function isStrictSameSingleGender(aGender: GroupSummary['gender'], bGender: GroupSummary['gender']): boolean {
+  return aGender === bGender && (aGender === 'male' || aGender === 'female')
 }
 
 function sharesDepartment(a: GroupSummary, b: GroupSummary): boolean {

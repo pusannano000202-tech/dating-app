@@ -14,6 +14,7 @@
   },
   "include": [
     "components/matching/group-create/**/*.ts",
+    "lib/match-pool-stats.ts",
     "lib/matching/**/*.ts",
     "tests/matching/**/*.ts"
   ]

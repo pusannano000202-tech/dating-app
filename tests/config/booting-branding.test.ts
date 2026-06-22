@@ -63,6 +63,27 @@ test('match result surfaces keep real APIs while using Booting chat-style cards'
   assert.doesNotMatch(matchDetail, /bg-black\/10/)
 })
 
+test('matching entry surfaces expose 2:2, 3:3, and mixed-group queue visuals', () => {
+  const matchList = readSource('app/match/page.tsx')
+  const matchStart = readSource('app/match/start/page.tsx')
+  const groupCreate = readSource('app/group/create/page.tsx')
+  const matchingPool = readSource('components/MatchingPool.tsx')
+  const queueRadar = readSource('components/matching/QueueRadarCard.tsx')
+  const statsMigration = readSource('supabase/migrations/20260622183100_match_pool_mixed_group_stats.sql')
+  const exactSizeMigration = readSource('supabase/migrations/20260622183000_match_pool_exact_group_size.sql')
+
+  assert.match(matchList, /2:2 매칭찾기/)
+  assert.match(matchList, /3:3 매칭찾기/)
+  assert.match(matchStart, /href="\/group\/create\?size=2"/)
+  assert.match(matchStart, /href="\/group\/create\?size=3"/)
+  assert.match(groupCreate, /매칭 규모 선택/)
+  assert.match(matchingPool, /혼성팀/)
+  assert.match(queueRadar, /mixedDots/)
+  assert.match(queueRadar, /mixedGradient/)
+  assert.match(statsMigration, /THEN 'mixed'/)
+  assert.match(exactSizeMigration, /v_active_count <> v_group\.size/)
+})
+
 test('pending match detail uses page steps instead of one long scroll', () => {
   const matchDetail = readSource('app/match/[id]/page.tsx')
 

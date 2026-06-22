@@ -124,13 +124,30 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             </p>
           </section>
 
-          <Link
-            href="/group/create"
-            className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
-          >
-            그룹 만들고 매칭 찾기
-            <ArrowRight size={18} />
-          </Link>
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/group/create?size=2"
+              className="flex min-h-[112px] flex-col justify-between rounded-3xl border border-boot-hairline bg-white px-4 py-4 shadow-sm transition hover:border-boot-primary/30 hover:bg-boot-soft"
+            >
+              <span className="text-xs font-black text-boot-primary">빠른 매칭</span>
+              <span className="text-2xl font-black text-boot-ink">2:2</span>
+              <span className="flex items-center gap-1 text-[11px] font-bold text-boot-muted">
+                둘이서 바로 준비
+                <ArrowRight size={13} />
+              </span>
+            </Link>
+            <Link
+              href="/group/create?size=3"
+              className="flex min-h-[112px] flex-col justify-between rounded-3xl bg-boot-ink px-4 py-4 text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)] transition hover:-translate-y-0.5"
+            >
+              <span className="text-xs font-black text-white/70">활기찬 매칭</span>
+              <span className="text-2xl font-black">3:3</span>
+              <span className="flex items-center gap-1 text-[11px] font-bold text-white/70">
+                셋이서 과팅 시작
+                <ArrowRight size={13} />
+              </span>
+            </Link>
+          </div>
         </div>
       </main>
     )

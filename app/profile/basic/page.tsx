@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import BasicInfoForm, { type BasicInfoData } from '@/components/profile/BasicInfoForm'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { DEV_BASIC_PROFILE_STORAGE_KEY } from '@/lib/profile/dev-basic-profile'
 import { createClient } from '@/lib/supabase'
 
 export default function BasicInfoPage() {
@@ -50,7 +51,7 @@ export default function BasicInfoPage() {
       if (!user) {
         if (isDevPreviewClientSession()) {
           try {
-            sessionStorage.setItem('booting_dev_basic_profile', JSON.stringify(data))
+            sessionStorage.setItem(DEV_BASIC_PROFILE_STORAGE_KEY, JSON.stringify(data))
           } catch {}
           router.push('/profile/worldcup')
           return

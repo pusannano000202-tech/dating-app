@@ -20,7 +20,7 @@ interface MatchRow {
   my_group_id: string
   opp_group_id: string
   opp_group_size: number
-  opp_group_gender: 'male' | 'female'
+  opp_group_gender: 'male' | 'female' | 'mixed'
   match_status: string
   matched_at: string
   confirmed_at: string | null
@@ -64,15 +64,20 @@ const DEV_MATCHES: MatchRow[] = [
 const EMPTY_POOL: PoolStats = {
   female: 0,
   male: 0,
-  bySize: { '2': { female: 0, male: 0 }, '3': { female: 0, male: 0 } },
+  mixed: 0,
+  bySize: {
+    '2': { female: 0, male: 0, mixed: 0 },
+    '3': { female: 0, male: 0, mixed: 0 },
+  },
 }
 
 const DEV_POOL: PoolStats = {
   female: 6,
   male: 8,
+  mixed: 3,
   bySize: {
-    '2': { female: 3, male: 5 },
-    '3': { female: 3, male: 3 },
+    '2': { female: 3, male: 5, mixed: 1 },
+    '3': { female: 3, male: 3, mixed: 2 },
   },
 }
 
@@ -202,17 +207,24 @@ export default function MatchesPage() {
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+          <div className="grid grid-cols-2 gap-2">
             <Link
-              href="/match/start"
-              className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-base font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)]"
+              href="/group/create?size=2"
+              className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)]"
             >
-              매칭 찾기
+              2:2 매칭찾기
+              <ChevronRight size={16} />
+            </Link>
+            <Link
+              href="/group/create?size=3"
+              className="flex h-14 items-center justify-center gap-2 rounded-[24px] border border-boot-primary/20 bg-boot-soft px-4 text-sm font-black text-boot-primary"
+            >
+              3:3 매칭찾기
               <ChevronRight size={16} />
             </Link>
             <Link
               href="/friends"
-              className="flex h-14 items-center justify-center gap-1.5 rounded-[24px] border border-boot-primary/20 bg-boot-soft px-3 text-xs font-black text-boot-primary"
+              className="col-span-2 flex h-12 items-center justify-center gap-1.5 rounded-[22px] border border-boot-primary/15 bg-white px-3 text-xs font-black text-boot-primary"
             >
               <UserPlus size={15} />
               친구 초대
@@ -367,7 +379,15 @@ function getMatchCardTitle(match: MatchRow): string {
     return '가매칭 후보가 도착했어요'
   }
 
-  return `상대 그룹 ${match.opp_group_size}명 · ${match.opp_group_gender === 'male' ? '남자' : '여자'}`
+  return `상대 그룹 ${match.opp_group_size}명 · ${formatGroupGender(match.opp_group_gender)}`
+}
+
+function formatGroupGender(gender: MatchRow['opp_group_gender']): string {
+  switch (gender) {
+    case 'male': return '남자'
+    case 'female': return '여자'
+    case 'mixed': return '혼성'
+  }
 }
 
 function getMatchBadgeClass(status: string): string {

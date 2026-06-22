@@ -26,7 +26,7 @@ interface MatchDetail {
   my_group_id: string
   opp_group_id: string
   opp_group_size: number
-  opp_group_gender: 'male' | 'female'
+  opp_group_gender: 'male' | 'female' | 'mixed'
   match_status: string
   matched_at: string
   confirmed_at: string | null
@@ -813,7 +813,7 @@ export default function MatchDetailPage() {
               score={70}
               department="확정 후 공개"
               ageRange="20~23세"
-              genderSummary={`${currentMatch.opp_group_gender === 'male' ? '남' : '여'} ${currentMatch.opp_group_size}명`}
+              genderSummary={`${formatGroupGender(currentMatch.opp_group_gender)} ${currentMatch.opp_group_size}명`}
               title="가매칭됐어요!"
               subtitle="보증금과 사전 카드를 끝내면 확정돼요"
               lockedMessage="상대팀 이름과 자세한 정보는 확정 후 공개돼요."
@@ -825,7 +825,7 @@ export default function MatchDetailPage() {
                 <div className="rounded-2xl bg-boot-soft px-2 py-3">
                   <p className="text-[11px] text-boot-muted">상대 구성</p>
                   <p className="mt-1 text-sm font-black text-boot-ink">
-                    {currentMatch.opp_group_gender === 'male' ? '남' : '여'} {currentMatch.opp_group_size}명
+                    {formatGroupGender(currentMatch.opp_group_gender)} {currentMatch.opp_group_size}명
                   </p>
                 </div>
                 <div className="rounded-2xl bg-boot-soft px-2 py-3">
@@ -1091,7 +1091,7 @@ export default function MatchDetailPage() {
                   score={92}
                   department="경영학과"
                   ageRange="20~23세"
-                  genderSummary={`${match.opp_group_gender === 'male' ? '남' : '여'} ${match.opp_group_size}명`}
+                  genderSummary={`${formatGroupGender(match.opp_group_gender)} ${match.opp_group_size}명`}
                   title="매칭됐어요!"
                   subtitle="딱 맞는 팀을 찾았어요"
                   lockedMessage="날짜를 정하고 만남 전까지 하루씩 Q&A로 알아가요."
@@ -1592,6 +1592,14 @@ function formatCardKind(kind: string): string {
     case 'intro': return '소개 카드'
     case 'vibe': return '분위기 카드'
     default: return kind
+  }
+}
+
+function formatGroupGender(gender: MatchDetail['opp_group_gender']): string {
+  switch (gender) {
+    case 'male': return '남'
+    case 'female': return '여'
+    case 'mixed': return '혼성'
   }
 }
 

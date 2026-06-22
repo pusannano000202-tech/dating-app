@@ -10,6 +10,7 @@ import type { PreferenceResult } from '@/lib/appearance/preference'
 import { legacyTypeFromBucketWeights } from '@/lib/appearance/bucket-to-legacy'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { normalizeGender, oppositeGenderForWorldcup } from '@/lib/gender'
+import { readDevBasicProfileGender } from '@/lib/profile/dev-basic-profile'
 import { isSupabaseConfigured } from '@/lib/utils'
 import type { Gender } from '@/lib/types'
 
@@ -35,8 +36,7 @@ export default function WorldcupPage() {
           const meta = await loadIdealMetadata()
           if (cancelled) return
           setMetadata(meta)
-          // 개발 환경: 여성 유저가 남성 이상형 월드컵을 보는 상태로 기본 실행
-          setGender('female')
+          setGender(readDevBasicProfileGender())
           setLoaded(true)
           return
         }

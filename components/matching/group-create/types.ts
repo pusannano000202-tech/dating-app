@@ -58,6 +58,7 @@ export interface GroupState {
 export type QueueVisualState = {
   male: number
   female: number
+  mixed: number
   myGroupSize: number
   myGroupInQueue: boolean
 }

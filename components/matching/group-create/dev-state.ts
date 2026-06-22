@@ -60,6 +60,7 @@ export const DEV_GROUP_STATE: GroupState = {
 export const DEV_QUEUE_VISUAL: QueueVisualState = {
   male: 8,
   female: 6,
+  mixed: 3,
   myGroupSize: DEV_PREVIEW_GROUP_MEMBERS.length,
   myGroupInQueue: true,
 }
@@ -67,6 +68,7 @@ export const DEV_QUEUE_VISUAL: QueueVisualState = {
 export const QUEUE_VISUAL_DEFAULT: QueueVisualState = {
   male: 0,
   female: 0,
+  mixed: 0,
   myGroupSize: 0,
   myGroupInQueue: false,
 }

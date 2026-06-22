@@ -5,6 +5,7 @@ import {
   type MatchSetupProfile,
   type MatchSetupStatus,
 } from '@/lib/matching/match-setup-status'
+import { normalizeGroupSize } from '@/lib/matching/group-size'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await readJson(req)
-  const size = body.size === 2 ? 2 : 3
+  const size = normalizeGroupSize(body.size)
   const name = typeof body.name === 'string' && body.name.trim() ? body.name.trim() : null
 
   const { data: profile, error: profileError } = await supabase
@@ -129,6 +130,46 @@ export async function POST(req: NextRequest) {
 
   const state = await loadGroupState(supabase, user.id)
   return NextResponse.json({ ...state, current_user_id: user.id }, { status: 201 })
+}
+
+export async function PATCH(req: NextRequest) {
+  const supabase = createSupabaseServerClient()
+  const user = await getUser(supabase)
+  if (!user) {
+    return jsonError('Unauthorized', 401)
+  }
+
+  const body = await readJson(req)
+  const size = normalizeGroupSize(body.size)
+  const state = await loadGroupState(supabase, user.id)
+  const group = state.group
+
+  if (!group) {
+    return jsonError('group_not_found', 404)
+  }
+  if (group.leader_user_id !== user.id) {
+    return jsonError('not_group_leader', 403)
+  }
+  if (group.status !== 'forming') {
+    return jsonError('group_locked', 409)
+  }
+
+  const activeMemberCount = state.members.length
+  if (activeMemberCount > size) {
+    return jsonError('group_size_smaller_than_members', 409)
+  }
+
+  const { error } = await supabase
+    .from('groups')
+    .update({ size })
+    .eq('id', group.id)
+
+  if (error) {
+    return jsonError('group_size_update_failed', 500)
+  }
+
+  const nextState = await loadGroupState(supabase, user.id)
+  return NextResponse.json({ ...nextState, current_user_id: user.id })
 }
 
 async function loadGroupState(

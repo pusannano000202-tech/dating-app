@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, LockKeyhole } from 'lucide-react'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { normalizeGroupSize } from '@/lib/matching/group-size'
 import {
   EMPTY_MATCH_SETUP_STATUS,
   type MatchSetupStatus,
@@ -39,7 +41,9 @@ import type {
 } from '@/components/matching/group-create/types'
 
 export default function GroupCreatePage() {
+  const searchParams = useSearchParams()
   const isDevPreview = isDevPreviewClientSession()
+  const requestedSize = normalizeGroupSize(searchParams.get('size'))
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -57,7 +61,7 @@ export default function GroupCreatePage() {
   const members = state.members
   const currentUserId = state.current_user_id ?? null
   const pendingInvites = state.invites.filter((invite) => invite.status === 'pending')
-  const capacity = group?.size ?? 3
+  const capacity = group?.size ?? requestedSize
   const groupIsFull = members.length >= capacity
   const openSlots = Math.max(0, capacity - members.length)
   const isLeader = Boolean(group && currentUserId && group.leader_user_id === currentUserId)
@@ -122,11 +126,13 @@ export default function GroupCreatePage() {
 
       const male = Number((data as { male?: number }).male)
       const female = Number((data as { female?: number }).female)
+      const mixed = Number((data as { mixed?: number }).mixed ?? 0)
       if (!Number.isFinite(male) || !Number.isFinite(female)) return
 
       setQueueVisualState({
         male: Math.max(0, Math.floor(male)),
         female: Math.max(0, Math.floor(female)),
+        mixed: Number.isFinite(mixed) ? Math.max(0, Math.floor(mixed)) : 0,
         myGroupSize: members.length,
         myGroupInQueue: true,
       })
@@ -155,7 +161,13 @@ export default function GroupCreatePage() {
     setError(null)
 
     if (isDevPreview) {
-      setState(DEV_GROUP_STATE)
+      setState({
+        ...DEV_GROUP_STATE,
+        group: DEV_GROUP_STATE.group
+          ? { ...DEV_GROUP_STATE.group, size: requestedSize }
+          : DEV_GROUP_STATE.group,
+        members: DEV_GROUP_STATE.members.slice(0, requestedSize),
+      })
       setMyDeposit({ id: 'dev-deposit-1', status: 'paid', amount: DEPOSIT_AMOUNT })
       setDepositSummary(DEV_DEPOSIT_SUMMARY)
       setLoading(false)
@@ -166,7 +178,7 @@ export default function GroupCreatePage() {
       const res = await fetch('/api/groups', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ size: 3 }),
+        body: JSON.stringify({ size: requestedSize }),
       })
 
       if (res.status === 401) {
@@ -202,6 +214,48 @@ export default function GroupCreatePage() {
     await refreshPreMatchCardStatus()
     if (data.group?.id) {
       await refreshDeposit(data.group.id)
+    }
+  }
+
+  async function updateGroupSize(size: 2 | 3) {
+    if (saving || capacity === size) return
+
+    if (members.length > size) {
+      setError(`${size}:${size} 매칭은 ${size}명 그룹에서만 시작할 수 있어요. 현재 멤버가 더 많아서 변경할 수 없어요.`)
+      return
+    }
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, size } : current.group,
+        members: current.members.slice(0, size),
+      }))
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/groups', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+
+      const data = await res.json() as GroupState
+      setState(data)
+    } catch {
+      setError('그룹 인원을 변경하지 못했어요.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -560,6 +614,8 @@ export default function GroupCreatePage() {
       case 'new_leader_required': return '새 리더를 선택해야 해요.'
       case 'new_leader_is_caller': return '본인을 새 리더로 지정할 수 없어요.'
       case 'new_leader_not_member': return '선택한 멤버가 이 그룹의 활성 멤버가 아니에요.'
+      case 'group_size_smaller_than_members': return '현재 들어온 멤버 수보다 작은 매칭 규모로는 바꿀 수 없어요.'
+      case 'group_size_update_failed': return '그룹 인원 변경에 실패했어요.'
       default:                    return '처리에 실패했어요. 잠시 후 다시 시도해 주세요.'
     }
   }
@@ -595,6 +651,51 @@ export default function GroupCreatePage() {
               />
             ) : (
               <>
+            <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black text-boot-primary">매칭 규모 선택</p>
+                  <h2 className="mt-1 text-lg font-black text-boot-ink">
+                    {capacity}:{capacity} 과팅으로 준비 중
+                  </h2>
+                  <p className="mt-1 text-xs leading-5 text-boot-muted">
+                    2:2와 3:3 중 하나를 고르면 같은 규모의 그룹끼리 매칭돼요. 친구 성별이 섞인 혼성 그룹도 만들 수 있어요.
+                  </p>
+                </div>
+                <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
+                  {members.length}/{capacity}명
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                {[2, 3].map((size) => {
+                  const selected = capacity === size
+                  const locked = members.length > size || saving
+
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      disabled={locked || selected}
+                      onClick={() => updateGroupSize(size as 2 | 3)}
+                      className={[
+                        'min-h-[82px] rounded-2xl border px-3 py-3 text-left transition-all',
+                        selected
+                          ? 'border-boot-primary/40 bg-boot-soft text-boot-primary shadow-sm'
+                          : 'border-boot-hairline bg-white text-boot-ink hover:border-boot-primary/30 hover:bg-boot-soft/60',
+                        locked && !selected ? 'cursor-not-allowed opacity-45' : '',
+                      ].join(' ')}
+                    >
+                      <span className="block text-lg font-black">{size}:{size}</span>
+                      <span className="mt-1 block text-[11px] leading-4 text-boot-muted">
+                        {size === 2 ? '빠르게 2명이서 가볍게 매칭' : '친구 3명이 모이면 더 활기찬 매칭'}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+
             <GroupMemberStatusPanel
               members={members}
               currentUserId={currentUserId}

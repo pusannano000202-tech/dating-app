@@ -1,14 +1,16 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { CalendarClock, LockKeyhole, ShieldCheck, Users } from 'lucide-react'
 
 export interface PoolStats {
   female: number
   male: number
+  mixed: number
   bySize?: {
-    '2': { female: number; male: number }
-    '3': { female: number; male: number }
+    '2': { female: number; male: number; mixed: number }
+    '3': { female: number; male: number; mixed: number }
   }
 }
 
@@ -17,11 +19,19 @@ interface Props {
   className?: string
 }
 
-const FALLBACK_STATS: PoolStats = { female: 0, male: 0 }
+const FALLBACK_STATS: PoolStats = {
+  female: 0,
+  male: 0,
+  mixed: 0,
+  bySize: {
+    '2': { female: 0, male: 0, mixed: 0 },
+    '3': { female: 0, male: 0, mixed: 0 },
+  },
+}
 
 export default function MatchingPool({ stats, className = '' }: Props) {
   const target = stats ?? FALLBACK_STATS
-  const [displayed, setDisplayed] = useState({ female: 0, male: 0 })
+  const [displayed, setDisplayed] = useState({ female: 0, male: 0, mixed: 0 })
 
   useEffect(() => {
     const duration = 900
@@ -35,33 +45,36 @@ export default function MatchingPool({ stats, className = '' }: Props) {
       setDisplayed({
         female: Math.round(target.female * ease),
         male: Math.round(target.male * ease),
+        mixed: Math.round(target.mixed * ease),
       })
       if (step >= steps) window.clearInterval(timer)
     }, interval)
     return () => window.clearInterval(timer)
-  }, [target.female, target.male])
+  }, [target.female, target.male, target.mixed])
 
-  const totalGroups = displayed.female + displayed.male
+  const totalGroups = displayed.female + displayed.male + displayed.mixed
 
   const queueRows = useMemo(() => {
     const bySize = target.bySize
     const empty = bySize == null
-    const row2 = bySize?.['2'] ?? { female: 0, male: 0 }
-    const row3 = bySize?.['3'] ?? { female: 0, male: 0 }
+    const row2 = bySize?.['2'] ?? { female: 0, male: 0, mixed: 0 }
+    const row3 = bySize?.['3'] ?? { female: 0, male: 0, mixed: 0 }
     return [
       {
-        label: '2:2 그룹',
+        label: '2:2 매칭찾기',
         size: 2,
         male: row2.male,
         female: row2.female,
-        active: !empty && (row2.male > 0 || row2.female > 0),
+        mixed: row2.mixed,
+        active: !empty && (row2.male > 0 || row2.female > 0 || row2.mixed > 0),
       },
       {
-        label: '3:3 그룹',
+        label: '3:3 매칭찾기',
         size: 3,
         male: row3.male,
         female: row3.female,
-        active: !empty && (row3.male > 0 || row3.female > 0),
+        mixed: row3.mixed,
+        active: !empty && (row3.male > 0 || row3.female > 0 || row3.mixed > 0),
       },
     ]
   }, [target.bySize])
@@ -94,12 +107,14 @@ export default function MatchingPool({ stats, className = '' }: Props) {
 
         <div className="space-y-3">
           {queueRows.map((row) => {
-            const totalTeams = row.male + row.female
+            const totalTeams = row.male + row.female + row.mixed
             const totalPeople = totalTeams * row.size
             const malePeople = row.male * row.size
             const femalePeople = row.female * row.size
+            const mixedPeople = row.mixed * row.size
             const maleWidth = row.male > 0 ? Math.max(12, Math.min(72, row.male * 12)) : 0
             const femaleWidth = row.female > 0 ? Math.max(12, Math.min(72, row.female * 12)) : 0
+            const mixedWidth = row.mixed > 0 ? Math.max(12, Math.min(72, row.mixed * 12)) : 0
             return (
               <div key={row.label} className="rounded-2xl border border-boot-hairline bg-boot-soft/60 px-3 py-3">
                 <div className="mb-2 flex items-start justify-between gap-3">
@@ -123,6 +138,13 @@ export default function MatchingPool({ stats, className = '' }: Props) {
                   />
                   <div className="h-px flex-1 bg-boot-hairline" />
                   <div
+                    className={`h-5 rounded-xl border border-amber-200 bg-amber-300/70 transition-all duration-700 ${
+                      row.active ? 'shadow-[0_0_18px_rgba(252,211,77,0.23)]' : ''
+                    }`}
+                    style={{ width: `${mixedWidth}%` }}
+                  />
+                  <div className="h-px flex-1 bg-boot-hairline" />
+                  <div
                     className={`h-5 rounded-xl border border-rose-200 bg-boot-primary/50 transition-all duration-700 ${
                       row.active ? 'shadow-[0_0_18px_rgba(255,90,111,0.24)]' : ''
                     }`}
@@ -130,19 +152,28 @@ export default function MatchingPool({ stats, className = '' }: Props) {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <QueuePill label="남자 대표" teams={row.male} people={malePeople} tone="sky" />
-                  <QueuePill label="여자 대표" teams={row.female} people={femalePeople} tone="rose" />
+                <div className="grid grid-cols-3 gap-2">
+                  <QueuePill label="남자팀" teams={row.male} people={malePeople} tone="sky" />
+                  <QueuePill label="혼성팀" teams={row.mixed} people={mixedPeople} tone="amber" />
+                  <QueuePill label="여자팀" teams={row.female} people={femalePeople} tone="rose" />
                 </div>
+
+                <Link
+                  href={`/group/create?size=${row.size}`}
+                  className="mt-3 flex h-11 items-center justify-center rounded-2xl bg-boot-ink text-xs font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
+                >
+                  {row.size}:{row.size} 그룹으로 시작하기
+                </Link>
               </div>
             )
           })}
         </div>
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-2">
+      <div className="mb-4 grid grid-cols-4 gap-2">
         <StatBox value={displayed.male} label="남자 그룹" tone="text-sky-600" />
         <StatBox value={displayed.female} label="여자 그룹" tone="text-boot-primary" />
+        <StatBox value={displayed.mixed} label="혼성 그룹" tone="text-amber-600" />
         <StatBox value="2~3" label="그룹 인원" tone="text-amber-600" />
       </div>
 
@@ -151,7 +182,7 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         <div>
           <p className="text-xs font-black text-emerald-700">혼성 그룹도 가능해요</p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
-            친구 성별이 섞인 그룹도 만들 수 있어요. 위 남자/여자 숫자는 매칭 계산에 쓰는 대표 성별 기준입니다.
+            친구 성별이 섞인 그룹도 만들 수 있어요. 혼성 대기자는 별도로 표시하고, 2:2와 3:3은 같은 인원 규모끼리 매칭돼요.
           </p>
         </div>
       </div>
@@ -173,9 +204,14 @@ function QueuePill({
   label: string
   teams: number
   people: number
-  tone: 'sky' | 'rose'
+  tone: 'sky' | 'rose' | 'amber'
 }) {
-  const toneClass = tone === 'sky' ? 'text-sky-600 bg-sky-50 border-sky-100' : 'text-boot-primary bg-white border-rose-100'
+  const toneClass =
+    tone === 'sky'
+      ? 'text-sky-600 bg-sky-50 border-sky-100'
+      : tone === 'amber'
+        ? 'text-amber-700 bg-amber-50 border-amber-100'
+        : 'text-boot-primary bg-white border-rose-100'
 
   return (
     <div className={`rounded-2xl border px-2.5 py-2 ${toneClass}`}>
