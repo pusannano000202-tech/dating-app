@@ -2,13 +2,14 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  getGroupCompositionSummary,
   getFriendMatchLabel,
   getFriendMatchState,
   getGroupExitActionState,
   getMemberStatusLabel,
   getQueueStatusText,
 } from '../../components/matching/group-create/status'
-import type { FriendSummary, GroupRecord } from '../../components/matching/group-create/types'
+import type { FriendSummary, GroupMemberRecord, GroupRecord } from '../../components/matching/group-create/types'
 
 const group: GroupRecord = {
   id: 'group-1',
@@ -26,6 +27,21 @@ function friend(overrides: Partial<FriendSummary>): FriendSummary {
     phone: null,
     status: 'active',
     group_status: 'available',
+    ...overrides,
+  }
+}
+
+function member(overrides: Partial<GroupMemberRecord>): GroupMemberRecord {
+  return {
+    group_id: 'group-1',
+    user_id: 'user-1',
+    display_name: 'Member',
+    role: 'member',
+    joined_at: '2026-06-23T00:00:00.000Z',
+    left_at: null,
+    match_setup_ready: false,
+    pre_match_card_ready: false,
+    gender: null,
     ...overrides,
   }
 }
@@ -59,6 +75,23 @@ test('getQueueStatusText makes a 2:2 group look open again after a friend leaves
   assert.equal(
     getQueueStatusText({ group: twoPersonGroup, membersLength: 1, needsSetupCount: 0 }),
     '친구 1명이 더 필요해요',
+  )
+})
+
+test('getGroupCompositionSummary recalculates from active member genders', () => {
+  assert.deepEqual(
+    getGroupCompositionSummary([
+      member({ user_id: 'male-1', gender: 'male' }),
+      member({ user_id: 'male-left', gender: 'male', left_at: '2026-06-23T00:00:00.000Z' }),
+      member({ user_id: 'female-1', gender: 'female' }),
+    ]),
+    {
+      male: 1,
+      female: 1,
+      unknown: 0,
+      label: '혼성 그룹',
+      detail: '남자 1명 · 여자 1명',
+    },
   )
 })
 

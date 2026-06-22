@@ -2,6 +2,7 @@ export type DevPreviewGroupMember = {
   group_id: string
   user_id: string
   display_name: string | null
+  gender: 'male' | 'female' | null
   role: 'leader' | 'member'
   joined_at: string
   left_at: string | null
@@ -24,6 +25,7 @@ export const DEV_PREVIEW_GROUP_MEMBERS: DevPreviewGroupMember[] = [
     group_id: DEV_PREVIEW_GROUP_ID,
     user_id: DEV_PREVIEW_CURRENT_USER_ID,
     display_name: '나',
+    gender: 'male',
     role: 'leader',
     joined_at: 'dev-preview',
     left_at: null,
@@ -33,6 +35,7 @@ export const DEV_PREVIEW_GROUP_MEMBERS: DevPreviewGroupMember[] = [
     group_id: DEV_PREVIEW_GROUP_ID,
     user_id: DEV_PREVIEW_FRIEND_MINJI_ID,
     display_name: '민지',
+    gender: 'female',
     role: 'member',
     joined_at: 'dev-preview',
     left_at: null,

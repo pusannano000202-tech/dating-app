@@ -27,6 +27,7 @@ interface GroupMemberRecord {
   group_id: string
   user_id: string
   display_name: string | null
+  gender: 'male' | 'female' | null
   role: GroupRole
   joined_at: string
   left_at: string | null
@@ -219,11 +220,18 @@ async function loadMembers(
 ): Promise<GroupMemberRecord[]> {
   const { data } = await supabase.rpc('get_group_member_summaries', { p_group_id: groupId })
 
-  type Row = { user_id: string; display_name: string | null; role: GroupRole; joined_at: string }
+  type Row = {
+    user_id: string
+    display_name: string | null
+    gender: 'male' | 'female' | null
+    role: GroupRole
+    joined_at: string
+  }
   const members = ((data ?? []) as Row[]).map((row) => ({
     group_id: groupId,
     user_id: row.user_id,
     display_name: row.display_name,
+    gender: row.gender,
     role: row.role,
     joined_at: row.joined_at,
     left_at: null,

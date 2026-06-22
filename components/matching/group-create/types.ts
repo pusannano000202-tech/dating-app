@@ -18,6 +18,7 @@ export interface GroupMemberRecord {
   group_id: string
   user_id: string
   display_name: string | null
+  gender?: 'male' | 'female' | null
   role: GroupRole
   joined_at: string
   left_at: string | null

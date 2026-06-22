@@ -1,4 +1,5 @@
 import type { FriendSummary, GroupRecord, GroupStatus, MatchStepState } from './types'
+import type { GroupMemberRecord } from './types'
 
 export type GroupExitActionKind =
   | 'member_can_leave'
@@ -12,6 +13,44 @@ export type GroupExitActionState = {
   description: string
   primaryLabel: string
   helperText: string
+}
+
+export type GroupCompositionSummary = {
+  male: number
+  female: number
+  unknown: number
+  label: '남자 그룹' | '여자 그룹' | '혼성 그룹' | '성별 확인 중'
+  detail: string
+}
+
+export function getGroupCompositionSummary(
+  members: GroupMemberRecord[],
+): GroupCompositionSummary {
+  const activeMembers = members.filter((member) => !member.left_at)
+  const male = activeMembers.filter((member) => member.gender === 'male').length
+  const female = activeMembers.filter((member) => member.gender === 'female').length
+  const unknown = Math.max(0, activeMembers.length - male - female)
+  const label = male > 0 && female > 0
+    ? '혼성 그룹'
+    : male > 0
+      ? '남자 그룹'
+      : female > 0
+        ? '여자 그룹'
+        : '성별 확인 중'
+
+  const parts = [
+    male > 0 ? `남자 ${male}명` : null,
+    female > 0 ? `여자 ${female}명` : null,
+    unknown > 0 ? `확인 중 ${unknown}명` : null,
+  ].filter((part): part is string => Boolean(part))
+
+  return {
+    male,
+    female,
+    unknown,
+    label,
+    detail: parts.join(' · ') || '아직 그룹원이 없어요',
+  }
 }
 
 export function getMemberStatusLabel(

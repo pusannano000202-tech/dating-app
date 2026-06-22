@@ -33,7 +33,7 @@ import { GroupDangerZone } from '@/components/matching/group-create/GroupDangerZ
 import { GroupHeader } from '@/components/matching/group-create/GroupHeader'
 import { GroupMemberStatusPanel } from '@/components/matching/group-create/GroupMemberStatusPanel'
 import { InviteFriendPanel } from '@/components/matching/group-create/InviteFriendPanel'
-import { getQueueStatusText } from '@/components/matching/group-create/status'
+import { getGroupCompositionSummary, getQueueStatusText } from '@/components/matching/group-create/status'
 import type {
   DepositSummary,
   FriendSummary,
@@ -91,6 +91,7 @@ export default function GroupCreatePage() {
   )
   const readyMemberCount = members.filter((member) => memberMatchReadyByUserId.get(member.user_id)).length
   const needsSetupCount = Math.max(0, members.length - readyMemberCount)
+  const groupComposition = useMemo(() => getGroupCompositionSummary(members), [members])
   const canEnterQueue = Boolean(
     group &&
       isLeader &&
@@ -103,9 +104,10 @@ export default function GroupCreatePage() {
 
   const groupStats = useMemo(() => [
     { label: groupStatusLabel, value: `${members.length}` },
+    { label: groupComposition.detail, value: groupComposition.label },
     { label: '매칭 설정 준비 완료', value: `${readyMemberCount}명` },
     { label: '매칭 설정 입력 필요', value: `${needsSetupCount}명` },
-  ], [groupStatusLabel, members.length, readyMemberCount, needsSetupCount])
+  ], [groupComposition.detail, groupComposition.label, groupStatusLabel, members.length, readyMemberCount, needsSetupCount])
 
   useEffect(() => {
     if (!inQueue || !groupId) {
