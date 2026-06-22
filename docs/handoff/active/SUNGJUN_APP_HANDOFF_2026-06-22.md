@@ -40,7 +40,7 @@ https://github.com/pusannano000202-tech/dating-app.git
 profile/post-worldcup-decisions-2026-05-21
 ```
 
-현재 푸시 완료 HEAD:
+현재 푸시 완료 코드 기준선:
 
 ```text
 e6ab3b8 feat: sync booting frontend flow for sungjun handoff
@@ -49,8 +49,8 @@ e6ab3b8 feat: sync booting frontend flow for sungjun handoff
 원격 브랜치 상태:
 
 ```text
-origin/profile/post-worldcup-decisions-2026-05-21 = e6ab3b8...
-현재 로컬 브랜치와 origin 브랜치가 같은 커밋을 가리킴
+origin/profile/post-worldcup-decisions-2026-05-21 최신 브랜치에 위 코드 기준선과 이 인수인계 문서가 push됨
+성준은 브랜치 최신 HEAD를 받으면 됨
 ```
 
 중요:
