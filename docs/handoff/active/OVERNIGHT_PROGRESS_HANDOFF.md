@@ -1078,3 +1078,11 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - Vercel Environment Variables에 실제 값 입력.
 - 새 Supabase 프로젝트가 현재 Supabase 플러그인 계정에 보이지 않아 이 세션에서는 실제 DB 적용/조회 검증 불가.
 - 사용자가 받은 key 문자열은 `.env.local`이나 Vercel dashboard에 직접 넣되, 뒤에 붙은 설명/한글/공백 없이 값만 넣어야 한다.
+
+## 2026-06-23 결제 cancel 내부 secret 전달 방식 보강
+
+- `app/api/payments/deposit/cancel/route.ts`에서 `PAYMENT_INTERNAL_SECRET`을 JSON body의 `internal_secret`으로 받던 fallback을 제거했다.
+- 이제 내부 환불/cancel 호출은 `x-payment-internal-secret` 헤더 또는 `Authorization: Bearer ...`로만 인증한다.
+- 이유: secret을 request body에 넣으면 로깅/디버깅/프록시 도구에 남을 위험이 더 크다.
+- 회귀 테스트: `tests/config/deposit-payment-routes.test.ts`가 cancel route에 `body.internal_secret` 참조가 없는지 확인한다.
+- 검증: `npm run test:config` 통과. 49개 테스트 통과.

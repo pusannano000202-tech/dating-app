@@ -63,7 +63,6 @@ async function cancelPaidDeposit(
 
   const providedSecret = req.headers.get('x-payment-internal-secret')
     ?? readBearerToken(req.headers.get('authorization'))
-    ?? readString(body.internal_secret)
   if (providedSecret !== internalSecret) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }

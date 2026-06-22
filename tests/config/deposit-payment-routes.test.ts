@@ -53,6 +53,7 @@ test('deposit payment routes use provider readiness and return Toss browser chec
   assert.match(cancelRoute, /payment_cancelled/)
   assert.match(cancelRoute, /PAYMENT_INTERNAL_SECRET/)
   assert.match(cancelRoute, /cancelTossPayment/)
+  assert.doesNotMatch(cancelRoute, /body\.internal_secret/)
   assert.match(webhookRoute, /payment_provider_not_configured/)
   assert.match(webhookRoute, /getTossPayment/)
   assert.match(webhookRoute, /getTossPaymentByOrderId/)
