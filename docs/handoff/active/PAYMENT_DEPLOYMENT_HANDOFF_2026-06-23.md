@@ -21,6 +21,12 @@
   - 매칭 상세 화면 출발: `/match/[id]?payment=paid`
 - 실패/취소 시에도 `return_path` 기준으로 원래 화면으로 돌아오며 `payment=failed` 또는 `payment=cancelled` 상태를 붙인다.
 - 환불/취소 API는 `PAYMENT_INTERNAL_SECRET`과 `SUPABASE_SERVICE_ROLE_KEY`가 있어야 동작한다.
+- `scripts/check-payment-env.mjs`는 이제 키 존재 여부만 보지 않고 형식도 검사한다.
+  - Supabase URL은 `https://...supabase.co` 형식이어야 한다.
+  - Supabase public key는 publishable key 또는 `anon` JWT여야 한다.
+  - Supabase service role key는 `service_role` JWT여야 한다.
+  - Toss client/secret key는 `test_` 또는 `live_` 계열의 client/secret 접두사가 맞아야 한다.
+  - 키 뒤에 공백, 한글 메모, 잘못 붙은 문자가 있으면 `INVALID`로 실패한다.
 
 ## Vercel에 넣어야 하는 환경변수
 
@@ -62,7 +68,8 @@ npm run lint
 npm run build
 ```
 
-`npm run check:payment-env -- --provider=toss`가 missing을 띄우면 Toss 실결제 흐름은 아직 준비되지 않은 것이다.
+`npm run check:payment-env -- --provider=toss`가 `MISSING`을 띄우면 키가 빠진 것이다.
+`INVALID`를 띄우면 키 값에 잘못 붙은 문자, 잘못된 접두사, 잘못된 JWT role 같은 문제가 있는 것이다.
 
 ## 현재 로컬/배포 연결 상태
 
@@ -122,3 +129,10 @@ http://localhost:3004/match/dev-match-pending                      200
 - Preview 배포 생성 후 실제 Toss sandbox 결제창 수동 검증
 - 결제 성공 후 `deposits.status=paid`가 Supabase에 반영되는지 확인
 - 정상 만남 후 환불 플로우에서 앱 기여금 선택값과 Toss cancel 금액이 일치하는지 E2E 확인
+
+## 2026-06-23 추가 점검
+
+- 이상형 월드컵에서 저장된 기본정보 성별이 없으면 더 이상 `female`로 가정하지 않는다.
+- 저장 성별이 없을 때 남자 후보가 뜨던 로컬 검토 오류를 막기 위해, 성별이 없으면 기본정보 저장 안내를 먼저 보여준다.
+- 실제 이미지 풀은 `female 64장`, `male 64장` 모두 존재한다.
+- 남자로 저장된 경우 월드컵에는 여자 후보 풀이 열려야 하고, 여자로 저장된 경우 남자 후보 풀이 열려야 한다.

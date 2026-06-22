@@ -35,8 +35,15 @@ export default function WorldcupPage() {
         if (!isSupabaseConfigured() || isDevPreviewClientSession()) {
           const meta = await loadIdealMetadata()
           if (cancelled) return
+          const savedGender = readDevBasicProfileGender()
+          if (!savedGender) {
+            setLoadError('기본정보에서 성별을 먼저 저장해줘.')
+            setMetadata(meta)
+            setLoaded(true)
+            return
+          }
           setMetadata(meta)
-          setGender(readDevBasicProfileGender())
+          setGender(savedGender)
           setLoaded(true)
           return
         }

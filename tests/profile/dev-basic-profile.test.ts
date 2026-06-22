@@ -17,11 +17,11 @@ test('readDevBasicProfileGender reads the saved female gender for dev worldcup r
   )
 })
 
-test('readDevBasicProfileGender falls back to female when no basic profile was saved', () => {
-  assert.equal(readDevBasicProfileGender(() => null), 'female')
+test('readDevBasicProfileGender returns null when no basic profile was saved', () => {
+  assert.equal(readDevBasicProfileGender(() => null), null)
 })
 
 test('readDevBasicProfileGender ignores malformed stored profile data', () => {
-  assert.equal(readDevBasicProfileGender(() => '{broken'), 'female')
-  assert.equal(readDevBasicProfileGender(() => JSON.stringify({ gender: 'unknown' })), 'female')
+  assert.equal(readDevBasicProfileGender(() => '{broken'), null)
+  assert.equal(readDevBasicProfileGender(() => JSON.stringify({ gender: 'unknown' })), null)
 })

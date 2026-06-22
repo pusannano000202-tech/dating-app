@@ -11,13 +11,13 @@ export function readDevBasicProfileGender(
     if (!storage) return null
     return storage.getItem(DEV_BASIC_PROFILE_STORAGE_KEY)
   },
-): Gender {
+): Gender | null {
   try {
     const stored = readStoredProfile()
-    if (!stored) return 'female'
+    if (!stored) return null
     const parsed = JSON.parse(stored) as { gender?: unknown }
-    return normalizeGender(parsed.gender) ?? 'female'
+    return normalizeGender(parsed.gender)
   } catch {
-    return 'female'
+    return null
   }
 }

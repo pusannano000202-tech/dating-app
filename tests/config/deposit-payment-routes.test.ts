@@ -1,5 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
@@ -125,6 +126,35 @@ test('payment env checker supports mock review and Toss sandbox preflight withou
   assert.doesNotMatch(checker, /console\.table\(env/)
 })
 
+test('payment env checker rejects malformed Toss and service role values without printing secrets', () => {
+  const baseEnv = {
+    ...process.env,
+    NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: makeFakeJwt({ role: 'anon' }),
+    NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
+    TOSS_SECRET_KEY: ['test', 'sk', 'fake_secret_key'].join('_'),
+    PAYMENT_INTERNAL_SECRET: 'local-internal-secret',
+    SUPABASE_SERVICE_ROLE_KEY: `${makeFakeJwt({ role: 'service_role' })}그저`,
+  }
+
+  assert.throws(
+    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss'], {
+      cwd: ROOT,
+      env: baseEnv,
+      encoding: 'utf8',
+      stdio: 'pipe',
+    }),
+    (error: unknown) => {
+      const output = String((error as { stdout?: unknown; stderr?: unknown }).stdout ?? '')
+        + String((error as { stdout?: unknown; stderr?: unknown }).stderr ?? '')
+      assert.match(output, /INVALID/)
+      assert.doesNotMatch(output, /local-internal-secret/)
+      assert.doesNotMatch(output, /fake_secret_key/)
+      return true
+    },
+  )
+})
+
 test('deposit payment request draft sends failed checkout back through cancel route', () => {
   const paymentLib = readSource('lib/payments/deposit.ts')
 
@@ -196,6 +226,14 @@ test('deposit return path only allows group and match screens', () => {
   assert.equal(normalizeDepositReturnPath('//evil.example/path'), '/group/create')
   assert.equal(normalizeDepositReturnPath('https://evil.example/path'), '/group/create')
 })
+
+function makeFakeJwt(payload: Record<string, unknown>) {
+  return [
+    Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url'),
+    Buffer.from(JSON.stringify(payload)).toString('base64url'),
+    'signature',
+  ].join('.')
+}
 
 test('group create page explains payment callback results after Toss returns', () => {
   const groupCreatePage = readSource('app/group/create/page.tsx')

@@ -15,12 +15,14 @@ const checks = [
     key: 'NEXT_PUBLIC_SUPABASE_URL',
     required: true,
     purpose: 'Supabase project URL',
+    validate: (value) => isSupabaseProjectUrl(value),
   },
   {
     key: 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY',
     required: true,
     purpose: 'browser-safe Supabase key',
-    ok: Boolean(env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    value: env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    validate: (value) => isSupabasePublicKey(value),
   },
 ]
 
@@ -30,21 +32,25 @@ if (provider === 'toss') {
       key: 'NEXT_PUBLIC_TOSS_CLIENT_KEY',
       required: true,
       purpose: 'browser-safe Toss checkout key',
+      validate: (value) => /^(?:test|live)_(?:g)?ck_/.test(value),
     },
     {
       key: 'TOSS_SECRET_KEY',
       required: true,
       purpose: 'server-only Toss API key',
+      validate: (value) => /^(?:test|live)_(?:g)?sk_/.test(value),
     },
     {
       key: 'PAYMENT_INTERNAL_SECRET',
       required: true,
       purpose: 'protect internal refund/cancel calls',
+      validate: (value) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
     },
     {
       key: 'SUPABASE_SERVICE_ROLE_KEY',
       required: true,
       purpose: 'server-only payment reconciliation',
+      validate: (value) => isSupabaseJwtWithRole(value, 'service_role'),
     },
   )
 }
@@ -52,7 +58,7 @@ if (provider === 'toss') {
 const rows = checks.map((check) => ({
   key: check.key,
   required: check.required ? 'yes' : 'no',
-  status: (check.ok ?? Boolean(env[check.key])) ? 'SET' : 'MISSING',
+  status: checkStatus(check, env),
   purpose: check.purpose,
 }))
 
@@ -62,6 +68,7 @@ console.log(`provider: ${provider}`)
 console.table(rows)
 
 const missing = rows.filter((row) => row.required === 'yes' && row.status === 'MISSING')
+const invalid = rows.filter((row) => row.required === 'yes' && row.status === 'INVALID')
 
 if (provider === 'mock') {
   console.log('mock provider: Toss keys are not required for local UI review.')
@@ -72,7 +79,19 @@ if (missing.length > 0) {
   process.exit(1)
 }
 
+if (invalid.length > 0) {
+  console.error(`Invalid payment env keys: ${invalid.map((row) => row.key).join(', ')}`)
+  process.exit(1)
+}
+
 console.log('Payment env check passed.')
+
+function checkStatus(check, values) {
+  const value = check.value ?? values[check.key]
+  if (!value) return 'MISSING'
+  if (check.validate && !check.validate(String(value))) return 'INVALID'
+  return 'SET'
+}
 
 function readEnvFile(path) {
   const parsed = {}
@@ -113,4 +132,32 @@ function resolveProvider(args, values) {
   const normalized = String(raw).trim().toLowerCase()
 
   return normalized === 'toss' ? 'toss' : 'mock'
+}
+
+function isSupabaseProjectUrl(value) {
+  return /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(value)
+}
+
+function isSupabasePublicKey(value) {
+  if (typeof value !== 'string' || !value.trim()) return false
+  if (value.startsWith('sb_publishable_')) return !hasUnsafeEnvValueCharacters(value)
+  return isSupabaseJwtWithRole(value, 'anon')
+}
+
+function isSupabaseJwtWithRole(value, role) {
+  if (typeof value !== 'string') return false
+  if (hasUnsafeEnvValueCharacters(value)) return false
+  const parts = value.split('.')
+  if (parts.length !== 3 || parts.some((part) => !part)) return false
+
+  try {
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+    return payload?.role === role
+  } catch {
+    return false
+  }
+}
+
+function hasUnsafeEnvValueCharacters(value) {
+  return /\s/.test(value) || /[^\x21-\x7e]/.test(value)
 }
