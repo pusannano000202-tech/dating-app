@@ -35,6 +35,7 @@ checks.push({
   purpose: 'local folder is linked to the Vercel project',
 })
 
+checks.push(checkSecretLeaks())
 checks.push(checkPaymentEnv())
 
 checks.push({
@@ -81,6 +82,19 @@ function checkPaymentEnv() {
     key: 'scripts/check-payment-env.mjs --provider=toss',
     status: result.status === 0 ? 'SET' : 'ACTION_REQUIRED',
     purpose: 'Toss/Supabase server envs are present and valid without printing secrets',
+  }
+}
+
+function checkSecretLeaks() {
+  const result = spawnSync(process.execPath, ['scripts/check-secret-leaks.mjs'], {
+    cwd: root,
+    encoding: 'utf8',
+  })
+
+  return {
+    key: 'scripts/check-secret-leaks.mjs',
+    status: result.status === 0 ? 'SET' : 'ACTION_REQUIRED',
+    purpose: 'git-tracked files do not contain Supabase/Toss secret values',
   }
 }
 

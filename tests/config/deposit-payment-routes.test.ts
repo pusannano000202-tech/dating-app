@@ -113,6 +113,7 @@ test('payment env checker supports mock review and Toss sandbox preflight withou
   const checker = readSource('scripts/check-payment-env.mjs')
 
   assert.match(packageJson, /"check:payment-env": "node scripts\/check-payment-env\.mjs"/)
+  assert.match(packageJson, /"check:secrets": "node scripts\/check-secret-leaks\.mjs"/)
   assert.match(checker, /--provider=/)
   assert.match(checker, /NEXT_PUBLIC_PAYMENT_PROVIDER/)
   assert.match(checker, /PAYMENT_PROVIDER/)
@@ -139,6 +140,8 @@ test('deployment readiness checker verifies git, Vercel link, and Toss env witho
   assert.match(checker, /\.\.\.readLocalEnvFile\(\),\s+\.\.\.process\.env/)
   assert.match(checker, /\.vercel[\\/]project\.json/)
   assert.match(checker, /vercel --version/)
+  assert.match(checker, /scripts\/check-secret-leaks\.mjs/)
+  assert.match(checker, /git-tracked files do not contain Supabase\/Toss secret values/)
   assert.match(checker, /scripts\/check-payment-env\.mjs/)
   assert.match(checker, /--provider=toss/)
   assert.match(checker, /classifyAppOrigin\(env\.NEXT_PUBLIC_APP_ORIGIN\)/)
@@ -146,6 +149,25 @@ test('deployment readiness checker verifies git, Vercel link, and Toss env witho
   assert.doesNotMatch(checker, /console\.log\(process\.env/)
   assert.doesNotMatch(checker, /TOSS_SECRET_KEY=.*test/)
   assert.doesNotMatch(checker, /SUPABASE_SERVICE_ROLE_KEY=.*eyJ/)
+})
+
+test('tracked secret scanner blocks real payment and service-role keys without printing values', () => {
+  const scanner = readSource('scripts/check-secret-leaks.mjs')
+
+  assert.match(scanner, /git ls-files/)
+  assert.match(scanner, /toss_api_key/)
+  assert.match(scanner, /supabase_service_role_jwt/)
+  assert.match(scanner, /tracked_supabase_public_jwt_env/)
+  assert.match(scanner, /console\.error\(`\$\{finding\.file\}:\$\{finding\.line\}:\$\{finding\.detector\}`\)/)
+  assert.doesNotMatch(scanner, /console\.error\([^)]*value/)
+  assert.doesNotMatch(scanner, /console\.log\([^)]*value/)
+
+  const output = execFileSync('node', ['scripts/check-secret-leaks.mjs'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    stdio: 'pipe',
+  })
+  assert.match(output, /Tracked secret scan passed/)
 })
 
 test('payment env checker rejects malformed Toss and service role values without printing secrets', () => {
