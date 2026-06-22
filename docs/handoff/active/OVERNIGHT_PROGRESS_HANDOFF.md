@@ -1035,3 +1035,46 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - 그룹/알림/프로필 편집은 새 배경과 카드 톤 적용 확인.
   - `/profile/basic` 첫 화면은 하단탭이 성별 카드 하단 영역을 살짝 덮는 느낌이 있지만, 스크롤 가능한 고정 탭 구조라 텍스트 자체가 겹치거나 깨지지는 않는다.
 - Toss sandbox 실제 결제, Supabase production 적용, 성준 스키마 합의 항목은 이번 pass에서 건드리지 않았다.
+
+## 2026-06-23 결제 배포 env 템플릿 / 월드컵 회귀 테스트 보강
+
+이번 추가 작업도 production Supabase, production Vercel, Toss 실결제는 건드리지 않았다.
+
+완료한 것:
+
+1. GitHub push 완료.
+   - `feat: harden group member removal flow`
+   - `chore: add tracked secret deployment scan`
+   - `chore: document payment env deployment template`
+2. `.env.example` 추가.
+   - 실제 키 없이 Supabase, Vercel origin, mock/Toss provider, Toss client/secret, payment internal secret, service role 자리만 정리했다.
+   - `.env.local.example`의 로컬 origin도 현재 검토 포트인 `http://localhost:3004`로 맞췄다.
+3. 결제 env 회귀 테스트 보강.
+   - `.env.local.example`과 `.env.example`이 모두 mock/Toss sandbox/server-only key 자리를 문서화하는지 확인한다.
+   - 실제 Toss secret 또는 Supabase service_role JWT가 예시 파일에 들어가지 않는지도 확인한다.
+4. 이상형 월드컵 성별 회귀 테스트 보강.
+   - `/profile/basic` dev preview 저장 key와 `/profile/worldcup` 읽기 key가 같은지 확인한다.
+   - 월드컵 화면이 `gender` 원본이 아니라 `oppositeGenderForWorldcup(gender)` 결과를 `IdealWorldcup`에 넘기는지 확인한다.
+
+검증:
+
+- `npm run test:config` 통과. 49개 테스트 통과.
+- `npm run test:profile` 통과. 24개 테스트 통과.
+- `npm run check:secrets` 통과.
+- `npm run check:payment-env` 통과. mock provider 기준.
+- `npm run check:payment-env -- --provider=toss`는 예상대로 실패.
+  - 로컬 `.env.local`에 Toss provider mode, Toss client/secret, payment internal secret, service_role key가 없기 때문이다.
+  - 이 실패는 실제 결제 검증이 아직 외부 env 없이는 완료될 수 없다는 정상 차단이다.
+- `npm run check:deploy-readiness`는 예상대로 실패.
+  - `vercel --version` 없음.
+  - `.vercel/project.json` 없음.
+  - Toss env 없음.
+  - `NEXT_PUBLIC_APP_ORIGIN`이 production 배포 URL이 아님.
+
+남은 외부 차단:
+
+- Vercel CLI 설치 또는 GitHub-Vercel dashboard 연결 확인.
+- Vercel Project link.
+- Vercel Environment Variables에 실제 값 입력.
+- 새 Supabase 프로젝트가 현재 Supabase 플러그인 계정에 보이지 않아 이 세션에서는 실제 DB 적용/조회 검증 불가.
+- 사용자가 받은 key 문자열은 `.env.local`이나 Vercel dashboard에 직접 넣되, 뒤에 붙은 설명/한글/공백 없이 값만 넣어야 한다.
