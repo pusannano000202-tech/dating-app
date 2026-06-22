@@ -116,6 +116,8 @@ test('payment env checker supports mock review and Toss sandbox preflight withou
   assert.match(checker, /--provider=/)
   assert.match(checker, /NEXT_PUBLIC_PAYMENT_PROVIDER/)
   assert.match(checker, /PAYMENT_PROVIDER/)
+  assert.match(checker, /browser payment mode/)
+  assert.match(checker, /server payment mode/)
   assert.match(checker, /NEXT_PUBLIC_TOSS_CLIENT_KEY/)
   assert.match(checker, /TOSS_SECRET_KEY/)
   assert.match(checker, /PAYMENT_INTERNAL_SECRET/)

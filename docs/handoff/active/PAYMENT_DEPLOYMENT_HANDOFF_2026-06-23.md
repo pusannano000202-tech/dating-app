@@ -22,6 +22,8 @@
 - 실패/취소 시에도 `return_path` 기준으로 원래 화면으로 돌아오며 `payment=failed` 또는 `payment=cancelled` 상태를 붙인다.
 - 환불/취소 API는 `PAYMENT_INTERNAL_SECRET`과 `SUPABASE_SERVICE_ROLE_KEY`가 있어야 동작한다.
 - `scripts/check-payment-env.mjs`는 이제 키 존재 여부만 보지 않고 형식도 검사한다.
+  - Toss 배포 모드에서는 `NEXT_PUBLIC_PAYMENT_PROVIDER=toss`, `PAYMENT_PROVIDER=toss`까지 함께 검사한다.
+  - 키가 있어도 provider가 `mock`이면 실제 배포 전 검사에서 실패하게 한다.
   - Supabase URL은 `https://...supabase.co` 형식이어야 한다.
   - Supabase public key는 publishable key 또는 `anon` JWT여야 한다.
   - Supabase service role key는 `service_role` JWT여야 한다.
@@ -79,6 +81,7 @@ npm run build
 - `vercel` CLI는 현재 작업 환경에서 잡히지 않는다.
 - `.vercel/project.json`도 없어서 이 폴더는 아직 Vercel 프로젝트와 로컬 link가 되어 있지 않다.
 - `npm run check:deploy-readiness` 기준으로 현재 차단점은 Vercel CLI/link, Toss env, 배포 URL origin 설정이다.
+- Supabase 플러그인 계정에서는 성준이 넘긴 새 프로젝트가 보이지 않아, 이 세션에서 새 Supabase DB에 migration 적용/조회 검증은 못 했다.
 - 따라서 이 상태에서 가능한 검증은 mock 결제, 타입/린트/빌드, 라우트 응답 확인까지다.
 - Toss sandbox 결제창 진입 검증은 Vercel env 또는 로컬 `.env.local`에 실제 테스트 키를 넣은 뒤 진행해야 한다.
 
@@ -139,3 +142,15 @@ http://localhost:3004/match/dev-match-pending                      200
 - 저장 성별이 없을 때 남자 후보가 뜨던 로컬 검토 오류를 막기 위해, 성별이 없으면 기본정보 저장 안내를 먼저 보여준다.
 - 실제 이미지 풀은 `female 64장`, `male 64장` 모두 존재한다.
 - 남자로 저장된 경우 월드컵에는 여자 후보 풀이 열려야 하고, 여자로 저장된 경우 남자 후보 풀이 열려야 한다.
+
+## 2026-06-23 추가 배포 점검
+
+- `feat: support group size matching and mixed queue stats` 커밋은 GitHub 원격 브랜치에 push 완료했다.
+- `npm run check:payment-env -- --provider=toss`는 이제 provider mode까지 검사한다.
+  - 현재 로컬은 Toss 관련 env와 provider mode가 없어서 정상적으로 실패한다.
+  - 실패 항목은 키 값이 아니라 키 이름과 상태만 출력한다.
+- `npm run check:deploy-readiness`의 Git 동기화 차단점은 push 후 사라졌다.
+  - 이후 새 preflight 수정분 때문에 다시 dirty 상태가 되면 Git 항목은 다시 `ACTION_REQUIRED`가 된다.
+- 오래 떠 있던 Next dev 서버가 `.next` 청크를 잃어 `/api/notifications/unread-count` 500을 낸 문제가 있었다.
+  - 워크스페이스 내부 `.next`만 경로 확인 후 삭제했고, 3004 dev 서버를 새로 띄웠다.
+  - 재확인 결과 `/dev/preview`, `/group/create?size=2`, `/match/dev-match-pending`, `/match/dev-match-1` 모두 200이다.

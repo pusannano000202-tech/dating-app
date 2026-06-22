@@ -183,6 +183,35 @@
 7. `/match`, `/notifications`, 비로그인 랜딩 홈의 변경은 실제 브라우저에서 사용자 체감 확인이 필요하다.
 8. 실제 브라우저에서 `/profile/basic` 학과 검색 후보와 `/group/create` 보증금 요약/멤버 표시도 함께 확인한다.
 
+## 2026-06-23 추가 진행
+
+### 그룹 멤버/혼성 집계
+
+- 실제 그룹 멤버 내보내기 UI를 `친구 관리 -> 그룹에서 내보내기` 흐름으로 정리했다.
+- `get_group_member_summaries(UUID)`가 active 멤버의 `gender`도 반환하도록 새 migration을 추가했다.
+- 그룹 화면은 active 멤버 기준으로 `남자 그룹`, `여자 그룹`, `혼성 그룹`, `성별 확인 중`을 다시 계산한다.
+- 남남이었다가 남녀로 그룹 구성이 바뀌는 경우, `left_at IS NULL`인 현재 멤버만 기준으로 집계하도록 테스트를 추가했다.
+- 커밋 `7fcd738 feat: support group size matching and mixed queue stats`는 GitHub 원격 브랜치에 push 완료했다.
+
+### 결제/Vercel 배포 preflight
+
+- `scripts/check-payment-env.mjs`가 Toss 배포 모드에서 `NEXT_PUBLIC_PAYMENT_PROVIDER=toss`, `PAYMENT_PROVIDER=toss`까지 요구하도록 강화했다.
+- 키가 있어도 provider mode가 `mock`이면 Vercel 배포 전 검사에서 실패하게 했다.
+- 실제 secret 값은 코드/문서/테스트에 쓰지 않았다.
+- 현재 로컬 `.env.local`에는 Supabase 공개 설정만 있고 Toss 관련 env와 server-only env는 없다.
+- `vercel` CLI는 현재 로컬에서 잡히지 않고, `.vercel/project.json`도 없다.
+- Supabase 플러그인 계정에서는 성준이 넘긴 새 Supabase 프로젝트가 보이지 않아, 이 세션에서 새 DB migration 적용 검증은 못 했다.
+
+### 로컬 route 회복
+
+- 오래 떠 있던 Next dev 서버가 `.next` 청크를 잃어 500을 내던 문제를 확인했다.
+- 워크스페이스 내부 `.next`만 경로 확인 후 삭제하고 3004 dev 서버를 재시작했다.
+- 재확인 결과:
+  - `/dev/preview` 200
+  - `/group/create?size=2` 200
+  - `/match/dev-match-pending` 200
+  - `/match/dev-match-1` 200
+
 ## 2026-06-22 추가 진행
 
 ### 추가 수정

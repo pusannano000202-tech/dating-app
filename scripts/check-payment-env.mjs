@@ -29,6 +29,18 @@ const checks = [
 if (provider === 'toss') {
   checks.push(
     {
+      key: 'NEXT_PUBLIC_PAYMENT_PROVIDER',
+      required: true,
+      purpose: 'browser payment mode',
+      validate: (value) => String(value).trim().toLowerCase() === 'toss',
+    },
+    {
+      key: 'PAYMENT_PROVIDER',
+      required: true,
+      purpose: 'server payment mode',
+      validate: (value) => String(value).trim().toLowerCase() === 'toss',
+    },
+    {
       key: 'NEXT_PUBLIC_TOSS_CLIENT_KEY',
       required: true,
       purpose: 'browser-safe Toss checkout key',
