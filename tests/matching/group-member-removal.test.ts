@@ -1,0 +1,60 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+const repoRoot = process.cwd()
+
+function readSource(path: string): string {
+  return readFileSync(join(repoRoot, path), 'utf8')
+}
+
+function readAllMigrations(): string {
+  return readdirSync(join(repoRoot, 'supabase/migrations'))
+    .filter((name) => name.endsWith('.sql'))
+    .sort()
+    .map((name) => `\n-- ${name}\n${readSource(`supabase/migrations/${name}`)}`)
+    .join('\n')
+}
+
+test('leader member removal has an API route and database RPC', () => {
+  assert.equal(existsSync(join(repoRoot, 'app/api/groups/remove-member/route.ts')), true)
+
+  const route = readSource('app/api/groups/remove-member/route.ts')
+  assert.match(route, /rpc\('remove_group_member'/)
+  assert.match(route, /member_user_id_required/)
+
+  const migrations = readAllMigrations()
+  assert.match(migrations, /CREATE OR REPLACE FUNCTION public\.remove_group_member/)
+  assert.match(migrations, /p_member_user_id UUID/)
+  assert.match(migrations, /not_group_leader/)
+  assert.match(migrations, /cannot_remove_self/)
+  assert.match(migrations, /UPDATE group_members AS gm\s+SET left_at = v_now/)
+})
+
+test('member removal is exposed as a real member-card action, not a preview button', () => {
+  const page = readSource('app/group/create/page.tsx')
+  const panel = readSource('components/matching/group-create/GroupMemberStatusPanel.tsx')
+
+  assert.doesNotMatch(page, /친구가 그룹을 나간 상황 보기/)
+  assert.doesNotMatch(page, /simulateFriendLeaving/)
+  assert.match(page, /\/api\/groups\/remove-member/)
+  assert.match(panel, /내보내기/)
+  assert.match(panel, /onRemoveMember\(member\)/)
+})
+
+test('removing a group member cancels ready queue state and reopens the group', () => {
+  const migrations = readAllMigrations()
+
+  assert.match(migrations, /UPDATE match_pool AS mp\s+SET status = 'cancelled'/)
+  assert.match(migrations, /UPDATE groups AS g\s+SET status = 'forming'/)
+})
+
+test('queue and match display composition is calculated from active member genders', () => {
+  const migrations = readAllMigrations()
+
+  assert.match(migrations, /CREATE OR REPLACE FUNCTION public\.get_group_composition_gender/)
+  assert.match(migrations, /WHEN male_members > 0 AND female_members > 0 THEN 'mixed'/)
+  assert.match(migrations, /public\.get_group_composition_gender\(mp\.group_id\)/)
+  assert.match(migrations, /public\.get_group_composition_gender\(CASE WHEN/)
+})

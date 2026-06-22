@@ -20,8 +20,9 @@ export function InviteFriendPanel({
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h2 className="text-sm font-black">친구 초대하기</h2>
-          <p className="mt-0.5 text-xs text-boot-muted">
-            링크를 받은 친구는 로그인/회원가입 후 초대를 수락해야 그룹에 들어옵니다.
+          <p className="mt-0.5 text-xs leading-5 text-boot-muted">
+            링크를 받은 친구가 로그인/회원가입 후 초대를 수락해야 그룹에 들어옵니다.
+            누가 나가면 이 링크로 다시 친구를 채울 수 있어요.
           </p>
         </div>
         <UserPlus size={18} className="text-boot-primary" />
@@ -44,7 +45,7 @@ export function InviteFriendPanel({
       </button>
 
       <p className="mt-2 rounded-2xl bg-white/75 px-3 py-2 text-[11px] leading-4 text-boot-muted">
-        친구가 이미 회원이면 아래 친구 목록에서 바로 초대하고, 아직 친구가 아니라면 링크를 먼저 보내세요.
+        친구가 이미 회원이면 친구 목록에서 바로 초대하고, 아직 회원이 아니면 링크를 먼저 보내세요.
       </p>
 
       {pendingInvites.length > 0 && (

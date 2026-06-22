@@ -10,6 +10,7 @@ import {
   Wallet,
 } from 'lucide-react'
 
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import type { MatchSetupStatus } from '@/lib/matching/match-setup-status'
 import type { DepositSummary } from './types'
 
@@ -53,15 +54,15 @@ export function FreeBetaQueuePanel({
     {
       key: 'personality',
       label: '성향 선호',
-      desc: '어떤 성향의 상대와 편한지',
+      desc: '어떤 성향과 잘 맞는지',
       done: currentUserSetupStatus.personality,
       href: '/profile/personality-preference?redirect=%2Fmatch%2Fstart',
       Icon: HeartHandshake,
     },
     {
       key: 'schedule',
-      label: '안 되는 시간',
-      desc: '이번 주 절대 안 되는 시간',
+      label: '가능 시간',
+      desc: '이번 주 가능한 시간',
       done: currentUserSetupStatus.schedule,
       href: '/profile/schedule?redirect=%2Fmatch%2Fstart',
       Icon: CalendarClock,
@@ -76,7 +77,7 @@ export function FreeBetaQueuePanel({
     },
     {
       key: 'match-card',
-      label: '사전 카드 초안',
+      label: '사전 카드',
       desc: '하루 한 장 카드 초안',
       done: currentUserCardReady,
       href: '/profile/match-card?redirect=%2Fmatch%2Fstart',
@@ -88,8 +89,8 @@ export function FreeBetaQueuePanel({
     {
       label: '내 매칭 설정',
       desc: currentUserSetupReady
-        ? '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안 완료'
-        : `${nextSetupStep?.label ?? '매칭 설정'}부터 완료하면 돼요`,
+        ? '성향 선호, 가능 시간, 매칭 비중, 사전 카드까지 완료했어요.'
+        : `${nextSetupStep?.label ?? '매칭 설정'}부터 완료하면 돼요.`,
       done: currentUserSetupReady,
       href: nextSetupStep?.href ?? '/match/start',
       cta: nextSetupStep ? `${nextSetupStep.label} 하기` : '입력하러 가기',
@@ -97,24 +98,24 @@ export function FreeBetaQueuePanel({
     {
       label: `${requiredMemberCount}명 그룹 완성`,
       desc: groupIsFull
-        ? '그룹 정원이 모두 채워졌어요'
-        : `친구 ${missingMembers}명이 더 들어와야 해요`,
+        ? '그룹 정원이 모두 채워졌어요.'
+        : `친구 ${missingMembers}명이 더 들어와야 해요. 친구가 나가면 이 조건이 다시 잠겨요.`,
       done: groupIsFull,
       href: '/friends',
       cta: '친구 초대',
     },
     {
-      label: '그룹원 매칭 준비',
+      label: '그룹원 전체 준비',
       desc: allMembersReady
-        ? '모든 멤버가 매칭 설정을 끝냈어요'
-        : `${needsSetupCount}명이 성향/시간/비중/사전 카드 준비를 끝내야 해요`,
+        ? '모든 멤버가 매칭 준비를 끝냈어요.'
+        : `${needsSetupCount}명이 성향/시간/비중/사전 카드 준비를 끝내야 해요.`,
       done: allMembersReady,
       href: '/match/start',
       cta: '내 설정 보기',
     },
     {
-      label: '리더 큐 진입',
-      desc: isLeader ? '리더가 큐에 넣고 임시 매칭을 기다려요' : '리더만 큐 진입 버튼을 누를 수 있어요',
+      label: '리더가 큐 진입',
+      desc: isLeader ? '리더가 매칭 큐에 넣고 임시 매칭을 기다려요.' : '리더만 매칭 큐 진입 버튼을 누를 수 있어요.',
       done: isLeader,
     },
   ]
@@ -127,9 +128,9 @@ export function FreeBetaQueuePanel({
             <CalendarClock size={18} className="text-boot-coral" />
           </div>
           <div>
-            <h2 className="text-sm font-black">이번 주 매칭 큐</h2>
-            <p className="text-xs text-boot-muted">
-              그룹 준비가 끝나면 큐에 들어가고, 임시 매칭 후 카드와 보증금 결제로 확정합니다.
+            <h2 className="text-sm font-black">이번 주 매칭 준비</h2>
+            <p className="text-xs leading-5 text-boot-muted">
+              그룹 준비가 끝나면 큐에 들어가고, 임시 매칭 카드는 보증금 결제로 확정돼요.
             </p>
           </div>
         </div>
@@ -150,7 +151,7 @@ export function FreeBetaQueuePanel({
             <UserRoundCheck size={18} />
           </div>
           <div>
-            <h2 className="text-sm font-black">매칭찾기 버튼이 켜지는 조건</h2>
+            <h2 className="text-sm font-black">매칭 찾기 버튼을 켜는 조건</h2>
             <p className="mt-0.5 text-xs leading-5 text-boot-muted">
               아래 항목을 순서대로 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
             </p>
@@ -228,7 +229,9 @@ export function FreeBetaQueuePanel({
             <Wallet size={16} className={myDepositPaid ? 'text-emerald-700' : 'text-amber-700'} />
             <div>
               <p className="text-xs font-bold">보증금 결제</p>
-              <p className="text-[11px] text-boot-muted">10,000원 보증금은 노쇼가 없으면 환불돼요.</p>
+              <p className="text-[11px] text-boot-muted">
+                {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원 보증금은 노쇼가 없으면 환불돼요.
+              </p>
             </div>
           </div>
           {myDepositPaid ? (
@@ -288,23 +291,23 @@ export function FreeBetaQueuePanel({
       {!canEnterQueue && (
         <p className="mt-3 text-center text-xs text-boot-muted">
           {!currentUserSetupReady
-            ? '내 성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안을 먼저 입력해 주세요.'
+            ? '내 성향 선호, 가능 시간, 매칭 비중, 사전 카드 초안을 먼저 입력해주세요.'
             : !groupIsFull
               ? `${requiredMemberCount}명 그룹이 완성되면 큐 진입 단계로 넘어갈 수 있어요.`
-            : !isLeader
-              ? '리더만 큐 진입을 시작할 수 있어요.'
-              : needsSetupCount > 0
-                ? '매칭 준비 항목(성향, 시간, 비중, 사전 카드)을 아직 입력해야 하는 멤버가 있어요.'
-                : '큐 진입 조건이 맞으면 버튼이 활성화됩니다.'}
+              : !isLeader
+                ? '리더만 큐 진입을 시작할 수 있어요.'
+                : needsSetupCount > 0
+                  ? '아직 준비를 끝내야 하는 멤버가 있어요.'
+                  : '큐 진입 조건이 맞으면 버튼이 활성화됩니다.'}
         </p>
       )}
       {canEnterQueue && !myDepositPaid && (
         <p className="mt-3 text-center text-xs text-amber-700/80">
-          큐 진입은 가능해요. 보증금 결제는 임시 매칭 후 확정 전에 반드시 끝내면 됩니다.
+          큐 진입은 가능하지만, 보증금 결제는 임시 매칭 확정 전에 반드시 끝내야 합니다.
         </p>
       )}
       <p className="mt-2 text-center text-[10px] text-boot-muted">
-        보증금 10,000원은 약속이 정상 진행되면 환불되고, 노쇼가 확정되면 환불이 제한됩니다.
+        보증금 {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원은 약속이 정상 진행되면 환불되고, 노쇼가 확정되면 환불이 제한됩니다.
       </p>
     </>
   )

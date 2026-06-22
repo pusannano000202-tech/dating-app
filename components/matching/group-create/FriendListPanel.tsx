@@ -28,7 +28,7 @@ export function FriendListPanel({
       {friends.length === 0 ? (
         <div className="rounded-2xl border border-boot-hairline bg-white/80 px-4 py-5">
           <p className="text-sm leading-relaxed text-boot-muted">
-            아직 등록된 친구가 없어도 괜찮아요. 초대 링크를 받은 친구가 로그인/회원가입 후 수락하면 그룹에 들어올 수 있어요.
+            아직 등록된 친구가 없어요. 초대 링크를 받은 친구가 로그인하고 수락하면 그룹에 들어올 수 있어요.
           </p>
           <Link
             href="/friends"
@@ -45,7 +45,7 @@ export function FriendListPanel({
             const isDisabled = saving || openSlots === 0 || isInGroup || isInvited
             const statusLabel = getFriendMatchLabel(friend, memberMatchReadyByUserId)
             const canInvite = !saving && !isInvited && !isInGroup && openSlots > 0
-            const actionLabel = isInGroup ? '그룹 참여중' : isInvited ? '수락 대기' : '초대'
+            const actionLabel = isInGroup ? '그룹 참여 중' : isInvited ? '수락 대기' : '초대'
             const statusClass = isInGroup
               ? memberMatchReadyByUserId.get(friend.user_id)
                 ? 'text-emerald-700 bg-emerald-500/10 border-emerald-300/25'
@@ -57,16 +57,16 @@ export function FriendListPanel({
             return (
               <div key={friend.user_id} className="glass flex flex-col gap-3 rounded-2xl px-4 py-3 sm:flex-row sm:items-center">
                 <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-boot-soft text-sm font-black">
-                  {friend.display_name.slice(0, 1)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">{friend.display_name}</p>
-                  <p className="truncate text-xs text-boot-muted">닉네임으로 연결된 친구</p>
-                  <p className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10px] ${statusClass}`}>
-                    {statusLabel}
-                  </p>
-                </div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-boot-soft text-sm font-black">
+                    {friend.display_name.slice(0, 1)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold">{friend.display_name}</p>
+                    <p className="truncate text-xs text-boot-muted">닉네임으로 연결된 친구</p>
+                    <p className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10px] ${statusClass}`}>
+                      {statusLabel}
+                    </p>
+                  </div>
                 </div>
                 <button
                   type="button"

@@ -187,7 +187,7 @@ export default function GroupCreatePage() {
       }
 
       if (!res.ok) {
-        setError('그룹을 만들 수 없어요. 기본 프로필을 먼저 완료해 주세요.')
+        setError('그룹을 만들 수 없어요. 기본 프로필을 먼저 완료해주세요.')
         return
       }
 
@@ -259,6 +259,69 @@ export default function GroupCreatePage() {
     }
   }
 
+  async function removeGroupMember(member: GroupMemberRecord) {
+    if (!group || saving || !isLeader || member.user_id === currentUserId) return
+
+    const memberName = member.display_name ?? '친구'
+    const confirmed = window.confirm(
+      `${memberName}님을 그룹에서 내보낼까요?\n\n이미 매칭 준비 상태였다면 큐 대기는 취소되고, 부족한 친구를 다시 초대해야 해요.`
+    )
+    if (!confirmed) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+        members: current.members.filter((item) => item.user_id !== member.user_id),
+        friends: current.friends.map((friend) =>
+          friend.user_id === member.user_id ? { ...friend, group_status: 'available' } : friend
+        ),
+      }))
+      setDepositSummary((current) => {
+        if (!current) return current
+        const rows = current.rows.filter((row) => row.user_id !== member.user_id)
+        const paidCount = rows.filter((row) => row.deposit_status === 'paid' || row.deposit_status === 'held').length
+        return {
+          ...current,
+          rows,
+          total_active: rows.length,
+          paid_count: paidCount,
+          all_paid: rows.length > 0 && paidCount >= rows.length,
+        }
+      })
+      setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대하면 매칭 찾기를 이어갈 수 있어요.`)
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/groups/remove-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          group_id: group.id,
+          member_user_id: member.user_id,
+        }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+
+      await refreshGroup()
+      await refreshDeposit(group.id)
+      setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대해야 매칭 찾기가 켜져요.`)
+    } catch {
+      setError('친구를 그룹에서 내보내지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function refreshPreMatchCardStatus() {
     if (isDevPreview) {
       setPreMatchCardDone(hasPreMatchCardDraftCookie())
@@ -297,7 +360,7 @@ export default function GroupCreatePage() {
         setDepositSummary(data)
       }
     } catch {
-      // ignore
+      // Deposit state is secondary to group creation. Keep the page usable.
     }
   }
 
@@ -318,7 +381,7 @@ export default function GroupCreatePage() {
         body: JSON.stringify({ group_id: group.id }),
       })
       if (res.status === 202) {
-        setError('외부 결제창 연결 준비 상태예요. 로컬 검토에서는 mock 결제로 확인해 주세요.')
+        setError('외부 결제창 연결 준비 상태예요. 로컬 검증에서는 mock 결제로 확인해주세요.')
         return
       }
       if (!res.ok) {
@@ -337,11 +400,11 @@ export default function GroupCreatePage() {
   function translateDepositError(code?: string) {
     switch (code) {
       case 'deposit_already_exists': return '이미 보증금 결제가 확인됐어요.'
-      case 'not_group_member':       return '그룹 멤버만 보증금 결제를 할 수 있어요.'
+      case 'not_group_member':       return '그룹 멤버만 보증금을 결제할 수 있어요.'
       case 'invalid_amount':         return '보증금 금액이 올바르지 않아요.'
       case 'invalid_deposit_amount': return '보증금 금액이 올바르지 않아요.'
       case 'payment_provider_not_configured': return '결제 제공자 설정이 아직 연결되지 않았어요.'
-      default:                        return '보증금 결제 확인에 실패했어요. 잠시 후 다시 시도해 주세요.'
+      default:                        return '보증금 결제 확인에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
 
@@ -517,18 +580,18 @@ export default function GroupCreatePage() {
       case 'member_pre_match_card_incomplete':
         return '그룹 멤버 모두 사전 카드 초안을 저장해야 큐에 들어갈 수 있어요.'
       case 'member_card_lookup_failed':
-        return '멤버의 사전 카드 준비 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.'
+        return '멤버의 사전 카드 준비 상태를 확인하지 못했어요. 잠시 후 다시 시도해주세요.'
       case 'member_match_setup_incomplete':
         return '멤버의 성향 선호/가능 시간/매칭 비중/사전 카드 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
       case 'member_profile_lookup_failed':
-        return '멤버 준비 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'
-      default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해 주세요.'
+        return '멤버 준비 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.'
+      default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
 
   async function leaveGroup() {
     if (!group || saving || isLeader) return
-    if (!window.confirm('그룹에서 나갈까요?')) return
+    if (!window.confirm('이 그룹에서 나갈까요? 남은 그룹은 다시 친구를 초대해야 해요.')) return
     setSaving(true)
     setError(null)
     try {
@@ -547,7 +610,7 @@ export default function GroupCreatePage() {
       setDepositSummary(null)
       await ensureGroup()
     } catch {
-      setError('그룹을 나가지 못했어요.')
+      setError('그룹에서 나가지 못했어요.')
     } finally {
       setSaving(false)
     }
@@ -555,7 +618,7 @@ export default function GroupCreatePage() {
 
   async function disbandGroup() {
     if (!group || saving || !isLeader) return
-    if (!window.confirm('그룹을 해체할까요? 모든 멤버가 빠지게 돼요.')) return
+    if (!window.confirm('그룹을 해체할까요? 모든 멤버가 이 그룹에서 빠지게 돼요.')) return
     setSaving(true)
     setError(null)
     try {
@@ -582,7 +645,7 @@ export default function GroupCreatePage() {
 
   async function transferLeadership(newLeaderUserId: string) {
     if (!group || saving || !isLeader) return
-    if (!window.confirm('이 멤버에게 리더를 위임할까요? 위임 이후 본인은 일반 멤버가 돼요.')) return
+    if (!window.confirm('이 멤버에게 리더를 위임할까요? 위임 후 본인은 일반 멤버가 됩니다.')) return
     setSaving(true)
     setError(null)
     try {
@@ -616,7 +679,7 @@ export default function GroupCreatePage() {
       case 'new_leader_not_member': return '선택한 멤버가 이 그룹의 활성 멤버가 아니에요.'
       case 'group_size_smaller_than_members': return '현재 들어온 멤버 수보다 작은 매칭 규모로는 바꿀 수 없어요.'
       case 'group_size_update_failed': return '그룹 인원 변경에 실패했어요.'
-      default:                    return '처리에 실패했어요. 잠시 후 다시 시도해 주세요.'
+      default:                    return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
 
@@ -635,7 +698,7 @@ export default function GroupCreatePage() {
         ) : (
           <>
             {error && (
-              <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
@@ -651,91 +714,94 @@ export default function GroupCreatePage() {
               />
             ) : (
               <>
-            <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs font-black text-boot-primary">매칭 규모 선택</p>
-                  <h2 className="mt-1 text-lg font-black text-boot-ink">
-                    {capacity}:{capacity} 과팅으로 준비 중
-                  </h2>
-                  <p className="mt-1 text-xs leading-5 text-boot-muted">
-                    2:2와 3:3 중 하나를 고르면 같은 규모의 그룹끼리 매칭돼요. 친구 성별이 섞인 혼성 그룹도 만들 수 있어요.
-                  </p>
-                </div>
-                <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
-                  {members.length}/{capacity}명
-                </span>
-              </div>
+                <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-black text-boot-primary">매칭 규모 선택</p>
+                      <h2 className="mt-1 text-lg font-black text-boot-ink">
+                        {capacity}:{capacity} 과팅으로 준비 중
+                      </h2>
+                      <p className="mt-1 text-xs leading-5 text-boot-muted">
+                        2:2와 3:3 중 하나를 고르면 같은 규모의 그룹끼리 매칭돼요. 친구 성별이 섞인 혼성 그룹도 만들 수 있어요.
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
+                      {members.length}/{capacity}명
+                    </span>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                {[2, 3].map((size) => {
-                  const selected = capacity === size
-                  const locked = members.length > size || saving
+                  <div className="grid grid-cols-2 gap-2">
+                    {[2, 3].map((size) => {
+                      const selected = capacity === size
+                      const locked = members.length > size || saving
 
-                  return (
-                    <button
-                      key={size}
-                      type="button"
-                      disabled={locked || selected}
-                      onClick={() => updateGroupSize(size as 2 | 3)}
-                      className={[
-                        'min-h-[82px] rounded-2xl border px-3 py-3 text-left transition-all',
-                        selected
-                          ? 'border-boot-primary/40 bg-boot-soft text-boot-primary shadow-sm'
-                          : 'border-boot-hairline bg-white text-boot-ink hover:border-boot-primary/30 hover:bg-boot-soft/60',
-                        locked && !selected ? 'cursor-not-allowed opacity-45' : '',
-                      ].join(' ')}
-                    >
-                      <span className="block text-lg font-black">{size}:{size}</span>
-                      <span className="mt-1 block text-[11px] leading-4 text-boot-muted">
-                        {size === 2 ? '빠르게 2명이서 가볍게 매칭' : '친구 3명이 모이면 더 활기찬 매칭'}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </section>
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          disabled={locked || selected}
+                          onClick={() => updateGroupSize(size as 2 | 3)}
+                          className={[
+                            'min-h-[82px] rounded-2xl border px-3 py-3 text-left transition-all',
+                            selected
+                              ? 'border-boot-primary/40 bg-boot-soft text-boot-primary shadow-sm'
+                              : 'border-boot-hairline bg-white text-boot-ink hover:border-boot-primary/30 hover:bg-boot-soft/60',
+                            locked && !selected ? 'cursor-not-allowed opacity-45' : '',
+                          ].join(' ')}
+                        >
+                          <span className="block text-lg font-black">{size}:{size}</span>
+                          <span className="mt-1 block text-[11px] leading-4 text-boot-muted">
+                            {size === 2 ? '빠르게 2명이서 가볍게 매칭' : '친구 3명이 모이면 더 시끌한 매칭'}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
 
-            <GroupMemberStatusPanel
-              members={members}
-              currentUserId={currentUserId}
-              capacity={capacity}
-              groupStats={groupStats}
-              memberMatchReadyByUserId={memberMatchReadyByUserId}
-              queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
-            />
+                <GroupMemberStatusPanel
+                  members={members}
+                  currentUserId={currentUserId}
+                  capacity={capacity}
+                  groupStats={groupStats}
+                  memberMatchReadyByUserId={memberMatchReadyByUserId}
+                  queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
+                  canManageMembers={Boolean(isLeader && group && ['forming', 'ready'].includes(group.status))}
+                  saving={saving}
+                  onRemoveMember={removeGroupMember}
+                />
 
-            <InviteFriendPanel
-              copied={copied}
-              saving={saving || !group}
-              pendingInvites={pendingInvites}
-              onCopyInviteLink={copyInviteLink}
-            />
+                <InviteFriendPanel
+                  copied={copied}
+                  saving={saving || !group}
+                  pendingInvites={pendingInvites}
+                  onCopyInviteLink={copyInviteLink}
+                />
 
-            <FriendListPanel
-              friends={state.friends}
-              saving={saving}
-              openSlots={openSlots}
-              memberMatchReadyByUserId={memberMatchReadyByUserId}
-              onInviteFriend={inviteFriend}
-            />
+                <FriendListPanel
+                  friends={state.friends}
+                  saving={saving}
+                  openSlots={openSlots}
+                  memberMatchReadyByUserId={memberMatchReadyByUserId}
+                  onInviteFriend={inviteFriend}
+                />
 
-            <FreeBetaQueuePanel
-              saving={saving}
-              canEnterQueue={canEnterQueue}
-              isLeader={isLeader}
-              requiredMemberCount={capacity}
-              membersLength={members.length}
-              needsSetupCount={needsSetupCount}
-              currentUserSetupStatus={currentUserMatchSetup}
-              currentUserSetupReady={currentUserSetupReady}
-              currentUserCardReady={preMatchCardDone}
-              myDepositPaid={myDepositPaid}
-              depositSummary={depositSummary}
-              groupStats={groupStats}
-              onConfirmParticipation={payDeposit}
-              onEnterQueue={enterQueue}
-            />
+                <FreeBetaQueuePanel
+                  saving={saving}
+                  canEnterQueue={canEnterQueue}
+                  isLeader={isLeader}
+                  requiredMemberCount={capacity}
+                  membersLength={members.length}
+                  needsSetupCount={needsSetupCount}
+                  currentUserSetupStatus={currentUserMatchSetup}
+                  currentUserSetupReady={currentUserSetupReady}
+                  currentUserCardReady={preMatchCardDone}
+                  myDepositPaid={myDepositPaid}
+                  depositSummary={depositSummary}
+                  groupStats={groupStats}
+                  onConfirmParticipation={payDeposit}
+                  onEnterQueue={enterQueue}
+                />
               </>
             )}
           </>
@@ -748,6 +814,8 @@ export default function GroupCreatePage() {
             showTransferPanel={showTransferPanel}
             members={members}
             currentUserId={currentUserId}
+            groupStatus={group.status}
+            capacity={capacity}
             onToggleTransferPanel={() => setShowTransferPanel((prev) => !prev)}
             onTransferLeadership={transferLeadership}
             onLeaveGroup={leaveGroup}
@@ -764,7 +832,7 @@ export default function GroupCreatePage() {
 
         <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-boot-muted">
           <LockKeyhole size={13} />
-          서로 매칭하기 전까지 사진과 이름은 공개하지 않아요
+          서로 매칭되기 전까지 사진과 이름은 공개되지 않아요.
         </div>
       </div>
     </main>
@@ -780,5 +848,3 @@ function hasPreMatchCardDraftCookie(): boolean {
     ?.split('=')[1]
   return isPreMatchCardDraftCookieDone(value)
 }
-
-
