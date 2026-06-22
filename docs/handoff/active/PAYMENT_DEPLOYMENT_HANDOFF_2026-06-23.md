@@ -78,6 +78,8 @@ npm run build
 ## 현재 로컬/배포 연결 상태
 
 - `.env.local`에는 Supabase 공개 설정만 있고 Toss 관련 변수는 아직 없다.
+- `.env.example`과 `.env.local.example`에는 실제 키 없이 Supabase/Toss/Vercel 필수 변수 자리를 정리했다.
+  - 새 사람이 받을 때는 `.env.example` 또는 `.env.local.example`을 `.env.local`로 복사하고 값을 채운다.
 - `vercel` CLI는 현재 작업 환경에서 잡히지 않는다.
 - `.vercel/project.json`도 없어서 이 폴더는 아직 Vercel 프로젝트와 로컬 link가 되어 있지 않다.
 - `npm run check:deploy-readiness` 기준으로 현재 차단점은 Vercel CLI/link, Toss env, 배포 URL origin 설정이다.

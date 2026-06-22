@@ -93,19 +93,21 @@ test('Toss deposit readiness requires checkout, refund, and reconciliation serve
 })
 
 test('local env example documents mock and Toss sandbox payment settings without secrets', () => {
-  const envExample = readSource('.env.local.example')
+  for (const file of ['.env.local.example', '.env.example']) {
+    const envExample = readSource(file)
 
-  assert.match(envExample, /NEXT_PUBLIC_PAYMENT_PROVIDER=mock/)
-  assert.match(envExample, /PAYMENT_PROVIDER=mock/)
-  assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY=/)
-  assert.match(envExample, /TOSS_SECRET_KEY=/)
-  assert.match(envExample, /PAYMENT_INTERNAL_SECRET=/)
-  assert.match(envExample, /SUPABASE_SERVICE_ROLE_KEY=/)
-  assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY is safe for the browser/)
-  assert.match(envExample, /TOSS_SECRET_KEY is server-only/)
-  assert.match(envExample, /Never expose these with NEXT_PUBLIC_/)
-  assert.doesNotMatch(envExample, /TOSS_SECRET_KEY=gsk_/)
-  assert.doesNotMatch(envExample, /SUPABASE_SERVICE_ROLE_KEY=eyJ/)
+    assert.match(envExample, /NEXT_PUBLIC_PAYMENT_PROVIDER=mock/)
+    assert.match(envExample, /PAYMENT_PROVIDER=mock/)
+    assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY=/)
+    assert.match(envExample, /TOSS_SECRET_KEY=/)
+    assert.match(envExample, /PAYMENT_INTERNAL_SECRET=/)
+    assert.match(envExample, /SUPABASE_SERVICE_ROLE_KEY=/)
+    assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY is .*browser/)
+    assert.match(envExample, /TOSS_SECRET_KEY is server-only/)
+    assert.match(envExample, /Never expose these with NEXT_PUBLIC_/)
+    assert.doesNotMatch(envExample, /TOSS_SECRET_KEY=gsk_/)
+    assert.doesNotMatch(envExample, /SUPABASE_SERVICE_ROLE_KEY=eyJ/)
+  }
 })
 
 test('payment env checker supports mock review and Toss sandbox preflight without printing secrets', () => {
