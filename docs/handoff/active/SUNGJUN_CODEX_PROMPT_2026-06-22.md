@@ -12,7 +12,8 @@
 - profile/post-worldcup-decisions-2026-05-21
 
 주의:
-- 충현 로컬 브랜치가 origin보다 앞서 있을 수 있다.
+- 2026-06-22 기준 충현이 `e6ab3b8 feat: sync booting frontend flow for sungjun handoff`까지 GitHub에 push 완료했다.
+- 우선 origin 브랜치가 `e6ab3b8` 이상인지 확인해.
 - 먼저 `git status -sb`, `git log --oneline --decorate -5`, `git remote -v`로 현재 상태를 확인해.
 - 사용자가 만든 변경은 절대 되돌리지 마.
 
@@ -77,4 +78,3 @@ npm run check:payment-env -- --provider=toss
 6. 발표 전 바로 고치면 좋은 UI 문제
 7. 다음 커밋/PR 추천 단위
 ```
-

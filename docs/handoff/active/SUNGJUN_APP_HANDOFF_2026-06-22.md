@@ -40,26 +40,26 @@ https://github.com/pusannano000202-tech/dating-app.git
 profile/post-worldcup-decisions-2026-05-21
 ```
 
-현재 로컬 HEAD:
+현재 푸시 완료 HEAD:
 
 ```text
-5c95c91 chore: audit overnight completion gates
+e6ab3b8 feat: sync booting frontend flow for sungjun handoff
 ```
 
 원격 브랜치 상태:
 
 ```text
-origin/profile/post-worldcup-decisions-2026-05-21 = f76d131...
-현재 로컬 브랜치는 origin보다 19커밋 앞서 있음
+origin/profile/post-worldcup-decisions-2026-05-21 = e6ab3b8...
+현재 로컬 브랜치와 origin 브랜치가 같은 커밋을 가리킴
 ```
 
 중요:
 
-- 지금 로컬에는 아직 커밋되지 않은 프론트/문서/테스트 변경이 있다.
-- 따라서 성준이가 GitHub에서 바로 pull하면 현재 화면과 100% 같지 않을 수 있다.
-- 성준에게 보내기 전에는 충현 쪽에서 현재 변경분을 커밋하고 push하거나, patch/PR로 전달해야 한다.
+- 2026-06-22 기준 코드/문서 변경은 GitHub에 push 완료됐다.
+- 성준은 GitHub에서 이 브랜치를 받으면 현재 프론트 흐름을 바로 이어서 볼 수 있다.
+- 로컬에 남은 `.codex-remote-attachments/`, `output/`은 카톡 첨부와 PDF/스크린샷 산출물이라 코드 기준선에는 포함하지 않았다.
 
-현재 주요 미커밋 변경 범위:
+이번 push에 포함된 주요 변경 범위:
 
 - `app/match/[id]/page.tsx`
 - `app/match/page.tsx`
@@ -75,7 +75,8 @@ origin/profile/post-worldcup-decisions-2026-05-21 = f76d131...
 - `tests/config/booting-branding.test.ts`
 - `tests/profile/gender-normalization.test.ts`
 - `lib/gender.ts`
-- `output/`
+- `docs/handoff/active/SUNGJUN_APP_HANDOFF_2026-06-22.md`
+- `docs/handoff/active/SUNGJUN_CODEX_PROMPT_2026-06-22.md`
 
 ---
 
@@ -407,13 +408,15 @@ http://localhost:3004/match/dev-match-pending = 200
 
 ## 8. 위험 항목
 
-### 위험 1 - 현재 로컬 상태가 GitHub와 다름
+### 위험 1 - 코드 기준선과 산출물 기준선이 다름
 
-로컬 브랜치는 origin보다 19커밋 앞서 있고, 미커밋 변경도 많다.
+코드/문서 기준선은 `e6ab3b8`로 GitHub에 push 완료됐다.
+다만 PDF, 스크린샷, 카톡 첨부 같은 산출물은 `output/`, `.codex-remote-attachments/`에 남아 있고 Git에는 올리지 않았다.
 
 해결:
 
-- 성준에게 보내기 전 커밋/푸시 또는 patch 전달.
+- 성준이 코드 작업을 이어갈 때는 GitHub 브랜치만 받으면 된다.
+- 발표 공유용 PDF는 카톡 파일로 따로 전달한다.
 
 ### 위험 2 - 공용 파일 수정
 
@@ -623,4 +626,3 @@ npm run check:payment-env -- --provider=toss
 ## 12. 한 줄 요약
 
 성준은 이 브랜치를 "완성된 운영앱"으로 보면 안 되고, "로컬에서 거의 전체 흐름을 눌러보며 발표 준비와 최종 합의 항목을 좁히는 기준선"으로 보면 된다.
-
