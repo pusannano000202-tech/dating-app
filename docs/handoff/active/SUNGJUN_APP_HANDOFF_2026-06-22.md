@@ -25,7 +25,7 @@
 현재 작업 폴더:
 
 ```powershell
-C:\Users\82108\OneDrive\바탕 화면\데이팅앱만들기
+C:/Users/82108/OneDrive/바탕 화면/데이팅앱만들기
 ```
 
 현재 origin:
