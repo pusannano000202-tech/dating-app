@@ -17,6 +17,10 @@ export async function middleware(request: NextRequest) {
 
   // Supabase 키 없으면 인증 체크 스킵 (로컬 UI 확인용)
   if (!isSupabaseConfigured() || isDevAuthed || shouldIssueDevAuth) {
+    if (pathname === '/' && !isDevAuthed && !shouldIssueDevAuth) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+
     const response = NextResponse.next({ request })
     if (shouldIssueDevAuth) {
       response.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue(), {
@@ -54,6 +58,10 @@ export async function middleware(request: NextRequest) {
 
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 
+  if (pathname === '/' && !user) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
   if (isProtected && !user) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
@@ -70,6 +78,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|appearance-types|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|appearance-types|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|ogg)$).*)',
   ],
 }

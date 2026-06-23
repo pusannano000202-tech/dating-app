@@ -2,9 +2,8 @@
 
 import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Eye, LogIn, MailCheck, Send } from 'lucide-react'
+import { LogIn, MailCheck, Send, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { getSupabaseConfigIssue } from '@/lib/utils'
 import BootingLogo from '@/components/BootingLogo'
 
@@ -29,7 +28,6 @@ function LoginContent() {
   const redirectTo = searchParams.get('redirect') ?? searchParams.get('next') ?? '/profile/basic'
   const authError = searchParams.get('auth_error')
   const supabaseConfigIssue = getSupabaseConfigIssue()
-  const devAuthBypassEnabled = isDevAuthBypassEnabled()
 
   const [step, setStep] = useState<LoginStep>('email')
   const [email, setEmail] = useState('')
@@ -197,29 +195,41 @@ function LoginContent() {
     codeRefs.current[Math.min(digits.length, 5)]?.focus()
   }
 
-  function enterDevPreview() {
-    const maxAge = 60 * 60 * 24 * 7
-    document.cookie = `${DEV_AUTH_COOKIE}=${getDevAuthCookieValue()}; path=/; max-age=${maxAge}; SameSite=Lax`
-    window.localStorage.setItem(DEV_AUTH_COOKIE, getDevAuthCookieValue())
-    router.replace('/dev/preview')
-  }
-
   return (
-    <main className="flex min-h-screen items-center justify-center overflow-hidden booting-band px-5 py-10 text-boot-ink">
-      <section className="w-full max-w-sm">
-        <div className="mb-9 text-center">
-          <div className="mb-5 flex justify-center">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#17120f] px-5 py-8 text-boot-ink">
+      <video
+        className="absolute inset-0 h-full w-full object-cover opacity-60 motion-reduce:hidden"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      >
+        <source src="/media/booting-login-bg.mp4" type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(255,117,89,0.28),transparent_34%),linear-gradient(180deg,rgba(20,14,12,0.36)_0%,rgba(255,247,241,0.92)_44%,rgba(255,247,241,0.98)_100%)]" />
+
+      <section className="relative z-10 w-full max-w-sm">
+        <div className="mb-6 rounded-[32px] border border-white/45 bg-white/65 px-5 py-5 text-center shadow-[0_24px_70px_rgba(23,18,15,0.22)] backdrop-blur-2xl">
+          <div className="mb-4 flex justify-center">
             <BootingLogo size="lg" />
           </div>
-          <h1 className="text-3xl font-black leading-tight">
-            이메일 코드로<br />부팅하세요
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-boot-primary/20 bg-white/75 px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary">
+            <Sparkles size={12} />
+            PNU GROUP MATCHING
+          </div>
+          <h1 className="text-[2rem] font-black leading-tight tracking-normal">
+            오늘 같이 과팅할
+            <br />
+            친구를 모아보세요
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-boot-muted">
-            메일로 받은 6자리 숫자를 입력하면 로그인돼요.
+          <p className="mx-auto mt-3 max-w-[17rem] text-sm leading-6 text-boot-muted">
+            로그인 후에만 그룹 만들기, 매칭 찾기, 알림 화면을 열 수 있어요.
           </p>
         </div>
 
-        <div className="glass-card rounded-3xl border border-boot-hairline p-6">
+        <div className="rounded-[30px] border border-white/55 bg-white/88 p-6 shadow-[0_26px_70px_rgba(23,18,15,0.18)] backdrop-blur-2xl">
           {step === 'email' ? (
             <div>
               <button
@@ -339,18 +349,7 @@ function LoginContent() {
           )}
         </div>
 
-        {devAuthBypassEnabled && (
-          <button
-            type="button"
-            onClick={enterDevPreview}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 text-sm font-black text-boot-primary shadow-sm transition-colors hover:border-boot-primary/30"
-          >
-            <Eye size={16} strokeWidth={2.5} />
-            디자인 확인용으로 입장
-          </button>
-        )}
-
-        <p className="mt-6 text-center text-[11px] leading-relaxed text-boot-muted">
+        <p className="mt-5 text-center text-[11px] leading-relaxed text-boot-muted">
           이메일은 로그인과 학교 인증 진행을 위해서만 사용돼요.
         </p>
       </section>

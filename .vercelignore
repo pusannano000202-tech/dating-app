@@ -1,0 +1,44 @@
+# Dependencies and build outputs
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Local Vercel metadata
+.vercel/
+
+# Git and editor metadata
+.git/
+.vscode/
+.idea/
+
+# Local agent/work artifacts
+.tmp/
+.codex/
+.codex-remote-attachments/
+.claude/
+.superpowers/
+.planning/
+.agents/
+output/
+
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Large local model weights
+python/appearance/weights/
+
+# OS files
+.DS_Store
+Thumbs.db
