@@ -248,15 +248,18 @@ test('middleware issues dev auth cookie when opening dev preview', () => {
   assert.match(devMatchSetup, /hasDevAuthLocalStorage\(\) \|\| hasDevAuthCookie\(\)/)
 })
 
-test('temporary school demo mode routes login entry points to dev preview', () => {
+test('temporary school demo mode keeps login visible and exposes a local preview button', () => {
   const middleware = readSource('middleware.ts')
   const devAuth = readSource('lib/dev-auth.ts')
+  const login = readSource('app/(auth)/login/page.tsx')
 
   assert.match(devAuth, /NEXT_PUBLIC_BOOTING_DEMO_MODE/)
   assert.match(devAuth, /!== 'off'/)
-  assert.match(middleware, /pathname === '\/login'/)
-  assert.match(middleware, /pathname === '\/'/)
-  assert.match(middleware, /new URL\('\/dev\/preview', request\.url\)/)
+  assert.match(login, /href="\/dev\/preview"/)
+  assert.match(login, /로컬로 둘러보기/)
+  assert.match(middleware, /pathname\.startsWith\('\/dev\/preview'\)/)
+  assert.doesNotMatch(middleware, /new URL\('\/dev\/preview', request\.url\)/)
+  assert.doesNotMatch(middleware, /canBypassAuth && pathname === '\/login'/)
 })
 
 test('health check validates Supabase Auth with the public key', () => {

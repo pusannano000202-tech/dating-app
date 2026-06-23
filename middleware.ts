@@ -21,12 +21,7 @@ export async function middleware(request: NextRequest) {
   const canBypassAuth = isDevAuthBypassEnabled()
   const shouldIssueDevAuth =
     canBypassAuth &&
-    (
-      pathname.startsWith('/dev/preview') ||
-      pathname === '/' ||
-      pathname === '/login' ||
-      isProtected
-    )
+    pathname.startsWith('/dev/preview')
 
   if (shouldIssueDevAuth) {
     request.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue())
@@ -36,15 +31,15 @@ export async function middleware(request: NextRequest) {
     canBypassAuth &&
     request.cookies.get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
 
-  if (canBypassAuth && pathname === '/login') {
-    const response = NextResponse.redirect(new URL('/dev/preview', request.url))
-    setDevAuthCookie(response)
-    return response
-  }
-
   if (!isSupabaseConfigured() || isDevAuthed || shouldIssueDevAuth) {
     if (pathname === '/' && !isDevAuthed && !shouldIssueDevAuth) {
       return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    if (isProtected && !isDevAuthed && !shouldIssueDevAuth) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
     }
 
     const response = NextResponse.next({ request })

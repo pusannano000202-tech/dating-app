@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ChevronLeft, LogIn, MailCheck, Send, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
@@ -255,8 +256,16 @@ function LoginContent() {
               <ArrowRight size={18} strokeWidth={2.8} />
             </button>
 
+            <Link
+              href="/dev/preview"
+              className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[22px] border border-white/55 bg-white/82 text-sm font-black text-boot-ink shadow-sm backdrop-blur-xl transition-colors hover:bg-white"
+            >
+              로컬로 둘러보기
+              <ArrowRight size={16} strokeWidth={2.7} />
+            </Link>
+
             <p className="mt-4 text-center text-[12px] font-bold leading-5 text-white/78">
-              시작하면 Google 또는 이메일 코드로 로그인할 수 있어요.
+              실제 로그인은 위 버튼으로, 시연은 로컬 둘러보기로 바로 확인할 수 있어요.
             </p>
           </div>
         ) : (
