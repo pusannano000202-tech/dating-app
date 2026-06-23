@@ -19,7 +19,6 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
 import HomeInfoButton from '@/components/matching/HomeInfoButton'
 import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
-import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 
 type ServerSupabaseClient = ReturnType<typeof createSupabaseServerClient>
 
@@ -175,13 +174,7 @@ function HomeDashboard() {
 
         <HomeTodayTaskCard />
 
-        <LockedOpponentCard
-          className="mb-5"
-          title="추천 상대팀"
-          chemi={92}
-          chips={['차분한', '카페파', '수요일']}
-          description="상대 프로필은 매칭 확정 후에 공개돼요"
-        />
+        <HomeLockedOpponentNotice />
 
         <section className="mb-5 grid grid-cols-2 gap-3">
           <HomeActionCard
@@ -226,6 +219,42 @@ function HomeDashboard() {
         </div>
       </div>
     </main>
+  )
+}
+
+function HomeLockedOpponentNotice() {
+  const steps = ['친구 초대', '내 설정 완료', '매칭 찾기']
+
+  return (
+    <section className="mb-5 rounded-[30px] border border-boot-hairline bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+      <div className="flex items-start gap-4">
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+          <LockKeyhole size={21} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-black uppercase tracking-[0.26em] text-boot-primary">Privacy lock</p>
+          <h2 className="mt-2 text-xl font-black leading-tight text-boot-ink">상대팀 카드는 아직 잠겨 있어요</h2>
+          <p className="mt-2 text-sm leading-6 text-boot-muted">
+            매칭이 잡히기 전에는 케미 점수나 상대팀 정보가 보이지 않아요. 먼저 내 팀 준비를 끝내면
+            다음 단계에서 필요한 정보만 차례로 열립니다.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        {steps.map((step, index) => (
+          <div
+            key={step}
+            className="rounded-2xl border border-boot-hairline bg-boot-soft px-2 py-3 text-center"
+          >
+            <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-black text-boot-primary">
+              {index + 1}
+            </span>
+            <span className="mt-2 block text-[11px] font-black text-boot-body">{step}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 

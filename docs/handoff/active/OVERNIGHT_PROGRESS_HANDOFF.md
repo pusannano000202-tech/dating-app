@@ -1249,3 +1249,25 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - 먼저 `npm run test:config`에서 `printNextSteps` 누락으로 실패하는 것을 확인했다.
   - 구현 후 `npm run test:config` 통과. 56개 테스트.
   - `npm run check:deploy-readiness`는 예상대로 실패하지만, 이제 위 다음 행동을 같이 출력한다.
+
+## 2026-06-23 홈 매칭 전 상대카드 오해 제거
+
+- 홈 대시보드에서 매칭 전인데도 `추천 상대팀`, `케미 92%`처럼 결과 카드처럼 보이던 영역을 제거했다.
+- 해당 위치는 이제 `상대팀 카드는 아직 잠겨 있어요` 잠금 안내 카드로 바뀐다.
+- 목적:
+  - 사용자가 매칭 찾기를 누르기 전 상대팀 카드가 이미 나온 것처럼 오해하지 않게 한다.
+  - 홈은 오늘 할 일/진행 요약만 담당하고, 실제 상대팀 정보는 매칭 단계에서만 보이게 한다.
+- 회귀 테스트 추가:
+  - `home page does not show result-like opponent card before matching starts`
+  - 홈 소스에 `title="추천 상대팀"`, `chemi={92}`, `상대 프로필은 매칭 확정 후에 공개돼요`가 다시 들어오면 실패한다.
+- 검증:
+  - `npm run test:config` 통과. 57개 테스트.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - dev preview 쿠키 세션 기준 `http://localhost:3004/` 응답 확인:
+    - `상대팀 카드는 아직 잠겨 있어요` 있음.
+    - `추천 상대팀` 없음.
+    - `케미 92` 없음.
+- 참고:
+  - Playwright 브라우저 바이너리가 현재 로컬에 없어 스크린샷 자동화는 실패했다.
+  - 대신 dev preview 세션을 포함한 HTML 응답 검증으로 화면 문구 반영 여부를 확인했다.

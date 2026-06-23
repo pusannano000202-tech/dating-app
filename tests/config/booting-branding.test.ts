@@ -30,6 +30,16 @@ test('home page keeps real app login flow while presenting Booting UI', () => {
   assert.doesNotMatch(home, /DestinyLogo/)
 })
 
+test('home page does not show result-like opponent card before matching starts', () => {
+  const home = readSource('app/page.tsx')
+
+  assert.match(home, /상대팀 카드는 아직 잠겨 있어요/)
+  assert.match(home, /매칭이 잡히기 전에는 케미 점수나 상대팀 정보가 보이지 않아요/)
+  assert.doesNotMatch(home, /title="추천 상대팀"/)
+  assert.doesNotMatch(home, /chemi=\{92\}/)
+  assert.doesNotMatch(home, /상대 프로필은 매칭 확정 후에 공개돼요/)
+})
+
 test('profile personality flows use Booting surfaces instead of Destiny dark styling', () => {
   const profileLayout = readSource('app/profile/layout.tsx')
   const surveyPage = readSource('app/profile/survey/page.tsx')
