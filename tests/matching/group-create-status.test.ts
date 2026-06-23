@@ -168,3 +168,31 @@ test('getGroupExitActionState locks leaving once matching is already underway', 
   assert.equal(state.kind, 'locked')
   assert.equal(state.primaryLabel, '진행 중')
 })
+
+test('getGroupExitActionState lets non-leader members leave while the group is in pool', () => {
+  const state = getGroupExitActionState({
+    isLeader: false,
+    groupStatus: 'in_pool',
+    activeMemberCount: 2,
+    capacity: 2,
+    transferableMemberCount: 0,
+  })
+
+  assert.equal(state.kind, 'member_can_leave')
+  assert.equal(state.primaryLabel, '그룹 나가기')
+  assert.match(state.description, /다시 친구를 초대/)
+})
+
+test('getGroupExitActionState tells leaders to cancel queue before structural changes in pool', () => {
+  const state = getGroupExitActionState({
+    isLeader: true,
+    groupStatus: 'in_pool',
+    activeMemberCount: 2,
+    capacity: 2,
+    transferableMemberCount: 1,
+  })
+
+  assert.equal(state.kind, 'locked')
+  assert.equal(state.primaryLabel, '큐 진행 중')
+  assert.match(state.description, /큐에서 먼저 빠져야/)
+})

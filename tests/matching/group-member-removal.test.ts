@@ -47,6 +47,7 @@ test('member removal is exposed as a real member-card action, not a preview butt
   assert.doesNotMatch(queuePanel, /친구가 나가면/)
   assert.match(page, /\/api\/groups\/remove-member/)
   assert.match(panel, /내보내기/)
+  assert.match(panel, /친구 내보내기/)
   assert.match(panel, /그룹에서 내보내기/)
   assert.match(panel, /aria-label=\{`\$\{name\}를 그룹에서 내보내기`\}/)
   assert.match(panel, /대기 중이면 큐는 자동 취소됩니다/)
@@ -57,9 +58,31 @@ test('member removal is exposed as a real member-card action, not a preview butt
   assert.match(panel, /window\.setTimeout/)
   assert.match(panel, /이 그룹 자리만 비워요/)
   assert.match(panel, /성별 구성/)
+  assert.match(page, /\['forming', 'ready', 'in_pool'\]\.includes\(group\.status\)/)
+  assert.doesNotMatch(page, /\{group && !inQueue && \(/)
   assert.match(types, /gender\?: 'male' \| 'female' \| null/)
   assert.match(route, /gender: 'male' \| 'female' \| null/)
   assert.match(route, /gender: row\.gender/)
+})
+
+test('member self-leave is a real database action that reopens queue preparation', () => {
+  const migrations = readAllMigrations()
+
+  assert.match(migrations, /CREATE OR REPLACE FUNCTION public\.leave_group/)
+  assert.match(migrations, /v_group\.leader_user_id = v_caller/)
+  assert.match(migrations, /UPDATE group_members AS gm\s+SET left_at = v_now/)
+  assert.match(migrations, /UPDATE match_pool AS mp\s+SET status = 'cancelled'/)
+  assert.match(migrations, /UPDATE groups AS g\s+SET status = 'forming'/)
+  assert.match(migrations, /leader_cannot_leave/)
+})
+
+test('member removal and self-leave also reopen explicit in_pool groups', () => {
+  const migrations = readAllMigrations()
+
+  assert.match(migrations, /v_group\.status NOT IN \('forming', 'ready', 'in_pool'\)/)
+  assert.match(migrations, /v_group\.status IN \('ready', 'in_pool'\)/)
+  assert.match(migrations, /COMMENT ON FUNCTION public\.remove_group_member\(UUID, UUID\)[\s\S]+forming\/ready\/in_pool/)
+  assert.match(migrations, /COMMENT ON FUNCTION public\.leave_group\(UUID\)[\s\S]+forming\/ready\/in_pool/)
 })
 
 test('group member summary exposes only safe active-member gender for composition UI', () => {

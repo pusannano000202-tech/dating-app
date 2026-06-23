@@ -120,6 +120,16 @@ export function getGroupExitActionState({
   capacity: number
   transferableMemberCount: number
 }): GroupExitActionState {
+  if (groupStatus === 'in_pool' && isLeader) {
+    return {
+      kind: 'locked',
+      title: '큐에서 먼저 빠져야 해요',
+      description: '리더가 리더 위임이나 그룹 해체처럼 구조를 바꾸려면 큐에서 먼저 빠져야 해요. 특정 친구 내보내기는 멤버 카드에서 바로 처리할 수 있어요.',
+      primaryLabel: '큐 진행 중',
+      helperText: '큐에서 빠지면 그룹은 다시 준비 상태로 돌아가고, 친구 관리 후 다시 큐에 들어갈 수 있어요.',
+    }
+  }
+
   if (!canLeaveWhileGroupStatus(groupStatus)) {
     return {
       kind: 'locked',
@@ -161,5 +171,5 @@ export function getGroupExitActionState({
 }
 
 function canLeaveWhileGroupStatus(status: GroupStatus) {
-  return status === 'forming' || status === 'ready'
+  return status === 'forming' || status === 'ready' || status === 'in_pool'
 }

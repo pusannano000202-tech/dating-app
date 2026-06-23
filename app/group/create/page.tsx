@@ -74,6 +74,7 @@ export default function GroupCreatePage() {
   const isLeader = Boolean(group && currentUserId && group.leader_user_id === currentUserId)
   const inQueue = group?.status === 'ready' || group?.status === 'in_pool'
   const groupId = group?.id
+  const canManageMembers = Boolean(isLeader && group && ['forming', 'ready', 'in_pool'].includes(group.status))
   const currentUserMatchSetup = isDevPreview
     ? devCurrentSetupStatus
     : state.current_user_match_setup ?? EMPTY_MATCH_SETUP_STATUS
@@ -752,14 +753,27 @@ export default function GroupCreatePage() {
             )}
 
             {inQueue ? (
-              <QueueRadarCard
-                stats={queueVisualState}
-                saving={saving}
-                canCancel={canCancelQueue}
-                onCancel={cancelQueue}
-                homeHref="/"
-                resultHref="/match"
-              />
+              <>
+                <QueueRadarCard
+                  stats={queueVisualState}
+                  saving={saving}
+                  canCancel={canCancelQueue}
+                  onCancel={cancelQueue}
+                  homeHref="/"
+                  resultHref="/match"
+                />
+                <GroupMemberStatusPanel
+                  members={members}
+                  currentUserId={currentUserId}
+                  capacity={capacity}
+                  groupStats={groupStats}
+                  memberMatchReadyByUserId={memberMatchReadyByUserId}
+                  queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
+                  canManageMembers={canManageMembers}
+                  saving={saving}
+                  onRemoveMember={removeGroupMember}
+                />
+              </>
             ) : (
               <>
                 <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
@@ -814,7 +828,7 @@ export default function GroupCreatePage() {
                   groupStats={groupStats}
                   memberMatchReadyByUserId={memberMatchReadyByUserId}
                   queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
-                  canManageMembers={Boolean(isLeader && group && ['forming', 'ready'].includes(group.status))}
+                  canManageMembers={canManageMembers}
                   saving={saving}
                   onRemoveMember={removeGroupMember}
                 />
@@ -855,7 +869,7 @@ export default function GroupCreatePage() {
           </>
         )}
 
-        {group && !inQueue && (
+        {group && ['forming', 'ready', 'in_pool'].includes(group.status) && (
           <GroupDangerZone
             isLeader={isLeader}
             saving={saving}

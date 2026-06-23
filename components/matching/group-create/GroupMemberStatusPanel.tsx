@@ -125,34 +125,35 @@ export function GroupMemberStatusPanel({
               </p>
 
               {canRemove && (
-                <div className="mt-auto pt-3">
+                <div className="mt-auto space-y-2 pt-3">
+                  <button
+                    type="button"
+                    aria-label={`${name}를 그룹에서 내보내기`}
+                    disabled={saving}
+                    onClick={() => onRemoveMember(member)}
+                    className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-black text-red-600 transition-colors hover:bg-red-100 disabled:opacity-40"
+                  >
+                    <UserMinus size={12} />
+                    친구 내보내기
+                  </button>
                   <button
                     type="button"
                     aria-expanded={actionOpen}
-                    aria-label={`${name} 친구 관리`}
+                    aria-label={`${name} 친구 관리 안내`}
                     disabled={saving}
                     onClick={() => setOpenMemberId(actionOpen ? null : member.user_id)}
-                    className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-boot-hairline bg-boot-soft px-3 py-2 text-[11px] font-black text-boot-primary transition-colors hover:bg-boot-soft/70 disabled:opacity-40"
+                    className="inline-flex min-h-8 w-full items-center justify-center gap-1.5 rounded-xl border border-boot-hairline bg-white px-3 py-2 text-[10px] font-black text-boot-muted transition-colors hover:bg-boot-soft disabled:opacity-40"
                   >
                     <MoreHorizontal size={13} />
                     친구 관리
                   </button>
 
                   {actionOpen && (
-                    <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-2 text-left">
-                      <p className="mb-2 text-[10px] leading-4 text-red-600">
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-2 text-left">
+                      <p className="text-[10px] leading-4 text-red-600">
                         친구 계정을 지우는 게 아니라 이 그룹 자리만 비워요. 대기 중이면 큐는 자동 취소됩니다.
                       </p>
-                      <button
-                        type="button"
-                        aria-label={`${name}를 그룹에서 내보내기`}
-                        disabled={saving}
-                        onClick={() => onRemoveMember(member)}
-                        className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-white px-3 py-2 text-[11px] font-black text-red-600 transition-colors hover:bg-red-100 disabled:opacity-40"
-                      >
-                        <UserMinus size={12} />
-                        그룹에서 내보내기
-                      </button>
+                      <p className="mt-1 text-[10px] font-black text-red-600">그룹에서 내보내기 전 확인 문구입니다.</p>
                     </div>
                   )}
                   {!actionOpen && (
