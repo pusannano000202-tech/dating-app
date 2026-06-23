@@ -22,7 +22,10 @@ export function getSupabasePublicKey(): string {
 
 export function getPublicAppOrigin(): string {
   const origin = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim()
-  return origin ? origin.replace(/\/+$/, '') : ''
+  if (!origin || isPlaceholder(origin) || !/^https?:\/\//.test(origin)) {
+    return ''
+  }
+  return origin.replace(/\/+$/, '')
 }
 
 function isPlaceholder(value: string): boolean {
@@ -31,7 +34,11 @@ function isPlaceholder(value: string): boolean {
     normalized === '' ||
     normalized.includes('placeholder') ||
     normalized.includes('your-') ||
-    normalized.includes('your_')
+    normalized.includes('your_') ||
+    normalized.includes('example') ||
+    normalized.includes('replace_me') ||
+    normalized.includes('changeme') ||
+    /<[^>]+>/.test(normalized)
   )
 }
 

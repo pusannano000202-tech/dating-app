@@ -9,6 +9,7 @@ import {
 } from '@/lib/payments/deposit'
 import { confirmTossPayment, TossPaymentError } from '@/lib/payments/toss'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { getPublicAppOrigin } from '@/lib/utils'
 
 interface DepositPaymentRow {
   id: string
@@ -34,7 +35,7 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     if (options.redirectBrowser) {
-      const target = new URL('/login', req.nextUrl.origin)
+      const target = new URL('/login', getPublicAppOrigin() || req.nextUrl.origin)
       target.searchParams.set('redirect', '/group/create')
       target.searchParams.set('payment', 'failed')
       target.searchParams.set('reason', 'unauthorized')
@@ -260,7 +261,7 @@ function respondWithPaymentError(
 function buildPaymentRedirect(req: NextRequest, groupId: string) {
   const target = new URL(
     normalizeDepositReturnPath(req.nextUrl.searchParams.get('return_path')),
-    req.nextUrl.origin,
+    getPublicAppOrigin() || req.nextUrl.origin,
   )
   if (groupId) {
     target.searchParams.set('group_id', groupId)

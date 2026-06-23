@@ -1135,3 +1135,10 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - 실제 키 값은 문서에 쓰지 않았고, 환경변수 이름/대시보드 작업/검증 명령만 정리했다.
 - `scripts/check-payment-env.mjs`와 `scripts/check-deploy-readiness.mjs`가 이제 `your-*`, `example`, `placeholder`, `replace_me`, `<...>` 같은 복사용 placeholder 값을 실패 처리한다.
 - 현재 로컬 기준 남은 차단점은 Vercel CLI/link, Toss env/provider mode, `NEXT_PUBLIC_APP_ORIGIN`, Supabase DB 실제 적용 검증이다.
+
+## 2026-06-23 Toss 콜백 origin 보강
+
+- `/api/deposits`, `/api/payments/deposit`, `/api/payments/deposit/confirm`, `/api/payments/deposit/cancel`이 결제 success/fail/redirect URL을 만들 때 `NEXT_PUBLIC_APP_ORIGIN`을 우선 사용하도록 보강했다.
+- `NEXT_PUBLIC_APP_ORIGIN`이 없거나 placeholder면 기존처럼 `req.nextUrl.origin`으로 fallback한다.
+- 이 변경으로 Vercel production/preview 배포에서 Toss 콜백이 로컬/프록시 origin으로 흔들릴 위험을 줄였다.
+- 검증: `npm run test:config`, `npm run typecheck`, `npm run lint`, `npm run build`, `node scripts/check-secret-leaks.mjs` 통과.

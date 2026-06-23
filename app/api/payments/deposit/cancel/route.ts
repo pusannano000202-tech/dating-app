@@ -7,13 +7,13 @@ import {
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
 import { cancelTossPayment, TossPaymentError } from '@/lib/payments/toss'
-import { getSupabaseUrl } from '@/lib/utils'
+import { getPublicAppOrigin, getSupabaseUrl } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   const result = readCancelResult(req)
   const target = new URL(
     normalizeDepositReturnPath(req.nextUrl.searchParams.get('return_path')),
-    req.nextUrl.origin,
+    getPublicAppOrigin() || req.nextUrl.origin,
   )
   target.searchParams.set('payment', 'cancelled')
   target.searchParams.set('provider', result.provider)

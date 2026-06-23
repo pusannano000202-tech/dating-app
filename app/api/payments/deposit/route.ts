@@ -7,6 +7,7 @@ import {
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { getPublicAppOrigin } from '@/lib/utils'
 
 interface DepositPaymentRow {
   id: string
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
     provider,
     groupId,
     userId: user.id,
-    origin: req.nextUrl.origin,
+    origin: getPublicAppOrigin() || req.nextUrl.origin,
     orderId: pendingOrderId,
     returnPath: typeof body.return_path === 'string' ? body.return_path : undefined,
   })

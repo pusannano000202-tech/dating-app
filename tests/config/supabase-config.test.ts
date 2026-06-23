@@ -95,6 +95,17 @@ test('getPublicAppOrigin returns configured public app origin', () => {
   assert.equal(getPublicAppOrigin(), 'http://localhost:3003')
 })
 
+test('getPublicAppOrigin rejects placeholders and invalid values', () => {
+  process.env.NEXT_PUBLIC_APP_ORIGIN = 'https://<vercel-domain>'
+  assert.equal(getPublicAppOrigin(), '')
+
+  process.env.NEXT_PUBLIC_APP_ORIGIN = 'replace_me'
+  assert.equal(getPublicAppOrigin(), '')
+
+  process.env.NEXT_PUBLIC_APP_ORIGIN = 'vercel.example.com'
+  assert.equal(getPublicAppOrigin(), '')
+})
+
 test('getPublicAppOrigin returns empty string when missing', () => {
   delete process.env.NEXT_PUBLIC_APP_ORIGIN
 
