@@ -127,6 +127,7 @@ test('payment env checker supports mock review and Toss sandbox preflight withou
   assert.match(checker, /PAYMENT_INTERNAL_SECRET/)
   assert.match(checker, /SUPABASE_SERVICE_ROLE_KEY/)
   assert.match(checker, /console\.table\(rows\)/)
+  assert.match(checker, /isPlaceholderValue/)
   assert.doesNotMatch(checker, /console\.log\(env/)
   assert.doesNotMatch(checker, /console\.log\(fileEnv/)
   assert.doesNotMatch(checker, /console\.table\(env/)
@@ -148,6 +149,7 @@ test('deployment readiness checker verifies git, Vercel link, and Toss env witho
   assert.match(checker, /scripts\/check-payment-env\.mjs/)
   assert.match(checker, /--provider=toss/)
   assert.match(checker, /classifyAppOrigin\(env\.NEXT_PUBLIC_APP_ORIGIN\)/)
+  assert.match(checker, /isPlaceholderValue/)
   assert.match(checker, /localhost/)
   assert.doesNotMatch(checker, /console\.log\(process\.env/)
   assert.doesNotMatch(checker, /TOSS_SECRET_KEY=.*test/)
@@ -228,6 +230,38 @@ test('payment env checker rejects Toss keys with trailing prose or unsafe charac
       assert.match(output, /INVALID/)
       assert.match(output, /TOSS_SECRET_KEY/)
       assert.doesNotMatch(output, /fake_secret_key/)
+      return true
+    },
+  )
+})
+
+test('payment env checker rejects copied placeholder deployment values', () => {
+  const baseEnv = {
+    ...process.env,
+    NEXT_PUBLIC_SUPABASE_URL: 'https://your-project.supabase.co',
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_your-key',
+    NEXT_PUBLIC_PAYMENT_PROVIDER: 'toss',
+    PAYMENT_PROVIDER: 'toss',
+    NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_your_client_key',
+    TOSS_SECRET_KEY: 'test_sk_your_secret_key',
+    PAYMENT_INTERNAL_SECRET: 'replace_me_secret',
+    SUPABASE_SERVICE_ROLE_KEY: makeFakeJwt({ role: 'service_role' }),
+  }
+
+  assert.throws(
+    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss'], {
+      cwd: ROOT,
+      env: baseEnv,
+      encoding: 'utf8',
+      stdio: 'pipe',
+    }),
+    (error: unknown) => {
+      const output = String((error as { stdout?: unknown; stderr?: unknown }).stdout ?? '')
+        + String((error as { stdout?: unknown; stderr?: unknown }).stderr ?? '')
+      assert.match(output, /INVALID/)
+      assert.match(output, /NEXT_PUBLIC_SUPABASE_URL/)
+      assert.doesNotMatch(output, /replace_me_secret/)
+      assert.doesNotMatch(output, /your_secret_key/)
       return true
     },
   )

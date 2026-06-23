@@ -100,6 +100,7 @@ function checkSecretLeaks() {
 
 function classifyAppOrigin(value) {
   if (!value) return 'MISSING'
+  if (isPlaceholderValue(value)) return 'INVALID'
   if (/localhost|127\.0\.0\.1/i.test(value)) return 'ACTION_REQUIRED'
   if (!/^https:\/\/.+/.test(value)) return 'INVALID'
   return 'SET'
@@ -131,4 +132,8 @@ function stripQuotes(value) {
     return value.slice(1, -1)
   }
   return value
+}
+
+function isPlaceholderValue(value) {
+  return /(?:your-|your_|example|placeholder|replace_me|changeme|<[^>]+>)/i.test(String(value))
 }

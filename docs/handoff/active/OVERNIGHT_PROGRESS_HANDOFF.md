@@ -1128,3 +1128,10 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - 도구 상태:
   - 현재 PATH에 `supabase` CLI와 `psql`이 없어 로컬 `supabase db reset`은 실행하지 못했다.
   - Docker는 설치되어 있으나 Supabase CLI 실행파일이 없어 실제 DB replay는 다음 단계에서 CLI 설치 또는 기존 `.tmp/phase5-local-supabase` 방식 재구성이 필요하다.
+## 2026-06-23 배포 운영자 체크리스트 추가
+
+- 성준에게 받은 Supabase/Toss 키를 Vercel 배포 기준으로 넣을 때 볼 체크리스트를 추가했다.
+- 위치: `docs/handoff/active/DEPLOYMENT_OPERATOR_CHECKLIST_2026-06-23.md`
+- 실제 키 값은 문서에 쓰지 않았고, 환경변수 이름/대시보드 작업/검증 명령만 정리했다.
+- `scripts/check-payment-env.mjs`와 `scripts/check-deploy-readiness.mjs`가 이제 `your-*`, `example`, `placeholder`, `replace_me`, `<...>` 같은 복사용 placeholder 값을 실패 처리한다.
+- 현재 로컬 기준 남은 차단점은 Vercel CLI/link, Toss env/provider mode, `NEXT_PUBLIC_APP_ORIGIN`, Supabase DB 실제 적용 검증이다.
