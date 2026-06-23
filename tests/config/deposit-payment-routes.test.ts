@@ -322,14 +322,22 @@ test('deposit checkout preserves safe return paths for group and match flows', (
   assert.match(paymentLib, /returnPath\?: string/)
   assert.match(paymentLib, /normalizeDepositReturnPath/)
   assert.match(paymentLib, /return_path=\$\{encodeURIComponent\(returnPath\)\}/)
+  assert.match(paymentLib, /matchId\?: string/)
+  assert.match(paymentLib, /match_id=\$\{encodeURIComponent\(params\.matchId\)\}/)
   assert.match(depositsRoute, /returnPath: typeof body\.return_path === 'string' \? body\.return_path : undefined/)
+  assert.match(depositsRoute, /match_id_required/)
+  assert.match(depositsRoute, /validateDepositMatchContext/)
   assert.match(paymentRoute, /returnPath: typeof body\.return_path === 'string' \? body\.return_path : undefined/)
+  assert.match(paymentRoute, /match_id_required/)
+  assert.match(paymentRoute, /validateDepositMatchContext/)
   assert.match(confirmRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
   assert.match(cancelRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
   assert.match(cancelRoute, /getPublicAppOrigin\(\) \|\| req\.nextUrl\.origin/)
   assert.doesNotMatch(cancelRoute, /new URL\('\/match\/start'/)
-  assert.match(groupCreatePage, /return_path: `\/group\/create\?size=\$\{capacity\}`/)
+  assert.doesNotMatch(groupCreatePage, /fetch\('\/api\/deposits'/)
+  assert.doesNotMatch(groupCreatePage, /requestTossPaymentWindow\(data\.payment\)/)
   assert.match(matchDetailPage, /return_path: `\/match\/\$\{match\.match_id\}`/)
+  assert.match(matchDetailPage, /match_id: match\.match_id/)
 })
 
 test('client pages open Toss payment window with the browser SDK request payload', () => {
@@ -337,8 +345,7 @@ test('client pages open Toss payment window with the browser SDK request payload
   const matchDetailPage = readSource('app/match/[id]/page.tsx')
   const browserHelper = readSource('lib/payments/toss-browser.ts')
 
-  assert.match(groupCreatePage, /const data = await res\.json\(\)\.catch/)
-  assert.match(groupCreatePage, /await requestTossPaymentWindow\(data\.payment\)/)
+  assert.doesNotMatch(groupCreatePage, /await requestTossPaymentWindow\(data\.payment\)/)
   assert.match(matchDetailPage, /await requestTossPaymentWindow\(data\.payment\)/)
   assert.match(browserHelper, /https:\/\/js\.tosspayments\.com\/v2\/standard/)
   assert.match(browserHelper, /payment\.requestPayment/)
@@ -346,6 +353,17 @@ test('client pages open Toss payment window with the browser SDK request payload
   assert.doesNotMatch(groupCreatePage, /window\.location\.href = data\.payment\.checkoutUrl/)
   assert.doesNotMatch(matchDetailPage, /window\.location\.href = data\.payment\.checkoutUrl/)
   assert.doesNotMatch(groupCreatePage, /res\.status === 202\)[\s\S]{0,220}setError\('외부 결제창 연결 준비 상태/)
+})
+
+test('group create explains deposits happen after tentative match instead of charging in queue setup', () => {
+  const groupCreatePanel = readSource('components/matching/group-create/FreeBetaQueuePanel.tsx')
+  const groupCreatePage = readSource('app/group/create/page.tsx')
+
+  assert.match(groupCreatePanel, /보증금은 가매칭이 잡힌 뒤/)
+  assert.match(groupCreatePanel, /가매칭 후 결제/)
+  assert.doesNotMatch(groupCreatePanel, /onConfirmParticipation/)
+  assert.doesNotMatch(groupCreatePanel, /결제 확인/)
+  assert.doesNotMatch(groupCreatePage, /onConfirmParticipation=\{payDeposit\}/)
 })
 
 test('Toss customer key stays within the browser SDK length limit', () => {
@@ -374,13 +392,15 @@ function makeFakeJwt(payload: Record<string, unknown>) {
   ].join('.')
 }
 
-test('group create page explains payment callback results after Toss returns', () => {
+test('group create does not handle deposit callbacks because deposits happen after tentative match', () => {
   const groupCreatePage = readSource('app/group/create/page.tsx')
+  const matchDetailPage = readSource('app/match/[id]/page.tsx')
 
-  assert.match(groupCreatePage, /const paymentStatus = searchParams\.get\('payment'\)/)
-  assert.match(groupCreatePage, /보증금 결제가 확인됐어요/)
-  assert.match(groupCreatePage, /결제가 완료되지 않았어요/)
-  assert.match(groupCreatePage, /refreshDeposit\(group\.id\)/)
+  assert.doesNotMatch(groupCreatePage, /const paymentStatus = searchParams\.get\('payment'\)/)
+  assert.doesNotMatch(groupCreatePage, /보증금 결제가 확인됐어요/)
+  assert.doesNotMatch(groupCreatePage, /refreshDeposit\(group\.id\)/)
+  assert.match(matchDetailPage, /match_id: match\.match_id/)
+  assert.match(matchDetailPage, /return_path: `\/match\/\$\{match\.match_id\}`/)
 })
 
 test('match refund route reports external Toss settlement separately from DB refund request', () => {

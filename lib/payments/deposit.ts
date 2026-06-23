@@ -78,6 +78,7 @@ export function getDepositPaymentReadiness(provider: DepositPaymentProvider): De
 export function buildDepositPaymentRequestDraft(params: {
   provider: DepositPaymentProvider
   groupId: string
+  matchId?: string
   userId: string
   origin: string
   amount?: number
@@ -89,6 +90,9 @@ export function buildDepositPaymentRequestDraft(params: {
   const base = params.origin.replace(/\/$/, '')
   const returnPath = normalizeDepositReturnPath(params.returnPath)
   const returnPathQuery = `return_path=${encodeURIComponent(returnPath)}`
+  const matchQuery = params.matchId
+    ? `&match_id=${encodeURIComponent(params.matchId)}`
+    : ''
 
   return {
     provider: params.provider,
@@ -97,8 +101,8 @@ export function buildDepositPaymentRequestDraft(params: {
     amount,
     orderId,
     orderName: `부팅 보증금 ${amount.toLocaleString('ko-KR')}원`,
-    successUrl: `${base}/api/payments/deposit/confirm?provider=${params.provider}&group_id=${encodeURIComponent(params.groupId)}&${returnPathQuery}`,
-    failUrl: `${base}/api/payments/deposit/cancel?provider=${params.provider}&group_id=${encodeURIComponent(params.groupId)}&reason=checkout_failed&${returnPathQuery}`,
+    successUrl: `${base}/api/payments/deposit/confirm?provider=${params.provider}&group_id=${encodeURIComponent(params.groupId)}${matchQuery}&${returnPathQuery}`,
+    failUrl: `${base}/api/payments/deposit/cancel?provider=${params.provider}&group_id=${encodeURIComponent(params.groupId)}${matchQuery}&reason=checkout_failed&${returnPathQuery}`,
   }
 }
 

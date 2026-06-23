@@ -4,13 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, LockKeyhole } from 'lucide-react'
-import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { normalizeGroupSize } from '@/lib/matching/group-size'
-import {
-  requestTossPaymentWindow,
-  type TossBrowserPaymentRequest,
-} from '@/lib/payments/toss-browser'
 import {
   EMPTY_MATCH_SETUP_STATUS,
   type MatchSetupStatus,
@@ -21,7 +16,6 @@ import {
 } from '@/lib/matching/pre-match-card-draft'
 import QueueRadarCard from '@/components/matching/QueueRadarCard'
 import {
-  DEV_DEPOSIT_SUMMARY,
   DEV_GROUP_STATE,
   DEV_QUEUE_VISUAL,
   EMPTY_STATE,
@@ -35,12 +29,10 @@ import { GroupMemberStatusPanel } from '@/components/matching/group-create/Group
 import { InviteFriendPanel } from '@/components/matching/group-create/InviteFriendPanel'
 import { getGroupCompositionSummary, getQueueStatusText } from '@/components/matching/group-create/status'
 import type {
-  DepositSummary,
   FriendSummary,
   GroupInviteRecord,
   GroupMemberRecord,
   GroupState,
-  MyDeposit,
   QueueVisualState,
 } from '@/components/matching/group-create/types'
 
@@ -48,16 +40,12 @@ export default function GroupCreatePage() {
   const searchParams = useSearchParams()
   const isDevPreview = isDevPreviewClientSession()
   const requestedSize = normalizeGroupSize(searchParams.get('size'))
-  const paymentStatus = searchParams.get('payment')
-  const paymentReason = searchParams.get('reason')
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [myDeposit, setMyDeposit] = useState<MyDeposit | null>(null)
-  const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
   const [showTransferPanel, setShowTransferPanel] = useState(false)
   const [queueVisualState, setQueueVisualState] = useState<QueueVisualState>(DEV_QUEUE_VISUAL)
   const [devCurrentSetupStatus, setDevCurrentSetupStatus] =
@@ -166,27 +154,6 @@ export default function GroupCreatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    if (paymentStatus === 'paid') {
-      setNotice('보증금 결제가 확인됐어요. 이제 그룹 준비 상태를 이어서 확인해주세요.')
-      setError(null)
-      if (group?.id) {
-        void refreshDeposit(group.id)
-      }
-      return
-    }
-
-    if (paymentStatus === 'failed' || paymentStatus === 'cancelled') {
-      setNotice(null)
-      setError(
-        paymentReason
-          ? `결제가 완료되지 않았어요. 사유: ${paymentReason}`
-          : '결제가 완료되지 않았어요. 다시 시도해주세요.'
-      )
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentStatus, paymentReason, group?.id])
-
   async function ensureGroup() {
     setLoading(true)
     setError(null)
@@ -199,8 +166,6 @@ export default function GroupCreatePage() {
           : DEV_GROUP_STATE.group,
         members: DEV_GROUP_STATE.members.slice(0, requestedSize),
       })
-      setMyDeposit({ id: 'dev-deposit-1', status: 'paid', amount: DEPOSIT_AMOUNT })
-      setDepositSummary(DEV_DEPOSIT_SUMMARY)
       setLoading(false)
       return
     }
@@ -225,9 +190,6 @@ export default function GroupCreatePage() {
       const data = await res.json() as GroupState
       setState(data)
       await refreshPreMatchCardStatus()
-      if (data.group?.id) {
-        await refreshDeposit(data.group.id)
-      }
     } catch {
       setError('그룹 정보를 불러오지 못했어요.')
     } finally {
@@ -243,9 +205,6 @@ export default function GroupCreatePage() {
     const data = await res.json() as GroupState
     setState(data)
     await refreshPreMatchCardStatus()
-    if (data.group?.id) {
-      await refreshDeposit(data.group.id)
-    }
   }
 
   async function updateGroupSize(size: 2 | 3) {
@@ -308,18 +267,6 @@ export default function GroupCreatePage() {
           friend.user_id === member.user_id ? { ...friend, group_status: 'available' } : friend
         ),
       }))
-      setDepositSummary((current) => {
-        if (!current) return current
-        const rows = current.rows.filter((row) => row.user_id !== member.user_id)
-        const paidCount = rows.filter((row) => row.deposit_status === 'paid' || row.deposit_status === 'held').length
-        return {
-          ...current,
-          rows,
-          total_active: rows.length,
-          paid_count: paidCount,
-          all_paid: rows.length > 0 && paidCount >= rows.length,
-        }
-      })
       setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대하면 매칭 찾기를 이어갈 수 있어요.`)
       return
     }
@@ -344,7 +291,6 @@ export default function GroupCreatePage() {
       }
 
       await refreshGroup()
-      await refreshDeposit(group.id)
       setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대해야 매칭 찾기가 켜져요.`)
     } catch {
       setError('친구를 그룹에서 내보내지 못했어요.')
@@ -371,83 +317,6 @@ export default function GroupCreatePage() {
       setPreMatchCardDone(Number(data.draft?.completed_items ?? 0) >= 4)
     } catch {
       setPreMatchCardDone(false)
-    }
-  }
-
-  async function refreshDeposit(groupId: string) {
-    if (isDevPreview) return
-
-    try {
-      const [own, summary] = await Promise.all([
-        fetch(`/api/deposits?group_id=${encodeURIComponent(groupId)}`),
-        fetch(`/api/deposits/summary?group_id=${encodeURIComponent(groupId)}`),
-      ])
-      if (own.ok) {
-        const data = await own.json() as { my_deposit: MyDeposit | null }
-        setMyDeposit(data.my_deposit)
-      }
-      if (summary.ok) {
-        const data = await summary.json() as DepositSummary
-        setDepositSummary(data)
-      }
-    } catch {
-      // Deposit state is secondary to group creation. Keep the page usable.
-    }
-  }
-
-  async function payDeposit() {
-    if (!group || saving) return
-    if (isDevPreview) {
-      setMyDeposit({ id: 'dev-deposit-1', status: 'paid', amount: DEPOSIT_AMOUNT })
-      setDepositSummary((current) => current ? { ...current, paid_count: current.total_active, all_paid: true } : DEV_DEPOSIT_SUMMARY)
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-    setNotice(null)
-    try {
-      const res = await fetch('/api/deposits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          group_id: group.id,
-          return_path: `/group/create?size=${capacity}`,
-        }),
-      })
-      if (res.status === 202) {
-        const data = await res.json().catch(() => ({})) as {
-          payment?: TossBrowserPaymentRequest
-        }
-        if (data.payment) {
-          await requestTossPaymentWindow(data.payment)
-          return
-        }
-
-        setError('결제창 정보를 받지 못했어요. 잠시 후 다시 시도해주세요.')
-        return
-      }
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        setError(translateDepositError(data.error))
-        return
-      }
-      await refreshDeposit(group.id)
-    } catch {
-      setError('보증금 결제 확인에 실패했어요.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  function translateDepositError(code?: string) {
-    switch (code) {
-      case 'deposit_already_exists': return '이미 보증금 결제가 확인됐어요.'
-      case 'not_group_member':       return '그룹 멤버만 보증금을 결제할 수 있어요.'
-      case 'invalid_amount':         return '보증금 금액이 올바르지 않아요.'
-      case 'invalid_deposit_amount': return '보증금 금액이 올바르지 않아요.'
-      case 'payment_provider_not_configured': return '결제 제공자 설정이 아직 연결되지 않았어요.'
-      default:                        return '보증금 결제 확인에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
 
@@ -649,8 +518,6 @@ export default function GroupCreatePage() {
         return
       }
       setState(EMPTY_STATE)
-      setMyDeposit(null)
-      setDepositSummary(null)
       await ensureGroup()
     } catch {
       setError('그룹에서 나가지 못했어요.')
@@ -676,8 +543,6 @@ export default function GroupCreatePage() {
         return
       }
       setState(EMPTY_STATE)
-      setMyDeposit(null)
-      setDepositSummary(null)
       await ensureGroup()
     } catch {
       setError('그룹 해체에 실패했어요.')
@@ -726,8 +591,6 @@ export default function GroupCreatePage() {
       default:                    return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
-
-  const myDepositPaid = myDeposit?.status === 'paid' || myDeposit?.status === 'held'
 
   return (
     <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
@@ -858,10 +721,7 @@ export default function GroupCreatePage() {
                   currentUserSetupStatus={currentUserMatchSetup}
                   currentUserSetupReady={currentUserSetupReady}
                   currentUserCardReady={preMatchCardDone}
-                  myDepositPaid={myDepositPaid}
-                  depositSummary={depositSummary}
                   groupStats={groupStats}
-                  onConfirmParticipation={payDeposit}
                   onEnterQueue={enterQueue}
                 />
               </>

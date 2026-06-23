@@ -27,6 +27,19 @@ export async function POST(req: NextRequest) {
   if (!groupId) {
     return NextResponse.json({ error: 'group_id_required' }, { status: 400 })
   }
+  const matchId = typeof body.match_id === 'string' ? body.match_id : ''
+  if (!matchId) {
+    return NextResponse.json({ error: 'match_id_required' }, { status: 400 })
+  }
+
+  const matchContext = await validateDepositMatchContext(supabase, {
+    matchId,
+    groupId,
+    userId: user.id,
+  })
+  if (!matchContext.ok) {
+    return matchContext.response
+  }
 
   const provider = resolveDepositPaymentProvider(body.provider)
   const readiness = getDepositPaymentReadiness(provider)
@@ -47,18 +60,6 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ provider, status: 'paid', deposit: data }, { status: 201 })
-  }
-
-  const membership = await supabase
-    .from('group_members')
-    .select('group_id')
-    .eq('group_id', groupId)
-    .eq('user_id', user.id)
-    .is('left_at', null)
-    .maybeSingle()
-
-  if (membership.error || !membership.data) {
-    return NextResponse.json({ error: 'not_group_member' }, { status: 403 })
   }
 
   const activeDeposit = await supabase
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest) {
   const payment = buildDepositPaymentRequestDraft({
     provider,
     groupId,
+    matchId,
     userId: user.id,
     origin: getPublicAppOrigin() || req.nextUrl.origin,
     orderId: pendingOrderId,
@@ -147,4 +149,57 @@ async function readJson(req: NextRequest): Promise<Record<string, unknown>> {
   } catch {
     return {}
   }
+}
+
+type DepositMatchValidation =
+  | { ok: true }
+  | { ok: false; response: NextResponse }
+
+interface DepositMatchRow {
+  id: string
+  status: string
+  group_a_id: string
+  group_b_id: string
+}
+
+async function validateDepositMatchContext(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  params: { matchId: string; groupId: string; userId: string },
+): Promise<DepositMatchValidation> {
+  const matchLookup = await supabase
+    .from('matches')
+    .select('id,status,group_a_id,group_b_id')
+    .eq('id', params.matchId)
+    .maybeSingle()
+
+  if (matchLookup.error) {
+    return { ok: false, response: NextResponse.json({ error: 'match_lookup_failed' }, { status: 500 }) }
+  }
+
+  const match = matchLookup.data as DepositMatchRow | null
+  if (!match) {
+    return { ok: false, response: NextResponse.json({ error: 'match_not_found' }, { status: 404 }) }
+  }
+
+  if (match.status !== 'pending' && match.status !== 'confirmed') {
+    return { ok: false, response: NextResponse.json({ error: 'match_not_payable' }, { status: 400 }) }
+  }
+
+  if (match.group_a_id !== params.groupId && match.group_b_id !== params.groupId) {
+    return { ok: false, response: NextResponse.json({ error: 'group_not_in_match' }, { status: 403 }) }
+  }
+
+  const membership = await supabase
+    .from('group_members')
+    .select('group_id')
+    .eq('group_id', params.groupId)
+    .eq('user_id', params.userId)
+    .is('left_at', null)
+    .maybeSingle()
+
+  if (membership.error || !membership.data) {
+    return { ok: false, response: NextResponse.json({ error: 'not_group_member' }, { status: 403 }) }
+  }
+
+  return { ok: true }
 }

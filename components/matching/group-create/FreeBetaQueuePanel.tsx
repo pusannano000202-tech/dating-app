@@ -12,7 +12,6 @@ import {
 
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import type { MatchSetupStatus } from '@/lib/matching/match-setup-status'
-import type { DepositSummary } from './types'
 
 type FreeBetaQueuePanelProps = {
   saving: boolean
@@ -24,10 +23,7 @@ type FreeBetaQueuePanelProps = {
   currentUserSetupStatus: MatchSetupStatus
   currentUserSetupReady: boolean
   currentUserCardReady: boolean
-  myDepositPaid: boolean
-  depositSummary: DepositSummary | null
   groupStats: Array<{ label: string; value: string }>
-  onConfirmParticipation: () => void
   onEnterQueue: () => void
 }
 
@@ -41,10 +37,7 @@ export function FreeBetaQueuePanel({
   currentUserSetupStatus,
   currentUserSetupReady,
   currentUserCardReady,
-  myDepositPaid,
-  depositSummary,
   groupStats,
-  onConfirmParticipation,
   onEnterQueue,
 }: FreeBetaQueuePanelProps) {
   const groupIsFull = membersLength >= requiredMemberCount
@@ -130,7 +123,7 @@ export function FreeBetaQueuePanel({
           <div>
             <h2 className="text-sm font-black">이번 주 매칭 준비</h2>
             <p className="text-xs leading-5 text-boot-muted">
-              그룹 준비가 끝나면 큐에 들어가고, 임시 매칭 카드는 보증금 결제로 확정돼요.
+              그룹 준비가 끝나면 큐에 들어가고, 가매칭이 잡힌 뒤 보증금으로 확정해요.
             </p>
           </div>
         </div>
@@ -226,56 +219,21 @@ export function FreeBetaQueuePanel({
       <div className="mb-3 rounded-2xl border border-boot-hairline bg-white/80 px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Wallet size={16} className={myDepositPaid ? 'text-emerald-700' : 'text-amber-700'} />
+            <Wallet size={16} className="text-boot-primary" />
             <div>
-              <p className="text-xs font-bold">보증금 결제</p>
+              <p className="text-xs font-bold">가매칭 후 결제</p>
               <p className="text-[11px] text-boot-muted">
-                {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원 보증금은 노쇼가 없으면 환불돼요.
+                보증금은 가매칭이 잡힌 뒤 매칭 상세 화면에서 결제해요.
               </p>
             </div>
           </div>
-          {myDepositPaid ? (
-            <span className="text-[11px] font-bold text-emerald-700">결제 확인</span>
-          ) : (
-            <button
-              type="button"
-              disabled={saving}
-              onClick={onConfirmParticipation}
-              className="rounded-xl border border-boot-primary/25 bg-violet-400/15 px-3 py-2 text-xs font-bold text-boot-primary disabled:opacity-40"
-            >
-              결제 확인
-            </button>
-          )}
+          <span className="rounded-full bg-boot-soft px-3 py-1.5 text-[11px] font-black text-boot-primary">
+            {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원
+          </span>
         </div>
-
-        {depositSummary && depositSummary.total_active > 0 && (
-          <div className="mt-3 border-t border-boot-hairline pt-3">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[11px] text-boot-muted">그룹 전체</p>
-              <p className="text-[11px] font-bold text-boot-muted">
-                {depositSummary.paid_count}/{depositSummary.total_active}명 결제
-              </p>
-            </div>
-            <div className="flex gap-1.5">
-              {depositSummary.rows.map((row) => {
-                const paid = row.deposit_status === 'paid' || row.deposit_status === 'held'
-                return (
-                  <div
-                    key={row.user_id}
-                    className={`min-w-0 flex-1 truncate rounded-lg px-2 py-1.5 text-center text-[10px] ${
-                      paid
-                        ? 'border border-emerald-400/20 bg-emerald-400/10 text-emerald-700'
-                        : 'border border-boot-hairline bg-white/90 text-boot-muted'
-                    }`}
-                    title={row.display_name ?? row.user_id.slice(0, 8)}
-                  >
-                    {row.display_name ?? `친구 ${row.user_id.slice(0, 4)}`}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        <p className="mt-2 text-[11px] leading-5 text-boot-muted">
+          큐 진입 전에는 돈을 받지 않아요. 상대팀이 잡히면 내 카드 작성과 함께 보증금을 결제하고, 약속이 정상 진행되면 환불 단계로 넘어가요.
+        </p>
       </div>
 
       <button
@@ -301,13 +259,8 @@ export function FreeBetaQueuePanel({
                   : '큐 진입 조건이 맞으면 버튼이 활성화됩니다.'}
         </p>
       )}
-      {canEnterQueue && !myDepositPaid && (
-        <p className="mt-3 text-center text-xs text-amber-700/80">
-          큐 진입은 가능하지만, 보증금 결제는 임시 매칭 확정 전에 반드시 끝내야 합니다.
-        </p>
-      )}
       <p className="mt-2 text-center text-[10px] text-boot-muted">
-        보증금 {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원은 약속이 정상 진행되면 환불되고, 노쇼가 확정되면 환불이 제한됩니다.
+        보증금 {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원은 가매칭 후 확정 단계에서 결제하며, 노쇼 없이 약속이 진행되면 환불됩니다.
       </p>
     </>
   )

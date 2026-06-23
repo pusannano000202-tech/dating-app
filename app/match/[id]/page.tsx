@@ -678,6 +678,7 @@ export default function MatchDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           group_id: match.my_group_id,
+          match_id: match.match_id,
           return_path: `/match/${match.match_id}`,
         }),
       })
@@ -714,6 +715,10 @@ export default function MatchDetailPage() {
       case 'invalid_card_content': return '카드는 10자 이상 500자 이하로 작성해 주세요.'
       case 'deposit_already_exists': return '이미 보증금 결제가 확인됐어요.'
       case 'not_group_member':    return '그룹 멤버만 보증금 결제를 할 수 있어요.'
+      case 'match_id_required':    return '가매칭 화면에서만 보증금을 결제할 수 있어요.'
+      case 'match_not_found':      return '가매칭 정보를 찾을 수 없어요.'
+      case 'match_not_payable':    return '이 매칭은 보증금 결제를 진행할 수 없는 상태예요.'
+      case 'group_not_in_match':   return '이 그룹은 해당 가매칭에 포함되어 있지 않아요.'
       case 'invalid_deposit_amount': return '보증금 금액이 올바르지 않아요.'
       case 'payment_provider_not_configured': return '결제 제공자 설정이 아직 연결되지 않았어요.'
       default:                     return '처리에 실패했어요. 잠시 뒤 다시 시도해 주세요.'

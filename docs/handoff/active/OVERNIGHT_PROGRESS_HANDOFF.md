@@ -1271,3 +1271,48 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - 참고:
   - Playwright 브라우저 바이너리가 현재 로컬에 없어 스크린샷 자동화는 실패했다.
   - 대신 dev preview 세션을 포함한 HTML 응답 검증으로 화면 문구 반영 여부를 확인했다.
+
+## 2026-06-23 보증금 결제 시점 가매칭 후로 확정
+
+- 사용자 결정:
+  - 보증금은 큐 진입 전이나 그룹 생성 단계가 아니라 `가매칭 후` 결제한다.
+  - 매칭 비중은 `appearance`, `personality`, `height`, `body_type` 4개 기준을 유지한다.
+  - production 배포 때 Supabase migration은 실제 적용 대상으로 본다.
+  - Toss webhook은 필수 구현 대상으로 본다.
+- 코드 반영:
+  - `app/group/create/page.tsx`
+    - 그룹 생성/큐 진입 화면에서 `/api/deposits` 직접 호출을 제거했다.
+    - Toss 결제창 호출과 payment callback 처리도 제거했다.
+  - `components/matching/group-create/FreeBetaQueuePanel.tsx`
+    - `결제 확인` 버튼을 없애고 `가매칭 후 결제` 안내 카드로 교체했다.
+    - 큐 진입 전에는 돈을 받지 않고, 가매칭 상세에서 10,000원 보증금을 결제한다고 설명한다.
+  - `app/match/[id]/page.tsx`
+    - 보증금 결제 요청 body에 `match_id: match.match_id`를 포함한다.
+    - 가매칭/매칭 문맥 오류를 사용자 문구로 번역한다.
+  - `app/api/deposits/route.ts`, `app/api/payments/deposit/route.ts`
+    - `match_id`가 없으면 `match_id_required`로 결제를 시작하지 않는다.
+    - `matches` row가 존재하고, 해당 group이 그 match의 `group_a_id` 또는 `group_b_id`에 포함되어 있으며, 사용자가 그 group의 활성 멤버인지 확인한다.
+    - `pending` 또는 `confirmed` match에서만 보증금 결제를 허용한다.
+    - 이 검증은 `mock` provider와 `toss` provider 모두에 적용된다.
+  - `lib/payments/deposit.ts`
+    - Toss success/fail callback URL에 `match_id`를 포함할 수 있게 했다.
+- Toss webhook 상태:
+  - `/api/payments/deposit/webhook`은 이미 `paymentKey` 또는 `orderId`로 Toss Payment Query API를 다시 조회한 뒤 `deposits.status`를 맞추는 reconciliation route로 구현되어 있다.
+  - 실제 Toss dashboard webhook 등록과 sandbox E2E는 Vercel/ngrok 같은 외부 URL과 Toss sandbox env가 준비된 뒤 검증해야 한다.
+- 검증:
+  - `npm run test:config` 통과. 58개 테스트.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run test:matching` 통과. 58개 테스트.
+  - `npm run test:profile` 통과. 25개 테스트.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+  - `npm run check:payment-env -- --provider=toss` 통과. 로컬 `.env.local` 기준 Toss/Supabase server env가 모두 설정되어 있다.
+  - 첫 `npm run build`는 기존 `.next` 캐시의 Windows readlink 오류로 실패했다.
+  - 프로젝트 내부 `.next`만 삭제한 뒤 `npm run build` 재실행 통과. 57개 route production build 생성 완료.
+  - `npm run check:deploy-readiness`는 예상대로 실패한다.
+    - 남은 blocker: 현재 dirty tree, Vercel CLI 미인증, `.vercel/project.json` 없음, `NEXT_PUBLIC_APP_ORIGIN`이 production/preview Vercel URL이 아님.
+- 아직 남은 외부 작업:
+  - Vercel project link.
+  - Vercel env 등록.
+  - Toss sandbox dashboard webhook URL 등록.
+  - production Supabase migration 적용은 배포 직전/배포 중 별도 실행.
