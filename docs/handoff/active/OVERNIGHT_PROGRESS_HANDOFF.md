@@ -1086,3 +1086,45 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - 이유: secret을 request body에 넣으면 로깅/디버깅/프록시 도구에 남을 위험이 더 크다.
 - 회귀 테스트: `tests/config/deposit-payment-routes.test.ts`가 cancel route에 `body.internal_secret` 참조가 없는지 확인한다.
 - 검증: `npm run test:config` 통과. 49개 테스트 통과.
+
+## 2026-06-23 Toss env 값 후행 설명 차단 보강
+
+- `scripts/check-payment-env.mjs`에서 Toss client/secret key 검증을 앞부분 prefix 검사에서 전체 문자열 검사로 강화했다.
+- 이제 `test_ck_...`, `test_sk_...` 뒤에 공백, 한글 설명, 다른 문구가 붙으면 `INVALID`로 막는다.
+- 이유: 외부에서 받은 키를 `.env.local`이나 Vercel dashboard에 붙여넣을 때 `이거니까`, 설명 문장, 공백까지 같이 들어가면 배포 결제가 런타임에서 실패한다.
+- 실제 secret 값은 코드/문서/테스트 출력에 쓰지 않는다. 테스트는 fake key와 fake JWT만 사용한다.
+- 회귀 테스트: `tests/config/deposit-payment-routes.test.ts`의 `payment env checker rejects Toss keys with trailing prose or unsafe characters`.
+- 검증:
+  - 수정 전 해당 테스트는 `Missing expected exception`으로 실패했다.
+  - 수정 후 `npm run test:config -- --test-name-pattern "trailing prose"` 통과. 50개 테스트 중 해당 필터 실행 결과 전체 pass.
+- 추가 보강:
+  - `lib/payments/deposit.ts`의 런타임 `getDepositPaymentReadiness('toss')`도 같은 기준으로 검사하게 했다.
+  - preflight 스크립트만 막고 실제 API route가 malformed key를 OK로 보는 상황을 막기 위한 조치다.
+  - `TOSS_SECRET_KEY`, `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` 중 값은 있지만 형식이 잘못된 항목은 `invalid`로 분류한다.
+  - 검증: `npm run test:config -- --test-name-pattern "runtime readiness"` 통과.
+
+## 2026-06-23 그룹 멤버 내보내기/나가기 실제 동작 보강
+
+- `app/group/create/page.tsx`에서 그룹이 `ready` 또는 `in_pool` 상태여도 멤버 상태 패널을 계속 보여주도록 했다.
+- 리더는 멤버 카드에서 바로 `친구 내보내기`를 누를 수 있다.
+- 일반 멤버는 `forming`, `ready`, `in_pool` 상태에서 그룹 나가기를 할 수 있다.
+- 새 migration `supabase/migrations/20260623162000_group_member_exit_in_pool_support.sql`을 추가했다.
+- DB 함수 `leave_group`, `remove_group_member`는 멤버가 빠질 때 active `match_pool` row를 `cancelled`로 바꾸고 그룹 상태를 다시 `forming`으로 되돌린다.
+- 목적: 남남 그룹이었다가 남녀 혼성으로 바뀌는 경우처럼 멤버 구성이 바뀐 뒤에도 이전 큐/성별 구성이 stale 상태로 남지 않게 한다.
+- 성별 통계는 기존처럼 active `group_members`와 `profiles.gender` 기준으로 다시 계산한다. `groups.gender` 고정값을 매칭 큐 통계의 진실로 쓰지 않는다.
+- production Supabase에는 적용하지 않았다. migration 파일만 추가했으므로 main merge 전 성준 리뷰와 로컬 Supabase reset 검증이 필요하다.
+- 검증:
+  - `npm run test:matching` 통과. 57개 테스트 통과.
+  - `npm run test:config` 통과. 51개 테스트 통과.
+  - `npm run test:profile` 통과. 24개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과.
+  - `http://localhost:3004/group/create?size=2` 200 응답 확인.
+  - `python scripts/verify-migrations.py` 실행. 새 migration warning은 없음. 남은 warning은 기존 migration의 CTE/주석 오인 항목이다.
+  - `npm run check:payment-env` 통과. mock provider 기준.
+  - `npm run check:payment-env -- --provider=toss`는 로컬 Toss/Vercel env 미설정으로 실패. 실제 값은 코드에 저장하지 않았다.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+- 도구 상태:
+  - 현재 PATH에 `supabase` CLI와 `psql`이 없어 로컬 `supabase db reset`은 실행하지 못했다.
+  - Docker는 설치되어 있으나 Supabase CLI 실행파일이 없어 실제 DB replay는 다음 단계에서 CLI 설치 또는 기존 `.tmp/phase5-local-supabase` 방식 재구성이 필요하다.
