@@ -1200,3 +1200,38 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - `npm run check:payment-env -- --provider=toss` 실패. Toss/Supabase server env가 로컬/Vercel에 아직 없다.
   - `NEXT_PUBLIC_APP_ORIGIN`이 production Vercel URL로 설정되지 않았다.
 - 사용자가 준 실키는 코드/문서/git에 쓰지 않는다. 값은 Vercel dashboard 또는 로컬 `.env.local`에 사용자가 직접 넣어야 한다.
+
+## 2026-06-23 로컬 Toss env 반영 및 환불 화면 대비 수정
+
+- 사용자가 전달한 Supabase/Toss 값은 tracked 파일에 쓰지 않고 로컬 `.env.local`에만 반영했다.
+- 실제 secret 값은 문서/코드/테스트 출력에 남기지 않는다.
+- `PAYMENT_INTERNAL_SECRET`은 로컬에서 새로 생성했다.
+- `npm run check:payment-env -- --provider=toss`는 로컬 기준 통과했다.
+- `node scripts/check-secret-leaks.mjs` 통과. tracked 파일에 실키가 들어가지 않았다.
+- Supabase MCP로 read-only 스키마 조회를 시도했지만 현재 연결 계정 권한 부족으로 실패했다. production DB에는 아무 변경도 하지 않았다.
+- `/profile/worldcup`를 Chrome/Playwright로 재검증했다.
+  - dev preview에서 기본정보 성별을 `male`로 넣으면 `/appearance-ideal/female-64/...` 후보가 렌더링된다.
+  - 현재 코드 기준 여자 사진이 사라진 상태는 아니다.
+  - 사용자가 계속 남자 후보를 보면 브라우저 sessionStorage 또는 Supabase에 남은 기존 성별 저장값을 의심해야 한다.
+- `/match/dev-match-1/refund` 모바일 화면에서 앱 기여금 현재 금액과 환불 예정 금액이 밝은 카드 위에서 `text-white`라 안 보이던 문제를 수정했다.
+  - `app/match/[id]/refund/page.tsx`
+  - 밝은 `booting-paper`/`glass-card` 계열에 맞춰 금액을 `text-boot-ink`로 변경했다.
+  - 회귀 테스트 `refund page keeps contribution and refund amounts readable on the light settlement card`를 추가했다.
+- 추가로 Toss checkout order name이 깨진 한글이 아니라 `부팅 보증금 10,000원`으로 유지되는 테스트를 추가했다.
+- 검증:
+  - `npm run test:config` 통과. 56개 테스트.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run test:profile` 통과. 25개 테스트.
+  - `npm run test:matching` 통과. 58개 테스트.
+  - `npm run build` 통과.
+  - `npm run check:payment-env -- --provider=toss` 통과.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+- 첫 `npm run build`는 `.next` 캐시가 예전 API route를 잘못 물고 있어 실패했다.
+  - `app/api/groups/disband/route.ts`, `app/api/deposits/summary/route.ts`는 실제로 존재했다.
+  - 프로젝트 내부 `.next`만 삭제한 뒤 재빌드했고 통과했다.
+- 현재 남은 배포 blocker:
+  - working tree가 아직 dirty다.
+  - Vercel CLI 인증이 안 되어 있다.
+  - `.vercel/project.json`이 없어 현재 폴더가 Vercel 프로젝트에 link되지 않았다.
+  - `NEXT_PUBLIC_APP_ORIGIN`이 아직 localhost다. production 배포 전 Vercel URL로 바꿔야 한다.

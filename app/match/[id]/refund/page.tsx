@@ -103,7 +103,7 @@ export default function RefundPage() {
   const nextBegAmount = APP_FEE_BEG_STEPS[begStepIndex + 1]
 
   return (
-    <main className="min-h-screen px-5 pb-10">
+    <main className="min-h-screen booting-paper px-5 pb-10 text-boot-ink">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
           <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
@@ -122,9 +122,9 @@ export default function RefundPage() {
         )}
 
         {stage === 'select' && (
-          <section className="glass-card rounded-3xl p-5">
+          <section className="glass-card rounded-3xl border border-boot-hairline p-5">
             <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
-            <p className="text-3xl font-black text-violet-200 mb-6">{total.toLocaleString()} 원</p>
+            <p className="gradient-fate-text mb-6 text-3xl font-black tabular-nums">{total.toLocaleString()} 원</p>
 
             <label className="text-xs text-gray-500 mb-2 block">앱 기여금</label>
             <input
@@ -134,11 +134,11 @@ export default function RefundPage() {
               step={1000}
               value={appFee}
               onChange={(e) => setAppFee(parseInt(e.target.value, 10))}
-              className="w-full accent-violet-500"
+              className="w-full accent-boot-primary"
             />
             <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
               <span>0원</span>
-              <span className="text-2xl font-black text-white">{appFee.toLocaleString()} 원</span>
+              <span data-testid="refund-app-fee-current" className="text-2xl font-black text-boot-ink tabular-nums">{appFee.toLocaleString()} 원</span>
               <span>{total.toLocaleString()}원</span>
             </div>
 
@@ -150,8 +150,8 @@ export default function RefundPage() {
                   onClick={() => setAppFee(value)}
                   className={`py-2 rounded-xl text-xs font-bold border ${
                     appFee === value
-                      ? 'border-violet-400/50 bg-violet-500/10 text-violet-200'
-                      : 'border-white/10 text-gray-400'
+                      ? 'border-boot-primary/40 bg-boot-primary/10 text-boot-primary'
+                      : 'border-boot-hairline bg-white/70 text-boot-body'
                   }`}
                 >
                   {value.toLocaleString()}원
@@ -159,12 +159,12 @@ export default function RefundPage() {
               ))}
             </div>
 
-            <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+            <div className="mt-5 rounded-2xl border border-boot-hairline bg-white/80 px-4 py-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">환불 예정 금액</span>
-                <span className="font-black text-white">{refundAmount.toLocaleString()}원</span>
+                <span className="text-boot-muted">환불 예정 금액</span>
+                <span data-testid="refund-amount-preview" className="font-black text-boot-ink tabular-nums">{refundAmount.toLocaleString()}원</span>
               </div>
-              <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
+              <p className="mt-2 text-[11px] text-boot-muted leading-relaxed">
                 보증금은 기본 전액 환불이고, 앱 기여금은 자율 선택이에요. 0원을 선택해도 막지 않으며, 전액 환불 전에는 3,000원, 2,000원, 1,000원 순서로 한 번 더 물어봐요.
               </p>
             </div>

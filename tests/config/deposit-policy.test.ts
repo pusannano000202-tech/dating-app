@@ -48,6 +48,15 @@ test('refund page starts from full refund and separates voluntary contribution c
   assert.doesNotMatch(refundPage, /앱에게 줄 매칭비/)
 })
 
+test('refund page keeps contribution and refund amounts readable on the light settlement card', () => {
+  const refundPage = readSource('app/match/[id]/refund/page.tsx')
+
+  assert.doesNotMatch(refundPage, /text-white">\{appFee\.toLocaleString\(\)\}/)
+  assert.doesNotMatch(refundPage, /text-white">\{refundAmount\.toLocaleString\(\)\}/)
+  assert.match(refundPage, /data-testid="refund-app-fee-current"/)
+  assert.match(refundPage, /data-testid="refund-amount-preview"/)
+})
+
 test('deposit API exposes an explicit mock provider while real payment providers stay opt-in', () => {
   const depositRoute = readSource('app/api/deposits/route.ts')
   const paymentLib = readSource('lib/payments/deposit.ts')

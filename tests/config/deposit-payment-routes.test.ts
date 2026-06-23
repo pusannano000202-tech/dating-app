@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
+  buildDepositPaymentRequestDraft,
   buildDepositCustomerKey,
   normalizeDepositReturnPath,
 } from '../../lib/payments/deposit'
@@ -93,6 +94,19 @@ test('Toss deposit readiness requires checkout, refund, and reconciliation serve
   assert.match(paymentLib, /NEXT_PUBLIC_TOSS_CLIENT_KEY/)
   assert.match(paymentLib, /PAYMENT_INTERNAL_SECRET/)
   assert.match(paymentLib, /SUPABASE_SERVICE_ROLE_KEY/)
+})
+
+test('deposit checkout order name is readable Korean copy for Toss users', () => {
+  const draft = buildDepositPaymentRequestDraft({
+    provider: 'toss',
+    groupId: 'group-1',
+    userId: 'user-1',
+    origin: 'https://booting.example',
+    orderId: 'deposit_group1_user1_test',
+  })
+
+  assert.equal(draft.orderName, '부팅 보증금 10,000원')
+  assert.doesNotMatch(draft.orderName, /[?�]|遺|蹂|湲|寃|留/)
 })
 
 test('local env example documents mock and Toss sandbox payment settings without secrets', () => {
