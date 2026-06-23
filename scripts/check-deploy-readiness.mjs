@@ -23,11 +23,7 @@ checks.push(checkCommand(
   },
 ))
 
-checks.push(checkCommand(
-  'vercel --version',
-  ['vercel', ['--version']],
-  (result) => result.status === 0 ? 'SET' : 'MISSING',
-))
+checks.push(checkVercelCli())
 
 checks.push({
   key: '.vercel/project.json',
@@ -70,6 +66,45 @@ function checkCommand(key, command, classify) {
       ? 'local branch is clean and synced before Vercel deployment'
       : 'Vercel CLI is available for env/link/deploy checks',
   }
+}
+
+function checkVercelCli() {
+  const exists = commandExists('vercel')
+  if (!exists) {
+    return {
+      key: 'vercel --version',
+      status: 'MISSING',
+      purpose: 'Vercel CLI is available for env/link/deploy checks',
+    }
+  }
+
+  const result = spawnSync('vercel', ['--version'], {
+    cwd: root,
+    encoding: 'utf8',
+    shell: process.platform === 'win32',
+  })
+
+  return {
+    key: 'vercel --version',
+    status: result.status === 0 && result.stdout.trim().length > 0 ? 'SET' : 'MISSING',
+    purpose: 'Vercel CLI is available for env/link/deploy checks',
+  }
+}
+
+function commandExists(command) {
+  // Windows uses `where vercel`; POSIX uses `command -v vercel`.
+  const result = process.platform === 'win32'
+    ? spawnSync('where', [command], {
+      cwd: root,
+      encoding: 'utf8',
+      shell: true,
+    })
+    : spawnSync('sh', ['-lc', `command -v ${command}`], {
+      cwd: root,
+      encoding: 'utf8',
+    })
+
+  return result.status === 0 && result.stdout.trim().length > 0
 }
 
 function checkPaymentEnv() {

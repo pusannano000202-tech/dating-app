@@ -146,6 +146,8 @@ test('deployment readiness checker verifies git, Vercel link, and Toss env witho
   assert.match(checker, /\.\.\.readLocalEnvFile\(\),\s+\.\.\.process\.env/)
   assert.match(checker, /\.vercel[\\/]project\.json/)
   assert.match(checker, /vercel --version/)
+  assert.match(checker, /where vercel/)
+  assert.match(checker, /commandExists/)
   assert.match(checker, /scripts\/check-secret-leaks\.mjs/)
   assert.match(checker, /git-tracked files do not contain Supabase\/Toss secret values/)
   assert.match(checker, /scripts\/check-payment-env\.mjs/)

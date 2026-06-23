@@ -1184,3 +1184,19 @@ production Supabase/Vercel/Toss는 건드리지 마.
 - `NEXT_PUBLIC_APP_ORIGIN`이 없거나 placeholder면 기존처럼 `req.nextUrl.origin`으로 fallback한다.
 - 이 변경으로 Vercel production/preview 배포에서 Toss 콜백이 로컬/프록시 origin으로 흔들릴 위험을 줄였다.
 - 검증: `npm run test:config`, `npm run typecheck`, `npm run lint`, `npm run build`, `node scripts/check-secret-leaks.mjs` 통과.
+
+## 2026-06-23 배포 readiness 체크기 보강
+
+- `fix: align refund defaults and worldcup safeguards` 커밋을 GitHub에 push했다.
+- Vercel CLI를 설치했고, `npm run check:deploy-readiness` 기준 `vercel --version` 항목은 `SET`으로 잡힌다.
+- 다만 직접 shell에서 CLI가 안 잡히는 상황을 보며, readiness 체크기가 Windows에서 `vercel --version`만 보고 거짓 양성을 내지 않도록 보강했다.
+- 이제 체크기는 `where vercel` 또는 `command -v vercel`로 실제 실행 파일 존재를 확인한 뒤 version을 검사한다.
+- 검증:
+  - `npm run test:config` 통과. 54개 테스트.
+  - `npm run lint` 통과.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+- 현재 남은 배포 blocker:
+  - `.vercel/project.json` 없음. 즉 이 폴더가 아직 Vercel project에 link되지 않았다.
+  - `npm run check:payment-env -- --provider=toss` 실패. Toss/Supabase server env가 로컬/Vercel에 아직 없다.
+  - `NEXT_PUBLIC_APP_ORIGIN`이 production Vercel URL로 설정되지 않았다.
+- 사용자가 준 실키는 코드/문서/git에 쓰지 않는다. 값은 Vercel dashboard 또는 로컬 `.env.local`에 사용자가 직접 넣어야 한다.
