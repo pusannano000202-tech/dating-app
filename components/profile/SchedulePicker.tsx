@@ -1,182 +1,290 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Ban, CheckCircle2, Clock3 } from 'lucide-react'
 import type { DayOfWeek, AvailableTimeslots } from '@/lib/types'
 
-const DAYS: { key: DayOfWeek; label: string }[] = [
-  { key: 'monday',    label: '월' },
-  { key: 'tuesday',   label: '화' },
-  { key: 'wednesday', label: '수' },
-  { key: 'thursday',  label: '목' },
-  { key: 'friday',    label: '금' },
-  { key: 'saturday',  label: '토' },
-  { key: 'sunday',    label: '일' },
+const DAYS: { key: DayOfWeek; label: string; fullLabel: string }[] = [
+  { key: 'monday', label: '월', fullLabel: '월요일' },
+  { key: 'tuesday', label: '화', fullLabel: '화요일' },
+  { key: 'wednesday', label: '수', fullLabel: '수요일' },
+  { key: 'thursday', label: '목', fullLabel: '목요일' },
+  { key: 'friday', label: '금', fullLabel: '금요일' },
+  { key: 'saturday', label: '토', fullLabel: '토요일' },
+  { key: 'sunday', label: '일', fullLabel: '일요일' },
 ]
 
-// 18:00 ~ 23:00, 30분 단위
-const TIME_OPTIONS = Array.from({ length: 11 }, (_, i) => {
-  const totalMins = 18 * 60 + i * 30
-  const h = String(Math.floor(totalMins / 60)).padStart(2, '0')
-  const m = String(totalMins % 60).padStart(2, '0')
-  return `${h}:${m}`
-})
+const TIME_BLOCKS = [
+  { start: '18:00', end: '19:00', label: '18시' },
+  { start: '19:00', end: '20:00', label: '19시' },
+  { start: '20:00', end: '21:00', label: '20시' },
+  { start: '21:00', end: '22:00', label: '21시' },
+  { start: '22:00', end: '23:00', label: '22시' },
+]
 
-interface DaySlot {
-  enabled: boolean
-  start: string
-  end: string
-}
-
-const DEFAULT_SLOT: DaySlot = { enabled: false, start: '18:00', end: '22:00' }
+type BlockedState = Record<DayOfWeek, string[]>
 
 interface Props {
   initialValue?: AvailableTimeslots
   onChange: (value: AvailableTimeslots) => void
 }
 
-export default function SchedulePicker({ initialValue, onChange }: Props) {
-  const [slots, setSlots] = useState<Record<DayOfWeek, DaySlot>>(() => {
-    const base = Object.fromEntries(DAYS.map(({ key }) => [key, { ...DEFAULT_SLOT }])) as Record<DayOfWeek, DaySlot>
-    if (initialValue) {
-      for (const s of initialValue.slots) {
-        base[s.day] = { enabled: true, start: s.start, end: s.end }
+function createEmptyBlocked(): BlockedState {
+  return {
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+  }
+}
+
+function slotCoversBlock(slot: AvailableTimeslots['slots'][number], start: string, end: string) {
+  return slot.start <= start && slot.end >= end
+}
+
+function buildInitialBlocked(initialValue?: AvailableTimeslots): BlockedState {
+  if (!initialValue?.slots?.length) return createEmptyBlocked()
+
+  const next = createEmptyBlocked()
+  for (const day of DAYS) {
+    const availableForDay = initialValue.slots.filter((slot) => slot.day === day.key)
+    next[day.key] = TIME_BLOCKS
+      .filter((block) => !availableForDay.some((slot) => slotCoversBlock(slot, block.start, block.end)))
+      .map((block) => block.start)
+  }
+  return next
+}
+
+function toAvailableTimeslots(blocked: BlockedState): AvailableTimeslots {
+  const slots: AvailableTimeslots['slots'] = []
+
+  for (const day of DAYS) {
+    let currentStart: string | null = null
+    let currentEnd: string | null = null
+
+    for (const block of TIME_BLOCKS) {
+      const blockedHere = blocked[day.key].includes(block.start)
+      if (blockedHere) {
+        if (currentStart && currentEnd) {
+          slots.push({ day: day.key, start: currentStart, end: currentEnd })
+        }
+        currentStart = null
+        currentEnd = null
+        continue
       }
+
+      if (!currentStart) currentStart = block.start
+      currentEnd = block.end
     }
-    return base
-  })
 
-  function update(day: DayOfWeek, patch: Partial<DaySlot>) {
-    setSlots((prev) => {
-      const merged = { ...prev[day], ...patch }
-      // Auto-advance end time if start >= end after a start change
-      if (patch.start !== undefined && merged.start >= merged.end) {
-        const nextEnd = TIME_OPTIONS.find((t) => t > merged.start)
-        if (nextEnd) merged.end = nextEnd
-      }
-      const next = { ...prev, [day]: merged }
-      const value: AvailableTimeslots = {
-        slots: DAYS.filter(({ key }) => next[key].enabled).map(({ key }) => ({
-          day: key,
-          start: next[key].start,
-          end: next[key].end,
-        })),
-      }
-      onChange(value)
-      return next
-    })
+    if (currentStart && currentEnd) {
+      slots.push({ day: day.key, start: currentStart, end: currentEnd })
+    }
   }
 
-  const enabledCount = DAYS.filter(({ key }) => slots[key].enabled).length
-  const allEnabled = enabledCount === DAYS.length
+  return { slots }
+}
 
-  function toggleAll() {
-    const next = allEnabled
-    setSlots((prev) => {
-      const updated = { ...prev }
-      DAYS.forEach(({ key }) => { updated[key] = { ...prev[key], enabled: !next } })
-      const value: AvailableTimeslots = {
-        slots: next ? [] : DAYS.map(({ key }) => ({
-          day: key,
-          start: updated[key].start,
-          end: updated[key].end,
-        })),
-      }
-      onChange(value)
-      return updated
-    })
+function countBlocked(blocked: BlockedState) {
+  return DAYS.reduce((sum, day) => sum + blocked[day.key].length, 0)
+}
+
+export default function SchedulePicker({ initialValue, onChange }: Props) {
+  const [blocked, setBlocked] = useState<BlockedState>(() => buildInitialBlocked(initialValue))
+  const [lastTouched, setLastTouched] = useState<{ day: DayOfWeek; start: string; end: string } | null>(null)
+
+  const available = useMemo(() => toAvailableTimeslots(blocked), [blocked])
+  const blockedCount = countBlocked(blocked)
+  const totalBlocks = DAYS.length * TIME_BLOCKS.length
+  const allBlocked = blockedCount === totalBlocks
+
+  useEffect(() => {
+    onChange(toAvailableTimeslots(blocked))
+    // 최초 진입 시 기본값을 부모 상태에 맞추기 위한 1회 동기화.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function commit(next: BlockedState) {
+    setBlocked(next)
+    onChange(toAvailableTimeslots(next))
   }
+
+  function toggleBlock(day: DayOfWeek, start: string, end: string) {
+    const current = blocked[day]
+    const nextForDay = current.includes(start)
+      ? current.filter((item) => item !== start)
+      : [...current, start]
+    const next = { ...blocked, [day]: nextForDay }
+    setLastTouched({ day, start, end })
+    commit(next)
+  }
+
+  function toggleWholeDay(day: DayOfWeek) {
+    const isFullBlocked = blocked[day].length === TIME_BLOCKS.length
+    const next = {
+      ...blocked,
+      [day]: isFullBlocked ? [] : TIME_BLOCKS.map((block) => block.start),
+    }
+    setLastTouched({
+      day,
+      start: TIME_BLOCKS[0].start,
+      end: TIME_BLOCKS[TIME_BLOCKS.length - 1].end,
+    })
+    commit(next)
+  }
+
+  function resetAll() {
+    setLastTouched(null)
+    commit(createEmptyBlocked())
+  }
+
+  const lastTouchedDay = lastTouched ? DAYS.find((day) => day.key === lastTouched.day) : null
 
   return (
-    <div className="flex flex-col gap-2.5">
-      {/* 모두 선택 / 해제 */}
-      <div className="flex justify-end mb-1">
-        <button
-          type="button"
-          onClick={toggleAll}
-          className="text-xs text-violet-400 hover:text-violet-300 transition-colors px-2 py-1"
-        >
-          {allEnabled ? '모두 해제' : '모두 선택'}
-        </button>
+    <div className="space-y-4">
+      <section className="rounded-[30px] border border-boot-primary/20 bg-white p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+            <Clock3 size={20} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-black text-boot-ink">안 되는 시간만 눌러주세요</p>
+            <p className="mt-1 text-xs leading-5 text-boot-muted">
+              대학생 일정은 대부분 저녁이 가능하다고 보고, 시험·알바·약속처럼 절대 안 되는 시간만 막는 방식이에요.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="rounded-2xl border border-boot-hairline bg-boot-soft px-3 py-3">
+            <p className="text-[11px] font-black text-boot-primary">매칭 가능 시간</p>
+            <p className="mt-0.5 text-lg font-black text-boot-ink">{available.slots.length}개 구간</p>
+          </div>
+          <div className="rounded-2xl border border-boot-hairline bg-white px-3 py-3">
+            <p className="text-[11px] font-black text-boot-primary">막은 시간</p>
+            <p className="mt-0.5 text-lg font-black text-boot-ink">{blockedCount}개</p>
+          </div>
+        </div>
+
+        {lastTouched && lastTouchedDay && (
+          <div className="mt-3 rounded-2xl border border-boot-primary/20 bg-boot-soft px-3 py-3">
+            <p className="text-[11px] font-black text-boot-primary">방금 선택</p>
+            <p className="mt-0.5 text-sm font-black text-boot-ink">
+              {lastTouchedDay.fullLabel} 시작 {lastTouched.start} · {lastTouched.end}까지 안 됨
+            </p>
+          </div>
+        )}
+      </section>
+
+      <div className="space-y-3">
+        {DAYS.map((day) => {
+          const blockedForDay = blocked[day.key]
+          const isFullBlocked = blockedForDay.length === TIME_BLOCKS.length
+          const isWeekend = day.key === 'saturday' || day.key === 'sunday'
+          return (
+            <section
+              key={day.key}
+              className={[
+                'rounded-[26px] border bg-white p-3 shadow-sm',
+                isFullBlocked ? 'border-rose-200' : 'border-boot-hairline',
+              ].join(' ')}
+            >
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={[
+                      'flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-black',
+                      isFullBlocked
+                        ? 'bg-rose-50 text-rose-600'
+                        : isWeekend
+                          ? 'bg-boot-soft text-boot-primary'
+                          : 'bg-boot-soft text-boot-ink',
+                    ].join(' ')}
+                  >
+                    {day.label}
+                  </span>
+                  <div>
+                    <p className="text-sm font-black text-boot-ink">{day.fullLabel}</p>
+                    <p className="text-[11px] text-boot-muted">
+                      {isFullBlocked
+                        ? '이날은 절대 안 됨'
+                        : blockedForDay.length > 0
+                          ? `${blockedForDay.length}개 시간만 안 됨`
+                          : '저녁 전체 가능'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleWholeDay(day.key)}
+                  className={[
+                    'rounded-2xl border px-3 py-2 text-[11px] font-black',
+                    isFullBlocked
+                      ? 'border-boot-primary/20 bg-boot-soft text-boot-primary'
+                      : 'border-rose-200 bg-rose-50 text-rose-600',
+                  ].join(' ')}
+                >
+                  {isFullBlocked ? '다시 가능' : '이날 안 됨'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-5">
+                {TIME_BLOCKS.map((block) => {
+                  const selected = blockedForDay.includes(block.start)
+                  return (
+                    <button
+                      key={block.start}
+                      type="button"
+                      onClick={() => toggleBlock(day.key, block.start, block.end)}
+                      className={[
+                        'min-h-[58px] rounded-2xl border px-1.5 py-2 text-center transition',
+                        selected
+                          ? 'border-rose-300 bg-rose-50 text-rose-600'
+                          : 'border-boot-hairline bg-boot-soft text-boot-ink',
+                      ].join(' ')}
+                    >
+                      <span className="block text-xs font-black">{block.label}</span>
+                      <span className="mt-1 block text-[9px] font-bold opacity-75">
+                        {selected ? '안 됨' : '가능'}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          )
+        })}
       </div>
 
-      {DAYS.map(({ key, label }) => {
-        const slot = slots[key]
-        const isWeekend = key === 'saturday' || key === 'sunday'
-        return (
-          <div
-            key={key}
-            className={`rounded-2xl transition-all duration-200 overflow-hidden border ${
-              slot.enabled
-                ? 'glass border-violet-500/30'
-                : 'bg-white/[0.03] border-white/5'
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => update(key, { enabled: !slot.enabled })}
-              className="w-full flex items-center justify-between px-4 py-3.5"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold transition-colors ${
-                    slot.enabled
-                      ? 'gradient-brand text-white'
-                      : isWeekend
-                      ? 'bg-white/10 text-rose-400'
-                      : 'bg-white/10 text-gray-400'
-                  }`}
-                >
-                  {label}
-                </span>
-                <span className={`text-sm font-medium transition-colors ${slot.enabled ? 'text-white' : 'text-gray-600'}`}>
-                  {slot.enabled ? `${slot.start} ~ ${slot.end}` : '선택 안 함'}
-                </span>
-              </div>
-              <div
-                className={`w-11 h-6 rounded-full transition-colors duration-300 relative flex-shrink-0 ${
-                  slot.enabled ? 'bg-violet-600' : 'bg-white/10'
-                }`}
-              >
-                <div
-                  className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-all duration-300 ${
-                    slot.enabled ? 'left-6' : 'left-1'
-                  }`}
-                />
-              </div>
-            </button>
+      <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+        <CheckCircle2 size={17} className="mt-0.5 flex-shrink-0 text-emerald-600" />
+        <p className="text-xs leading-5 text-boot-muted">
+          저장할 때는 안 되는 시간을 제외한 나머지 시간이 매칭 가능 시간으로 자동 변환돼요.
+        </p>
+      </div>
 
-            {slot.enabled && (
-              <div className="px-4 pb-4 flex items-center gap-3">
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500 mb-1.5">시작</p>
-                  <select
-                    value={slot.start}
-                    onChange={(e) => update(key, { start: e.target.value })}
-                    className="w-full glass text-white text-sm rounded-xl px-3 py-2.5 appearance-none border border-white/10 focus:outline-none focus:border-violet-500"
-                  >
-                    {TIME_OPTIONS.slice(0, -1).map((t) => (
-                      <option key={t} value={t} className="bg-[#0a0a14]">{t}</option>
-                    ))}
-                  </select>
-                </div>
-                <span className="text-gray-600 mt-5 text-sm">~</span>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-500 mb-1.5">종료</p>
-                  <select
-                    value={slot.end}
-                    onChange={(e) => update(key, { end: e.target.value })}
-                    className="w-full glass text-white text-sm rounded-xl px-3 py-2.5 appearance-none border border-white/10 focus:outline-none focus:border-violet-500"
-                  >
-                    {TIME_OPTIONS.filter((t) => t > slot.start).map((t) => (
-                      <option key={t} value={t} className="bg-[#0a0a14]">{t}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
+      {allBlocked && (
+        <div className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3">
+          <Ban size={17} className="mt-0.5 flex-shrink-0 text-rose-600" />
+          <div>
+            <p className="text-xs font-black text-rose-600">모든 시간이 막혀 있어요</p>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
+              매칭을 찾으려면 최소 한 구간은 가능해야 해요.
+            </p>
           </div>
-        )
-      })}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={resetAll}
+        className="w-full rounded-2xl border border-boot-hairline bg-white px-4 py-3 text-xs font-black text-boot-muted"
+      >
+        전체 저녁 가능으로 되돌리기
+      </button>
     </div>
   )
 }

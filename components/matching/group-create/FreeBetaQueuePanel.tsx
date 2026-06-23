@@ -1,0 +1,267 @@
+import Link from 'next/link'
+import {
+  CalendarClock,
+  CheckCircle2,
+  HeartHandshake,
+  Radar,
+  SlidersHorizontal,
+  StickyNote,
+  UserRoundCheck,
+  Wallet,
+} from 'lucide-react'
+
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import type { MatchSetupStatus } from '@/lib/matching/match-setup-status'
+
+type FreeBetaQueuePanelProps = {
+  saving: boolean
+  canEnterQueue: boolean
+  isLeader: boolean
+  requiredMemberCount: number
+  membersLength: number
+  needsSetupCount: number
+  currentUserSetupStatus: MatchSetupStatus
+  currentUserSetupReady: boolean
+  currentUserCardReady: boolean
+  groupStats: Array<{ label: string; value: string }>
+  onEnterQueue: () => void
+}
+
+export function FreeBetaQueuePanel({
+  saving,
+  canEnterQueue,
+  isLeader,
+  requiredMemberCount,
+  membersLength,
+  needsSetupCount,
+  currentUserSetupStatus,
+  currentUserSetupReady,
+  currentUserCardReady,
+  groupStats,
+  onEnterQueue,
+}: FreeBetaQueuePanelProps) {
+  const groupIsFull = membersLength >= requiredMemberCount
+  const allMembersReady = needsSetupCount === 0
+  const missingMembers = Math.max(0, requiredMemberCount - membersLength)
+  const setupSteps = [
+    {
+      key: 'personality',
+      label: '성향 선호',
+      desc: '어떤 성향과 잘 맞는지',
+      done: currentUserSetupStatus.personality,
+      href: '/profile/personality-preference?redirect=%2Fmatch%2Fstart',
+      Icon: HeartHandshake,
+    },
+    {
+      key: 'schedule',
+      label: '가능 시간',
+      desc: '이번 주 가능한 시간',
+      done: currentUserSetupStatus.schedule,
+      href: '/profile/schedule?redirect=%2Fmatch%2Fstart',
+      Icon: CalendarClock,
+    },
+    {
+      key: 'preferences',
+      label: '매칭 비중',
+      desc: '외모, 성격, 키, 체형 비율',
+      done: currentUserSetupStatus.preferences,
+      href: '/profile/preferences?redirect=%2Fmatch%2Fstart',
+      Icon: SlidersHorizontal,
+    },
+    {
+      key: 'match-card',
+      label: '사전 카드',
+      desc: '하루 한 장 카드 초안',
+      done: currentUserCardReady,
+      href: '/profile/match-card?redirect=%2Fmatch%2Fstart',
+      Icon: StickyNote,
+    },
+  ]
+  const nextSetupStep = setupSteps.find((step) => !step.done)
+  const requirements = [
+    {
+      label: '내 매칭 설정',
+      desc: currentUserSetupReady
+        ? '성향 선호, 가능 시간, 매칭 비중, 사전 카드까지 완료했어요.'
+        : `${nextSetupStep?.label ?? '매칭 설정'}부터 완료하면 돼요.`,
+      done: currentUserSetupReady,
+      href: nextSetupStep?.href ?? '/match/start',
+      cta: nextSetupStep ? `${nextSetupStep.label} 하기` : '입력하러 가기',
+    },
+    {
+      label: `${requiredMemberCount}명 그룹 완성`,
+      desc: groupIsFull
+        ? '그룹 정원이 모두 채워졌어요.'
+        : `친구 ${missingMembers}명이 더 들어와야 해요. 초대나 내보내기로 인원이 바뀌면 다시 확인해요.`,
+      done: groupIsFull,
+      href: '/friends',
+      cta: '친구 초대',
+    },
+    {
+      label: '그룹원 전체 준비',
+      desc: allMembersReady
+        ? '모든 멤버가 매칭 준비를 끝냈어요.'
+        : `${needsSetupCount}명이 성향/시간/비중/사전 카드 준비를 끝내야 해요.`,
+      done: allMembersReady,
+      href: '/match/start',
+      cta: '내 설정 보기',
+    },
+    {
+      label: '리더가 큐 진입',
+      desc: isLeader ? '리더가 매칭 큐에 넣고 임시 매칭을 기다려요.' : '리더만 매칭 큐 진입 버튼을 누를 수 있어요.',
+      done: isLeader,
+    },
+  ]
+
+  return (
+    <>
+      <section className="glass mb-5 rounded-3xl p-4">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-rose-400/20 bg-rose-500/10">
+            <CalendarClock size={18} className="text-boot-coral" />
+          </div>
+          <div>
+            <h2 className="text-sm font-black">이번 주 매칭 준비</h2>
+            <p className="text-xs leading-5 text-boot-muted">
+              그룹 준비가 끝나면 큐에 들어가고, 가매칭이 잡힌 뒤 보증금으로 확정해요.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {groupStats.map((stat) => (
+            <div key={stat.label} className="rounded-2xl bg-white/80 px-3 py-3">
+              <p className="text-lg font-black">{stat.value}</p>
+              <p className="mt-1 text-[10px] leading-snug text-boot-muted">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
+        <div className="mb-3 flex items-start gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+            <UserRoundCheck size={18} />
+          </div>
+          <div>
+            <h2 className="text-sm font-black">매칭 찾기 버튼을 켜는 조건</h2>
+            <p className="mt-0.5 text-xs leading-5 text-boot-muted">
+              아래 항목을 순서대로 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="rounded-2xl border border-boot-hairline bg-boot-soft/50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-black text-boot-ink">내가 먼저 끝낼 4단계</p>
+              <p className="text-[11px] font-bold text-boot-muted">
+                {setupSteps.filter((step) => step.done).length}/{setupSteps.length}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {setupSteps.map((step) => {
+                const StepIcon = step.Icon
+                return (
+                  <Link
+                    key={step.key}
+                    href={step.href}
+                    className={[
+                      'min-h-[86px] rounded-2xl border px-2.5 py-3 text-center transition-colors',
+                      step.done
+                        ? 'border-emerald-300/30 bg-emerald-50 text-emerald-800'
+                        : 'border-boot-hairline bg-white text-boot-body hover:border-boot-primary/30 hover:text-boot-primary',
+                    ].join(' ')}
+                  >
+                    <span className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+                      {step.done ? <CheckCircle2 size={16} strokeWidth={2.7} /> : <StepIcon size={16} />}
+                    </span>
+                    <span className="block text-[11px] font-black">{step.label}</span>
+                    <span className="mt-1 block text-[10px] leading-4 text-boot-muted">{step.desc}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {requirements.map((item) => (
+            <div
+              key={item.label}
+              className={[
+                'flex items-center gap-3 rounded-2xl border px-3 py-3',
+                item.done
+                  ? 'border-emerald-300/30 bg-emerald-50'
+                  : 'border-boot-hairline bg-white',
+              ].join(' ')}
+            >
+              <CheckCircle2
+                size={17}
+                className={item.done ? 'text-emerald-700' : 'text-boot-muted'}
+                strokeWidth={2.5}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-black text-boot-ink">{item.label}</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-boot-muted">{item.desc}</p>
+              </div>
+              {!item.done && item.href && (
+                <Link
+                  href={item.href}
+                  className="flex-shrink-0 rounded-xl border border-boot-primary/20 bg-boot-soft px-3 py-2 text-[11px] font-bold text-boot-primary"
+                >
+                  {item.cta}
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="mb-3 rounded-2xl border border-boot-hairline bg-white/80 px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Wallet size={16} className="text-boot-primary" />
+            <div>
+              <p className="text-xs font-bold">가매칭 후 결제</p>
+              <p className="text-[11px] text-boot-muted">
+                보증금은 가매칭이 잡힌 뒤 매칭 상세 화면에서 결제해요.
+              </p>
+            </div>
+          </div>
+          <span className="rounded-full bg-boot-soft px-3 py-1.5 text-[11px] font-black text-boot-primary">
+            {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원
+          </span>
+        </div>
+        <p className="mt-2 text-[11px] leading-5 text-boot-muted">
+          큐 진입 전에는 돈을 받지 않아요. 상대팀이 잡히면 내 카드 작성과 함께 보증금을 결제하고, 약속이 정상 진행되면 환불 단계로 넘어가요.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        disabled={saving || !canEnterQueue}
+        onClick={onEnterQueue}
+        className="btn-gradient flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <Radar size={17} />
+        이번 주 매칭 큐에 들어가기
+      </button>
+
+      {!canEnterQueue && (
+        <p className="mt-3 text-center text-xs text-boot-muted">
+          {!currentUserSetupReady
+            ? '내 성향 선호, 가능 시간, 매칭 비중, 사전 카드 초안을 먼저 입력해주세요.'
+            : !groupIsFull
+              ? `${requiredMemberCount}명 그룹이 완성되면 큐 진입 단계로 넘어갈 수 있어요.`
+              : !isLeader
+                ? '리더만 큐 진입을 시작할 수 있어요.'
+                : needsSetupCount > 0
+                  ? '아직 준비를 끝내야 하는 멤버가 있어요.'
+                  : '큐 진입 조건이 맞으면 버튼이 활성화됩니다.'}
+        </p>
+      )}
+      <p className="mt-2 text-center text-[10px] text-boot-muted">
+        보증금 {DEPOSIT_AMOUNT.toLocaleString('ko-KR')}원은 가매칭 후 확정 단계에서 결제하며, 노쇼 없이 약속이 진행되면 환불됩니다.
+      </p>
+    </>
+  )
+}

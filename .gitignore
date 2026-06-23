@@ -31,7 +31,15 @@ supabase/.temp/
 
 # Claude Code / 도구 내부 파일
 .claude/
+.codex/
 .superpowers/
+.codex-remote-attachments/
 
 # 빌드 캐시
 tsconfig.tsbuildinfo
+.tmp/
+
+# 생성 산출물
+output/
+
+.vercel

@@ -1,10 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
-import type { Gender, BodyType, HairDensity } from '@/lib/types'
-import { searchDepartments } from '@/lib/pnu-departments'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { CheckCircle2, GraduationCap, Loader2, Phone, Ruler, UserRound } from 'lucide-react'
+import type { BodyType, Gender, HairDensity } from '@/lib/types'
+import { getDepartmentCollege, searchDepartments } from '@/lib/pnu-departments'
 
 export interface BasicInfoData {
+  display_name: string
+  phone: string
   gender: Gender
   age: number
   height: number | null
@@ -22,49 +25,146 @@ interface Props {
   serverError?: string | null
 }
 
-const BODY_TYPES: { key: BodyType; label: string; emoji: string }[] = [
-  { key: 'slim',     label: '슬림',   emoji: '🪶' },
-  { key: 'average',  label: '보통',   emoji: '😊' },
-  { key: 'athletic', label: '근육형', emoji: '💪' },
-  { key: 'chubby',   label: '통통',   emoji: '🐻' },
+const BODY_TYPES: { key: BodyType; label: string; description: string }[] = [
+  { key: 'slim', label: '슬림', description: '마른 편' },
+  { key: 'average', label: '보통', description: '평균 체형' },
+  { key: 'athletic', label: '운동형', description: '탄탄한 편' },
+  { key: 'chubby', label: '통통', description: '부드러운 편' },
 ]
 
-const HAIR_DENSITIES: { key: HairDensity; label: string; emoji: string }[] = [
-  { key: 'full',     label: '풍성', emoji: '💇' },
-  { key: 'thinning', label: '가늘음', emoji: '🧑' },
-  { key: 'bald',     label: '탈모',  emoji: '🙃' },
+const HAIR_DENSITIES: { key: HairDensity; label: string; description: string }[] = [
+  { key: 'full', label: '풍성', description: '머리숱 많음' },
+  { key: 'thinning', label: '보통', description: '평균 또는 적은 편' },
+  { key: 'bald', label: '없음', description: '탈모 또는 민머리' },
+]
+
+const GENDER_OPTIONS: { key: Gender; label: string; description: string }[] = [
+  { key: 'male', label: '남자', description: '남자 그룹으로 매칭돼요' },
+  { key: 'female', label: '여자', description: '여자 그룹으로 매칭돼요' },
 ]
 
 export default function BasicInfoForm({ initialValue, onSubmit, saving, serverError }: Props) {
-  const [gender, setGender]       = useState<Gender | null>(initialValue?.gender ?? null)
-  const [age, setAge]             = useState(initialValue?.age?.toString() ?? '')
-  const [height, setHeight]       = useState(initialValue?.height?.toString() ?? '')
-  const [bodyType, setBodyType]   = useState<BodyType | null>(initialValue?.body_type ?? null)
+  const [displayName, setDisplayName] = useState(initialValue?.display_name ?? '')
+  const [nicknameCheck, setNicknameCheck] = useState<{ value: string; available: boolean; message: string } | null>(null)
+  const [checkingNickname, setCheckingNickname] = useState(false)
+  const [phone, setPhone] = useState(initialValue?.phone ?? '')
+  const [gender, setGender] = useState<Gender | null>(initialValue?.gender ?? null)
+  const [age, setAge] = useState(initialValue?.age?.toString() ?? '')
+  const [height, setHeight] = useState(initialValue?.height?.toString() ?? '')
+  const [bodyType, setBodyType] = useState<BodyType | null>(initialValue?.body_type ?? null)
   const [hairDensity, setHairDensity] = useState<HairDensity | null>(initialValue?.hair_density ?? null)
-  const [school, setSchool]       = useState(initialValue?.school ?? '부산대학교')
+  const [school, setSchool] = useState(initialValue?.school ?? '부산대학교')
   const [department, setDepartment] = useState(initialValue?.department ?? '')
   const [deptSuggestions, setDeptSuggestions] = useState<string[]>([])
-  const [year, setYear]           = useState<number | null>(initialValue?.year ?? null)
-  const [error, setError]         = useState<string | null>(null)
+  const [year, setYear] = useState<number | null>(initialValue?.year ?? null)
+  const [error, setError] = useState<string | null>(null)
   const deptRef = useRef<HTMLDivElement>(null)
 
-  const handleSubmit = useCallback(function handleSubmit() {
-    if (!gender) { setError('성별을 선택해줘.'); return }
+  const requiredDone = [
+    displayName.trim().length >= 2,
+    !!gender,
+    !!age,
+    !!normalizePhone(phone),
+    !!school.trim(),
+  ].filter(Boolean).length
+
+  const inputClass = 'w-full rounded-2xl border border-boot-hairline bg-white px-4 py-3.5 text-sm font-bold text-boot-ink outline-none transition placeholder:text-boot-muted/70 focus:border-boot-primary disabled:opacity-50'
+  const cardOff = 'border-boot-hairline bg-white text-boot-body hover:border-boot-primary/35 hover:bg-boot-soft/60'
+  const cardOn = 'border-boot-primary bg-boot-soft text-boot-primary shadow-sm'
+
+  const checkNicknameAvailability = useCallback(async function checkNicknameAvailability(value = displayName.trim()): Promise<boolean> {
+    const trimmedName = value.trim()
+    if (trimmedName.length < 2 || trimmedName.length > 20) {
+      setNicknameCheck(null)
+      setError('닉네임은 2~20자 사이로 입력해 주세요.')
+      return false
+    }
+
+    setCheckingNickname(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/profiles/check-nickname?nickname=${encodeURIComponent(trimmedName)}`)
+      if (!res.ok) {
+        setNicknameCheck({
+          value: trimmedName,
+          available: false,
+          message: '중복 확인 DB 적용이 아직 필요해요.',
+        })
+        return false
+      }
+
+      const data = await res.json() as { available?: boolean; duplicate_count?: number }
+      const available = Boolean(data.available)
+      setNicknameCheck({
+        value: trimmedName,
+        available,
+        message: available
+          ? '사용 가능한 닉네임이에요.'
+          : '이미 사용 중인 닉네임이에요.',
+      })
+      if (!available) {
+        setError('다른 닉네임을 입력해 주세요.')
+      }
+      return available
+    } catch {
+      setNicknameCheck({
+        value: trimmedName,
+        available: false,
+        message: '중복 확인을 잠시 할 수 없어요.',
+      })
+      return false
+    } finally {
+      setCheckingNickname(false)
+    }
+  }, [displayName])
+
+  const handleSubmit = useCallback(async function handleSubmit() {
+    const trimmedName = displayName.trim()
+    const normalizedPhone = normalizePhone(phone)
+    if (!trimmedName) {
+      setError('친구에게 보여줄 이름을 입력해 주세요.')
+      return
+    }
+    if (trimmedName.length < 2 || trimmedName.length > 20) {
+      setError('이름은 2~20자 사이로 입력해 주세요.')
+      return
+    }
+    if (!normalizedPhone) {
+      setError('휴대폰 번호를 010-1234-5678 형식으로 입력해 주세요.')
+      return
+    }
+    if (!gender) {
+      setError('성별을 선택해 주세요.')
+      return
+    }
     const ageNum = parseInt(age, 10)
-    if (!age || isNaN(ageNum) || ageNum < 18 || ageNum > 35) {
-      setError('나이를 올바르게 입력해줘. (18~35)')
+    if (!age || Number.isNaN(ageNum) || ageNum < 18 || ageNum > 35) {
+      setError('나이를 올바르게 입력해 주세요. (18~35)')
       return
     }
     if (height) {
       const h = parseInt(height, 10)
-      if (isNaN(h) || h < 100 || h > 250) {
-        setError('키를 올바르게 입력해줘. (100~250cm)')
+      if (Number.isNaN(h) || h < 100 || h > 250) {
+        setError('키를 올바르게 입력해 주세요. (100~250cm)')
         return
       }
     }
-    if (!school.trim()) { setError('학교를 입력해줘.'); return }
+    if (!school.trim()) {
+      setError('학교를 입력해 주세요.')
+      return
+    }
+    const nicknameReady =
+      nicknameCheck?.value === trimmedName && nicknameCheck.available
+
+    if (!nicknameReady) {
+      const available = await checkNicknameAvailability(trimmedName)
+      if (!available) return
+    }
+
     setError(null)
     onSubmit({
+      display_name: trimmedName,
+      phone: normalizedPhone,
       gender,
       age: ageNum,
       height: height ? parseInt(height, 10) : null,
@@ -74,155 +174,251 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       department: department.trim() || null,
       year,
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gender, age, height, bodyType, hairDensity, school, department, year, saving, onSubmit])
+  }, [displayName, phone, gender, age, height, bodyType, hairDensity, school, department, year, nicknameCheck, checkNicknameAvailability, onSubmit])
 
-  // Enter 키로 폼 제출 (텍스트 입력 focus 중에는 기본 동작 허용)
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (saving) return
       if (e.key !== 'Enter') return
       const tag = (e.target as HTMLElement).tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
-      handleSubmit()
+      void handleSubmit()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [saving, handleSubmit])
 
-  const pillBase = 'py-3 rounded-2xl text-sm font-bold border transition-all duration-200'
-  const pillOn   = 'btn-gradient border-transparent text-white shadow-md shadow-violet-900/30'
-  const pillOff  = 'glass border-white/10 text-gray-400 hover:border-white/20'
-
   return (
-    <div className="flex flex-col gap-6">
-
-      {/* 성별 */}
-      <div>
-        <label className="text-sm font-bold mb-3 block">
-          성별 <span className="text-rose-400">*</span>
-        </label>
-        <div className="flex gap-3">
-          {(['male', 'female'] as Gender[]).map((g) => (
-            <button key={g} type="button" onClick={() => setGender(g)}
-              className={`flex-1 ${pillBase} ${gender === g ? pillOn : pillOff}`}>
-              {g === 'male' ? '👨 남자' : '👩 여자'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 나이 / 키 */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-sm font-bold mb-3 block">
-            나이 <span className="text-rose-400">*</span>
-          </label>
-          <input type="number" placeholder="22" value={age}
-            onChange={(e) => setAge(e.target.value)}
-            disabled={saving}
-            className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-bold mb-3 block">
-            키 <span className="text-gray-600 font-normal text-xs">(선택)</span>
-          </label>
-          <div className="relative">
-            <input type="number" placeholder="173" value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              disabled={saving}
-              className="w-full glass rounded-2xl px-4 py-3.5 pr-10 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">cm</span>
+    <div className="flex flex-col gap-5">
+      <section className="rounded-3xl border border-boot-primary/20 bg-white px-4 py-4 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-black text-boot-ink">필수 입력 {requiredDone}/5</p>
+            <p className="mt-1 text-xs text-boot-muted">이름, 성별, 나이, 휴대폰, 학교만 채우면 다음으로 넘어갈 수 있어요.</p>
+          </div>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+            <CheckCircle2 size={22} />
           </div>
         </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-boot-soft">
+          <div
+            className="h-full rounded-full bg-boot-primary transition-all"
+            style={{ width: `${(requiredDone / 5) * 100}%` }}
+          />
+        </div>
+      </section>
+
+      <div className="block">
+        <span className="mb-3 block text-sm font-bold">
+          닉네임 <span className="text-rose-500">*</span>
+          <span className="ml-2 text-xs font-normal text-boot-muted">친구 검색과 그룹원 표시 이름이에요</span>
+        </span>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="예: 충현"
+            value={displayName}
+            onChange={(event) => {
+              setDisplayName(event.target.value)
+              setNicknameCheck(null)
+            }}
+            disabled={saving}
+            maxLength={20}
+            className={inputClass}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              void checkNicknameAvailability()
+            }}
+            disabled={saving || checkingNickname || displayName.trim().length < 2}
+            aria-label="닉네임 중복 확인"
+            className="w-[104px] flex-shrink-0 rounded-2xl border border-boot-primary/25 bg-boot-soft px-3 py-2 text-xs font-black leading-4 text-boot-primary disabled:opacity-40"
+          >
+            {checkingNickname ? <Loader2 size={15} className="mx-auto animate-spin" /> : '중복 확인'}
+          </button>
+        </div>
+        {nicknameCheck && (
+          <p className={`mt-2 text-xs font-bold ${nicknameCheck.available ? 'text-emerald-600' : 'text-amber-700'}`}>
+            {nicknameCheck.message}
+          </p>
+        )}
       </div>
 
-      {/* 체형 */}
+      <label className="block">
+        <span className="mb-3 block text-sm font-bold">
+          휴대폰 번호 <span className="text-rose-500">*</span>
+          <span className="ml-2 text-xs font-normal text-boot-muted">친구 초대와 약속 연락에 사용돼요</span>
+        </span>
+        <div className="relative">
+          <Phone size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-boot-muted" />
+          <input
+            type="tel"
+            inputMode="tel"
+            placeholder="010-1234-5678"
+            value={phone}
+            onChange={(event) => setPhone(formatPhoneInput(event.target.value))}
+            disabled={saving}
+            maxLength={13}
+            className={`${inputClass} pl-11`}
+          />
+        </div>
+      </label>
+
       <div>
-        <label className="text-sm font-bold mb-3 block">
-          체형 <span className="text-gray-600 font-normal text-xs">(선택)</span>
+        <label className="mb-3 block text-sm font-bold">
+          성별 <span className="text-rose-500">*</span>
         </label>
-        <div className="grid grid-cols-4 gap-2">
-          {BODY_TYPES.map(({ key, label, emoji }) => (
-            <button key={key} type="button"
-              onClick={() => setBodyType(bodyType === key ? null : key)}
-              className={`py-3 rounded-2xl text-xs font-bold border text-center transition-all duration-200 ${
-                bodyType === key ? pillOn : pillOff
-              }`}>
-              <div className="text-base mb-0.5">{emoji}</div>
-              {label}
+        <div className="grid grid-cols-2 gap-3">
+          {GENDER_OPTIONS.map((item) => {
+            const selected = gender === item.key
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setGender(item.key)}
+                className={`min-h-[118px] rounded-2xl border px-3 py-4 text-center transition ${selected ? cardOn : cardOff}`}
+              >
+                <span className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm">
+                  <UserRound size={24} className={selected ? 'text-boot-primary' : 'text-boot-muted'} />
+                </span>
+                <span className="block text-sm font-black">{item.label}</span>
+                <span className="mt-1 block text-[11px] leading-4 text-boot-muted">{item.description}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="mb-3 block text-sm font-bold">
+            나이 <span className="text-rose-500">*</span>
+          </span>
+          <input
+            type="number"
+            placeholder="22"
+            value={age}
+            onChange={(event) => setAge(event.target.value)}
+            disabled={saving}
+            className={inputClass}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-3 block text-sm font-bold">
+            키 <span className="text-xs font-normal text-boot-muted">(선택)</span>
+          </span>
+          <div className="relative">
+            <Ruler size={15} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-boot-muted" />
+            <input
+              type="number"
+              placeholder="173"
+              value={height}
+              onChange={(event) => setHeight(event.target.value)}
+              disabled={saving}
+              className={`${inputClass} pl-10 pr-10`}
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-boot-muted">cm</span>
+          </div>
+        </label>
+      </div>
+
+      <div>
+        <label className="mb-3 block text-sm font-bold">
+          체형 <span className="text-xs font-normal text-boot-muted">(선택)</span>
+        </label>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {BODY_TYPES.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setBodyType(bodyType === item.key ? null : item.key)}
+              className={`min-h-[72px] rounded-2xl border px-2 py-2 text-center transition ${
+                bodyType === item.key ? cardOn : cardOff
+              }`}
+            >
+              <span className="block text-xs font-black">{item.label}</span>
+              <span className="mt-1 block text-[10px] leading-3 text-boot-muted">{item.description}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* 머리숱 — 남성만 표시 */}
       {gender === 'male' && (
         <div>
-          <label className="text-sm font-bold mb-3 block">
-            머리숱 <span className="text-gray-600 font-normal text-xs">(선택)</span>
+          <label className="mb-3 block text-sm font-bold">
+            머리숱 <span className="text-xs font-normal text-boot-muted">(선택)</span>
           </label>
           <div className="grid grid-cols-3 gap-2">
-            {HAIR_DENSITIES.map(({ key, label, emoji }) => (
-              <button key={key} type="button"
-                onClick={() => setHairDensity(hairDensity === key ? null : key)}
-                className={`py-3 rounded-2xl text-xs font-bold border text-center transition-all duration-200 ${
-                  hairDensity === key ? pillOn : pillOff
-                }`}>
-                <div className="text-base mb-0.5">{emoji}</div>
-                {label}
+            {HAIR_DENSITIES.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setHairDensity(hairDensity === item.key ? null : item.key)}
+                className={`min-h-[72px] rounded-2xl border px-2 py-2 text-center transition ${
+                  hairDensity === item.key ? cardOn : cardOff
+                }`}
+              >
+                <span className="block text-xs font-black">{item.label}</span>
+                <span className="mt-1 block text-[10px] leading-3 text-boot-muted">{item.description}</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* 학교 */}
-      <div>
-        <label className="text-sm font-bold mb-3 block">
-          학교 <span className="text-rose-400">*</span>
-        </label>
-        <input type="text" placeholder="부산대학교" value={school}
-          onChange={(e) => setSchool(e.target.value)}
-          disabled={saving}
-          className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
-        />
-      </div>
+      <label className="block">
+        <span className="mb-3 block text-sm font-bold">
+          학교 <span className="text-rose-500">*</span>
+        </span>
+        <div className="relative">
+          <GraduationCap size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-boot-muted" />
+          <input
+            type="text"
+            placeholder="부산대학교"
+            value={school}
+            onChange={(event) => setSchool(event.target.value)}
+            disabled={saving}
+            className={`${inputClass} pl-11`}
+          />
+        </div>
+      </label>
 
-      {/* 학과 / 학년 */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label className="text-sm font-bold mb-3 block">
-            학과 <span className="text-gray-600 font-normal text-xs">(선택)</span>
+          <label className="mb-3 block text-sm font-bold">
+            학과 <span className="text-xs font-normal text-boot-muted">(선택)</span>
           </label>
           <div ref={deptRef} className="relative">
             <input
               type="text"
-              placeholder="컴퓨터공학과"
+              placeholder="컴퓨터공학전공"
               value={department}
-              onChange={(e) => {
-                setDepartment(e.target.value)
-                setDeptSuggestions(searchDepartments(e.target.value))
+              onChange={(event) => {
+                setDepartment(event.target.value)
+                setDeptSuggestions(searchDepartments(event.target.value))
               }}
+              onFocus={() => setDeptSuggestions(searchDepartments(department))}
               onBlur={() => setTimeout(() => setDeptSuggestions([]), 150)}
               disabled={saving}
-              className="w-full glass rounded-2xl px-4 py-3.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-violet-500 border border-white/10 disabled:opacity-50"
+              className={inputClass}
             />
             {deptSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 glass-strong rounded-2xl border border-white/10 overflow-hidden z-10">
-                {deptSuggestions.map((s) => (
+              <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-2xl border border-boot-hairline bg-white shadow-lg">
+                {deptSuggestions.map((suggestion) => (
                   <button
-                    key={s}
+                    key={suggestion}
                     type="button"
                     onMouseDown={() => {
-                      setDepartment(s)
+                      setDepartment(suggestion)
                       setDeptSuggestions([])
                     }}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/10 transition-colors"
+                    className="w-full px-4 py-2.5 text-left transition-colors hover:bg-boot-soft"
                   >
-                    {s}
+                    <span className="block text-sm font-black text-boot-ink">{suggestion}</span>
+                    <span className="mt-0.5 block text-[11px] font-bold text-boot-muted">
+                      {getDepartmentCollege(suggestion) ?? '부산대학교'}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -230,17 +426,20 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
           </div>
         </div>
         <div>
-          <label className="text-sm font-bold mb-3 block">
-            학년 <span className="text-gray-600 font-normal text-xs">(선택)</span>
+          <label className="mb-3 block text-sm font-bold">
+            학년 <span className="text-xs font-normal text-boot-muted">(선택)</span>
           </label>
           <div className="grid grid-cols-3 gap-1.5">
-            {[1, 2, 3, 4, 5, 6].map((y) => (
-              <button key={y} type="button"
-                onClick={() => setYear(year === y ? null : y)}
-                className={`py-2.5 rounded-xl text-xs font-bold border transition-all duration-200 ${
-                  year === y ? pillOn : pillOff
-                }`}>
-                {y}학년
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setYear(year === item ? null : item)}
+                className={`rounded-xl border py-2.5 text-xs font-bold transition ${
+                  year === item ? cardOn : cardOff
+                }`}
+              >
+                {item}학년
               </button>
             ))}
           </div>
@@ -248,13 +447,32 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       </div>
 
       {(error || serverError) && (
-        <p className="text-xs text-red-400 text-center">{error || serverError}</p>
+        <p className="text-center text-xs text-red-500">{error || serverError}</p>
       )}
 
-      <button onClick={handleSubmit} disabled={saving}
-        className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-50 disabled:cursor-not-allowed">
-        {saving ? '저장 중...' : '다음'}
+      <button
+        type="button"
+        onClick={() => {
+          void handleSubmit()
+        }}
+        disabled={saving || checkingNickname}
+        className="btn-gradient w-full rounded-2xl py-4 text-base font-bold shadow-lg shadow-violet-900/30 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {saving ? '저장 중...' : checkingNickname ? '닉네임 확인 중...' : '저장하고 이상형 월드컵으로'}
       </button>
     </div>
   )
+}
+
+function normalizePhone(input: string): string {
+  const digits = input.replace(/\D/g, '')
+  if (!/^010\d{8}$/.test(digits)) return ''
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+}
+
+function formatPhoneInput(input: string): string {
+  const digits = input.replace(/\D/g, '').slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
 }

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "outDir": ".tmp/profile-tests",
+    "types": ["node"],
+    "noEmit": false
+  },
+  "include": [
+    "lib/pnu-departments.ts",
+    "lib/gender.ts",
+    "lib/profile/**/*.ts",
+    "tests/profile/**/*.ts"
+  ]
+}

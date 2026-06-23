@@ -8,9 +8,13 @@ import { createClient } from '@/lib/supabase'
 import { loadIdealMetadata, type IdealMetadata } from '@/lib/appearance/metadata'
 import type { PreferenceResult } from '@/lib/appearance/preference'
 import { legacyTypeFromBucketWeights } from '@/lib/appearance/bucket-to-legacy'
+import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { normalizeGender, oppositeGenderForWorldcup } from '@/lib/gender'
+import { readDevBasicProfileGender } from '@/lib/profile/dev-basic-profile'
+import { isSupabaseConfigured } from '@/lib/utils'
 import type { Gender } from '@/lib/types'
 
-// sessionStorage 키 (DB 컬럼 추가 전까지의 임시 저장소)
+// 개발 환경(Supabase 미설정)용 폴백 저장소
 const SESSION_KEY = 'ideal_worldcup_preference_v1'
 
 export default function WorldcupPage() {
@@ -28,10 +32,26 @@ export default function WorldcupPage() {
     let cancelled = false
     async function init() {
       try {
+        if (!isSupabaseConfigured() || isDevPreviewClientSession()) {
+          const meta = await loadIdealMetadata()
+          if (cancelled) return
+          const savedGender = readDevBasicProfileGender()
+          if (!savedGender) {
+            setLoadError('기본정보에서 성별을 먼저 저장해줘.')
+            setMetadata(meta)
+            setLoaded(true)
+            return
+          }
+          setMetadata(meta)
+          setGender(savedGender)
+          setLoaded(true)
+          return
+        }
+
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-          if (!cancelled) setLoaded(true)
+          if (!cancelled) router.push('/login')
           return
         }
 
@@ -42,7 +62,7 @@ export default function WorldcupPage() {
           .eq('user_id', user.id)
           .single()
 
-        const userGender: Gender | null = (profile?.gender as Gender) ?? null
+        const userGender = normalizeGender(profile?.gender)
         if (cancelled) return
         if (!userGender) {
           setLoadError('성별 정보를 먼저 입력해줘.')
@@ -66,33 +86,35 @@ export default function WorldcupPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [router])
 
   async function handleConfirm() {
     if (!result || !gender || saving) return
     setSaving(true)
     setSaveError(null)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
+      if (!isSupabaseConfigured() || isDevPreviewClientSession()) {
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
+        } catch {
+          // sessionStorage 미지원 환경은 조용히 무시
+        }
+        router.push('/profile/survey')
         return
       }
 
-      // 임시: sessionStorage 에 저장 (DB 컬럼 추가 전까지)
-      // TODO(성준 리뷰 후 마이그레이션 추가): profiles 테이블에 아래 컬럼 추가
-      //   - preferred_appearance_vector        jsonb
-      //   - preferred_appearance_delta_vector  jsonb
-      //   - preferred_choice_delta_vector      jsonb
-      //   - preferred_score_range              jsonb
-      //   - preferred_bucket_weights           jsonb
-      //   - worldcup_pool_mean_vector          jsonb
-      //   - worldcup_choice_logs               jsonb
-      try {
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
-      } catch {
-        // sessionStorage 미지원 환경은 조용히 무시
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        if (isDevPreviewClientSession()) {
+          try {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
+          } catch {}
+          router.push('/profile/survey')
+          return
+        }
+        router.push('/login')
+        return
       }
 
       // 기존 appearance_type 컬럼 호환 (INTERFACE_CONTRACT 6 enum)
@@ -101,17 +123,61 @@ export default function WorldcupPage() {
         result.preferred_bucket_weights,
       )
 
+      // 마이그레이션 20260521_profile_add_preference_vectors.sql 에 정의된 컬럼들에
+      // 월드컵 결과 영속 저장 (D-09 결정).
+      const profileUpdate: Record<string, unknown> = {
+        user_id: user.id,
+        preferred_appearance_vector: result.preferred_appearance_vector,
+        preferred_appearance_delta_vector: result.preferred_appearance_delta_vector,
+        preferred_choice_delta_vector: result.preferred_choice_delta_vector,
+        preferred_axis_percentile_vector: result.preferred_axis_percentile_vector,
+        preferred_axis_z_vector: result.preferred_axis_z_vector,
+        preferred_score_range: result.preferred_score_range,
+        preferred_bucket_weights: result.preferred_bucket_weights,
+        worldcup_pool_mean_vector: result.worldcup_pool_mean_vector,
+        worldcup_pool_axis_stats: result.pool_axis_stats,
+        worldcup_completed_at: new Date().toISOString(),
+      }
       if (legacyType) {
-        const { error } = await supabase
-          .from('profiles')
-          .upsert(
-            { user_id: user.id, appearance_type: legacyType },
-            { onConflict: 'user_id' },
-          )
-        if (error) throw error
+        profileUpdate.appearance_type = legacyType
       }
 
-      router.push('/profile/self-worldcup')
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(profileUpdate, { onConflict: 'user_id' })
+      if (profileError) throw profileError
+
+      // worldcup_choice_logs 에 라운드별 선택 기록 batch insert
+      // 매칭 엔진 디버깅 + 향후 ML 학습 데이터용. 사용자 노출 금지.
+      if (result.choice_logs.length > 0) {
+        const worldcupSessionId = crypto.randomUUID()
+        const logRows = result.choice_logs.map((log) => ({
+          user_id: user.id,
+          worldcup_session_id: worldcupSessionId,
+          round: log.round,
+          match_index: log.match_index,
+          winner_id: log.winner_id,
+          loser_id: log.loser_id,
+          winner_vector: log.winner_vector,
+          loser_vector: log.loser_vector,
+          choice_delta_vector: log.choice_delta_vector,
+          weight: log.weight,
+        }))
+        const { error: logError } = await supabase
+          .from('worldcup_choice_logs')
+          .insert(logRows)
+        if (logError) {
+          // 로그 실패는 매칭에 치명적이지 않으므로 경고만 남기고 계속 진행
+          console.warn('worldcup_choice_logs insert failed', logError)
+        }
+      }
+
+      // 개발 환경 복귀시 디버깅 폴백
+      try {
+        sessionStorage.removeItem(SESSION_KEY)
+      } catch {}
+
+      router.push('/profile/survey')
     } catch {
       setSaveError('저장 중 오류가 발생했어. 다시 시도해줘.')
     } finally {
@@ -182,7 +248,14 @@ export default function WorldcupPage() {
   }
 
   // 이성 풀에서 골라야 하므로 반대 성별로 전달
-  const oppositeGender: Gender = gender === 'male' ? 'female' : 'male'
+  const oppositeGender = oppositeGenderForWorldcup(gender)
+  if (!oppositeGender) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen px-4">
+        <p className="text-center text-gray-300 text-sm">성별 정보를 다시 확인해줘.</p>
+      </div>
+    )
+  }
 
   return (
     <IdealWorldcup

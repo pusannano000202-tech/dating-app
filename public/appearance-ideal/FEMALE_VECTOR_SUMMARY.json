@@ -1,0 +1,291 @@
+{
+  "created_at": "2026-05-18T17:38:33.757127+00:00",
+  "analysis_method": "codex_gpt_visual_pass_from_contact_sheet",
+  "external_api_called": false,
+  "image_count": 64,
+  "target_counts": {
+    "귀여운/동안형": 8,
+    "청순/자연형": 8,
+    "시크/도도형": 8,
+    "따뜻한/부드러운형": 8,
+    "스타일리시/화려형": 8,
+    "건강/활동형": 8,
+    "성숙/분위기형": 8,
+    "지적/단정형": 8
+  },
+  "measured_primary_counts": {
+    "귀여운/동안형": 3,
+    "청순/자연형": 10,
+    "성숙/분위기형": 8,
+    "지적/단정형": 12,
+    "시크/도도형": 9,
+    "스타일리시/화려형": 9,
+    "따뜻한/부드러운형": 5,
+    "건강/활동형": 8
+  },
+  "final_bucket_counts": {
+    "귀여운/동안형": 2,
+    "청순/자연형": 12,
+    "지적/단정형": 12,
+    "시크/도도형": 9,
+    "스타일리시/화려형": 9,
+    "따뜻한/부드러운형": 7,
+    "건강/활동형": 8,
+    "성숙/분위기형": 5
+  },
+  "score_bands": {
+    "70점대": 29,
+    "80점대": 33,
+    "60점대": 1,
+    "90점대": 1
+  },
+  "target_final_mismatch_count": 17,
+  "target_final_mismatches": [
+    {
+      "id": "FI02",
+      "target_type": "귀여운/동안형",
+      "measured_primary_type": "청순/자연형",
+      "final_bucket": "청순/자연형"
+    },
+    {
+      "id": "FI03",
+      "target_type": "귀여운/동안형",
+      "measured_primary_type": "청순/자연형",
+      "final_bucket": "청순/자연형"
+    },
+    {
+      "id": "FI05",
+      "target_type": "귀여운/동안형",
+      "measured_primary_type": "청순/자연형",
+      "final_bucket": "청순/자연형"
+    },
+    {
+      "id": "FI06",
+      "target_type": "귀여운/동안형",
+      "measured_primary_type": "성숙/분위기형",
+      "final_bucket": "지적/단정형"
+    },
+    {
+      "id": "FI07",
+      "target_type": "귀여운/동안형",
+      "measured_primary_type": "지적/단정형",
+      "final_bucket": "지적/단정형"
+    },
+    {
+      "id": "FI08",
+      "target_type": "귀여운/동안형",
+      "measured_primary_type": "청순/자연형",
+      "final_bucket": "청순/자연형"
+    },
+    {
+      "id": "FI15",
+      "target_type": "청순/자연형",
+      "measured_primary_type": "지적/단정형",
+      "final_bucket": "지적/단정형"
+    },
+    {
+      "id": "FI23",
+      "target_type": "시크/도도형",
+      "measured_primary_type": "스타일리시/화려형",
+      "final_bucket": "스타일리시/화려형"
+    },
+    {
+      "id": "FI31",
+      "target_type": "따뜻한/부드러운형",
+      "measured_primary_type": "스타일리시/화려형",
+      "final_bucket": "스타일리시/화려형"
+    },
+    {
+      "id": "FI32",
+      "target_type": "따뜻한/부드러운형",
+      "measured_primary_type": "스타일리시/화려형",
+      "final_bucket": "스타일리시/화려형"
+    },
+    {
+      "id": "FI34",
+      "target_type": "스타일리시/화려형",
+      "measured_primary_type": "시크/도도형",
+      "final_bucket": "시크/도도형"
+    },
+    {
+      "id": "FI38",
+      "target_type": "스타일리시/화려형",
+      "measured_primary_type": "시크/도도형",
+      "final_bucket": "시크/도도형"
+    },
+    {
+      "id": "FI49",
+      "target_type": "성숙/분위기형",
+      "measured_primary_type": "성숙/분위기형",
+      "final_bucket": "지적/단정형"
+    },
+    {
+      "id": "FI54",
+      "target_type": "성숙/분위기형",
+      "measured_primary_type": "지적/단정형",
+      "final_bucket": "지적/단정형"
+    },
+    {
+      "id": "FI55",
+      "target_type": "성숙/분위기형",
+      "measured_primary_type": "지적/단정형",
+      "final_bucket": "지적/단정형"
+    },
+    {
+      "id": "FI58",
+      "target_type": "지적/단정형",
+      "measured_primary_type": "지적/단정형",
+      "final_bucket": "청순/자연형"
+    },
+    {
+      "id": "FI61",
+      "target_type": "지적/단정형",
+      "measured_primary_type": "따뜻한/부드러운형",
+      "final_bucket": "따뜻한/부드러운형"
+    }
+  ],
+  "shortage_against_8_each": {
+    "귀여운/동안형": 6,
+    "따뜻한/부드러운형": 1,
+    "성숙/분위기형": 3
+  },
+  "surplus_against_8_each": {
+    "청순/자연형": 4,
+    "시크/도도형": 1,
+    "스타일리시/화려형": 1,
+    "지적/단정형": 4
+  },
+  "axis_stats": {
+    "귀여움": {
+      "mean": 0.465,
+      "std": 0.165,
+      "min": 0.25,
+      "p25": 0.31,
+      "median": 0.45,
+      "p75": 0.58,
+      "max": 0.88,
+      "spread": 0.63
+    },
+    "청순함": {
+      "mean": 0.63,
+      "std": 0.115,
+      "min": 0.43,
+      "p25": 0.57,
+      "median": 0.64,
+      "p75": 0.71,
+      "max": 0.81,
+      "spread": 0.38
+    },
+    "시크함": {
+      "mean": 0.429,
+      "std": 0.198,
+      "min": 0.18,
+      "p25": 0.24,
+      "median": 0.39,
+      "p75": 0.58,
+      "max": 0.88,
+      "spread": 0.7
+    },
+    "따뜻함": {
+      "mean": 0.566,
+      "std": 0.152,
+      "min": 0.33,
+      "p25": 0.44,
+      "median": 0.58,
+      "p75": 0.69,
+      "max": 0.88,
+      "spread": 0.55
+    },
+    "스타일리시함": {
+      "mean": 0.625,
+      "std": 0.116,
+      "min": 0.48,
+      "p25": 0.53,
+      "median": 0.6,
+      "p75": 0.7,
+      "max": 0.9,
+      "spread": 0.42
+    },
+    "건강함": {
+      "mean": 0.578,
+      "std": 0.111,
+      "min": 0.48,
+      "p25": 0.51,
+      "median": 0.54,
+      "p75": 0.58,
+      "max": 0.9,
+      "spread": 0.42
+    },
+    "성숙함": {
+      "mean": 0.579,
+      "std": 0.138,
+      "min": 0.32,
+      "p25": 0.44,
+      "median": 0.62,
+      "p75": 0.68,
+      "max": 0.86,
+      "spread": 0.54
+    },
+    "지적단정함": {
+      "mean": 0.649,
+      "std": 0.089,
+      "min": 0.53,
+      "p25": 0.58,
+      "median": 0.64,
+      "p75": 0.7,
+      "max": 0.86,
+      "spread": 0.33
+    },
+    "눈큼": {
+      "mean": 0.599,
+      "std": 0.048,
+      "min": 0.51,
+      "p25": 0.58,
+      "median": 0.6,
+      "p75": 0.62,
+      "max": 0.76,
+      "spread": 0.25
+    },
+    "부드러운인상": {
+      "mean": 0.612,
+      "std": 0.143,
+      "min": 0.35,
+      "p25": 0.51,
+      "median": 0.64,
+      "p75": 0.72,
+      "max": 0.88,
+      "spread": 0.53
+    },
+    "날카로운인상": {
+      "mean": 0.406,
+      "std": 0.172,
+      "min": 0.18,
+      "p25": 0.26,
+      "median": 0.37,
+      "p75": 0.52,
+      "max": 0.77,
+      "spread": 0.59
+    },
+    "자연스러움": {
+      "mean": 0.668,
+      "std": 0.11,
+      "min": 0.48,
+      "p25": 0.56,
+      "median": 0.71,
+      "p75": 0.76,
+      "max": 0.83,
+      "spread": 0.35
+    },
+    "화려함": {
+      "mean": 0.424,
+      "std": 0.185,
+      "min": 0.18,
+      "p25": 0.28,
+      "median": 0.37,
+      "p75": 0.53,
+      "max": 0.94,
+      "spread": 0.76
+    }
+  },
+  "next_action": "부족 버킷은 새 후보 생성, 과잉 버킷은 같은 final_bucket 내부에서 선택 압축. 사용자가 고른 이미지는 target_type이 아니라 measured_vector로 집계."
+}

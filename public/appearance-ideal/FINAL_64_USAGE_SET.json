@@ -1,0 +1,1019 @@
+{
+  "count": 64,
+  "items": [
+    {
+      "id": "NEW_FI02",
+      "file": "female-64/NEW_FI02.jpg",
+      "absolute_score": 70,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.84,
+      "secondary": [],
+      "source": "previous_analysis",
+      "group_type": "귀여운/동안형",
+      "group_rank": 1
+    },
+    {
+      "id": "FI94",
+      "file": "female-64/FI94.jpg",
+      "absolute_score": 66,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.84,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.66
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "귀여운/동안형",
+      "group_rank": 2
+    },
+    {
+      "id": "FI95",
+      "file": "female-64/FI95.jpg",
+      "absolute_score": 68,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.81,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.7
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "귀여운/동안형",
+      "group_rank": 3
+    },
+    {
+      "id": "FI101",
+      "file": "female-64/FI101.jpg",
+      "absolute_score": 69,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.62
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "귀여운/동안형",
+      "group_rank": 4
+    },
+    {
+      "id": "NEW_FI04",
+      "file": "female-64/NEW_FI04.jpg",
+      "absolute_score": 74,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.79,
+      "secondary": [
+        {
+          "type": "건강/활동형",
+          "score": 0.64
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "귀여운/동안형",
+      "group_rank": 5
+    },
+    {
+      "id": "NEW_FI12",
+      "file": "female-64/NEW_FI12.jpg",
+      "absolute_score": 66,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.79,
+      "secondary": [
+        {
+          "type": "건강/활동형",
+          "score": 0.64
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "귀여운/동안형",
+      "group_rank": 6
+    },
+    {
+      "id": "NEW_FI07",
+      "file": "female-64/NEW_FI07.jpg",
+      "absolute_score": 73,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.7
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "귀여운/동안형",
+      "group_rank": 7
+    },
+    {
+      "id": "NEW_FI13",
+      "file": "female-64/NEW_FI13.jpg",
+      "absolute_score": 72,
+      "primary_type": "귀여운/동안형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.7
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "귀여운/동안형",
+      "group_rank": 8
+    },
+    {
+      "id": "FI96",
+      "file": "female-64/FI96.jpg",
+      "absolute_score": 70,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.68
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "청순/자연형",
+      "group_rank": 1
+    },
+    {
+      "id": "FI102",
+      "file": "female-64/FI102.jpg",
+      "absolute_score": 72,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.81,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.67
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "청순/자연형",
+      "group_rank": 2
+    },
+    {
+      "id": "NEW_FI08",
+      "file": "female-64/NEW_FI08.jpg",
+      "absolute_score": 76,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.68
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "청순/자연형",
+      "group_rank": 3
+    },
+    {
+      "id": "NEW_FI54",
+      "file": "female-64/NEW_FI54.jpg",
+      "absolute_score": 70,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "청순/자연형",
+      "group_rank": 4
+    },
+    {
+      "id": "FI65",
+      "file": "female-64/FI65.jpg",
+      "absolute_score": 68,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "청순/자연형",
+      "group_rank": 5
+    },
+    {
+      "id": "FI70",
+      "file": "female-64/FI70.jpg",
+      "absolute_score": 58,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "청순/자연형",
+      "group_rank": 6
+    },
+    {
+      "id": "FI80",
+      "file": "female-64/FI80.jpg",
+      "absolute_score": 62,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "청순/자연형",
+      "group_rank": 7
+    },
+    {
+      "id": "FI97",
+      "file": "female-64/FI97.jpg",
+      "absolute_score": 73,
+      "primary_type": "청순/자연형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.61
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "청순/자연형",
+      "group_rank": 8
+    },
+    {
+      "id": "NEW_FI22",
+      "file": "female-64/NEW_FI22.jpg",
+      "absolute_score": 76,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "스타일리시/화려형",
+          "score": 0.75
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "시크/도도형",
+      "group_rank": 1
+    },
+    {
+      "id": "FI91",
+      "file": "female-64/FI91.jpg",
+      "absolute_score": 76,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.7
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "시크/도도형",
+      "group_rank": 2
+    },
+    {
+      "id": "FI111",
+      "file": "female-64/FI111.jpg",
+      "absolute_score": 77,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.69
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "시크/도도형",
+      "group_rank": 3
+    },
+    {
+      "id": "FI113",
+      "file": "female-64/FI113.jpg",
+      "absolute_score": 77,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.7
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "시크/도도형",
+      "group_rank": 4
+    },
+    {
+      "id": "FI112",
+      "file": "female-64/FI112.jpg",
+      "absolute_score": 76,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.79,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.72
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "시크/도도형",
+      "group_rank": 5
+    },
+    {
+      "id": "NEW_FI18",
+      "file": "female-64/NEW_FI18.jpg",
+      "absolute_score": 76,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.7
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "시크/도도형",
+      "group_rank": 6
+    },
+    {
+      "id": "FI92",
+      "file": "female-64/FI92.jpg",
+      "absolute_score": 77,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.68
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "시크/도도형",
+      "group_rank": 7
+    },
+    {
+      "id": "FI79",
+      "file": "female-64/FI79.jpg",
+      "absolute_score": 70,
+      "primary_type": "시크/도도형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.7
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "시크/도도형",
+      "group_rank": 8
+    },
+    {
+      "id": "NEW_FI01",
+      "file": "female-64/NEW_FI01.jpg",
+      "absolute_score": 72,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.83,
+      "secondary": [
+        {
+          "type": "귀여운/동안형",
+          "score": 0.67
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 1
+    },
+    {
+      "id": "FI71",
+      "file": "female-64/FI71.jpg",
+      "absolute_score": 74,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.83,
+      "secondary": [
+        {
+          "type": "귀여운/동안형",
+          "score": 0.67
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 2
+    },
+    {
+      "id": "NEW_FI11",
+      "file": "female-64/NEW_FI11.jpg",
+      "absolute_score": 77,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.73
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 3
+    },
+    {
+      "id": "NEW_FI61",
+      "file": "female-64/NEW_FI61.jpg",
+      "absolute_score": 76,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.73
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 4
+    },
+    {
+      "id": "FI66",
+      "file": "female-64/FI66.jpg",
+      "absolute_score": 66,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.73
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 5
+    },
+    {
+      "id": "FI67",
+      "file": "female-64/FI67.jpg",
+      "absolute_score": 70,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.73
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 6
+    },
+    {
+      "id": "FI73",
+      "file": "female-64/FI73.jpg",
+      "absolute_score": 72,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.73
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 7
+    },
+    {
+      "id": "FI72",
+      "file": "female-64/FI72.jpg",
+      "absolute_score": 76,
+      "primary_type": "따뜻한/부드러운형",
+      "primary_score": 0.76,
+      "secondary": [
+        {
+          "type": "스타일리시/화려형",
+          "score": 0.56
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "따뜻한/부드러운형",
+      "group_rank": 8
+    },
+    {
+      "id": "FI81",
+      "file": "female-64/FI81.jpg",
+      "absolute_score": 77,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.66
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 1
+    },
+    {
+      "id": "FI88",
+      "file": "female-64/FI88.jpg",
+      "absolute_score": 77,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.79,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.67
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 2
+    },
+    {
+      "id": "FI82",
+      "file": "female-64/FI82.jpg",
+      "absolute_score": 76,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "건강/활동형",
+          "score": 0.73
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 3
+    },
+    {
+      "id": "FI116",
+      "file": "female-64/FI116.jpg",
+      "absolute_score": 76,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "시크/도도형",
+          "score": 0.68
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 4
+    },
+    {
+      "id": "FI104",
+      "file": "female-64/FI104.jpg",
+      "absolute_score": 75,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.77,
+      "secondary": [
+        {
+          "type": "건강/활동형",
+          "score": 0.64
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 5
+    },
+    {
+      "id": "FI107",
+      "file": "female-64/FI107.jpg",
+      "absolute_score": 75,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.77,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.67
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 6
+    },
+    {
+      "id": "FI105",
+      "file": "female-64/FI105.jpg",
+      "absolute_score": 76,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.76,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.7
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 7
+    },
+    {
+      "id": "FI106",
+      "file": "female-64/FI106.jpg",
+      "absolute_score": 68,
+      "primary_type": "스타일리시/화려형",
+      "primary_score": 0.74,
+      "secondary": [
+        {
+          "type": "건강/활동형",
+          "score": 0.68
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "스타일리시/화려형",
+      "group_rank": 8
+    },
+    {
+      "id": "NEW_FI33",
+      "file": "female-64/NEW_FI33.jpg",
+      "absolute_score": 68,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.88,
+      "secondary": [],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 1
+    },
+    {
+      "id": "NEW_FI15",
+      "file": "female-64/NEW_FI15.jpg",
+      "absolute_score": 76,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 2
+    },
+    {
+      "id": "NEW_FI31",
+      "file": "female-64/NEW_FI31.jpg",
+      "absolute_score": 72,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 3
+    },
+    {
+      "id": "NEW_FI35",
+      "file": "female-64/NEW_FI35.jpg",
+      "absolute_score": 74,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "귀여운/동안형",
+          "score": 0.62
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 4
+    },
+    {
+      "id": "NEW_FI37",
+      "file": "female-64/NEW_FI37.jpg",
+      "absolute_score": 75,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "귀여운/동안형",
+          "score": 0.62
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 5
+    },
+    {
+      "id": "FI68",
+      "file": "female-64/FI68.jpg",
+      "absolute_score": 72,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 6
+    },
+    {
+      "id": "FI74",
+      "file": "female-64/FI74.jpg",
+      "absolute_score": 67,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 7
+    },
+    {
+      "id": "FI77",
+      "file": "female-64/FI77.jpg",
+      "absolute_score": 73,
+      "primary_type": "건강/활동형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.72
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "건강/활동형",
+      "group_rank": 8
+    },
+    {
+      "id": "NEW_FI24",
+      "file": "female-64/NEW_FI24.jpg",
+      "absolute_score": 76,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "시크/도도형",
+          "score": 0.58
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "성숙/분위기형",
+      "group_rank": 1
+    },
+    {
+      "id": "FI98",
+      "file": "female-64/FI98.jpg",
+      "absolute_score": 76,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.68
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "성숙/분위기형",
+      "group_rank": 2
+    },
+    {
+      "id": "FI99",
+      "file": "female-64/FI99.jpg",
+      "absolute_score": 77,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "시크/도도형",
+          "score": 0.64
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "성숙/분위기형",
+      "group_rank": 3
+    },
+    {
+      "id": "FI103",
+      "file": "female-64/FI103.jpg",
+      "absolute_score": 76,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "지적/단정형",
+          "score": 0.69
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "성숙/분위기형",
+      "group_rank": 4
+    },
+    {
+      "id": "NEW_FI40",
+      "file": "female-64/NEW_FI40.jpg",
+      "absolute_score": 76,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.65
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "성숙/분위기형",
+      "group_rank": 5
+    },
+    {
+      "id": "NEW_FI42",
+      "file": "female-64/NEW_FI42.jpg",
+      "absolute_score": 74,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.65
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "성숙/분위기형",
+      "group_rank": 6
+    },
+    {
+      "id": "FI100",
+      "file": "female-64/FI100.jpg",
+      "absolute_score": 74,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "따뜻한/부드러운형",
+          "score": 0.67
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "성숙/분위기형",
+      "group_rank": 7
+    },
+    {
+      "id": "NEW_FI60",
+      "file": "female-64/NEW_FI60.jpg",
+      "absolute_score": 72,
+      "primary_type": "성숙/분위기형",
+      "primary_score": 0.78,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.65
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "성숙/분위기형",
+      "group_rank": 8
+    },
+    {
+      "id": "NEW_FI49",
+      "file": "female-64/NEW_FI49.jpg",
+      "absolute_score": 76,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.71
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 1
+    },
+    {
+      "id": "NEW_FI52",
+      "file": "female-64/NEW_FI52.jpg",
+      "absolute_score": 72,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.71
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 2
+    },
+    {
+      "id": "NEW_FI53",
+      "file": "female-64/NEW_FI53.jpg",
+      "absolute_score": 74,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "성숙/분위기형",
+          "score": 0.64
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 3
+    },
+    {
+      "id": "NEW_FI55",
+      "file": "female-64/NEW_FI55.jpg",
+      "absolute_score": 76,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.71
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 4
+    },
+    {
+      "id": "NEW_FI57",
+      "file": "female-64/NEW_FI57.jpg",
+      "absolute_score": 72,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.71
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 5
+    },
+    {
+      "id": "FI69",
+      "file": "female-64/FI69.jpg",
+      "absolute_score": 64,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.82,
+      "secondary": [
+        {
+          "type": "청순/자연형",
+          "score": 0.71
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 6
+    },
+    {
+      "id": "NEW_FI64",
+      "file": "female-64/NEW_FI64.jpg",
+      "absolute_score": 68,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.81,
+      "secondary": [
+        {
+          "type": "시크/도도형",
+          "score": 0.47
+        }
+      ],
+      "source": "previous_analysis",
+      "group_type": "지적/단정형",
+      "group_rank": 7
+    },
+    {
+      "id": "FI86",
+      "file": "female-64/FI86.jpg",
+      "absolute_score": 71,
+      "primary_type": "지적/단정형",
+      "primary_score": 0.8,
+      "secondary": [
+        {
+          "type": "스타일리시/화려형",
+          "score": 0.6
+        }
+      ],
+      "source": "manual_visual_pass_2026-05-20",
+      "group_type": "지적/단정형",
+      "group_rank": 8
+    }
+  ]
+}

@@ -228,7 +228,7 @@ export function computeAxisZVector(
 }
 
 // ─── 버킷 점수 계산 ─────────────────────────────────────
-// docs/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md 5, 6절 공식 그대로
+// docs/product/profile-worldcup/IDEAL_WORLDCUP_MEASURED_VECTOR_PLAN.md 5, 6절 공식 그대로
 
 export function computeFemaleBucketScores(v: AppearanceVector): Record<FemaleBucket, number> {
   const g = (k: string) => v[k] ?? 0

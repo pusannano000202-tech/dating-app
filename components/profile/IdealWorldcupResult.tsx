@@ -11,10 +11,20 @@ interface Props {
   onRetry: () => void
 }
 
-// 사용자 노출 금지 규칙:
-// - preferred_appearance_vector raw 값 표시 금지
-// - 점수, 백분위, 버킷명 직접 표시 금지
-// - 보여줄 수 있는 것은 추상적 한 줄 메시지 + 최종 우승 사진(있다면)
+function getPublicPreferenceTypes(result: PreferenceResult): {
+  primaryType: string
+  secondaryType: string | null
+} {
+  const ranked = Object.entries(result.preferred_bucket_weights)
+    .sort((a, b) => b[1] - a[1])
+    .map(([type]) => type)
+
+  return {
+    primaryType: ranked[0] ?? '균형형',
+    secondaryType: ranked[1] ?? null,
+  }
+}
+
 export default function IdealWorldcupResult({
   result,
   saving,
@@ -22,6 +32,8 @@ export default function IdealWorldcupResult({
   onConfirm,
   onRetry,
 }: Props) {
+  const { primaryType, secondaryType } = getPublicPreferenceTypes(result)
+
   // Enter: 확인, R: 다시
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -41,16 +53,28 @@ export default function IdealWorldcupResult({
         </h1>
         <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">
           {result.meta.total_choices}번의 선택으로 너의 취향을 측정했어.<br />
-          결과는 매칭 알고리즘 내부에서만 쓰여.
+          매칭에는 더 정밀한 내부 벡터가 함께 반영돼.
         </p>
 
         <div className="w-full glass-strong rounded-3xl p-5 border border-white/10 mb-8">
           <p className="text-xs text-violet-400 font-bold tracking-widest uppercase mb-2">
-            INTERNAL — 매칭 입력 준비됨
+            PRIMARY
           </p>
-          <p className="text-sm text-gray-300 leading-relaxed">
-            너가 끌리는 사람들의 공통점을 13~12개의 외모/스타일 축으로 변환했어.
-            구체적인 점수나 유형명은 보여주지 않을게 — 매칭이 더 정확해지도록.
+          <p className="text-xl font-black text-white leading-tight">
+            당신은 {primaryType}을 가장 좋아하는 편이에요.
+          </p>
+          {secondaryType && (
+            <>
+              <p className="mt-5 text-xs text-violet-400 font-bold tracking-widest uppercase">
+                SECONDARY
+              </p>
+              <p className="mt-2 text-sm text-gray-300 leading-relaxed">
+                그리고 {secondaryType} 분위기에도 자연스럽게 끌리는 경향이 있어요.
+              </p>
+            </>
+          )}
+          <p className="mt-5 text-xs text-gray-600 leading-relaxed">
+            세부 점수와 벡터값은 공개하지 않고 매칭 계산에만 사용해요.
           </p>
         </div>
 

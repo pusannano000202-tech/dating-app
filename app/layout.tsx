@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import AppBottomNav from '@/components/navigation/AppBottomNav'
 
 export const metadata: Metadata = {
-  title: 'Destiny — 운명적인 만남',
-  description: '운명적인 만남이 기다리고 있어요. 친구들과 팀을 짜고 보증금을 걸면, 시간·장소까지 자동으로 잡아드려요.',
+  title: '부팅 — 부산대 과팅',
+  description: '부산대생끼리 친구들과 팀을 만들고, 조건이 맞는 상대팀과 안전하게 만나는 과팅 서비스입니다.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Destiny',
+    statusBarStyle: 'default',
+    title: '부팅',
   },
   formatDetection: { telephone: false },
 }
@@ -18,13 +19,16 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
-  themeColor: '#060612',
+  themeColor: '#f8f3ec',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="bg-app min-h-screen text-white safe-area-padding">{children}</body>
+      <body className="bg-app min-h-screen text-boot-ink safe-area-padding">
+        {children}
+        <AppBottomNav />
+      </body>
     </html>
   )
 }

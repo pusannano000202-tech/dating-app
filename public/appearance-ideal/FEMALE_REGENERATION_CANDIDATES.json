@@ -1,0 +1,27 @@
+{
+  "status": "superseded_by_vector_first_review",
+  "reason": "노출/화보 느낌만으로 재생성 후보를 확정하지 않는다. FI01~FI64 전체를 GPT measured_vector로 분석한 뒤 부족한 final_bucket/vector 축을 기준으로 추가 생성 여부를 판단한다.",
+  "next_required_file": "public/appearance-ideal/ANALYSIS_RAW_FEMALE.json",
+  "next_review_doc": "public/appearance-ideal/REVIEW_FEMALE.md",
+  "handoff_for_manus": "docs/handoff/MANUS_FEMALE_GAP_FILL_AFTER_VECTOR_ANALYSIS.md",
+  "visual_notes_only": {
+    "similarity_risks": [
+      "FI01/FI03",
+      "FI05/FI06/FI12/FI13/FI16",
+      "FI07/FI15",
+      "FI60/FI63/FI64"
+    ],
+    "strong_style_or_health_signals_to_measure_before_rejecting": [
+      "FI31",
+      "FI32",
+      "FI35",
+      "FI39",
+      "FI40",
+      "FI44",
+      "FI47",
+      "FI48",
+      "FI53",
+      "FI56"
+    ]
+  }
+}
