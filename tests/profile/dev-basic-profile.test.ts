@@ -55,3 +55,34 @@ test('worldcup page passes the opposite candidate gender into IdealWorldcup', ()
   assert.match(worldcupPage, /gender=\{oppositeGender\}/)
   assert.doesNotMatch(worldcupPage, /gender=\{gender\}/)
 })
+
+test('ideal worldcup metadata keeps active male and female candidate pools', () => {
+  const metadata = JSON.parse(
+    readSource('public/appearance-ideal/METADATA.json'),
+  ) as {
+    items: Array<{
+      gender?: unknown
+      status?: unknown
+      measured?: { appearance_vector?: unknown } | null
+      file?: unknown
+    }>
+  }
+
+  const activeFemale = metadata.items.filter((item) =>
+    item.gender === 'female' &&
+    item.status === 'active' &&
+    Boolean(item.measured?.appearance_vector) &&
+    typeof item.file === 'string' &&
+    item.file.includes('/female-64/')
+  )
+  const activeMale = metadata.items.filter((item) =>
+    item.gender === 'male' &&
+    item.status === 'active' &&
+    Boolean(item.measured?.appearance_vector) &&
+    typeof item.file === 'string' &&
+    item.file.includes('/male-64/')
+  )
+
+  assert.equal(activeFemale.length, 64)
+  assert.equal(activeMale.length, 64)
+})

@@ -24,7 +24,7 @@ export default function RefundPage() {
   const total = DEPOSIT_AMOUNT
   const totalLabel = `${total.toLocaleString()}원`
   const presetAmounts = Array.from({ length: total / 1000 + 1 }, (_, index) => index * 1000)
-  const [appFee, setAppFee] = useState<number>(total)
+  const [appFee, setAppFee] = useState<number>(0)
   const [begStepIndex, setBegStepIndex] = useState(0)
   const [stage, setStage] = useState<Stage>('select')
   const [busy, setBusy] = useState(false)
@@ -110,8 +110,8 @@ export default function RefundPage() {
             <ChevronLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-xl font-black">매칭비 정산</h1>
-            <p className="text-xs text-gray-500 mt-0.5">보증금 중 앱에게 줄 금액을 선택해주세요</p>
+            <h1 className="text-xl font-black">보증금 정산</h1>
+            <p className="text-xs text-gray-500 mt-0.5">환불받을 금액과 앱 기여금을 직접 정해주세요</p>
           </div>
         </header>
 
@@ -126,7 +126,7 @@ export default function RefundPage() {
             <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
             <p className="text-3xl font-black text-violet-200 mb-6">{total.toLocaleString()} 원</p>
 
-            <label className="text-xs text-gray-500 mb-2 block">앱에게 줄 매칭비</label>
+            <label className="text-xs text-gray-500 mb-2 block">앱 기여금</label>
             <input
               type="range"
               min={0}
@@ -161,11 +161,11 @@ export default function RefundPage() {
 
             <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">환불 받을 금액</span>
+                <span className="text-gray-400">환불 예정 금액</span>
                 <span className="font-black text-white">{refundAmount.toLocaleString()}원</span>
               </div>
               <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
-                보증금은 기본 환불이고, 이어가기를 서로 선택한 경우에만 앱 기여금을 정해요. 0원을 선택하면 최종 확인 후 상대방에게 0원 지불 알림이 갑니다.
+                보증금은 기본 전액 환불이고, 앱 기여금은 자율 선택이에요. 0원을 선택해도 막지 않으며, 전액 환불 전에는 3,000원, 2,000원, 1,000원 순서로 한 번 더 물어봐요.
               </p>
             </div>
 
@@ -215,7 +215,7 @@ export default function RefundPage() {
               {result.refund.toLocaleString()} 원 환불
             </p>
             <p className="text-[11px] text-violet-300 mb-5">
-              앱 매칭비 {result.appRevenue.toLocaleString()}원
+              앱 기여금 {result.appRevenue.toLocaleString()}원
             </p>
             <Link
               href={`/match/${encodeURIComponent(matchId)}`}
@@ -382,7 +382,7 @@ function translateError(code?: string): string {
     case 'deposit_not_found_or_already_refunded':  return '이미 환불 처리됐거나 보증금이 없어요.'
     case 'refund_exceeds_deposit':                 return '보증금보다 많이 받을 수는 없어요.'
     case 'invalid_refund_amount':                  return '잘못된 금액이에요.'
-    case 'both_continue_required':                 return '양쪽 모두 이어가기를 선택한 뒤에만 매칭비를 정산할 수 있어요.'
+    case 'both_continue_required':                 return '양쪽 모두 이어가기를 선택한 뒤에만 보증금을 정산할 수 있어요.'
     case 'already_auto_refunded':                  return '한 명이라도 종료를 선택해 이미 전액 환불 처리됐어요.'
     default:                                       return '처리에 실패했어요.'
   }

@@ -33,6 +33,21 @@ test('refund page is not blocked by the old free beta gate', () => {
   assert.match(refundPage, /보증금/)
 })
 
+test('refund page starts from full refund and separates voluntary contribution copy', () => {
+  const refundPage = readSource('app/match/[id]/refund/page.tsx')
+
+  assert.match(refundPage, /useState<number>\(0\)/)
+  assert.match(refundPage, /보증금 정산/)
+  assert.match(refundPage, /앱 기여금/)
+  assert.match(refundPage, /환불 예정 금액/)
+  assert.match(refundPage, /전액 환불/)
+  assert.match(refundPage, /3,000/)
+  assert.match(refundPage, /2,000/)
+  assert.match(refundPage, /1,000/)
+  assert.doesNotMatch(refundPage, /매칭비 정산/)
+  assert.doesNotMatch(refundPage, /앱에게 줄 매칭비/)
+})
+
 test('deposit API exposes an explicit mock provider while real payment providers stay opt-in', () => {
   const depositRoute = readSource('app/api/deposits/route.ts')
   const paymentLib = readSource('lib/payments/deposit.ts')

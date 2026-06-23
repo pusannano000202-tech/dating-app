@@ -9,6 +9,7 @@ import {
   getMemberStatusLabel,
   getQueueStatusText,
 } from '../../components/matching/group-create/status'
+import { DEV_GROUP_STATE } from '../../components/matching/group-create/dev-state'
 import type { FriendSummary, GroupMemberRecord, GroupRecord } from '../../components/matching/group-create/types'
 
 const group: GroupRecord = {
@@ -85,6 +86,19 @@ test('getGroupCompositionSummary recalculates from active member genders', () =>
       member({ user_id: 'male-left', gender: 'male', left_at: '2026-06-23T00:00:00.000Z' }),
       member({ user_id: 'female-1', gender: 'female' }),
     ]),
+    {
+      male: 1,
+      female: 1,
+      unknown: 0,
+      label: '혼성 그룹',
+      detail: '남자 1명 · 여자 1명',
+    },
+  )
+})
+
+test('dev preview group state preserves member genders for visible queue composition', () => {
+  assert.deepEqual(
+    getGroupCompositionSummary(DEV_GROUP_STATE.members),
     {
       male: 1,
       female: 1,

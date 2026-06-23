@@ -7,8 +7,8 @@
 ## 현재 브랜치
 
 - `profile/post-worldcup-decisions-2026-05-21`
-- 원격 대비 3커밋 앞섬
-- 현재 추가 수정분은 아직 커밋하지 않았다.
+- 최근 기준선 커밋/푸시 이후 계속 같은 브랜치에서 작업 중.
+- 2026-06-23 현재 추가 수정분은 아직 커밋하지 않았다.
 
 ## 현재까지 진행
 
@@ -49,6 +49,30 @@
 21. `/dev/preview`의 성준 흡수 상태 문구를 낮췄다.
    - `venues`, `match_meetings`는 "흡수 완료"가 아니라 "우리 브랜치 후보 스키마 + 성준 기준 계약 합의 필요"로 표시한다.
    - 홈 디자인도 성준 디자인 통째 복사가 아니라 우리 톤 기준 정리로 표시한다.
+22. 2026-06-23 결제/환불 후속 점검:
+   - 환불 화면 기본값이 `보증금 전액을 앱 기여금으로 남기는 상태`에서 시작하던 문제를 확인했다.
+   - 기본 앱 기여금을 `0원`으로 바꿔 보증금은 전액 환불에서 시작하고, 사용자가 0~10,000원 사이 1,000원 단위로 자율 기여금을 고르게 수정했다.
+   - 화면 문구를 `매칭비 정산`이 아니라 `보증금 정산`, `앱 기여금`, `환불 예정 금액` 기준으로 정리했다.
+   - 0원 선택 시 3,000원 -> 2,000원 -> 1,000원 제안 흐름은 유지했다.
+23. 2026-06-23 그룹 멤버 내보내기/나가기 점검:
+   - `친구가 그룹을 나간 상황 보기` 같은 보여주기 버튼은 현재 테스트에서 금지되어 있다.
+   - 리더의 친구 내보내기, 일반 멤버의 그룹 나가기, `left_at` 기록, 큐 취소, 그룹 `forming` 복귀가 테스트로 고정되어 있다.
+   - 남남에서 남녀혼성으로 바뀌는 경우도 active member의 `gender`만 다시 계산하도록 테스트로 고정되어 있다.
+   - 추가로 dev preview 화면에서 `DEV_PREVIEW_GROUP_MEMBERS.gender`가 `DEV_GROUP_STATE.members`로 전달되지 않아 `성별 확인 중`으로 보이던 문제를 수정했다.
+   - 브라우저에서 `/group/create?size=2` 확인 결과 `혼성 그룹`, `남자 1명 · 여자 1명`, `리더 · 남자`, `멤버 · 여자`가 표시된다.
+24. 2026-06-23 이상형 월드컵 성별 분기 점검:
+   - 코드상 기본정보 성별은 `booting_dev_basic_profile` 또는 Supabase `profiles.gender`에서 읽는다.
+   - `/profile/worldcup`는 `oppositeGenderForWorldcup(gender)` 결과를 `IdealWorldcup`에 전달한다.
+   - `npm run test:profile`에서 남자 저장 시 여자 후보, 여자 저장 시 남자 후보로 넘기는 source-level 검증은 통과했다.
+   - `public/appearance-ideal/METADATA.json` 기준 active 여자 후보 64개, active 남자 후보 64개가 존재하도록 테스트를 추가했다.
+   - 따라서 현재 확인된 바로는 여자 사진이 사라진 문제가 아니라, 실제 브라우저 세션 또는 Supabase에 남은 기존 성별 값이 최신 입력과 다른 경우를 의심해야 한다.
+   - 사용자가 실제 브라우저에서 반대로 보지 못했다면 브라우저 sessionStorage 또는 Supabase에 저장된 기존 성별 값이 최신 입력과 다른지 런타임 확인이 필요하다.
+25. 2026-06-23 배포/결제 readiness 재점검:
+   - tracked secret scan은 통과했다. 사용자가 전달한 Supabase/Toss 실키는 코드나 문서에 커밋하지 않는다.
+   - `npm run check:payment-env -- --provider=toss`는 아직 실패한다. 로컬 `.env.local`에는 Toss 실결제/sandbox 실행에 필요한 서버 env가 없다.
+   - 빠진 항목은 `NEXT_PUBLIC_PAYMENT_PROVIDER`, `PAYMENT_PROVIDER`, `NEXT_PUBLIC_TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`, `PAYMENT_INTERNAL_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`다.
+   - `npm run check:deploy-readiness`는 아직 실패한다. 현재 작업트리가 dirty이고, Vercel CLI와 `.vercel/project.json`, `NEXT_PUBLIC_APP_ORIGIN`이 없다.
+   - 따라서 지금 상태는 "코드는 빌드 가능 + Toss 연결을 받을 준비가 있음"이지 "Vercel 실배포 결제 E2E 완료"는 아니다.
 
 ## 핵심 판단
 
@@ -111,18 +135,36 @@
 - `tests/config/deposit-policy.test.ts`
 - `app/dev/preview/page.tsx`
 
+2026-06-23 후속 수정 파일:
+
+- `app/match/[id]/refund/page.tsx`
+- `components/matching/group-create/dev-state.ts`
+- `tests/config/deposit-policy.test.ts`
+- `tests/matching/group-create-status.test.ts`
+- `docs/handoff/active/OVERNIGHT_PROGRESS_HANDOFF.md`
+
 이전부터 dirty 상태였던 파일은 감사 문서에 분류되어 있다.
 
 ## 검증 결과
 
 - `npm run test:profile` 실행 완료.
-- 결과: 13개 테스트 통과, 실패 0.
+- 결과: 2026-06-23 기준 25개 테스트 통과, 실패 0.
 - `npm run test:config` 실행 완료.
-- 결과: 29개 테스트 통과, 실패 0.
+- 결과: 2026-06-23 기준 54개 테스트 통과, 실패 0.
+- `npm run test:matching` 실행 완료.
+- 결과: 2026-06-23 기준 58개 테스트 통과, 실패 0.
 - `npm run typecheck` 실행 완료.
 - 결과: 통과.
 - `npm run lint` 실행 완료.
 - 결과: ESLint 경고/오류 없음.
+- `node scripts/check-secret-leaks.mjs` 실행 완료.
+- 결과: tracked secret scan 통과.
+- `npm run build` 실행 완료.
+- 결과: 57개 route production build 통과.
+- `npm run check:payment-env -- --provider=toss` 실행 완료.
+- 결과: 실패. Toss/Supabase server env 미설정.
+- `npm run check:deploy-readiness` 실행 완료.
+- 결과: 실패. dirty tree, Vercel CLI 미설치, Vercel project link 없음, Toss env 미설정, `NEXT_PUBLIC_APP_ORIGIN` 미설정.
 
 추가 검증:
 

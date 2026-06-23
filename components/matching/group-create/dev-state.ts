@@ -29,6 +29,7 @@ export const DEV_GROUP_STATE: GroupState = {
     group_id: DEV_PREVIEW_GROUP_ID,
     user_id: member.user_id,
     display_name: member.display_name,
+    gender: member.gender,
     role: member.role === 'leader' ? 'leader' : 'member',
     joined_at: nowIso,
     left_at: null,
