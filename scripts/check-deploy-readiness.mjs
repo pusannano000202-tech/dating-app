@@ -24,6 +24,7 @@ checks.push(checkCommand(
 ))
 
 checks.push(checkVercelCli())
+checks.push(checkVercelAuth())
 
 checks.push({
   key: '.vercel/project.json',
@@ -91,13 +92,39 @@ function checkVercelCli() {
   }
 }
 
+function checkVercelAuth() {
+  if (!commandExists('vercel')) {
+    return {
+      key: 'vercel whoami',
+      status: 'MISSING',
+      purpose: 'Vercel CLI is authenticated for project link/env/deploy checks',
+    }
+  }
+
+  const result = spawnSync('vercel', ['whoami'], {
+    cwd: root,
+    encoding: 'utf8',
+    shell: process.platform === 'win32',
+    env: {
+      ...process.env,
+      CI: '1',
+      VERCEL_TELEMETRY_DISABLED: '1',
+    },
+  })
+
+  return {
+    key: 'vercel whoami',
+    status: result.status === 0 && result.stdout.trim().length > 0 ? 'SET' : 'ACTION_REQUIRED',
+    purpose: 'Vercel CLI is authenticated for project link/env/deploy checks',
+  }
+}
+
 function commandExists(command) {
-  // Windows uses `where vercel`; POSIX uses `command -v vercel`.
+  // Windows uses `where.exe vercel`; POSIX uses `command -v vercel`.
   const result = process.platform === 'win32'
-    ? spawnSync('where', [command], {
+    ? spawnSync('where.exe', [command], {
       cwd: root,
       encoding: 'utf8',
-      shell: true,
     })
     : spawnSync('sh', ['-lc', `command -v ${command}`], {
       cwd: root,
