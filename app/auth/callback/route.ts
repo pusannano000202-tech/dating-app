@@ -36,7 +36,12 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      const loginUrl = new URL('/login', requestUrl.origin)
+      loginUrl.searchParams.set('auth_error', error.message)
+      return NextResponse.redirect(loginUrl)
+    }
   }
 
   return response
