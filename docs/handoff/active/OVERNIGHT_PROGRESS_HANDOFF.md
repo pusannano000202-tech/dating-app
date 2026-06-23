@@ -1316,3 +1316,19 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - Vercel env 등록.
   - Toss sandbox dashboard webhook URL 등록.
   - production Supabase migration 적용은 배포 직전/배포 중 별도 실행.
+
+## 2026-06-23 production Supabase migration 적용 가능 여부 확인
+
+- 현재 로컬 확인:
+  - `where.exe supabase` 결과 Supabase CLI 없음.
+  - `supabase --version` 실행 불가.
+  - `supabase/config.toml` 없음. 즉 현재 폴더는 Supabase project link가 잡혀 있지 않다.
+- 결론:
+  - production Supabase migration은 코드상 적용 대상이지만, 현재 PC/폴더 상태에서는 자동 적용할 수 없다.
+  - 실제 적용은 Supabase CLI 설치/로그인/link 또는 Supabase 대시보드/SQL editor 접근 권한이 필요하다.
+  - migration 적용 전에는 반드시 현재 production DB에 이미 반영된 migration 목록을 확인해야 한다.
+- 다음 사람이 할 일:
+  - Supabase CLI 설치 또는 Supabase dashboard 접근 확인.
+  - project ref가 올바른지 확인.
+  - `supabase/migrations` 중 미적용 migration만 적용.
+  - 적용 후 `npm run test:config`, `npm run test:matching`, 배포 URL 기준 결제/웹훅 smoke test 수행.
