@@ -1,5 +1,4 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { isSafeLocalRedirect } from '@/lib/auth/school-email'
 import { getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
@@ -17,19 +16,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
+  const response = NextResponse.redirect(new URL(destination, requestUrl.origin))
+
   if (code) {
-    const cookieStore = cookies()
     const supabase = createServerClient(
       getSupabaseUrl(),
       getSupabasePublicKey(),
       {
         cookies: {
           getAll() {
-            return cookieStore.getAll()
+            return request.cookies.getAll()
           },
           setAll(cookiesToSet: { name: string; value: string; options?: CookieOptions }[]) {
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options)
+              response.cookies.set(name, value, options ?? {})
             })
           },
         },
@@ -39,5 +39,5 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  return NextResponse.redirect(new URL(destination, requestUrl.origin))
+  return response
 }
