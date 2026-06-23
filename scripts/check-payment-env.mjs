@@ -44,13 +44,13 @@ if (provider === 'toss') {
       key: 'NEXT_PUBLIC_TOSS_CLIENT_KEY',
       required: true,
       purpose: 'browser-safe Toss checkout key',
-      validate: (value) => /^(?:test|live)_(?:g)?ck_/.test(value),
+      validate: (value) => isTossKey(value, 'ck'),
     },
     {
       key: 'TOSS_SECRET_KEY',
       required: true,
       purpose: 'server-only Toss API key',
-      validate: (value) => /^(?:test|live)_(?:g)?sk_/.test(value),
+      validate: (value) => isTossKey(value, 'sk'),
     },
     {
       key: 'PAYMENT_INTERNAL_SECRET',
@@ -154,6 +154,12 @@ function isSupabasePublicKey(value) {
   if (typeof value !== 'string' || !value.trim()) return false
   if (value.startsWith('sb_publishable_')) return !hasUnsafeEnvValueCharacters(value)
   return isSupabaseJwtWithRole(value, 'anon')
+}
+
+function isTossKey(value, kind) {
+  if (typeof value !== 'string') return false
+  if (hasUnsafeEnvValueCharacters(value)) return false
+  return new RegExp(`^(?:test|live)_(?:g)?${kind}_[A-Za-z0-9_-]{12,}$`).test(value)
 }
 
 function isSupabaseJwtWithRole(value, role) {

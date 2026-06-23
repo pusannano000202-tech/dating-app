@@ -5,6 +5,7 @@ import { join } from 'node:path'
 
 import { DEPOSIT_AMOUNT, FREE_BETA_ENABLED } from '../../lib/constants'
 import { OPERATIONS_CONFIG } from '../../lib/matching/config'
+import { getDepositPaymentReadiness } from '../../lib/payments/deposit'
 import { appFeeToRefundAmount, normalizeAppFeeAmount } from '../../lib/refund/fee-flow'
 
 const ROOT = process.cwd()
@@ -46,6 +47,32 @@ test('deposit API exposes an explicit mock provider while real payment providers
   assert.doesNotMatch(paymentLib, /production/i)
 })
 
+test('Toss runtime readiness rejects configured keys that include copied prose', () => {
+  const previousEnv = {
+    NEXT_PUBLIC_TOSS_CLIENT_KEY: process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY,
+    TOSS_SECRET_KEY: process.env.TOSS_SECRET_KEY,
+    PAYMENT_INTERNAL_SECRET: process.env.PAYMENT_INTERNAL_SECRET,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  }
+
+  try {
+    process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY = 'test_ck_fake_client_key'
+    process.env.TOSS_SECRET_KEY = 'test_sk_fake_secret_key 이거니까'
+    process.env.PAYMENT_INTERNAL_SECRET = 'local-internal-secret'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = makeFakeJwt({ role: 'service_role' })
+
+    const readiness = getDepositPaymentReadiness('toss')
+
+    assert.equal(readiness.ok, false)
+    if (!readiness.ok) {
+      assert.equal(readiness.error, 'payment_provider_not_configured')
+      assert.deepEqual(readiness.invalid, ['TOSS_SECRET_KEY'])
+    }
+  } finally {
+    restoreEnv(previousEnv)
+  }
+})
+
 test('mock deposit RPC enforces the configured 10000 won amount at the database boundary', () => {
   const migrations = readdirSync(join(ROOT, 'supabase/migrations'))
     .filter((file) => file.endsWith('.sql'))
@@ -57,3 +84,21 @@ test('mock deposit RPC enforces the configured 10000 won amount at the database 
   assert.match(migrations, /p_amount\s*<>\s*10000/)
   assert.match(migrations, /Temporary mock deposit payment.*10,000원/)
 })
+
+function makeFakeJwt(payload: Record<string, unknown>) {
+  return [
+    Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url'),
+    Buffer.from(JSON.stringify(payload)).toString('base64url'),
+    'signature',
+  ].join('.')
+}
+
+function restoreEnv(previous: Record<string, string | undefined>) {
+  for (const [key, value] of Object.entries(previous)) {
+    if (typeof value === 'undefined') {
+      delete process.env[key]
+    } else {
+      process.env[key] = value
+    }
+  }
+}

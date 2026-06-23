@@ -138,6 +138,14 @@ http://localhost:3004/match/dev-match-pending                      200
 - 결제 성공 후 `deposits.status=paid`가 Supabase에 반영되는지 확인
 - 정상 만남 후 환불 플로우에서 앱 기여금 선택값과 Toss cancel 금액이 일치하는지 E2E 확인
 
+## 2026-06-23 env 값 복사 주의사항 보강
+
+- Toss 키는 전체 문자열이 정확히 `test_ck_...`, `test_gck_...`, `test_sk_...`, `test_gsk_...` 형태여야 한다.
+- 키 뒤에 공백, 한글 설명, 카톡 문장, 메모가 붙으면 안 된다.
+- `scripts/check-payment-env.mjs`가 이제 Toss key 전체 문자열을 검사한다.
+- `npm run check:payment-env -- --provider=toss`에서 `TOSS_SECRET_KEY` 또는 `NEXT_PUBLIC_TOSS_CLIENT_KEY`가 `INVALID`로 뜨면, 값 자체를 다시 복사해야 한다.
+- 이 검사는 값 자체를 출력하지 않고 키 이름과 상태만 보여준다.
+
 ## 2026-06-23 추가 점검
 
 - 이상형 월드컵에서 저장된 기본정보 성별이 없으면 더 이상 `female`로 가정하지 않는다.

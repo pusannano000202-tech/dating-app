@@ -202,6 +202,37 @@ test('payment env checker rejects malformed Toss and service role values without
   )
 })
 
+test('payment env checker rejects Toss keys with trailing prose or unsafe characters', () => {
+  const baseEnv = {
+    ...process.env,
+    NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: makeFakeJwt({ role: 'anon' }),
+    NEXT_PUBLIC_PAYMENT_PROVIDER: 'toss',
+    PAYMENT_PROVIDER: 'toss',
+    NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
+    TOSS_SECRET_KEY: 'test_sk_fake_secret_key 이거니까',
+    PAYMENT_INTERNAL_SECRET: 'local-internal-secret',
+    SUPABASE_SERVICE_ROLE_KEY: makeFakeJwt({ role: 'service_role' }),
+  }
+
+  assert.throws(
+    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss'], {
+      cwd: ROOT,
+      env: baseEnv,
+      encoding: 'utf8',
+      stdio: 'pipe',
+    }),
+    (error: unknown) => {
+      const output = String((error as { stdout?: unknown; stderr?: unknown }).stdout ?? '')
+        + String((error as { stdout?: unknown; stderr?: unknown }).stderr ?? '')
+      assert.match(output, /INVALID/)
+      assert.match(output, /TOSS_SECRET_KEY/)
+      assert.doesNotMatch(output, /fake_secret_key/)
+      return true
+    },
+  )
+})
+
 test('deposit payment request draft sends failed checkout back through cancel route', () => {
   const paymentLib = readSource('lib/payments/deposit.ts')
 

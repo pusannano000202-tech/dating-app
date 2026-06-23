@@ -7,7 +7,13 @@ export type DepositPaymentProvider = typeof DEPOSIT_PAYMENT_PROVIDERS[number]
 
 export type DepositPaymentReadiness =
   | { ok: true; provider: DepositPaymentProvider }
-  | { ok: false; provider: DepositPaymentProvider; error: 'payment_provider_not_configured'; missing: string[] }
+  | {
+      ok: false
+      provider: DepositPaymentProvider
+      error: 'payment_provider_not_configured'
+      missing: string[]
+      invalid: string[]
+    }
 
 export interface DepositPaymentRequestDraft {
   provider: DepositPaymentProvider
@@ -34,15 +40,36 @@ export function getDepositPaymentReadiness(provider: DepositPaymentProvider): De
     return { ok: true, provider }
   }
 
-  const missing = missingEnv([
-    'NEXT_PUBLIC_TOSS_CLIENT_KEY',
-    'TOSS_SECRET_KEY',
-    'PAYMENT_INTERNAL_SECRET',
-    'SUPABASE_SERVICE_ROLE_KEY',
-  ])
+  const checks = [
+    {
+      key: 'NEXT_PUBLIC_TOSS_CLIENT_KEY',
+      validate: (value: string) => isTossKey(value, 'ck'),
+    },
+    {
+      key: 'TOSS_SECRET_KEY',
+      validate: (value: string) => isTossKey(value, 'sk'),
+    },
+    {
+      key: 'PAYMENT_INTERNAL_SECRET',
+      validate: (value: string) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
+    },
+    {
+      key: 'SUPABASE_SERVICE_ROLE_KEY',
+      validate: (value: string) => isSupabaseJwtWithRole(value, 'service_role'),
+    },
+  ] as const
+  const missing = checks
+    .filter((check) => !process.env[check.key])
+    .map((check) => check.key)
+  const invalid = checks
+    .filter((check) => {
+      const value = process.env[check.key]
+      return typeof value === 'string' && !check.validate(value)
+    })
+    .map((check) => check.key)
 
-  if (missing.length > 0) {
-    return { ok: false, provider, error: 'payment_provider_not_configured', missing }
+  if (missing.length > 0 || invalid.length > 0) {
+    return { ok: false, provider, error: 'payment_provider_not_configured', missing, invalid }
   }
 
   return { ok: true, provider }
@@ -101,10 +128,6 @@ function isDepositPaymentProvider(value: string): value is DepositPaymentProvide
   return (DEPOSIT_PAYMENT_PROVIDERS as readonly string[]).includes(value)
 }
 
-function missingEnv(keys: string[]) {
-  return keys.filter((key) => !process.env[key])
-}
-
 function buildDepositOrderId(groupId: string, userId: string) {
   const compactGroup = groupId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
   const compactUser = userId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
@@ -120,4 +143,26 @@ export function isDepositOrderIdForContext(orderId: string, groupId: string, use
   const compactGroup = groupId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
   const compactUser = userId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
   return orderId.startsWith(`deposit_${compactGroup}_${compactUser}_`)
+}
+
+function isTossKey(value: string, kind: 'ck' | 'sk') {
+  if (hasUnsafeEnvValueCharacters(value)) return false
+  return new RegExp(`^(?:test|live)_(?:g)?${kind}_[A-Za-z0-9_-]{12,}$`).test(value)
+}
+
+function isSupabaseJwtWithRole(value: string, role: string) {
+  if (hasUnsafeEnvValueCharacters(value)) return false
+  const parts = value.split('.')
+  if (parts.length !== 3 || parts.some((part) => !part)) return false
+
+  try {
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8')) as { role?: unknown }
+    return payload.role === role
+  } catch {
+    return false
+  }
+}
+
+function hasUnsafeEnvValueCharacters(value: string) {
+  return /\s/.test(value) || /[^\x21-\x7e]/.test(value)
 }
