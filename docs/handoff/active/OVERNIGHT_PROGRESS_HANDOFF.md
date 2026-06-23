@@ -1235,3 +1235,17 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - Vercel CLI 인증이 안 되어 있다.
   - `.vercel/project.json`이 없어 현재 폴더가 Vercel 프로젝트에 link되지 않았다.
   - `NEXT_PUBLIC_APP_ORIGIN`이 아직 localhost다. production 배포 전 Vercel URL로 바꿔야 한다.
+
+## 2026-06-23 배포 readiness 다음 행동 출력 보강
+
+- `scripts/check-deploy-readiness.mjs`가 blocker 이름만 출력하던 상태를 보강했다.
+- 이제 실패 시 `Next steps` 섹션에 blocker별 다음 행동을 출력한다.
+  - dirty tree: 커밋/푸시 필요.
+  - `vercel whoami`: `vercel login` 또는 배포 환경의 Vercel token 필요.
+  - `.vercel/project.json`: 인증 후 `vercel link` 필요.
+  - `NEXT_PUBLIC_APP_ORIGIN`: https Vercel production/preview URL 필요.
+- 비밀값은 출력하지 않는다.
+- 검증:
+  - 먼저 `npm run test:config`에서 `printNextSteps` 누락으로 실패하는 것을 확인했다.
+  - 구현 후 `npm run test:config` 통과. 56개 테스트.
+  - `npm run check:deploy-readiness`는 예상대로 실패하지만, 이제 위 다음 행동을 같이 출력한다.

@@ -47,6 +47,7 @@ console.table(checks)
 const blockers = checks.filter((check) => check.status !== 'SET')
 if (blockers.length > 0) {
   console.error(`Deployment readiness blockers: ${blockers.map((check) => check.key).join(', ')}`)
+  printNextSteps(blockers)
   process.exit(1)
 }
 
@@ -198,4 +199,32 @@ function stripQuotes(value) {
 
 function isPlaceholderValue(value) {
   return /(?:your-|your_|example|placeholder|replace_me|changeme|<[^>]+>)/i.test(String(value))
+}
+
+function printNextSteps(blockers) {
+  console.error('\nNext steps')
+  for (const blocker of blockers) {
+    console.error(`- ${blocker.key}: ${getNextStep(blocker.key)}`)
+  }
+}
+
+function getNextStep(key) {
+  switch (key) {
+    case 'git status --short --branch':
+      return 'commit/push current changes before deployment.'
+    case 'vercel --version':
+      return 'install or expose the Vercel CLI, then rerun this check.'
+    case 'vercel whoami':
+      return 'run `vercel login` or provide a valid Vercel token in the deployment environment.'
+    case '.vercel/project.json':
+      return 'run `vercel link` in this folder after Vercel authentication.'
+    case 'scripts/check-secret-leaks.mjs':
+      return 'remove real secrets from tracked files, then rerun the secret scanner.'
+    case 'scripts/check-payment-env.mjs --provider=toss':
+      return 'set Toss/Supabase server envs in `.env.local` or Vercel Environment Variables.'
+    case 'NEXT_PUBLIC_APP_ORIGIN':
+      return 'set `NEXT_PUBLIC_APP_ORIGIN` to the https Vercel production or preview URL.'
+    default:
+      return 'inspect this check and resolve it before deploying.'
+  }
 }

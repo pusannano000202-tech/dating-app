@@ -85,10 +85,13 @@ npm run build
 
 ## 현재 알려진 차단점
 
-- 이 로컬 폴더에는 아직 Vercel CLI가 없다.
+- Vercel CLI 실행 파일은 잡힌다.
+- 다만 `vercel whoami`가 통과하지 않아 현재 로컬 CLI 인증은 아직 안 된 상태다.
 - `.vercel/project.json`이 없어 Vercel 프로젝트 link가 잡혀 있지 않다.
-- 로컬 `.env.local`에는 Toss 관련 값과 provider mode가 아직 없다.
-- `NEXT_PUBLIC_APP_ORIGIN`이 production/preview Vercel URL로 설정되어야 한다.
+- 로컬 `.env.local` 기준 Toss/Supabase 결제 env 검증은 통과한다.
+- Vercel Dashboard에는 같은 env 값이 별도로 들어가야 한다. 로컬 `.env.local` 값이 자동으로 Vercel에 올라가는 것은 아니다.
+- `NEXT_PUBLIC_APP_ORIGIN`이 production/preview Vercel URL로 설정되어야 한다. 현재 로컬 검토값은 `localhost`라 production 준비로 보지 않는다.
+- Supabase MCP 조회는 현재 연결 계정 권한 부족으로 실패했다. production DB에는 아무 변경도 하지 않았다.
 - Supabase CLI/psql이 없어 새 Supabase 프로젝트에 migration을 직접 적용/조회 검증하지 못했다.
 
 ## 통과 기준
