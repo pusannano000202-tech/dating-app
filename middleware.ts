@@ -5,17 +5,43 @@ import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '
 import { getSupabasePublicKey, getSupabaseUrl, isSupabaseConfigured } from './lib/utils'
 
 const PROTECTED_PREFIXES = ['/profile', '/group', '/match', '/friends', '/notifications', '/admin']
+const DEV_AUTH_MAX_AGE = 60 * 60 * 24 * 7
+
+function setDevAuthCookie(response: NextResponse): void {
+  response.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue(), {
+    path: '/',
+    maxAge: DEV_AUTH_MAX_AGE,
+    sameSite: 'lax',
+  })
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
+  const canBypassAuth = isDevAuthBypassEnabled()
   const shouldIssueDevAuth =
-    isDevAuthBypassEnabled() &&
-    pathname.startsWith('/dev/preview')
+    canBypassAuth &&
+    (
+      pathname.startsWith('/dev/preview') ||
+      pathname === '/' ||
+      pathname === '/login' ||
+      isProtected
+    )
+
+  if (shouldIssueDevAuth) {
+    request.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue())
+  }
+
   const isDevAuthed =
-    isDevAuthBypassEnabled() &&
+    canBypassAuth &&
     request.cookies.get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
 
-  // Supabase 키 없으면 인증 체크 스킵 (로컬 UI 확인용)
+  if (canBypassAuth && pathname === '/login') {
+    const response = NextResponse.redirect(new URL('/dev/preview', request.url))
+    setDevAuthCookie(response)
+    return response
+  }
+
   if (!isSupabaseConfigured() || isDevAuthed || shouldIssueDevAuth) {
     if (pathname === '/' && !isDevAuthed && !shouldIssueDevAuth) {
       return NextResponse.redirect(new URL('/login', request.url))
@@ -23,11 +49,7 @@ export async function middleware(request: NextRequest) {
 
     const response = NextResponse.next({ request })
     if (shouldIssueDevAuth) {
-      response.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue(), {
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7,
-        sameSite: 'lax',
-      })
+      setDevAuthCookie(response)
     }
     return response
   }
@@ -53,10 +75,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // 세션 갱신 (이걸 빠뜨리면 새로고침 시 로그아웃됨)
   const { data: { user } } = await supabase.auth.getUser()
-
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 
   if (pathname === '/' && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -68,7 +87,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // 이미 로그인된 상태에서 /login 접근 시 홈으로
   if (pathname === '/login' && user) {
     return NextResponse.redirect(new URL('/', request.url))
   }

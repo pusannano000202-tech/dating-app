@@ -17,13 +17,15 @@ test('root layout uses Booting production metadata and light theme color', () =>
   assert.doesNotMatch(layout, /Destiny/)
 })
 
-test('home page keeps real app login flow while presenting Booting UI', () => {
+test('home page renders the Booting dashboard behind demo auth for school preview', () => {
   const home = readSource('app/page.tsx')
 
   assert.match(home, /BootingLogo/)
-  assert.match(home, /href="\/login"/)
-  assert.match(home, /LandingFlowRow/)
-  assert.match(home, /프로필은 가리고, 흐름은 간단하게/)
+  assert.match(home, /HomeDashboard/)
+  assert.match(home, /HomeTodayTaskCard/)
+  assert.match(home, /href="\/match\/start"/)
+  assert.doesNotMatch(home, /href="\/login"/)
+  assert.doesNotMatch(home, /LandingFlowRow/)
   assert.doesNotMatch(home, /MatchingPool/)
   assert.doesNotMatch(home, /get_match_pool_stats/)
   assert.doesNotMatch(home, /font-destiny/)
@@ -244,6 +246,17 @@ test('middleware issues dev auth cookie when opening dev preview', () => {
   assert.match(devMatchSetup, /function hasDevAuthCookie/)
   assert.match(devMatchSetup, /document\.cookie/)
   assert.match(devMatchSetup, /hasDevAuthLocalStorage\(\) \|\| hasDevAuthCookie\(\)/)
+})
+
+test('temporary school demo mode routes login entry points to dev preview', () => {
+  const middleware = readSource('middleware.ts')
+  const devAuth = readSource('lib/dev-auth.ts')
+
+  assert.match(devAuth, /NEXT_PUBLIC_BOOTING_DEMO_MODE/)
+  assert.match(devAuth, /!== 'off'/)
+  assert.match(middleware, /pathname === '\/login'/)
+  assert.match(middleware, /pathname === '\/'/)
+  assert.match(middleware, /new URL\('\/dev\/preview', request\.url\)/)
 })
 
 test('health check validates Supabase Auth with the public key', () => {
