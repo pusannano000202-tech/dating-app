@@ -1,5 +1,5 @@
 import { CheckCircle2, CreditCard, Loader2, LockKeyhole, ShieldCheck } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 type DepositPaymentPanelProps = {
   amount: number
@@ -18,12 +18,29 @@ export default function DepositPaymentPanel({
   disabled = false,
   onPay,
 }: DepositPaymentPanelProps) {
+  const [mockReviewOpen, setMockReviewOpen] = useState(false)
   const provider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER || 'mock').toLowerCase()
   const tossClientReady = Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
   const paid = totalCount > 0 && paidCount >= totalCount
   const isToss = provider === 'toss'
   const providerLabel = isToss ? 'Toss sandbox' : '로컬 mock'
   const providerTone = isToss && tossClientReady ? '준비됨' : isToss ? '키 설정 필요' : '검토용'
+  const primaryLabel = paid
+    ? '우리 그룹 보증금 완료'
+    : isToss
+      ? 'Toss sandbox 결제하기'
+      : mockReviewOpen
+        ? '결제 확인하고 완료 처리'
+        : '시연용 결제 확인하기'
+
+  function handlePrimaryClick() {
+    if (paid || saving || disabled) return
+    if (!isToss && !mockReviewOpen) {
+      setMockReviewOpen(true)
+      return
+    }
+    onPay()
+  }
 
   return (
     <section className="mt-4 overflow-hidden rounded-[30px] border border-boot-primary/15 bg-white shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
@@ -77,14 +94,44 @@ export default function DepositPaymentPanel({
           done={false}
         />
 
+        {!paid && !isToss && mockReviewOpen && (
+          <div className="rounded-[24px] border border-boot-primary/20 bg-boot-soft px-4 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-black text-boot-primary">시연용 결제 확인</p>
+                <p className="mt-1 text-lg font-black text-boot-ink">
+                  {amount.toLocaleString('ko-KR')}원 보증금
+                </p>
+              </div>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black text-boot-primary shadow-sm">
+                MOCK
+              </span>
+            </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-boot-muted">
+              실제 돈은 나가지 않아요. 내일 시연에서는 이 확인 단계로 보증금을 냈다는 흐름을 보여주고, 실제 운영 전에는 Toss sandbox/운영키로 같은 위치를 연결하면 됩니다.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <InfoTile label="결제 상태" value="시연 확인" />
+              <InfoTile label="환불 기준" value="정상 만남 후" />
+            </div>
+            <button
+              type="button"
+              onClick={() => setMockReviewOpen(false)}
+              className="mt-3 text-xs font-black text-boot-muted underline underline-offset-4"
+            >
+              다시 닫기
+            </button>
+          </div>
+        )}
+
         <button
           type="button"
-          onClick={onPay}
+          onClick={handlePrimaryClick}
           disabled={saving || paid || disabled}
           className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)] transition hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-45"
         >
           {saving ? <Loader2 size={16} className="animate-spin" /> : paid ? <CheckCircle2 size={16} /> : <CreditCard size={16} />}
-          {paid ? '우리 그룹 보증금 완료' : isToss ? 'Toss sandbox 결제하기' : '로컬 mock 결제하기'}
+          {primaryLabel}
         </button>
       </div>
     </section>

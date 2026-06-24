@@ -355,6 +355,17 @@ test('client pages open Toss payment window with the browser SDK request payload
   assert.doesNotMatch(groupCreatePage, /res\.status === 202\)[\s\S]{0,220}setError\('외부 결제창 연결 준비 상태/)
 })
 
+test('mock deposit panel shows a demo confirmation step before marking payment complete', () => {
+  const depositPanel = readSource('components/matching/DepositPaymentPanel.tsx')
+
+  assert.match(depositPanel, /useState/)
+  assert.match(depositPanel, /시연용 결제 확인/)
+  assert.match(depositPanel, /실제 돈은 나가지 않아요/)
+  assert.match(depositPanel, /결제 확인하고 완료 처리/)
+  assert.match(depositPanel, /setMockReviewOpen\(true\)/)
+  assert.match(depositPanel, /onPay\(\)/)
+})
+
 test('group create explains deposits happen after tentative match instead of charging in queue setup', () => {
   const groupCreatePanel = readSource('components/matching/group-create/FreeBetaQueuePanel.tsx')
   const groupCreatePage = readSource('app/group/create/page.tsx')
