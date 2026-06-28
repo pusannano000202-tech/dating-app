@@ -16,8 +16,8 @@ const TRAITS = [
     key: 'openness' as keyof Big5Scores,
     label: '개방성',
     Icon: Palette,
-    iconBg: 'from-violet-600 to-fuchsia-600',
-    color: '#7c3aed',
+    iconBg: 'from-boot-primary to-boot-coral',
+    color: '#ff5a6f',
     low: '안정적이고 익숙한 것을 선호해',
     high: '새로운 경험과 창의성을 즐겨',
   },
@@ -25,8 +25,8 @@ const TRAITS = [
     key: 'conscientiousness' as keyof Big5Scores,
     label: '성실성',
     Icon: ClipboardCheck,
-    iconBg: 'from-blue-600 to-cyan-600',
-    color: '#2563eb',
+    iconBg: 'from-sky-500 to-cyan-400',
+    color: '#0ea5e9',
     low: '자유롭고 유연한 편이야',
     high: '계획적이고 책임감이 강해',
   },
@@ -43,7 +43,7 @@ const TRAITS = [
     key: 'agreeableness' as keyof Big5Scores,
     label: '친화성',
     Icon: Heart,
-    iconBg: 'from-emerald-600 to-teal-600',
+    iconBg: 'from-emerald-500 to-teal-400',
     color: '#059669',
     low: '독립적이고 솔직한 편이야',
     high: '배려심이 깊고 협력을 잘해',
@@ -87,10 +87,10 @@ export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
   return (
     <div className="flex flex-col gap-5">
       {/* 성격 유형 카드 */}
-      <div className="glass-strong rounded-3xl p-6 text-center border border-white/10">
-        <p className="text-xs text-violet-400 font-bold tracking-widest uppercase mb-2">나의 성격 유형</p>
+      <div className="glass-strong rounded-3xl p-6 text-center border border-boot-hairline bg-white/90">
+        <p className="text-xs text-boot-primary font-bold tracking-widest uppercase mb-2">나의 성격 유형</p>
         <h2 className="text-2xl font-black mb-1">{tag}</h2>
-        <p className="text-sm text-gray-400">{desc}</p>
+        <p className="text-sm text-boot-muted">{desc}</p>
       </div>
 
       {/* 5개 트레이트 바 */}
@@ -98,7 +98,7 @@ export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
         {TRAITS.map((t) => {
           const pct = Math.round(scores[t.key] * 100)
           return (
-            <div key={t.key} className="glass rounded-2xl p-4">
+            <div key={t.key} className="glass rounded-2xl p-4 border border-boot-hairline">
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2">
                   <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${t.iconBg} flex items-center justify-center flex-shrink-0`}>
@@ -110,13 +110,13 @@ export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
                   {pct}%
                 </span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mb-2">
+              <div className="w-full bg-boot-hairline rounded-full h-1.5 mb-2">
                 <div
                   className="h-1.5 rounded-full transition-all duration-700"
                   style={{ width: `${pct}%`, backgroundColor: t.color }}
                 />
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-boot-muted">
                 {pct >= 50 ? t.high : t.low}
               </p>
             </div>
@@ -124,14 +124,14 @@ export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
         })}
       </div>
 
-      <p className="text-xs text-gray-600 text-center">
+      <p className="text-xs text-boot-muted text-center">
         이 결과는 매칭 참고용이야. 상대방에게 공개되지 않아.
       </p>
 
       <button
         onClick={onNext}
         disabled={saving}
-        className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-50"
+        className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-sm disabled:opacity-50"
       >
         {saving ? '저장 중...' : '다음'}
       </button>
@@ -140,7 +140,7 @@ export default function Big5Result({ scores, onNext, onRetry, saving }: Props) {
           type="button"
           onClick={onRetry}
           disabled={saving}
-          className="w-full py-3 rounded-2xl glass text-sm text-gray-400 hover:text-gray-200 border border-white/5 transition-colors"
+          className="w-full py-3 rounded-2xl glass text-sm text-boot-body hover:text-boot-primary border border-boot-hairline transition-colors"
         >
           다시 하기
         </button>

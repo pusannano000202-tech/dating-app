@@ -9,6 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        boot: {
+          canvas: '#F8F3EC',
+          surface: '#FFFDF8',
+          soft: '#F5EEE7',
+          primary: '#FF4F5F',
+          coral: '#FF7548',
+          amber: '#FFB06A',
+          ink: '#171412',
+          body: '#4B433D',
+          muted: '#8A8178',
+          hairline: '#E8DED4',
+          mint: '#DFF8EC',
+          sky: '#EAF5FF',
+          lavender: '#F0EAFF',
+        },
         destiny: {
           base:       '#060612',
           violet:     '#7C3AED',

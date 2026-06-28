@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "outDir": ".tmp/config-tests",
+    "types": ["node"],
+    "noEmit": false
+  },
+  "include": [
+    "lib/utils.ts",
+    "lib/payments/**/*.ts",
+    "lib/refund/**/*.ts",
+    "tests/config/**/*.ts"
+  ]
+}

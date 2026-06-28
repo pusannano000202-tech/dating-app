@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "outDir": ".tmp/matching-tests",
+    "types": ["node"],
+    "noEmit": false
+  },
+  "include": [
+    "components/matching/group-create/**/*.ts",
+    "lib/match-pool-stats.ts",
+    "lib/matching/**/*.ts",
+    "tests/matching/**/*.ts"
+  ]
+}

@@ -1,71 +1,772 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Loader2, LockKeyhole } from 'lucide-react'
+import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { normalizeGroupSize } from '@/lib/matching/group-size'
+import {
+  EMPTY_MATCH_SETUP_STATUS,
+  type MatchSetupStatus,
+} from '@/lib/matching/match-setup-status'
+import {
+  PRE_MATCH_CARD_DRAFT_COOKIE,
+  isPreMatchCardDraftCookieDone,
+} from '@/lib/matching/pre-match-card-draft'
+import QueueRadarCard from '@/components/matching/QueueRadarCard'
+import {
+  DEV_GROUP_STATE,
+  DEV_QUEUE_VISUAL,
+  EMPTY_STATE,
+  QUEUE_VISUAL_DEFAULT,
+} from '@/components/matching/group-create/dev-state'
+import { FriendListPanel } from '@/components/matching/group-create/FriendListPanel'
+import { FreeBetaQueuePanel } from '@/components/matching/group-create/FreeBetaQueuePanel'
+import { GroupDangerZone } from '@/components/matching/group-create/GroupDangerZone'
+import { GroupHeader } from '@/components/matching/group-create/GroupHeader'
+import { GroupMemberStatusPanel } from '@/components/matching/group-create/GroupMemberStatusPanel'
+import { InviteFriendPanel } from '@/components/matching/group-create/InviteFriendPanel'
+import { getGroupCompositionSummary, getQueueStatusText } from '@/components/matching/group-create/status'
+import type {
+  FriendSummary,
+  GroupInviteRecord,
+  GroupMemberRecord,
+  GroupState,
+  QueueVisualState,
+} from '@/components/matching/group-create/types'
 
-const STEPS = [
-  { icon: '👤', label: '그룹 멤버 초대', desc: '친구 2~3명에게 초대 링크 전송' },
-  { icon: '💰', label: '보증금 결제', desc: '토스페이먼츠로 1인 2만원' },
-  { icon: '🎯', label: '자동 매칭 대기', desc: '시스템이 상대 그룹 찾아줘' },
-  { icon: '📍', label: '장소·시간 확정', desc: '부산대 근처 카페로 자동 확정' },
-]
-
-// TODO: 성준 담당 — 실제 그룹 생성/초대 UI 구현
-// 현재는 플로우 안내 플레이스홀더
 export default function GroupCreatePage() {
+  const searchParams = useSearchParams()
+  const isDevPreview = isDevPreviewClientSession()
+  const requestedSize = normalizeGroupSize(searchParams.get('size'))
+  const [state, setState] = useState<GroupState>(EMPTY_STATE)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [showTransferPanel, setShowTransferPanel] = useState(false)
+  const [queueVisualState, setQueueVisualState] = useState<QueueVisualState>(DEV_QUEUE_VISUAL)
+  const [devCurrentSetupStatus, setDevCurrentSetupStatus] =
+    useState<MatchSetupStatus>(EMPTY_MATCH_SETUP_STATUS)
+  const [preMatchCardDone, setPreMatchCardDone] = useState(false)
+
+  const group = state.group
+  const members = state.members
+  const currentUserId = state.current_user_id ?? null
+  const pendingInvites = state.invites.filter((invite) => invite.status === 'pending')
+  const capacity = group?.size ?? requestedSize
+  const groupIsFull = members.length >= capacity
+  const openSlots = Math.max(0, capacity - members.length)
+  const isLeader = Boolean(group && currentUserId && group.leader_user_id === currentUserId)
+  const inQueue = group?.status === 'ready' || group?.status === 'in_pool'
+  const groupId = group?.id
+  const canManageMembers = Boolean(isLeader && group && ['forming', 'ready', 'in_pool'].includes(group.status))
+  const currentUserMatchSetup = isDevPreview
+    ? devCurrentSetupStatus
+    : state.current_user_match_setup ?? EMPTY_MATCH_SETUP_STATUS
+  const currentUserSetupReady = Boolean(
+    currentUserId &&
+      currentUserMatchSetup.allDone &&
+      preMatchCardDone
+  )
+  const memberMatchReadyByUserId = useMemo(
+    () => new Map(members.map((member) => [
+      member.user_id,
+      member.user_id === currentUserId ? currentUserSetupReady : member.match_setup_ready,
+    ])),
+    [currentUserId, currentUserSetupReady, members]
+  )
+  const readyMemberCount = members.filter((member) => memberMatchReadyByUserId.get(member.user_id)).length
+  const needsSetupCount = Math.max(0, members.length - readyMemberCount)
+  const groupComposition = useMemo(() => getGroupCompositionSummary(members), [members])
+  const canEnterQueue = Boolean(
+    group &&
+      isLeader &&
+      groupIsFull &&
+      group.status === 'forming' &&
+      needsSetupCount === 0
+  )
+  const canCancelQueue = Boolean(group && isLeader && inQueue)
+  const groupStatusLabel = `${Math.min(members.length, group?.size ?? capacity)}/${group?.size ?? capacity} 현재 멤버`
+
+  const groupStats = useMemo(() => [
+    { label: groupStatusLabel, value: `${members.length}` },
+    { label: groupComposition.detail, value: groupComposition.label },
+    { label: '매칭 설정 준비 완료', value: `${readyMemberCount}명` },
+    { label: '매칭 설정 입력 필요', value: `${needsSetupCount}명` },
+  ], [groupComposition.detail, groupComposition.label, groupStatusLabel, members.length, readyMemberCount, needsSetupCount])
+
+  useEffect(() => {
+    if (!inQueue || !groupId) {
+      if (!inQueue) {
+        setQueueVisualState(QUEUE_VISUAL_DEFAULT)
+      }
+      return
+    }
+
+    if (isDevPreview) {
+      setQueueVisualState({
+        ...DEV_QUEUE_VISUAL,
+        myGroupSize: members.length,
+        myGroupInQueue: true,
+      })
+      return
+    }
+
+    const loadQueueStats = async () => {
+      const res = await fetch('/api/match-pool/stats')
+      if (!res.ok) return
+
+      const data = await res.json().catch(() => null)
+      if (!data || typeof data !== 'object') return
+
+      const male = Number((data as { male?: number }).male)
+      const female = Number((data as { female?: number }).female)
+      const mixed = Number((data as { mixed?: number }).mixed ?? 0)
+      if (!Number.isFinite(male) || !Number.isFinite(female)) return
+
+      setQueueVisualState({
+        male: Math.max(0, Math.floor(male)),
+        female: Math.max(0, Math.floor(female)),
+        mixed: Number.isFinite(mixed) ? Math.max(0, Math.floor(mixed)) : 0,
+        myGroupSize: members.length,
+        myGroupInQueue: true,
+      })
+    }
+
+    void loadQueueStats()
+  }, [isDevPreview, inQueue, groupId, members.length])
+
+  useEffect(() => {
+    ensureGroup()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!isDevPreview) return
+    setDevCurrentSetupStatus(getDevMatchSetupStatusFromClient())
+  }, [isDevPreview])
+
+  useEffect(() => {
+    void refreshPreMatchCardStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function ensureGroup() {
+    setLoading(true)
+    setError(null)
+
+    if (isDevPreview) {
+      setState({
+        ...DEV_GROUP_STATE,
+        group: DEV_GROUP_STATE.group
+          ? { ...DEV_GROUP_STATE.group, size: requestedSize }
+          : DEV_GROUP_STATE.group,
+        members: DEV_GROUP_STATE.members.slice(0, requestedSize),
+      })
+      setLoading(false)
+      return
+    }
+
+    try {
+      const res = await fetch('/api/groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size: requestedSize }),
+      })
+
+      if (res.status === 401) {
+        setError('로그인이 필요해요.')
+        return
+      }
+
+      if (!res.ok) {
+        setError('그룹을 만들 수 없어요. 기본 프로필을 먼저 완료해주세요.')
+        return
+      }
+
+      const data = await res.json() as GroupState
+      setState(data)
+      await refreshPreMatchCardStatus()
+    } catch {
+      setError('그룹 정보를 불러오지 못했어요.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function refreshGroup() {
+    if (isDevPreview) return
+
+    const res = await fetch('/api/groups')
+    if (!res.ok) return
+    const data = await res.json() as GroupState
+    setState(data)
+    await refreshPreMatchCardStatus()
+  }
+
+  async function updateGroupSize(size: 2 | 3) {
+    if (saving || capacity === size) return
+
+    if (members.length > size) {
+      setError(`${size}:${size} 매칭은 ${size}명 그룹에서만 시작할 수 있어요. 현재 멤버가 더 많아서 변경할 수 없어요.`)
+      return
+    }
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, size } : current.group,
+        members: current.members.slice(0, size),
+      }))
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/groups', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+
+      const data = await res.json() as GroupState
+      setState(data)
+    } catch {
+      setError('그룹 인원을 변경하지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function removeGroupMember(member: GroupMemberRecord) {
+    if (!group || saving || !isLeader || member.user_id === currentUserId) return
+
+    const memberName = member.display_name ?? '친구'
+    const confirmed = window.confirm(
+      `${memberName}님을 그룹에서 내보낼까요?\n\n이미 매칭 준비 상태였다면 큐 대기는 취소되고, 부족한 친구를 다시 초대해야 해요.`
+    )
+    if (!confirmed) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+        members: current.members.filter((item) => item.user_id !== member.user_id),
+        friends: current.friends.map((friend) =>
+          friend.user_id === member.user_id ? { ...friend, group_status: 'available' } : friend
+        ),
+      }))
+      setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대하면 매칭 찾기를 이어갈 수 있어요.`)
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/groups/remove-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          group_id: group.id,
+          member_user_id: member.user_id,
+        }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+
+      await refreshGroup()
+      setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대해야 매칭 찾기가 켜져요.`)
+    } catch {
+      setError('친구를 그룹에서 내보내지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function refreshPreMatchCardStatus() {
+    if (isDevPreview) {
+      setPreMatchCardDone(hasPreMatchCardDraftCookie())
+      return
+    }
+
+    try {
+      const res = await fetch('/api/profile/match-card-draft', { cache: 'no-store' })
+      if (!res.ok) {
+        setPreMatchCardDone(false)
+        return
+      }
+      const data = await res.json() as {
+        draft?: { completed_items?: number | null } | null
+      }
+      setPreMatchCardDone(Number(data.draft?.completed_items ?? 0) >= 4)
+    } catch {
+      setPreMatchCardDone(false)
+    }
+  }
+
+  async function inviteFriend(friend: FriendSummary) {
+    if (!group || saving || friend.group_status !== 'available') return
+
+    if (isDevPreview) {
+      const now = new Date().toISOString()
+      setState((current) => ({
+        ...current,
+        invites: current.invites.some((invite) => invite.invited_user_id === friend.user_id)
+          ? current.invites
+          : [
+              ...current.invites,
+              {
+                id: `dev-invite-${friend.user_id}`,
+                group_id: group.id,
+                invited_phone: null,
+                invited_user_id: friend.user_id,
+                invite_kind: 'user',
+                token: `dev-${friend.user_id}`,
+                status: 'pending',
+                expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+                created_at: now,
+              },
+            ],
+        friends: current.friends.map((item) =>
+          item.user_id === friend.user_id ? { ...item, group_status: 'invited' } : item
+        ),
+        members: current.members,
+      }))
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      await createInvite({ invited_user_id: friend.user_id })
+      await refreshGroup()
+    } catch {
+      setError('친구 초대에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function copyInviteLink() {
+    if (!group || saving) return
+
+    if (isDevPreview) {
+      await navigator.clipboard.writeText(`${window.location.origin}/group/invite/dev-preview`)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1400)
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const invite = await createInvite({ kind: 'link' })
+      const link = `${window.location.origin}/group/invite/${invite.token}`
+      await navigator.clipboard.writeText(link)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1400)
+      await refreshGroup()
+    } catch {
+      setError('초대 링크를 만들지 못했어요.')
+      setCopied(false)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function createInvite(payload: Record<string, string>) {
+    if (!group) throw new Error('group_required')
+
+    const res = await fetch('/api/group-invites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        group_id: group.id,
+        ...payload,
+      }),
+    })
+
+    if (!res.ok) {
+      throw new Error('invite_failed')
+    }
+
+    const data = await res.json() as { invite: GroupInviteRecord }
+    return data.invite
+  }
+
+  async function enterQueue() {
+    if (!group || saving || !canEnterQueue) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'in_pool' } : current.group,
+      }))
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/match-pool/enter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateQueueError(data.error))
+        return
+      }
+      await refreshGroup()
+    } catch {
+      setError('큐 진입에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function cancelQueue() {
+    if (!group || saving || !canCancelQueue) return
+
+    if (isDevPreview) {
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+      }))
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/match-pool/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateQueueError(data.error))
+        return
+      }
+      await refreshGroup()
+    } catch {
+      setError('큐 취소에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function translateQueueError(code?: string) {
+    switch (code) {
+      case 'not_enough_members': return '그룹은 최소 2명 이상이어야 큐에 들어갈 수 있어요.'
+      case 'group_not_full':     return '그룹 정원이 모두 채워져야 큐에 들어갈 수 있어요.'
+      case 'already_in_queue':   return '이미 매칭 큐에 들어가 있어요.'
+      case 'not_group_leader':   return '리더만 큐 진입/취소를 할 수 있어요.'
+      case 'group_not_open':     return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
+      case 'not_in_queue':       return '이 그룹은 큐에 들어가 있지 않아요.'
+      case 'deposit_not_paid':   return '매칭 확정 전에는 모든 멤버의 보증금 결제가 필요해요.'
+      case 'pre_match_card_required':
+        return '내 사전 카드 초안을 먼저 DB에 저장해야 큐에 들어갈 수 있어요.'
+      case 'member_pre_match_card_incomplete':
+        return '그룹 멤버 모두 사전 카드 초안을 저장해야 큐에 들어갈 수 있어요.'
+      case 'member_card_lookup_failed':
+        return '멤버의 사전 카드 준비 상태를 확인하지 못했어요. 잠시 후 다시 시도해주세요.'
+      case 'member_match_setup_incomplete':
+        return '멤버의 성향 선호/가능 시간/매칭 비중/사전 카드 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
+      case 'member_profile_lookup_failed':
+        return '멤버 준비 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.'
+      default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해주세요.'
+    }
+  }
+
+  async function leaveGroup() {
+    if (!group || saving || isLeader) return
+    if (!window.confirm('이 그룹에서 나갈까요? 남은 그룹은 다시 친구를 초대해야 해요.')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/groups/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+      setState(EMPTY_STATE)
+      await ensureGroup()
+    } catch {
+      setError('그룹에서 나가지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function disbandGroup() {
+    if (!group || saving || !isLeader) return
+    if (!window.confirm('그룹을 해체할까요? 모든 멤버가 이 그룹에서 빠지게 돼요.')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/groups/disband', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+      setState(EMPTY_STATE)
+      await ensureGroup()
+    } catch {
+      setError('그룹 해체에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function transferLeadership(newLeaderUserId: string) {
+    if (!group || saving || !isLeader) return
+    if (!window.confirm('이 멤버에게 리더를 위임할까요? 위임 후 본인은 일반 멤버가 됩니다.')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/groups/transfer-leadership', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_id: group.id, new_leader_user_id: newLeaderUserId }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        setError(translateGroupError(data.error))
+        return
+      }
+      setShowTransferPanel(false)
+      await ensureGroup()
+    } catch {
+      setError('리더 위임에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function translateGroupError(code?: string) {
+    switch (code) {
+      case 'not_group_leader':   return '리더만 그룹을 해체할 수 있어요.'
+      case 'leader_cannot_leave': return '리더는 바로 나갈 수 없어요. 해체하거나 리더 위임을 먼저 해야 해요.'
+      case 'cannot_remove_leader': return '리더는 그룹에서 내보낼 수 없어요. 리더 위임이나 그룹 해체를 먼저 선택해주세요.'
+      case 'not_active_member':  return '이미 이 그룹의 활성 멤버가 아니에요.'
+      case 'group_locked':       return '이미 매칭이 진행 중이거나 마감된 그룹이에요.'
+      case 'new_leader_required': return '새 리더를 선택해야 해요.'
+      case 'new_leader_is_caller': return '본인을 새 리더로 지정할 수 없어요.'
+      case 'new_leader_not_member': return '선택한 멤버가 이 그룹의 활성 멤버가 아니에요.'
+      case 'group_size_smaller_than_members': return '현재 들어온 멤버 수보다 작은 매칭 규모로는 바꿀 수 없어요.'
+      case 'group_size_update_failed': return '그룹 인원 변경에 실패했어요.'
+      default:                    return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
+    }
+  }
+
   return (
-    <div className="flex flex-col min-h-screen px-5 pb-10">
-      {/* 배경 glow */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-20%] w-[400px] h-[400px] rounded-full bg-violet-600/20 blur-[100px]" />
-        <div className="absolute bottom-[-10%] right-[-20%] w-[300px] h-[300px] rounded-full bg-fuchsia-600/15 blur-[80px]" />
-      </div>
+    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
+      <div className="relative mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-7 sm:max-w-md">
+        <GroupHeader />
 
-      <div className="relative pt-8">
-        {/* 헤더 */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl gradient-brand mb-4 shadow-2xl shadow-violet-900/50">
-            <span className="text-4xl">👥</span>
-          </div>
-          <h1 className="text-2xl font-black">그룹 과팅 신청</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            친구들과 팀 만들고 자동으로 매칭받아봐
-          </p>
-        </div>
-
-        {/* 진행 상황 배지 */}
-        <div className="glass rounded-2xl px-4 py-3 mb-6 flex items-center gap-3 border border-amber-500/30">
-          <span className="text-2xl">🚧</span>
-          <div>
-            <p className="text-sm font-bold text-amber-400">개발 중이야!</p>
-            <p className="text-xs text-gray-500">성준이가 열심히 만들고 있어. 조금만 기다려줘</p>
-          </div>
-        </div>
-
-        {/* 플로우 미리보기 */}
-        <div className="space-y-3 mb-8">
-          <p className="text-xs text-gray-600 font-medium uppercase tracking-wider px-1">이렇게 진행될 거야</p>
-          {STEPS.map(({ icon, label, desc }, i) => (
-            <div key={label} className="glass rounded-2xl px-4 py-4 flex items-center gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                <span className="text-xl">{icon}</span>
+        {loading ? (
+          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
+            <Loader2 size={18} className="animate-spin" />
+            그룹 정보를 준비하는 중
+          </section>
+        ) : (
+          <>
+            {error && (
+              <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold">{label}</p>
-                <p className="text-xs text-gray-500">{desc}</p>
+            )}
+            {notice && (
+              <div className="mb-4 rounded-2xl border border-emerald-400/20 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+                {notice}
               </div>
-              <span className="text-xs text-gray-700 font-bold">{i + 1}</span>
-            </div>
-          ))}
-        </div>
+            )}
 
-        {/* 프로필 수정 링크 */}
+            {inQueue ? (
+              <>
+                <QueueRadarCard
+                  stats={queueVisualState}
+                  saving={saving}
+                  canCancel={canCancelQueue}
+                  onCancel={cancelQueue}
+                  homeHref="/"
+                  resultHref="/match"
+                />
+                <GroupMemberStatusPanel
+                  members={members}
+                  currentUserId={currentUserId}
+                  capacity={capacity}
+                  groupStats={groupStats}
+                  memberMatchReadyByUserId={memberMatchReadyByUserId}
+                  queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
+                  canManageMembers={canManageMembers}
+                  saving={saving}
+                  onRemoveMember={removeGroupMember}
+                />
+              </>
+            ) : (
+              <>
+                <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-black text-boot-primary">매칭 규모 선택</p>
+                      <h2 className="mt-1 text-lg font-black text-boot-ink">
+                        {capacity}:{capacity} 과팅으로 준비 중
+                      </h2>
+                      <p className="mt-1 text-xs leading-5 text-boot-muted">
+                        2:2와 3:3 중 하나를 고르면 같은 규모의 그룹끼리 매칭돼요. 친구 성별이 섞인 혼성 그룹도 만들 수 있어요.
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
+                      {members.length}/{capacity}명
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {[2, 3].map((size) => {
+                      const selected = capacity === size
+                      const locked = members.length > size || saving
+
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          disabled={locked || selected}
+                          onClick={() => updateGroupSize(size as 2 | 3)}
+                          className={[
+                            'min-h-[82px] rounded-2xl border px-3 py-3 text-left transition-all',
+                            selected
+                              ? 'border-boot-primary/40 bg-boot-soft text-boot-primary shadow-sm'
+                              : 'border-boot-hairline bg-white text-boot-ink hover:border-boot-primary/30 hover:bg-boot-soft/60',
+                            locked && !selected ? 'cursor-not-allowed opacity-45' : '',
+                          ].join(' ')}
+                        >
+                          <span className="block text-lg font-black">{size}:{size}</span>
+                          <span className="mt-1 block text-[11px] leading-4 text-boot-muted">
+                            {size === 2 ? '빠르게 2명이서 가볍게 매칭' : '친구 3명이 모이면 더 시끌한 매칭'}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
+
+                <GroupMemberStatusPanel
+                  members={members}
+                  currentUserId={currentUserId}
+                  capacity={capacity}
+                  groupStats={groupStats}
+                  memberMatchReadyByUserId={memberMatchReadyByUserId}
+                  queueStatusText={getQueueStatusText({ group, membersLength: members.length, needsSetupCount })}
+                  canManageMembers={canManageMembers}
+                  saving={saving}
+                  onRemoveMember={removeGroupMember}
+                />
+
+                <InviteFriendPanel
+                  copied={copied}
+                  saving={saving || !group}
+                  pendingInvites={pendingInvites}
+                  onCopyInviteLink={copyInviteLink}
+                />
+
+                <FriendListPanel
+                  friends={state.friends}
+                  saving={saving}
+                  openSlots={openSlots}
+                  memberMatchReadyByUserId={memberMatchReadyByUserId}
+                  onInviteFriend={inviteFriend}
+                />
+
+                <FreeBetaQueuePanel
+                  saving={saving}
+                  canEnterQueue={canEnterQueue}
+                  isLeader={isLeader}
+                  requiredMemberCount={capacity}
+                  membersLength={members.length}
+                  needsSetupCount={needsSetupCount}
+                  currentUserSetupStatus={currentUserMatchSetup}
+                  currentUserSetupReady={currentUserSetupReady}
+                  currentUserCardReady={preMatchCardDone}
+                  groupStats={groupStats}
+                  onEnterQueue={enterQueue}
+                />
+              </>
+            )}
+          </>
+        )}
+
+        {group && ['forming', 'ready', 'in_pool'].includes(group.status) && (
+          <GroupDangerZone
+            isLeader={isLeader}
+            saving={saving}
+            showTransferPanel={showTransferPanel}
+            members={members}
+            currentUserId={currentUserId}
+            groupStatus={group.status}
+            capacity={capacity}
+            onToggleTransferPanel={() => setShowTransferPanel((prev) => !prev)}
+            onTransferLeadership={transferLeadership}
+            onLeaveGroup={leaveGroup}
+            onDisbandGroup={disbandGroup}
+          />
+        )}
+
         <Link
           href="/profile/edit"
-          className="glass w-full py-3 rounded-2xl text-sm text-gray-400 text-center block hover:text-gray-200 transition-colors border border-white/5"
+          className="mt-4 w-full py-3 rounded-2xl text-sm text-boot-muted text-center block hover:text-boot-body transition-colors"
         >
-          프로필 수정하기 →
+          프로필 다시 확인하기
         </Link>
+
+        <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-boot-muted">
+          <LockKeyhole size={13} />
+          서로 매칭되기 전까지 사진과 이름은 공개되지 않아요.
+        </div>
       </div>
-    </div>
+    </main>
   )
+}
+
+function hasPreMatchCardDraftCookie(): boolean {
+  if (typeof document === 'undefined') return false
+  const value = document.cookie
+    .split(';')
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith(`${PRE_MATCH_CARD_DRAFT_COOKIE}=`))
+    ?.split('=')[1]
+  return isPreMatchCardDraftCookieDone(value)
 }

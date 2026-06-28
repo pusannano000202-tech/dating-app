@@ -53,11 +53,20 @@ function shuffle<T>(arr: T[], seed: number): T[] {
   return out
 }
 
-function pairUp(items: IdealImageItem[], round: RoundLabel): Match[] {
+function pairUpBucketAware(items: IdealImageItem[], round: RoundLabel): Match[] {
   const out: Match[] = []
-  for (let i = 0; i + 1 < items.length; i += 2) {
-    out.push({ left: items[i], right: items[i + 1], round, match_index: i / 2 })
+  const queue = [...items]
+
+  while (queue.length >= 2) {
+    const left = queue.shift()!
+    const differentBucketIndex = queue.findIndex(
+      (candidate) => candidate.final_bucket !== left.final_bucket,
+    )
+    const rightIndex = differentBucketIndex >= 0 ? differentBucketIndex : 0
+    const [right] = queue.splice(rightIndex, 1)
+    out.push({ left, right, round, match_index: out.length })
   }
+
   return out
 }
 
@@ -74,7 +83,7 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
     const targetSize = largestPow2(shuffled.length)
     const trimmed = shuffled.slice(0, targetSize)
     const round = roundLabelForSize(trimmed.length)
-    return { items: trimmed, round, matches: pairUp(trimmed, round) }
+    return { items: trimmed, round, matches: pairUpBucketAware(trimmed, round) }
   }, [pool])
 
   const [matches, setMatches] = useState<Match[]>(initial.matches)
@@ -137,7 +146,7 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
         }
 
         const nextRound = roundLabelForSize(newWinners.length)
-        const nextMatches = pairUp(newWinners, nextRound)
+        const nextMatches = pairUpBucketAware(newWinners, nextRound)
         setMatches(nextMatches)
         setNextRoundWinners([])
         setCurrentRound(nextRound)

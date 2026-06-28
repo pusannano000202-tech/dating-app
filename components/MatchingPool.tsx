@@ -1,95 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { CalendarClock, LockKeyhole, ShieldCheck, Users } from 'lucide-react'
 
-interface PoolStats {
+export interface PoolStats {
   female: number
   male: number
-}
-
-interface OrbConfig {
-  gender: 'female' | 'male'
-  x: number
-  y: number
-  size: number
-  animName: string      // keyframe name
-  animDelay: string
-  animDuration: string
-  encounterDelay: string
-}
-
-const ORBS: OrbConfig[] = [
-  // 여자 오브 — 로즈핑크
-  { gender: 'female', x: -45, y: -30, size: 28, animName: 'orb-float-1', animDelay: '0s',   animDuration: '12s', encounterDelay: '3s'  },
-  { gender: 'female', x:  30, y: -55, size: 22, animName: 'orb-float-3', animDelay: '1.5s', animDuration: '10s', encounterDelay: '8s'  },
-  { gender: 'female', x: -20, y:  45, size: 26, animName: 'orb-float-5', animDelay: '3s',   animDuration: '11s', encounterDelay: '14s' },
-  { gender: 'female', x:  55, y:  20, size: 20, animName: 'orb-float-2', animDelay: '5s',   animDuration: '15s', encounterDelay: '1s'  },
-  { gender: 'female', x: -60, y:  10, size: 24, animName: 'orb-float-4', animDelay: '7s',   animDuration: '14s', encounterDelay: '11s' },
-  { gender: 'male',   x:  40, y: -25, size: 26, animName: 'orb-float-2', animDelay: '0.8s', animDuration: '13s', encounterDelay: '5s'  },
-  { gender: 'male',   x: -35, y:  55, size: 22, animName: 'orb-float-4', animDelay: '2.5s', animDuration: '11s', encounterDelay: '9s'  },
-  { gender: 'male',   x:  20, y:  50, size: 28, animName: 'orb-float-1', animDelay: '4s',   animDuration: '12s', encounterDelay: '16s' },
-  { gender: 'male',   x: -55, y: -40, size: 20, animName: 'orb-float-3', animDelay: '6s',   animDuration: '10s', encounterDelay: '2s'  },
-  { gender: 'male',   x:  60, y: -50, size: 24, animName: 'orb-float-5', animDelay: '8.5s', animDuration: '14s', encounterDelay: '12s' },
-]
-
-function SoulOrb({ orb }: { orb: OrbConfig }) {
-  const isFemale = orb.gender === 'female'
-
-  const baseColor  = isFemale ? '#f472b6' : '#a78bfa'
-  const glowColor  = isFemale ? 'rgba(244,114,182,0.6)' : 'rgba(167,139,250,0.6)'
-  const coreColor  = isFemale ? 'rgba(251,191,196,0.9)' : 'rgba(196,181,253,0.9)'
-
-  return (
-    <div
-      className="absolute"
-      style={{
-        left:             `calc(50% + ${orb.x}%)`,
-        top:              `calc(50% + ${orb.y}%)`,
-        transform:        'translate(-50%, -50%)',
-        animation:        `${orb.animName} ${orb.animDuration} ease-in-out infinite`,
-        animationDelay:   orb.animDelay,
-      }}
-    >
-      {/* 만남 효과 — 주기적 white flash */}
-      <div
-        className="absolute inset-0 rounded-full animate-orb-pulse"
-        style={{
-          animationDelay: orb.encounterDelay,
-          animationDuration: '6s',
-          background: `radial-gradient(circle, white 0%, ${glowColor} 60%, transparent 100%)`,
-          width: orb.size * 2.5,
-          height: orb.size * 2.5,
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
-      {/* aura glow */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          width:  orb.size * 2.2,
-          height: orb.size * 2.2,
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
-          filter: 'blur(8px)',
-          animation: `orb-pulse ${3 + Math.random()}s ease-in-out infinite`,
-          animationDelay: orb.animDelay,
-        }}
-      />
-      {/* 오브 본체 */}
-      <div
-        style={{
-          width:  orb.size,
-          height: orb.size,
-          borderRadius: '50%',
-          background: `radial-gradient(circle at 35% 35%, ${coreColor}, ${baseColor})`,
-          boxShadow: `0 0 ${orb.size}px ${glowColor}, 0 0 ${orb.size * 0.5}px white`,
-          filter: 'blur(0.5px)',
-        }}
-      />
-    </div>
-  )
+  mixed: number
+  bySize?: {
+    '2': { female: number; male: number; mixed: number }
+    '3': { female: number; male: number; mixed: number }
+  }
 }
 
 interface Props {
@@ -97,159 +19,221 @@ interface Props {
   className?: string
 }
 
-export default function MatchingPool({ stats, className = '' }: Props) {
-  const [displayed, setDisplayed] = useState({ female: 0, male: 0 })
-  const target = stats ?? { female: 38, male: 47 }   // 더미 기본값
+const FALLBACK_STATS: PoolStats = {
+  female: 0,
+  male: 0,
+  mixed: 0,
+  bySize: {
+    '2': { female: 0, male: 0, mixed: 0 },
+    '3': { female: 0, male: 0, mixed: 0 },
+  },
+}
 
-  /* 카운트업 애니메이션 */
+export default function MatchingPool({ stats, className = '' }: Props) {
+  const target = stats ?? FALLBACK_STATS
+  const [displayed, setDisplayed] = useState({ female: 0, male: 0, mixed: 0 })
+
   useEffect(() => {
-    const duration = 1200
-    const steps    = 40
+    const duration = 900
+    const steps = 30
     const interval = duration / steps
     let step = 0
-    const timer = setInterval(() => {
-      step++
+    const timer = window.setInterval(() => {
+      step += 1
       const progress = step / steps
       const ease = 1 - Math.pow(1 - progress, 3)
       setDisplayed({
         female: Math.round(target.female * ease),
-        male:   Math.round(target.male   * ease),
+        male: Math.round(target.male * ease),
+        mixed: Math.round(target.mixed * ease),
       })
-      if (step >= steps) clearInterval(timer)
+      if (step >= steps) window.clearInterval(timer)
     }, interval)
-    return () => clearInterval(timer)
-  }, [target.female, target.male])
+    return () => window.clearInterval(timer)
+  }, [target.female, target.male, target.mixed])
 
-  const total = target.female + target.male
+  const totalGroups = displayed.female + displayed.male + displayed.mixed
+
+  const queueRows = useMemo(() => {
+    const bySize = target.bySize
+    const empty = bySize == null
+    const row2 = bySize?.['2'] ?? { female: 0, male: 0, mixed: 0 }
+    const row3 = bySize?.['3'] ?? { female: 0, male: 0, mixed: 0 }
+    return [
+      {
+        label: '2:2 매칭찾기',
+        size: 2,
+        male: row2.male,
+        female: row2.female,
+        mixed: row2.mixed,
+        active: !empty && (row2.male > 0 || row2.female > 0 || row2.mixed > 0),
+      },
+      {
+        label: '3:3 매칭찾기',
+        size: 3,
+        male: row3.male,
+        female: row3.female,
+        mixed: row3.mixed,
+        active: !empty && (row3.male > 0 || row3.female > 0 || row3.mixed > 0),
+      },
+    ]
+  }, [target.bySize])
 
   return (
-    <div className={`flex flex-col items-center ${className}`}>
-      {/* 타이틀 */}
-      <p className="text-xs text-gray-500 tracking-widest uppercase mb-3 font-medium">
-        지금 운명을 기다리는 중
-      </p>
-
-      {/* ── 오브 필드 ── */}
-      <div className="relative" style={{ width: 280, height: 280 }}>
-        {/* 외부 링 — glow border */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: 'transparent',
-            border: '1.5px solid',
-            borderColor: 'rgba(167,139,250,0.25)',
-            boxShadow: '0 0 40px rgba(124,58,237,0.12), inset 0 0 40px rgba(190,24,93,0.06)',
-          }}
-        />
-        {/* 동심원 2 */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            inset: '15%',
-            border: '1px solid rgba(244,114,182,0.12)',
-          }}
-        />
-        {/* 동심원 3 */}
-        <div
-          className="absolute rounded-full"
-          style={{
-            inset: '35%',
-            border: '1px solid rgba(167,139,250,0.10)',
-          }}
-        />
-
-        {/* 레이더 스캔 라인 */}
-        <div
-          className="absolute inset-0 rounded-full overflow-hidden"
-          style={{ animation: 'radar-sweep 10s linear infinite' }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%', left: '50%',
-              width: '50%', height: '1px',
-              transformOrigin: '0% 50%',
-              background: 'linear-gradient(to right, transparent, rgba(167,139,250,0.4))',
-            }}
-          />
+    <div className={`w-full ${className}`}>
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-boot-primary">
+            Weekly Queue
+          </p>
+          <h2 className="mt-2 text-xl font-black text-boot-ink">이번 주 매칭 대기</h2>
+          <p className="mt-1 text-xs text-boot-muted">
+            토요일 14:00에 조건이 맞는 그룹끼리 자동 배정돼요.
+          </p>
         </div>
-
-        {/* 오브들 */}
-        {ORBS.map((orb, i) => (
-          <SoulOrb key={i} orb={orb} />
-        ))}
-
-        {/* 중심 — 펄스 링 */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="rounded-full"
-            style={{
-              width: 8, height: 8,
-              background: 'white',
-              boxShadow: '0 0 12px rgba(255,255,255,0.8)',
-              animation: 'ring-expand 3s ease-out infinite',
-            }}
-          />
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-boot-hairline bg-boot-soft text-boot-primary">
+          <CalendarClock size={20} />
         </div>
       </div>
 
-      {/* ── 카운터 ── */}
-      <div className="flex items-center gap-6 mt-5">
-        {/* 여자 */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, #fce7f3, #f472b6)',
-                boxShadow: '0 0 8px rgba(244,114,182,0.7)',
-              }}
-            />
-            <span className="text-xs text-gray-400">여자</span>
+      <div className="mb-4 rounded-3xl border border-boot-hairline bg-white p-4 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users size={16} className="text-boot-muted" />
+            <span className="text-sm font-black text-boot-ink">현재 대기 그룹</span>
           </div>
-          <span
-            className="text-2xl font-black"
-            style={{ color: '#f472b6', textShadow: '0 0 16px rgba(244,114,182,0.5)' }}
-          >
-            {displayed.female}
-          </span>
-          <span className="text-[10px] text-gray-600">명 대기 중</span>
+          <span className="text-2xl font-black text-boot-primary">{totalGroups}</span>
         </div>
 
-        {/* 구분 + 총계 */}
-        <div className="flex flex-col items-center gap-0.5">
-          <span className="text-gray-700 text-xs">·</span>
-          <span className="text-lg font-black text-white">{total}</span>
-          <span className="text-[10px] text-gray-500">총 인원</span>
-        </div>
+        <div className="space-y-3">
+          {queueRows.map((row) => {
+            const totalTeams = row.male + row.female + row.mixed
+            const totalPeople = totalTeams * row.size
+            const malePeople = row.male * row.size
+            const femalePeople = row.female * row.size
+            const mixedPeople = row.mixed * row.size
+            const maleWidth = row.male > 0 ? Math.max(12, Math.min(72, row.male * 12)) : 0
+            const femaleWidth = row.female > 0 ? Math.max(12, Math.min(72, row.female * 12)) : 0
+            const mixedWidth = row.mixed > 0 ? Math.max(12, Math.min(72, row.mixed * 12)) : 0
+            return (
+              <div key={row.label} className="rounded-2xl border border-boot-hairline bg-boot-soft/60 px-3 py-3">
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black text-boot-ink">{row.label}</p>
+                    <p className="mt-0.5 text-[11px] text-boot-muted">
+                      총 {totalTeams}팀 · 참가 {totalPeople}명
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-boot-primary">
+                    {totalTeams}팀
+                  </span>
+                </div>
 
-        {/* 남자 */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, #ede9fe, #a78bfa)',
-                boxShadow: '0 0 8px rgba(167,139,250,0.7)',
-              }}
-            />
-            <span className="text-xs text-gray-400">남자</span>
-          </div>
-          <span
-            className="text-2xl font-black"
-            style={{ color: '#a78bfa', textShadow: '0 0 16px rgba(167,139,250,0.5)' }}
-          >
-            {displayed.male}
-          </span>
-          <span className="text-[10px] text-gray-600">명 대기 중</span>
+                <div className="mb-2 flex h-9 items-center gap-2 overflow-hidden rounded-2xl border border-boot-hairline bg-white px-2">
+                  <div
+                    className={`h-5 rounded-xl border border-sky-200 bg-sky-300/70 transition-all duration-700 ${
+                      row.active ? 'shadow-[0_0_18px_rgba(125,211,252,0.26)]' : ''
+                    }`}
+                    style={{ width: `${maleWidth}%` }}
+                  />
+                  <div className="h-px flex-1 bg-boot-hairline" />
+                  <div
+                    className={`h-5 rounded-xl border border-amber-200 bg-amber-300/70 transition-all duration-700 ${
+                      row.active ? 'shadow-[0_0_18px_rgba(252,211,77,0.23)]' : ''
+                    }`}
+                    style={{ width: `${mixedWidth}%` }}
+                  />
+                  <div className="h-px flex-1 bg-boot-hairline" />
+                  <div
+                    className={`h-5 rounded-xl border border-rose-200 bg-boot-primary/50 transition-all duration-700 ${
+                      row.active ? 'shadow-[0_0_18px_rgba(255,90,111,0.24)]' : ''
+                    }`}
+                    style={{ width: `${femaleWidth}%` }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <QueuePill label="남자팀" teams={row.male} people={malePeople} tone="sky" />
+                  <QueuePill label="혼성팀" teams={row.mixed} people={mixedPeople} tone="amber" />
+                  <QueuePill label="여자팀" teams={row.female} people={femalePeople} tone="rose" />
+                </div>
+
+                <Link
+                  href={`/group/create?size=${row.size}`}
+                  className="mt-3 flex h-11 items-center justify-center rounded-2xl bg-boot-ink text-xs font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
+                >
+                  {row.size}:{row.size} 그룹으로 시작하기
+                </Link>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* 실시간 뱃지 */}
-      <div className="flex items-center gap-1.5 mt-3">
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" style={{ animation: 'orb-pulse 2s ease-in-out infinite' }} />
-        <span className="text-[10px] text-gray-500">실시간 업데이트</span>
+      <div className="mb-4 grid grid-cols-4 gap-2">
+        <StatBox value={displayed.male} label="남자 그룹" tone="text-sky-600" />
+        <StatBox value={displayed.female} label="여자 그룹" tone="text-boot-primary" />
+        <StatBox value={displayed.mixed} label="혼성 그룹" tone="text-amber-600" />
+        <StatBox value="2~3" label="그룹 인원" tone="text-amber-600" />
       </div>
+
+      <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+        <ShieldCheck size={17} className="mt-0.5 flex-shrink-0 text-emerald-600" />
+        <div>
+          <p className="text-xs font-black text-emerald-700">혼성 그룹도 가능해요</p>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
+            친구 성별이 섞인 그룹도 만들 수 있어요. 혼성 대기자는 별도로 표시하고, 2:2와 3:3은 같은 인원 규모끼리 매칭돼요.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-boot-muted">
+        <LockKeyhole size={12} />
+        대기 숫자는 그룹 단위 기준입니다.
+      </div>
+    </div>
+  )
+}
+
+function QueuePill({
+  label,
+  teams,
+  people,
+  tone,
+}: {
+  label: string
+  teams: number
+  people: number
+  tone: 'sky' | 'rose' | 'amber'
+}) {
+  const toneClass =
+    tone === 'sky'
+      ? 'text-sky-600 bg-sky-50 border-sky-100'
+      : tone === 'amber'
+        ? 'text-amber-700 bg-amber-50 border-amber-100'
+        : 'text-boot-primary bg-white border-rose-100'
+
+  return (
+    <div className={`rounded-2xl border px-2.5 py-2 ${toneClass}`}>
+      <p className="text-xs font-black">{teams}팀</p>
+      <p className="mt-0.5 text-[10px] font-bold opacity-75">{label} · {people}명</p>
+    </div>
+  )
+}
+
+function StatBox({
+  value,
+  label,
+  tone,
+}: {
+  value: number | string
+  label: string
+  tone: string
+}) {
+  return (
+    <div className="rounded-2xl border border-boot-hairline bg-white px-3 py-3">
+      <p className={`text-lg font-black ${tone}`}>{value}</p>
+      <p className="mt-1 text-[10px] leading-snug text-boot-muted">{label}</p>
     </div>
   )
 }

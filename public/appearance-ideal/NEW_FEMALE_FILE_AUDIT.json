@@ -1,0 +1,811 @@
+{
+  "count": 80,
+  "problems": [],
+  "items": [
+    {
+      "id": "NEW_FI01",
+      "file": "public/appearance-ideal/female-64/NEW_FI01.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2386844
+    },
+    {
+      "id": "NEW_FI02",
+      "file": "public/appearance-ideal/female-64/NEW_FI02.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2218628
+    },
+    {
+      "id": "NEW_FI03",
+      "file": "public/appearance-ideal/female-64/NEW_FI03.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2052812
+    },
+    {
+      "id": "NEW_FI04",
+      "file": "public/appearance-ideal/female-64/NEW_FI04.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2654392
+    },
+    {
+      "id": "NEW_FI05",
+      "file": "public/appearance-ideal/female-64/NEW_FI05.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2190906
+    },
+    {
+      "id": "NEW_FI06",
+      "file": "public/appearance-ideal/female-64/NEW_FI06.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2204447
+    },
+    {
+      "id": "NEW_FI07",
+      "file": "public/appearance-ideal/female-64/NEW_FI07.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2561197
+    },
+    {
+      "id": "NEW_FI08",
+      "file": "public/appearance-ideal/female-64/NEW_FI08.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2775421
+    },
+    {
+      "id": "NEW_FI09",
+      "file": "public/appearance-ideal/female-64/NEW_FI09.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2241099
+    },
+    {
+      "id": "NEW_FI10",
+      "file": "public/appearance-ideal/female-64/NEW_FI10.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2473271
+    },
+    {
+      "id": "NEW_FI11",
+      "file": "public/appearance-ideal/female-64/NEW_FI11.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2295353
+    },
+    {
+      "id": "NEW_FI12",
+      "file": "public/appearance-ideal/female-64/NEW_FI12.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1988256
+    },
+    {
+      "id": "NEW_FI13",
+      "file": "public/appearance-ideal/female-64/NEW_FI13.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2317113
+    },
+    {
+      "id": "NEW_FI14",
+      "file": "public/appearance-ideal/female-64/NEW_FI14.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2279982
+    },
+    {
+      "id": "NEW_FI15",
+      "file": "public/appearance-ideal/female-64/NEW_FI15.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2124431
+    },
+    {
+      "id": "NEW_FI16",
+      "file": "public/appearance-ideal/female-64/NEW_FI16.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2498257
+    },
+    {
+      "id": "NEW_FI17",
+      "file": "public/appearance-ideal/female-64/NEW_FI17.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2286170
+    },
+    {
+      "id": "NEW_FI18",
+      "file": "public/appearance-ideal/female-64/NEW_FI18.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1760948
+    },
+    {
+      "id": "NEW_FI19",
+      "file": "public/appearance-ideal/female-64/NEW_FI19.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1815815
+    },
+    {
+      "id": "NEW_FI20",
+      "file": "public/appearance-ideal/female-64/NEW_FI20.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1772383
+    },
+    {
+      "id": "NEW_FI21",
+      "file": "public/appearance-ideal/female-64/NEW_FI21.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1881869
+    },
+    {
+      "id": "NEW_FI22",
+      "file": "public/appearance-ideal/female-64/NEW_FI22.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2370693
+    },
+    {
+      "id": "NEW_FI23",
+      "file": "public/appearance-ideal/female-64/NEW_FI23.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1932728
+    },
+    {
+      "id": "NEW_FI24",
+      "file": "public/appearance-ideal/female-64/NEW_FI24.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2125111
+    },
+    {
+      "id": "NEW_FI25",
+      "file": "public/appearance-ideal/female-64/NEW_FI25.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2914585
+    },
+    {
+      "id": "NEW_FI26",
+      "file": "public/appearance-ideal/female-64/NEW_FI26.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2331630
+    },
+    {
+      "id": "NEW_FI27",
+      "file": "public/appearance-ideal/female-64/NEW_FI27.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2459355
+    },
+    {
+      "id": "NEW_FI28",
+      "file": "public/appearance-ideal/female-64/NEW_FI28.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2044012
+    },
+    {
+      "id": "NEW_FI29",
+      "file": "public/appearance-ideal/female-64/NEW_FI29.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2171546
+    },
+    {
+      "id": "NEW_FI30",
+      "file": "public/appearance-ideal/female-64/NEW_FI30.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2005105
+    },
+    {
+      "id": "NEW_FI31",
+      "file": "public/appearance-ideal/female-64/NEW_FI31.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2294822
+    },
+    {
+      "id": "NEW_FI32",
+      "file": "public/appearance-ideal/female-64/NEW_FI32.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2465414
+    },
+    {
+      "id": "NEW_FI33",
+      "file": "public/appearance-ideal/female-64/NEW_FI33.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2649825
+    },
+    {
+      "id": "NEW_FI34",
+      "file": "public/appearance-ideal/female-64/NEW_FI34.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2133835
+    },
+    {
+      "id": "NEW_FI35",
+      "file": "public/appearance-ideal/female-64/NEW_FI35.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2365674
+    },
+    {
+      "id": "NEW_FI36",
+      "file": "public/appearance-ideal/female-64/NEW_FI36.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2232787
+    },
+    {
+      "id": "NEW_FI37",
+      "file": "public/appearance-ideal/female-64/NEW_FI37.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2114681
+    },
+    {
+      "id": "NEW_FI38",
+      "file": "public/appearance-ideal/female-64/NEW_FI38.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2178467
+    },
+    {
+      "id": "NEW_FI39",
+      "file": "public/appearance-ideal/female-64/NEW_FI39.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2066098
+    },
+    {
+      "id": "NEW_FI40",
+      "file": "public/appearance-ideal/female-64/NEW_FI40.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2149929
+    },
+    {
+      "id": "NEW_FI41",
+      "file": "public/appearance-ideal/female-64/NEW_FI41.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1944438
+    },
+    {
+      "id": "NEW_FI42",
+      "file": "public/appearance-ideal/female-64/NEW_FI42.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2244426
+    },
+    {
+      "id": "NEW_FI43",
+      "file": "public/appearance-ideal/female-64/NEW_FI43.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2020192
+    },
+    {
+      "id": "NEW_FI44",
+      "file": "public/appearance-ideal/female-64/NEW_FI44.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 3343691
+    },
+    {
+      "id": "NEW_FI45",
+      "file": "public/appearance-ideal/female-64/NEW_FI45.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2452768
+    },
+    {
+      "id": "NEW_FI46",
+      "file": "public/appearance-ideal/female-64/NEW_FI46.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2604194
+    },
+    {
+      "id": "NEW_FI47",
+      "file": "public/appearance-ideal/female-64/NEW_FI47.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1961027
+    },
+    {
+      "id": "NEW_FI48",
+      "file": "public/appearance-ideal/female-64/NEW_FI48.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2107024
+    },
+    {
+      "id": "NEW_FI49",
+      "file": "public/appearance-ideal/female-64/NEW_FI49.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1975185
+    },
+    {
+      "id": "NEW_FI50",
+      "file": "public/appearance-ideal/female-64/NEW_FI50.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2333054
+    },
+    {
+      "id": "NEW_FI51",
+      "file": "public/appearance-ideal/female-64/NEW_FI51.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2069085
+    },
+    {
+      "id": "NEW_FI52",
+      "file": "public/appearance-ideal/female-64/NEW_FI52.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2016651
+    },
+    {
+      "id": "NEW_FI53",
+      "file": "public/appearance-ideal/female-64/NEW_FI53.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2007229
+    },
+    {
+      "id": "NEW_FI54",
+      "file": "public/appearance-ideal/female-64/NEW_FI54.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2323482
+    },
+    {
+      "id": "NEW_FI55",
+      "file": "public/appearance-ideal/female-64/NEW_FI55.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2244156
+    },
+    {
+      "id": "NEW_FI56",
+      "file": "public/appearance-ideal/female-64/NEW_FI56.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1956723
+    },
+    {
+      "id": "NEW_FI57",
+      "file": "public/appearance-ideal/female-64/NEW_FI57.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2257723
+    },
+    {
+      "id": "NEW_FI58",
+      "file": "public/appearance-ideal/female-64/NEW_FI58.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2021093
+    },
+    {
+      "id": "NEW_FI59",
+      "file": "public/appearance-ideal/female-64/NEW_FI59.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1915958
+    },
+    {
+      "id": "NEW_FI60",
+      "file": "public/appearance-ideal/female-64/NEW_FI60.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2235911
+    },
+    {
+      "id": "NEW_FI61",
+      "file": "public/appearance-ideal/female-64/NEW_FI61.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1904564
+    },
+    {
+      "id": "NEW_FI62",
+      "file": "public/appearance-ideal/female-64/NEW_FI62.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1938485
+    },
+    {
+      "id": "NEW_FI63",
+      "file": "public/appearance-ideal/female-64/NEW_FI63.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2034588
+    },
+    {
+      "id": "NEW_FI64",
+      "file": "public/appearance-ideal/female-64/NEW_FI64.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2084708
+    },
+    {
+      "id": "FI65",
+      "file": "public/appearance-ideal/female-64/FI65.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2293513
+    },
+    {
+      "id": "FI66",
+      "file": "public/appearance-ideal/female-64/FI66.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2097415
+    },
+    {
+      "id": "FI67",
+      "file": "public/appearance-ideal/female-64/FI67.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2175188
+    },
+    {
+      "id": "FI68",
+      "file": "public/appearance-ideal/female-64/FI68.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2833640
+    },
+    {
+      "id": "FI69",
+      "file": "public/appearance-ideal/female-64/FI69.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1852044
+    },
+    {
+      "id": "FI70",
+      "file": "public/appearance-ideal/female-64/FI70.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2380404
+    },
+    {
+      "id": "FI71",
+      "file": "public/appearance-ideal/female-64/FI71.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2266031
+    },
+    {
+      "id": "FI72",
+      "file": "public/appearance-ideal/female-64/FI72.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2156797
+    },
+    {
+      "id": "FI73",
+      "file": "public/appearance-ideal/female-64/FI73.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1975571
+    },
+    {
+      "id": "FI74",
+      "file": "public/appearance-ideal/female-64/FI74.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2071085
+    },
+    {
+      "id": "FI75",
+      "file": "public/appearance-ideal/female-64/FI75.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2579236
+    },
+    {
+      "id": "FI76",
+      "file": "public/appearance-ideal/female-64/FI76.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2269934
+    },
+    {
+      "id": "FI77",
+      "file": "public/appearance-ideal/female-64/FI77.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2448447
+    },
+    {
+      "id": "FI78",
+      "file": "public/appearance-ideal/female-64/FI78.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 1813716
+    },
+    {
+      "id": "FI79",
+      "file": "public/appearance-ideal/female-64/FI79.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2708889
+    },
+    {
+      "id": "FI80",
+      "file": "public/appearance-ideal/female-64/FI80.jpg",
+      "width": 1056,
+      "height": 1408,
+      "ratio": 0.75,
+      "ok_ratio": true,
+      "ok_size": true,
+      "bytes": 2542564
+    }
+  ],
+  "contact_sheets": [
+    "public/appearance-ideal/female-64/CONTACT_SHEET_NEW_FI01_FI64.jpg",
+    "public/appearance-ideal/female-64/CONTACT_SHEET_FI65_FI80.jpg",
+    "public/appearance-ideal/female-64/CONTACT_SHEET_NEW_AND_FI65_FI80.jpg"
+  ]
+}

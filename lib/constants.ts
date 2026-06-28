@@ -63,4 +63,7 @@ export const APPEARANCE_TYPE_INFO: Record<
   },
 }
 
-export const DEPOSIT_AMOUNT = 20000 // 원 (1인당 보증금)
+// 초기 운영 정책: 매칭 확정 전 10,000원 보증금을 받고, 노쇼가 없으면 환불한다.
+// 실제 결제 연동 전까지는 로컬/검토 환경에서 mock provider로 같은 상태 전이를 확인한다.
+export const FREE_BETA_ENABLED = false
+export const DEPOSIT_AMOUNT = 10000 // 원
