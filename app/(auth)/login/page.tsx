@@ -37,6 +37,8 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(authError)
   const [resendCooldown, setResendCooldown] = useState(0)
   const [showAuth, setShowAuth] = useState(Boolean(authError))
+  const [videoReady, setVideoReady] = useState(false)
+  const [videoFailed, setVideoFailed] = useState(false)
   const codeRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const normalizedEmail = normalizeEmail(email)
@@ -199,14 +201,21 @@ function LoginContent() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#17120f] text-boot-ink">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,142,95,0.30),transparent_34%),linear-gradient(135deg,#271b16_0%,#17120f_42%,#fff3ec_100%)]" />
       <video
-        className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
+        className={[
+          'absolute inset-0 h-full w-full object-cover transition-opacity duration-700 motion-reduce:hidden',
+          videoReady && !videoFailed ? 'opacity-100' : 'opacity-0',
+        ].join(' ')}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         aria-hidden="true"
+        onCanPlay={() => setVideoReady(true)}
+        onPlaying={() => setVideoReady(true)}
+        onError={() => setVideoFailed(true)}
       >
         <source src="/media/booting-login-bg.mp4" type="video/mp4" />
       </video>
