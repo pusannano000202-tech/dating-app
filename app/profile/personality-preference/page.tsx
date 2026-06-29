@@ -12,7 +12,7 @@ import {
   type PersonalityPreferenceProfile,
 } from '@/lib/matching/personality-preference'
 import type { Big5Vector } from '@/lib/matching/types'
-import { getSafeClientRedirect } from '@/lib/client-redirect'
+import { getSequentialMatchStartRedirect } from '@/lib/client-redirect'
 import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 
@@ -81,10 +81,10 @@ export default function PersonalityPreferencePage() {
 
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        if (markDevMatchSetupStepComplete('personality')) {
-          router.push(getSafeClientRedirect('/profile/schedule'))
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          if (markDevMatchSetupStepComplete('personality')) {
+          router.push(getSequentialMatchStartRedirect('/profile/schedule', '/profile/schedule'))
           return
         }
         router.push('/login')
@@ -104,7 +104,7 @@ export default function PersonalityPreferencePage() {
         )
 
       if (dbErr) throw dbErr
-      router.push(getSafeClientRedirect('/profile/schedule'))
+      router.push(getSequentialMatchStartRedirect('/profile/schedule', '/profile/schedule'))
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해줘.')
       setSaving(false)

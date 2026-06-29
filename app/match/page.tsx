@@ -2,8 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { CalendarClock, ChevronLeft, ChevronRight, Loader2, Search, Sparkles, UserPlus, Users } from 'lucide-react'
-import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { CalendarClock, ChevronLeft, ChevronRight, Loader2, LockKeyhole, Search, Sparkles, UserPlus, Users } from 'lucide-react'
+import {
+  getDevPreviewGroupSizeFromClient,
+  getDevPreviewGroupStatusFromClient,
+  isDevPreviewClientSession,
+} from '@/lib/dev-match-setup'
 import {
   DEV_PREVIEW_CURRENT_USER_ID,
   DEV_PREVIEW_GROUP,
@@ -107,9 +111,19 @@ export default function MatchesPage() {
 
     if (isDevPreview) {
       const params = new URLSearchParams(window.location.search)
+      const previewGroupSize = getDevPreviewGroupSizeFromClient(DEV_PREVIEW_GROUP.size)
+      const previewGroupStatus = getDevPreviewGroupStatusFromClient()
       setMatches(params.get('sampleMatches') === '1' ? DEV_MATCHES : [])
       setPoolStats(DEV_POOL)
-      setGroupSummary(DEV_GROUP_SUMMARY)
+      setGroupSummary({
+        group: {
+          ...DEV_PREVIEW_GROUP,
+          size: previewGroupSize,
+          status: previewGroupStatus,
+        },
+        members: DEV_PREVIEW_GROUP_MEMBERS.slice(0, previewGroupSize),
+        current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
+      })
       setLoading(false)
       return
     }
@@ -163,6 +177,19 @@ export default function MatchesPage() {
   const progressValue = groupSummary.members.length > 0
     ? Math.min(100, Math.round((Math.max(readyCount, 1) / Math.max(groupCapacity, 1)) * 100))
     : 25
+  const hasMatchResults = matches.length > 0
+  const hasStartedMatching = groupSummary.group?.status === 'in_pool' || hasMatchResults
+  const teamCardName = loading
+    ? '매칭 상태 확인 중'
+    : groupSummary.group
+      ? '내 과팅 팀'
+      : '팀을 먼저 만들어요'
+  const teamCardMembers = loading ? ['확인 중'] : groupMemberNames
+  const teamCardStatus = loading
+    ? '불러오는 중'
+    : groupSummary.group?.status === 'in_pool'
+      ? '매칭 탐색 중'
+      : '매칭 준비'
 
   return (
     <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
@@ -180,64 +207,84 @@ export default function MatchesPage() {
 
         <DarkTeamProgressCard
           className="mb-4"
-          groupName={groupSummary.group ? '내 과팅 팀' : '팀을 먼저 만들어요'}
-          members={groupMemberNames}
+          groupName={teamCardName}
+          members={teamCardMembers}
           progressValue={progressValue}
           progressLabel={`팀 준비 ${Math.min(groupSummary.members.length, groupCapacity)}/${groupCapacity}명 - 조건을 맞추는 중`}
-          status={groupSummary.group?.status === 'in_pool' ? '매칭 탐색 중' : '매칭 준비'}
+          status={teamCardStatus}
         />
 
-        <LockedOpponentCard
-          className="mb-5"
-          title={matches.length > 0 ? '가매칭 후보' : '상대팀은 아직 잠겨 있어요'}
-          chemi={matches.length > 0 ? 92 : 70}
-          chips={matches.length > 0 ? ['차분한', '카페파', '수요일'] : ['친구 필요', '성향 필요', '시간 필요']}
-          description={matches.length > 0 ? '보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요' : '매칭 찾기를 누르기 전에는 상대 카드가 결과처럼 보이지 않아요'}
-        />
-
-        <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
-          <div className="mb-4 flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
-              <Search size={21} />
+        {loading ? (
+          <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+                <Search size={21} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-black leading-tight text-boot-ink">매칭 상태를 확인하고 있어요</p>
+                <p className="mt-1 text-xs leading-relaxed text-boot-muted">
+                  그룹과 큐 상태를 불러온 뒤 필요한 행동만 보여드릴게요.
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-lg font-black leading-tight text-boot-ink">매칭을 찾아주세요!</p>
-              <p className="mt-1 text-xs leading-relaxed text-boot-muted">
-                친구를 초대하고 성향, 시간, 비중을 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Link
-              href="/group/create?size=2"
-              className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)]"
-            >
-              2:2 매칭찾기
-              <ChevronRight size={16} />
-            </Link>
-            <Link
-              href="/group/create?size=3"
-              className="flex h-14 items-center justify-center gap-2 rounded-[24px] border border-boot-primary/20 bg-boot-soft px-4 text-sm font-black text-boot-primary"
-            >
-              3:3 매칭찾기
-              <ChevronRight size={16} />
-            </Link>
-            <Link
-              href="/friends"
-              className="col-span-2 flex h-12 items-center justify-center gap-1.5 rounded-[22px] border border-boot-primary/15 bg-white px-3 text-xs font-black text-boot-primary"
-            >
-              <UserPlus size={15} />
-              친구 초대
-            </Link>
-          </div>
-          <CurrentGroupPreview
-            className="mt-3"
-            members={groupSummary.members}
-            capacity={groupSummary.group?.size ?? 3}
-            currentUserId={groupSummary.current_user_id}
-            hasGroup={groupSummary.group != null || groupSummary.members.length > 0}
+          </section>
+        ) : hasMatchResults ? (
+          <LockedOpponentCard
+            className="mb-5"
+            title="가매칭 후보"
+            chemi={92}
+            chips={['차분한', '카페파', '수요일']}
+            description="보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요"
           />
-        </section>
+        ) : hasStartedMatching && !hasMatchResults ? (
+          <MatchSearchingPrivacyCard />
+        ) : null}
+
+        {!loading && !hasStartedMatching && (
+          <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+            <div className="mb-4 flex items-start gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+                <Search size={21} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-black leading-tight text-boot-ink">매칭을 찾아주세요!</p>
+                <p className="mt-1 text-xs leading-relaxed text-boot-muted">
+                  친구를 초대하고 성향, 시간, 비중을 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href="/group/create?size=2"
+                className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)]"
+              >
+                2:2 매칭찾기
+                <ChevronRight size={16} />
+              </Link>
+              <Link
+                href="/group/create?size=3"
+                className="flex h-14 items-center justify-center gap-2 rounded-[24px] border border-boot-primary/20 bg-boot-soft px-4 text-sm font-black text-boot-primary"
+              >
+                3:3 매칭찾기
+                <ChevronRight size={16} />
+              </Link>
+              <Link
+                href="/friends"
+                className="col-span-2 flex h-12 items-center justify-center gap-1.5 rounded-[22px] border border-boot-primary/15 bg-white px-3 text-xs font-black text-boot-primary"
+              >
+                <UserPlus size={15} />
+                친구 초대
+              </Link>
+            </div>
+            <CurrentGroupPreview
+              className="mt-3"
+              members={groupSummary.members}
+              capacity={groupSummary.group?.size ?? 3}
+              currentUserId={groupSummary.current_user_id}
+              hasGroup={groupSummary.group != null || groupSummary.members.length > 0}
+            />
+          </section>
+        )}
 
         <section className="mb-5">
           <MatchingPool stats={poolStats} />
@@ -254,7 +301,7 @@ export default function MatchesPage() {
             <Loader2 size={18} className="animate-spin" />
             매칭 정보를 확인하는 중
           </section>
-        ) : matches.length === 0 ? (
+        ) : matches.length === 0 && !hasStartedMatching ? (
           <section className="glass rounded-3xl p-5 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-boot-primary/15 bg-boot-soft">
               <CalendarClock size={20} className="text-boot-primary" />
@@ -270,6 +317,16 @@ export default function MatchesPage() {
               매칭 찾기 시작
               <ChevronRight size={14} />
             </Link>
+          </section>
+        ) : matches.length === 0 && hasStartedMatching ? (
+          <section className="glass rounded-3xl p-5 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-boot-primary/15 bg-boot-soft">
+              <Loader2 size={20} className="animate-spin text-boot-primary" />
+            </div>
+            <p className="text-sm font-bold text-boot-body">매칭 큐에서 상대팀을 찾는 중이에요</p>
+            <p className="mt-1 text-xs leading-5 text-boot-muted">
+              이미 매칭 찾기를 시작했어요. 조건이 맞는 팀이 잡히면 이 화면에서 상대 카드와 다음 행동이 열립니다.
+            </p>
           </section>
         ) : (
           <div className="space-y-3">
@@ -315,6 +372,36 @@ export default function MatchesPage() {
         )}
       </div>
     </main>
+  )
+}
+
+function MatchSearchingPrivacyCard() {
+  return (
+    <section className="mb-5 rounded-[30px] border border-boot-primary/15 bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+      <div className="flex items-start gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+          <LockKeyhole size={21} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-black uppercase tracking-[0.24em] text-boot-primary">Searching privately</p>
+          <h2 className="mt-2 text-xl font-black leading-tight text-boot-ink">상대 카드는 매칭 후에 열려요</h2>
+          <p className="mt-2 text-sm leading-6 text-boot-muted">
+            매칭 찾기를 시작했으니 이제 조건이 맞는 팀을 기다리는 단계예요. 상대팀이 잡히기 전까지는
+            케미 점수와 상세 정보가 공개되지 않습니다.
+          </p>
+        </div>
+      </div>
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        {['큐 진입', '상대 탐색', '가매칭 공개'].map((step, index) => (
+          <div key={step} className="rounded-2xl border border-boot-hairline bg-boot-soft px-2 py-3 text-center">
+            <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-black text-boot-primary">
+              {index + 1}
+            </span>
+            <span className="mt-2 block text-[11px] font-black text-boot-body">{step}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 

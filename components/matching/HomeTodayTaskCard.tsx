@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { CalendarCheck2, ChevronRight, Loader2, Search, Sparkles, UsersRound } from 'lucide-react'
-import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import {
+  getDevMatchSetupStatusFromClient,
+  getDevPreviewGroupSizeFromClient,
+  getDevPreviewGroupStatusFromClient,
+  isDevPreviewClientSession,
+} from '@/lib/dev-match-setup'
 import {
   EMPTY_MATCH_SETUP_STATUS,
   type MatchSetupStatus,
@@ -58,9 +63,10 @@ export default function HomeTodayTaskCard() {
   const load = useCallback(async () => {
     setLoading(true)
     if (isDevPreview) {
-      setGroupStatus(null)
-      setGroupSize(DEV_PREVIEW_GROUP.size)
-      setGroupMembers(DEV_PREVIEW_GROUP_MEMBERS)
+      const previewGroupSize = getDevPreviewGroupSizeFromClient(DEV_PREVIEW_GROUP.size)
+      setGroupStatus(getDevPreviewGroupStatusFromClient())
+      setGroupSize(previewGroupSize)
+      setGroupMembers(DEV_PREVIEW_GROUP_MEMBERS.slice(0, previewGroupSize))
       setCurrentUserId(DEV_PREVIEW_CURRENT_USER_ID)
       setMatchSetupStatus(getDevMatchSetupStatusFromClient())
       setPreMatchCardDone(hasPreMatchCardDraftCookie())
@@ -106,6 +112,20 @@ export default function HomeTodayTaskCard() {
   }, [load])
 
   const task = useMemo(() => {
+    if (loading) {
+      return {
+        eyebrow: '상태 확인',
+        title: '지금 진행 상태를 확인하고 있어요',
+        description: '매칭 준비, 그룹, 큐 상태를 불러온 뒤 다음 행동을 정확히 보여줄게요.',
+        href: '/match',
+        cta: '매칭 화면 보기',
+        Icon: Search,
+        tone: 'neutral' as const,
+        secondaryHref: null,
+        secondaryCta: null,
+      }
+    }
+
     const setupStarted =
       matchSetupStatus.personality ||
       matchSetupStatus.schedule ||
@@ -212,7 +232,7 @@ export default function HomeTodayTaskCard() {
       secondaryHref: '/friends',
       secondaryCta: '친구 초대',
     }
-  }, [groupStatus, matchSetupStatus, matches, preMatchCardDone])
+  }, [groupStatus, loading, matchSetupStatus, matches, preMatchCardDone])
 
   const Icon = task.Icon
   const showGroupPreview = task.href === '/match/start' || task.href === '/group/create'

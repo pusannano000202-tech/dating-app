@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PreferenceWeightInputs from '@/components/profile/PreferenceWeightInputs'
-import { getSafeClientRedirect } from '@/lib/client-redirect'
+import { getSequentialMatchStartRedirect } from '@/lib/client-redirect'
 import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 import type { PreferenceWeights } from '@/lib/types'
@@ -91,6 +91,9 @@ export default function PreferencesPage() {
 
   const total = Math.round(Object.values(weights).reduce((sum, value) => sum + value, 0) * 100)
   const ageRangeOk = ageMin >= AGE_INPUT_MIN && ageMax <= AGE_INPUT_MAX && ageMin <= ageMax
+  const ageTrackSpan = AGE_INPUT_MAX - AGE_INPUT_MIN
+  const ageMinPercent = ((ageMin - AGE_INPUT_MIN) / ageTrackSpan) * 100
+  const ageMaxPercent = ((ageMax - AGE_INPUT_MIN) / ageTrackSpan) * 100
   const weightStatus =
     total === 100
       ? '가중치 합계가 100%라 저장할 수 있어요.'
@@ -109,7 +112,7 @@ export default function PreferencesPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         if (markDevMatchSetupStepComplete('preferences')) {
-          router.push(getSafeClientRedirect('/'))
+          router.push(getSequentialMatchStartRedirect('/profile/match-card', '/'))
           return
         }
 
@@ -130,7 +133,7 @@ export default function PreferencesPage() {
         )
 
       if (dbErr) throw dbErr
-      router.push(getSafeClientRedirect('/'))
+      router.push(getSequentialMatchStartRedirect('/profile/match-card', '/'))
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해주세요.')
     } finally {
@@ -182,81 +185,95 @@ export default function PreferencesPage() {
       )}
 
       {loaded && (
-        <section className="mt-8 mb-1">
-          <div className="mb-2 flex items-baseline justify-between">
-            <h2 className="text-base font-bold text-boot-ink">상대 나이는 어디까지 괜찮아?</h2>
+        <section className="mt-8 mb-1 rounded-[30px] border border-boot-primary/15 bg-white p-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary">Age range</p>
+              <h2 className="mt-1 text-xl font-black text-boot-ink">상대 나이 범위</h2>
+              <p className="mt-2 text-xs leading-relaxed text-boot-muted">
+                이 범위 안의 상대만 우선 매칭해요. 좁히면 더 정확하고, 넓히면 후보가 많아져요.
+              </p>
+            </div>
             {myAge != null && (
-              <span className="text-[11px] text-boot-muted">내 나이 {myAge}</span>
+              <span className="rounded-full bg-boot-soft px-3 py-1.5 text-[11px] font-black text-boot-primary">
+                내 나이 {myAge}
+              </span>
             )}
           </div>
-          <p className="mb-4 text-xs leading-relaxed text-boot-muted">
-            기본은 내 나이 기준 ±3살이에요. 범위를 넓힐수록 후보가 늘고, 좁힐수록 조건이 더 강하게 적용돼요.
-          </p>
 
-          <div className="glass-card rounded-2xl p-4">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div className="flex-1">
-                <p className="mb-1 text-[11px] text-boot-muted">최소</p>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => bumpMin(-1)}
-                    className="h-9 w-9 rounded-xl border border-boot-hairline text-lg font-bold hover:border-boot-primary/30"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-lg font-black tabular-nums">{ageMin}</span>
-                  <button
-                    type="button"
-                    onClick={() => bumpMin(1)}
-                    className="h-9 w-9 rounded-xl border border-boot-hairline text-lg font-bold hover:border-boot-primary/30"
-                  >
-                    +
-                  </button>
-                </div>
+          <div className="mb-5 rounded-[26px] border border-boot-hairline bg-boot-soft px-4 py-4">
+            <div className="mb-3 flex items-end justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-boot-muted">선호 범위</p>
+                <p className="mt-0.5 text-3xl font-black tabular-nums text-boot-ink">
+                  {ageMin}<span className="mx-1 text-lg text-boot-muted">~</span>{ageMax}세
+                </p>
               </div>
-              <span className="pt-5 text-boot-muted">~</span>
-              <div className="flex-1">
-                <p className="mb-1 text-[11px] text-boot-muted">최대</p>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => bumpMax(-1)}
-                    className="h-9 w-9 rounded-xl border border-boot-hairline text-lg font-bold hover:border-boot-primary/30"
-                  >
-                    -
-                  </button>
-                  <span className="flex-1 text-center text-lg font-black tabular-nums">{ageMax}</span>
-                  <button
-                    type="button"
-                    onClick={() => bumpMax(1)}
-                    className="h-9 w-9 rounded-xl border border-boot-hairline text-lg font-bold hover:border-boot-primary/30"
-                  >
-                    +
-                  </button>
-                </div>
+              <p className="rounded-full bg-white px-3 py-1.5 text-[11px] font-black text-boot-body">
+                {ageMax - ageMin + 1}살 폭
+              </p>
+            </div>
+
+            <div className="relative h-12 rounded-full bg-white px-4">
+              <div className="absolute inset-x-4 top-1/2 h-2 -translate-y-1/2 rounded-full bg-boot-hairline" />
+              <div className="absolute inset-x-4 top-0 h-full">
+                <div
+                  className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-boot-primary to-orange-400"
+                  style={{
+                    left: `${ageMinPercent}%`,
+                    right: `${100 - ageMaxPercent}%`,
+                  }}
+                />
+                <span
+                  className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white bg-boot-primary shadow"
+                  style={{ left: `${ageMinPercent}%` }}
+                />
+                <span
+                  className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white bg-orange-400 shadow"
+                  style={{ left: `${ageMaxPercent}%` }}
+                />
               </div>
             </div>
 
-            {myAge != null && (
-              <button
-                type="button"
-                onClick={() => {
-                  setAgeMin(Math.max(AGE_INPUT_MIN, myAge - DEFAULT_TOLERANCE))
-                  setAgeMax(Math.min(AGE_INPUT_MAX, myAge + DEFAULT_TOLERANCE))
-                }}
-                className="mt-1 w-full rounded-xl border border-boot-hairline py-2 text-xs font-bold text-boot-body hover:border-boot-primary/30 hover:text-boot-primary"
-              >
-                내 나이 ±3살로 다시 맞추기
-              </button>
-            )}
-
-            {!ageRangeOk && (
-              <p className="mt-2 text-center text-xs text-red-500">
-                최소 나이가 최대 나이보다 클 수 없어요. ({AGE_INPUT_MIN}-{AGE_INPUT_MAX})
-              </p>
-            )}
+            <div className="mt-2 flex justify-between text-[10px] font-bold text-boot-muted">
+              <span>{AGE_INPUT_MIN}세</span>
+              <span>{AGE_INPUT_MAX}세</span>
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <AgeControlCard
+              label="최소 나이"
+              value={ageMin}
+              onMinus={() => bumpMin(-1)}
+              onPlus={() => bumpMin(1)}
+            />
+            <AgeControlCard
+              label="최대 나이"
+              value={ageMax}
+              onMinus={() => bumpMax(-1)}
+              onPlus={() => bumpMax(1)}
+            />
+          </div>
+
+          {myAge != null && (
+            <button
+              type="button"
+              onClick={() => {
+                setAgeMin(Math.max(AGE_INPUT_MIN, myAge - DEFAULT_TOLERANCE))
+                setAgeMax(Math.min(AGE_INPUT_MAX, myAge + DEFAULT_TOLERANCE))
+              }}
+              className="mt-4 w-full rounded-2xl border border-boot-primary/20 bg-white py-3 text-sm font-black text-boot-primary shadow-sm hover:border-boot-primary/40"
+            >
+              내 나이 ±3살로 다시 맞추기
+            </button>
+          )}
+
+          {!ageRangeOk && (
+            <p className="mt-3 rounded-2xl bg-red-50 px-3 py-2 text-center text-xs font-bold text-red-500">
+              최소 나이가 최대 나이보다 클 수 없어요. ({AGE_INPUT_MIN}-{AGE_INPUT_MAX})
+            </p>
+          )}
         </section>
       )}
 
@@ -274,6 +291,45 @@ export default function PreferencesPage() {
           {saving ? '저장 중...' : '프로필 완성!'}
         </button>
         <p className="mt-3 text-center text-xs text-boot-muted">완성 후 그룹을 만들고 과팅을 신청할 수 있어요.</p>
+      </div>
+    </div>
+  )
+}
+
+function AgeControlCard({
+  label,
+  value,
+  onMinus,
+  onPlus,
+}: {
+  label: string
+  value: number
+  onMinus: () => void
+  onPlus: () => void
+}) {
+  return (
+    <div className="rounded-[24px] border border-boot-hairline bg-white px-3 py-3 shadow-sm">
+      <p className="text-center text-[11px] font-black text-boot-muted">{label}</p>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={onMinus}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-boot-hairline text-lg font-black text-boot-ink hover:border-boot-primary/40 hover:text-boot-primary"
+          aria-label={`${label} 낮추기`}
+        >
+          -
+        </button>
+        <span className="min-w-0 flex-1 text-center text-2xl font-black tabular-nums text-boot-ink">
+          {value}
+        </span>
+        <button
+          type="button"
+          onClick={onPlus}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-boot-hairline text-lg font-black text-boot-ink hover:border-boot-primary/40 hover:text-boot-primary"
+          aria-label={`${label} 높이기`}
+        >
+          +
+        </button>
       </div>
     </div>
   )

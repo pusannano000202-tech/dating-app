@@ -19,6 +19,17 @@ interface Props {
   className?: string
 }
 
+type QueueTone = 'sky' | 'rose' | 'amber'
+
+type QueueRow = {
+  label: string
+  size: 2 | 3
+  male: number
+  female: number
+  mixed: number
+  active: boolean
+}
+
 const FALLBACK_STATS: PoolStats = {
   female: 0,
   male: 0,
@@ -54,11 +65,12 @@ export default function MatchingPool({ stats, className = '' }: Props) {
 
   const totalGroups = displayed.female + displayed.male + displayed.mixed
 
-  const queueRows = useMemo(() => {
+  const queueRows = useMemo<QueueRow[]>(() => {
     const bySize = target.bySize
     const empty = bySize == null
     const row2 = bySize?.['2'] ?? { female: 0, male: 0, mixed: 0 }
     const row3 = bySize?.['3'] ?? { female: 0, male: 0, mixed: 0 }
+
     return [
       {
         label: '2:2 매칭찾기',
@@ -91,12 +103,12 @@ export default function MatchingPool({ stats, className = '' }: Props) {
             토요일 14:00에 조건이 맞는 그룹끼리 자동 배정돼요.
           </p>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-boot-hairline bg-boot-soft text-boot-primary">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full border border-boot-hairline bg-boot-soft text-boot-primary">
           <CalendarClock size={20} />
         </div>
       </div>
 
-      <div className="mb-4 rounded-3xl border border-boot-hairline bg-white p-4 shadow-sm">
+      <div className="mb-4 rounded-[30px] border border-boot-hairline bg-white p-4 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Users size={16} className="text-boot-muted" />
@@ -105,68 +117,10 @@ export default function MatchingPool({ stats, className = '' }: Props) {
           <span className="text-2xl font-black text-boot-primary">{totalGroups}</span>
         </div>
 
-        <div className="space-y-3">
-          {queueRows.map((row) => {
-            const totalTeams = row.male + row.female + row.mixed
-            const totalPeople = totalTeams * row.size
-            const malePeople = row.male * row.size
-            const femalePeople = row.female * row.size
-            const mixedPeople = row.mixed * row.size
-            const maleWidth = row.male > 0 ? Math.max(12, Math.min(72, row.male * 12)) : 0
-            const femaleWidth = row.female > 0 ? Math.max(12, Math.min(72, row.female * 12)) : 0
-            const mixedWidth = row.mixed > 0 ? Math.max(12, Math.min(72, row.mixed * 12)) : 0
-            return (
-              <div key={row.label} className="rounded-2xl border border-boot-hairline bg-boot-soft/60 px-3 py-3">
-                <div className="mb-2 flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-black text-boot-ink">{row.label}</p>
-                    <p className="mt-0.5 text-[11px] text-boot-muted">
-                      총 {totalTeams}팀 · 참가 {totalPeople}명
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-boot-primary">
-                    {totalTeams}팀
-                  </span>
-                </div>
-
-                <div className="mb-2 flex h-9 items-center gap-2 overflow-hidden rounded-2xl border border-boot-hairline bg-white px-2">
-                  <div
-                    className={`h-5 rounded-xl border border-sky-200 bg-sky-300/70 transition-all duration-700 ${
-                      row.active ? 'shadow-[0_0_18px_rgba(125,211,252,0.26)]' : ''
-                    }`}
-                    style={{ width: `${maleWidth}%` }}
-                  />
-                  <div className="h-px flex-1 bg-boot-hairline" />
-                  <div
-                    className={`h-5 rounded-xl border border-amber-200 bg-amber-300/70 transition-all duration-700 ${
-                      row.active ? 'shadow-[0_0_18px_rgba(252,211,77,0.23)]' : ''
-                    }`}
-                    style={{ width: `${mixedWidth}%` }}
-                  />
-                  <div className="h-px flex-1 bg-boot-hairline" />
-                  <div
-                    className={`h-5 rounded-xl border border-rose-200 bg-boot-primary/50 transition-all duration-700 ${
-                      row.active ? 'shadow-[0_0_18px_rgba(255,90,111,0.24)]' : ''
-                    }`}
-                    style={{ width: `${femaleWidth}%` }}
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <QueuePill label="남자팀" teams={row.male} people={malePeople} tone="sky" />
-                  <QueuePill label="혼성팀" teams={row.mixed} people={mixedPeople} tone="amber" />
-                  <QueuePill label="여자팀" teams={row.female} people={femalePeople} tone="rose" />
-                </div>
-
-                <Link
-                  href={`/group/create?size=${row.size}`}
-                  className="mt-3 flex h-11 items-center justify-center rounded-2xl bg-boot-ink text-xs font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
-                >
-                  {row.size}:{row.size} 그룹으로 시작하기
-                </Link>
-              </div>
-            )
-          })}
+        <div className="grid gap-3">
+          {queueRows.map((row) => (
+            <QueueCircleCard key={row.label} row={row} />
+          ))}
         </div>
       </div>
 
@@ -182,7 +136,8 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         <div>
           <p className="text-xs font-black text-emerald-700">혼성 그룹도 가능해요</p>
           <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
-            친구 성별이 섞인 그룹도 만들 수 있어요. 혼성 대기자는 별도로 표시하고, 2:2와 3:3은 같은 인원 규모끼리 매칭돼요.
+            친구 성별이 섞인 그룹도 만들 수 있어요. 혼성 대기자는 별도로 표시하고,
+            2:2와 3:3은 같은 인원 규모끼리 매칭돼요.
           </p>
         </div>
       </div>
@@ -195,6 +150,118 @@ export default function MatchingPool({ stats, className = '' }: Props) {
   )
 }
 
+function QueueCircleCard({ row }: { row: QueueRow }) {
+  const totalTeams = row.male + row.female + row.mixed
+  const totalPeople = totalTeams * row.size
+  const malePeople = row.male * row.size
+  const femalePeople = row.female * row.size
+  const mixedPeople = row.mixed * row.size
+
+  return (
+    <div className="rounded-[28px] border border-boot-hairline bg-boot-soft/60 px-3 py-4">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-black text-boot-ink">{row.label}</p>
+          <p className="mt-0.5 text-[11px] text-boot-muted">
+            총 {totalTeams}팀 · 참가 {totalPeople}명
+          </p>
+        </div>
+        <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-boot-primary">
+          {totalTeams}팀
+        </span>
+      </div>
+
+      <div className="grid grid-cols-[132px_minmax(0,1fr)] items-center gap-3">
+        <div
+          className={[
+            'relative h-32 w-32 rounded-full p-[10px] shadow-[0_16px_28px_rgba(23,20,18,0.08)]',
+            row.active ? 'animate-[pulse_2.6s_ease-in-out_infinite]' : '',
+          ].join(' ')}
+          style={{ background: buildRingGradient(row) }}
+          aria-label={`${row.label} ${totalTeams}팀`}
+        >
+          <div className="flex h-full w-full flex-col items-center justify-center rounded-full border border-boot-hairline bg-white text-center">
+            <span className="text-[11px] font-black uppercase tracking-[0.12em] text-boot-muted">
+              {row.size}:{row.size}
+            </span>
+            <span className="mt-0.5 text-3xl font-black tabular-nums text-boot-ink">
+              {totalTeams}
+            </span>
+            <span className="text-[10px] font-bold text-boot-muted">대기 팀</span>
+          </div>
+          <QueueDotCluster row={row} />
+        </div>
+
+        <div className="grid gap-2">
+          <QueuePill label="남자팀" teams={row.male} people={malePeople} tone="sky" />
+          <QueuePill label="혼성팀" teams={row.mixed} people={mixedPeople} tone="amber" />
+          <QueuePill label="여자팀" teams={row.female} people={femalePeople} tone="rose" />
+        </div>
+      </div>
+
+      <Link
+        href={`/group/create?size=${row.size}`}
+        className="mt-3 flex h-11 items-center justify-center rounded-full bg-boot-ink text-xs font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
+      >
+        {row.size}:{row.size} 그룹으로 시작하기
+      </Link>
+    </div>
+  )
+}
+
+function QueueDotCluster({ row }: { row: QueueRow }) {
+  const total = row.male + row.female + row.mixed
+  const count = Math.min(total, 12)
+
+  if (count === 0) {
+    return (
+      <span className="absolute right-2 top-2 h-3 w-3 rounded-full border border-boot-hairline bg-white" />
+    )
+  }
+
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {Array.from({ length: count }).map((_, index) => {
+        const angle = (index / count) * Math.PI * 2 - Math.PI / 2
+        const radius = 57
+        const x = 66 + Math.cos(angle) * radius
+        const y = 66 + Math.sin(angle) * radius
+        return (
+          <span
+            key={index}
+            className={`absolute h-1.5 w-1.5 rounded-full border border-white/95 shadow-[0_2px_6px_rgba(23,20,18,0.14)] ${getQueueDotTone(index, row, count)}`}
+            style={{ left: x, top: y, transform: 'translate(-50%, -50%)' }}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+function getQueueDotTone(index: number, row: QueueRow, count: number): string {
+  const total = row.male + row.female + row.mixed
+  if (total <= 0) return 'bg-white'
+
+  const emphasis = count <= 8 || index % 2 === 0
+  return emphasis ? 'bg-white/95' : 'bg-stone-100/90'
+}
+
+function buildRingGradient(row: QueueRow): string {
+  const total = row.male + row.female + row.mixed
+  if (total <= 0) return 'conic-gradient(#f8f1ec 0deg 360deg)'
+
+  const maleEnd = (row.male / total) * 360
+  const mixedEnd = maleEnd + (row.mixed / total) * 360
+
+  return [
+    'conic-gradient(',
+    `#93d8f2 0deg ${maleEnd}deg, `,
+    `#f6d86f ${maleEnd}deg ${mixedEnd}deg, `,
+    `#ff8fa2 ${mixedEnd}deg 360deg`,
+    ')',
+  ].join('')
+}
+
 function QueuePill({
   label,
   teams,
@@ -204,7 +271,7 @@ function QueuePill({
   label: string
   teams: number
   people: number
-  tone: 'sky' | 'rose' | 'amber'
+  tone: QueueTone
 }) {
   const toneClass =
     tone === 'sky'
@@ -214,8 +281,8 @@ function QueuePill({
         : 'text-boot-primary bg-white border-rose-100'
 
   return (
-    <div className={`rounded-2xl border px-2.5 py-2 ${toneClass}`}>
-      <p className="text-xs font-black">{teams}팀</p>
+    <div className={`rounded-2xl border px-3 py-2 ${toneClass}`}>
+      <p className="text-sm font-black">{teams}팀</p>
       <p className="mt-0.5 text-[10px] font-bold opacity-75">{label} · {people}명</p>
     </div>
   )

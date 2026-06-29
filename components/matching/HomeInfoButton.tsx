@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Info, X } from 'lucide-react'
+import { CreditCard, Info, MessageCircle, Sparkles, UserPlus, X } from 'lucide-react'
 
 export default function HomeInfoButton() {
   const [open, setOpen] = useState(false)
@@ -19,12 +19,21 @@ export default function HomeInfoButton() {
       </button>
 
       {open && (
-        <section className="absolute right-0 top-12 z-30 w-[min(20rem,calc(100vw-2.5rem))] rounded-[28px] border border-boot-primary/15 bg-white p-4 text-left shadow-xl">
+        <section className="absolute right-0 top-12 z-30 max-h-[calc(100vh-7rem)] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto rounded-[28px] border border-boot-primary/15 bg-white p-4 text-left shadow-xl">
           <p className="text-xs font-black uppercase tracking-normal text-boot-primary">How it works</p>
           <h2 className="mt-1 text-lg font-black text-boot-ink">부팅은 기존 과팅이랑 이렇게 달라요</h2>
           <p className="mt-1 text-xs leading-5 text-boot-muted">
             홈에서는 다음 행동만 보고, 상대 카드와 큐 숫자는 매칭 찾기 이후 매칭 화면에서 확인해요.
           </p>
+          <div className="mt-3 rounded-3xl border border-boot-hairline bg-boot-soft/55 p-3">
+            <p className="mb-2 text-[11px] font-black uppercase tracking-[0.2em] text-boot-primary">앱 흐름 한눈에</p>
+            <div className="grid grid-cols-2 gap-2">
+              <FlowVisualCard title="친구 모으기" Icon={UserPlus} tone="bg-white text-boot-primary" />
+              <FlowVisualCard title="매칭 탐색" Icon={Sparkles} tone="bg-boot-ink text-white" />
+              <FlowVisualCard title="보증금 확인" Icon={CreditCard} tone="bg-white text-orange-500" />
+              <FlowVisualCard title="카드·채팅 공개" Icon={MessageCircle} tone="bg-white text-sky-500" />
+            </div>
+          </div>
           <div className="mt-3 space-y-2">
             <InfoRow index={1} title="친구와 그룹 만들기" desc="닉네임으로 친구를 찾거나 초대 링크로 같이 과팅할 멤버를 모아요." />
             <InfoRow index={2} title="혼성 그룹도 가능" desc="남녀가 섞인 그룹도 참여할 수 있고, 통계는 대표 성별 기준으로 보여줘요." />
@@ -33,6 +42,24 @@ export default function HomeInfoButton() {
           </div>
         </section>
       )}
+    </div>
+  )
+}
+
+function FlowVisualCard({
+  title,
+  Icon,
+  tone,
+}: {
+  title: string
+  Icon: typeof UserPlus
+  tone: string
+}) {
+  return (
+    <div className={`relative overflow-hidden rounded-2xl px-3 py-3 shadow-sm ${tone}`}>
+      <Icon size={19} strokeWidth={2.5} />
+      <span className="mt-4 block text-[11px] font-black leading-snug">{title}</span>
+      <span className="absolute -right-3 -top-3 h-12 w-12 rounded-full border border-current/10 bg-current/5" />
     </div>
   )
 }

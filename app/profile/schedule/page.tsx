@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Info } from 'lucide-react'
 import SchedulePicker from '@/components/profile/SchedulePicker'
-import { getSafeClientRedirect } from '@/lib/client-redirect'
+import { getSequentialMatchStartRedirect } from '@/lib/client-redirect'
 import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 import type { AvailableTimeslots } from '@/lib/types'
@@ -45,7 +45,7 @@ export default function SchedulePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         if (markDevMatchSetupStepComplete('schedule')) {
-          router.push(getSafeClientRedirect('/profile/preferences'))
+          router.push(getSequentialMatchStartRedirect('/profile/preferences', '/profile/preferences'))
           return
         }
         router.push('/login')
@@ -54,7 +54,7 @@ export default function SchedulePage() {
       const { error: dbErr } = await supabase.from('profiles')
         .upsert({ user_id: user.id, available_timeslots: timeslots }, { onConflict: 'user_id' })
       if (dbErr) throw dbErr
-      router.push(getSafeClientRedirect('/profile/preferences'))
+      router.push(getSequentialMatchStartRedirect('/profile/preferences', '/profile/preferences'))
     } catch { setError('저장 중 오류가 발생했어요.') }
     finally { setSaving(false) }
   }

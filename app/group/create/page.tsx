@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, LockKeyhole } from 'lucide-react'
-import { getDevMatchSetupStatusFromClient, isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import {
+  getDevMatchSetupStatusFromClient,
+  getDevPreviewGroupSizeFromClient,
+  getDevPreviewGroupStatusFromClient,
+  isDevPreviewClientSession,
+  setDevPreviewGroupSize,
+  setDevPreviewGroupStatus,
+} from '@/lib/dev-match-setup'
 import { normalizeGroupSize } from '@/lib/matching/group-size'
 import {
   EMPTY_MATCH_SETUP_STATUS,
@@ -159,12 +166,17 @@ export default function GroupCreatePage() {
     setError(null)
 
     if (isDevPreview) {
+      const previewSize = searchParams.has('size')
+        ? requestedSize
+        : getDevPreviewGroupSizeFromClient(requestedSize)
+      const previewStatus = getDevPreviewGroupStatusFromClient()
+      setDevPreviewGroupSize(previewSize)
       setState({
         ...DEV_GROUP_STATE,
         group: DEV_GROUP_STATE.group
-          ? { ...DEV_GROUP_STATE.group, size: requestedSize }
+          ? { ...DEV_GROUP_STATE.group, size: previewSize, status: previewStatus }
           : DEV_GROUP_STATE.group,
-        members: DEV_GROUP_STATE.members.slice(0, requestedSize),
+        members: DEV_GROUP_STATE.members.slice(0, previewSize),
       })
       setLoading(false)
       return
@@ -416,6 +428,8 @@ export default function GroupCreatePage() {
     if (!group || saving || !canEnterQueue) return
 
     if (isDevPreview) {
+      setDevPreviewGroupStatus('in_pool')
+      setDevPreviewGroupSize(capacity)
       setState((current) => ({
         ...current,
         group: current.group ? { ...current.group, status: 'in_pool' } : current.group,
@@ -449,6 +463,8 @@ export default function GroupCreatePage() {
     if (!group || saving || !canCancelQueue) return
 
     if (isDevPreview) {
+      setDevPreviewGroupStatus('forming')
+      setDevPreviewGroupSize(capacity)
       setState((current) => ({
         ...current,
         group: current.group ? { ...current.group, status: 'forming' } : current.group,
