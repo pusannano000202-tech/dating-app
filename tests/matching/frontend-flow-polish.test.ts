@@ -77,19 +77,23 @@ test('home routes the main matching CTA through the matching hub', () => {
   assert.doesNotMatch(homePage, /상대팀 카드는 아직 잠겨 있어요/)
 })
 
-test('matching pool uses circular queue visuals instead of horizontal bars', () => {
+test('matching pool uses large match cards without decorative dot clusters', () => {
   const matchingPool = readSource('components/MatchingPool.tsx')
 
   assert.match(matchingPool, /1:1 소개팅 매치/)
   assert.match(matchingPool, /href="\/match\/start\?mode=solo"/)
   assert.match(matchingPool, /남자 대기자/)
   assert.match(matchingPool, /여자 대기자/)
+  assert.match(matchingPool, /2:2 그룹 매치/)
+  assert.match(matchingPool, /3:3 그룹 매치/)
   assert.match(matchingPool, /function QueueCircleCard/)
+  assert.match(matchingPool, /function QueueRing/)
+  assert.match(matchingPool, /function QueueStat/)
   assert.match(matchingPool, /buildRingGradient/)
   assert.match(matchingPool, /conic-gradient/)
-  assert.match(matchingPool, /QueueDotCluster row=\{row\}/)
-  assert.match(matchingPool, /function getQueueDotTone/)
   assert.match(matchingPool, /혼성팀/)
+  assert.doesNotMatch(matchingPool, /QueueDotCluster/)
+  assert.doesNotMatch(matchingPool, /function getQueueDotTone/)
   assert.doesNotMatch(matchingPool, /maleWidth|femaleWidth|mixedWidth/)
   assert.doesNotMatch(matchingPool, /className="absolute h-2\.5 w-2\.5 rounded-full border border-white bg-boot-primary/)
   assert.doesNotMatch(matchingPool, /bg-rose-200|bg-amber-200|bg-sky-200/)
