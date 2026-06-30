@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { CalendarClock, ChevronLeft, ChevronRight, Loader2, LockKeyhole, Search, Sparkles, UserPlus, Users } from 'lucide-react'
+import { CalendarClock, ChevronLeft, ChevronRight, Heart, Loader2, LockKeyhole, Search, Sparkles, UserPlus, Users } from 'lucide-react'
 import {
   getDevPreviewGroupSizeFromClient,
   getDevPreviewGroupStatusFromClient,
@@ -21,6 +21,7 @@ import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 
 interface MatchRow {
   match_id: string
+  match_mode?: 'group' | 'solo'
   my_group_id: string
   opp_group_id: string
   opp_group_size: number
@@ -65,10 +66,30 @@ const DEV_MATCHES: MatchRow[] = [
   },
 ]
 
+const DEV_SOLO_MATCHES: MatchRow[] = [
+  {
+    match_id: 'dev-solo-match-pending',
+    match_mode: 'solo',
+    my_group_id: 'dev-solo-user',
+    opp_group_id: 'dev-solo-opponent',
+    opp_group_size: 1,
+    opp_group_gender: 'female',
+    match_status: 'pending',
+    matched_at: new Date().toISOString(),
+    confirmed_at: null,
+    scheduled_start: null,
+    venue_name: null,
+  },
+]
+
 const EMPTY_POOL: PoolStats = {
   female: 0,
   male: 0,
   mixed: 0,
+  solo: {
+    female: 0,
+    male: 0,
+  },
   bySize: {
     '2': { female: 0, male: 0, mixed: 0 },
     '3': { female: 0, male: 0, mixed: 0 },
@@ -79,6 +100,10 @@ const DEV_POOL: PoolStats = {
   female: 6,
   male: 8,
   mixed: 3,
+  solo: {
+    female: 21,
+    male: 18,
+  },
   bySize: {
     '2': { female: 3, male: 5, mixed: 1 },
     '3': { female: 3, male: 3, mixed: 2 },
@@ -102,6 +127,8 @@ export default function MatchesPage() {
   const [matches, setMatches] = useState<MatchRow[]>([])
   const [poolStats, setPoolStats] = useState<PoolStats>(EMPTY_POOL)
   const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
+  const [matchMode, setMatchMode] = useState<'group' | 'solo'>('group')
+  const [soloQueueActive, setSoloQueueActive] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -111,19 +138,26 @@ export default function MatchesPage() {
 
     if (isDevPreview) {
       const params = new URLSearchParams(window.location.search)
+      const isSoloPreview = params.get('mode') === 'solo'
       const previewGroupSize = getDevPreviewGroupSizeFromClient(DEV_PREVIEW_GROUP.size)
       const previewGroupStatus = getDevPreviewGroupStatusFromClient()
-      setMatches(params.get('sampleMatches') === '1' ? DEV_MATCHES : [])
+      setMatchMode(isSoloPreview ? 'solo' : 'group')
+      setSoloQueueActive(isSoloPreview && params.get('soloStatus') === 'in_pool')
+      setMatches(params.get('sampleMatches') === '1'
+        ? isSoloPreview ? DEV_SOLO_MATCHES : DEV_MATCHES
+        : [])
       setPoolStats(DEV_POOL)
-      setGroupSummary({
-        group: {
-          ...DEV_PREVIEW_GROUP,
-          size: previewGroupSize,
-          status: previewGroupStatus,
-        },
-        members: DEV_PREVIEW_GROUP_MEMBERS.slice(0, previewGroupSize),
-        current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
-      })
+      setGroupSummary(isSoloPreview
+        ? EMPTY_GROUP_SUMMARY
+        : {
+            group: {
+              ...DEV_PREVIEW_GROUP,
+              size: previewGroupSize,
+              status: previewGroupStatus,
+            },
+            members: DEV_PREVIEW_GROUP_MEMBERS.slice(0, previewGroupSize),
+            current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
+          })
       setLoading(false)
       return
     }
@@ -169,27 +203,43 @@ export default function MatchesPage() {
     refresh()
   }, [refresh])
 
-  const groupMemberNames = groupSummary.members.length > 0
+  const isSoloMode = matchMode === 'solo'
+  const groupMemberNames = isSoloMode
+    ? ['나']
+    : groupSummary.members.length > 0
     ? groupSummary.members.map((member) => member.user_id === groupSummary.current_user_id ? '나' : member.display_name || '친구')
     : ['나']
-  const readyCount = groupSummary.members.filter((member) => member.match_setup_ready || member.role === 'leader').length
-  const groupCapacity = groupSummary.group?.size ?? 3
-  const progressValue = groupSummary.members.length > 0
+  const readyCount = isSoloMode ? 1 : groupSummary.members.filter((member) => member.match_setup_ready || member.role === 'leader').length
+  const groupCapacity = isSoloMode ? 1 : groupSummary.group?.size ?? 3
+  const progressValue = isSoloMode
+    ? 100
+    : groupSummary.members.length > 0
     ? Math.min(100, Math.round((Math.max(readyCount, 1) / Math.max(groupCapacity, 1)) * 100))
     : 25
   const hasMatchResults = matches.length > 0
-  const hasStartedMatching = groupSummary.group?.status === 'in_pool' || hasMatchResults
+  const hasStartedMatching = isSoloMode
+    ? soloQueueActive || hasMatchResults
+    : groupSummary.group?.status === 'in_pool' || hasMatchResults
   const teamCardName = loading
     ? '매칭 상태 확인 중'
+    : isSoloMode
+      ? '1:1 소개팅'
     : groupSummary.group
       ? '내 과팅 팀'
       : '팀을 먼저 만들어요'
   const teamCardMembers = loading ? ['확인 중'] : groupMemberNames
   const teamCardStatus = loading
     ? '불러오는 중'
+    : isSoloMode && hasStartedMatching
+      ? '상대 탐색 중'
+    : isSoloMode
+      ? '소개팅 준비'
     : groupSummary.group?.status === 'in_pool'
       ? '매칭 탐색 중'
       : '매칭 준비'
+  const progressLabel = isSoloMode
+    ? '내 소개팅 준비 완료 - 조건이 맞는 한 명을 찾는 중'
+    : `팀 준비 ${Math.min(groupSummary.members.length, groupCapacity)}/${groupCapacity}명 - 조건을 맞추는 중`
 
   return (
     <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
@@ -210,7 +260,7 @@ export default function MatchesPage() {
           groupName={teamCardName}
           members={teamCardMembers}
           progressValue={progressValue}
-          progressLabel={`팀 준비 ${Math.min(groupSummary.members.length, groupCapacity)}/${groupCapacity}명 - 조건을 맞추는 중`}
+          progressLabel={progressLabel}
           status={teamCardStatus}
         />
 
@@ -231,13 +281,15 @@ export default function MatchesPage() {
         ) : hasMatchResults ? (
           <LockedOpponentCard
             className="mb-5"
-            title="가매칭 후보"
-            chemi={92}
-            chips={['차분한', '카페파', '수요일']}
-            description="보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요"
+            title={isSoloMode ? '소개팅 상대 후보' : '가매칭 후보'}
+            chemi={isSoloMode ? 88 : 92}
+            chips={isSoloMode ? ['1:1', '조용한 대화', '저녁 가능'] : ['차분한', '카페파', '수요일']}
+            description={isSoloMode
+              ? '보증금과 사전 카드가 끝나면 상대의 카드와 약속 정보가 단계적으로 열려요'
+              : '보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요'}
           />
         ) : hasStartedMatching && !hasMatchResults ? (
-          <MatchSearchingPrivacyCard />
+          <MatchSearchingPrivacyCard mode={matchMode} />
         ) : null}
 
         {!loading && !hasStartedMatching && (
@@ -249,10 +301,26 @@ export default function MatchesPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-lg font-black leading-tight text-boot-ink">매칭을 찾아주세요!</p>
                 <p className="mt-1 text-xs leading-relaxed text-boot-muted">
-                  친구를 초대하고 성향, 시간, 비중을 끝내면 이번 주 매칭 큐에 들어갈 수 있어요.
+                  혼자 소개팅을 시작하거나, 친구를 초대해 2:2와 3:3 과팅 큐에 들어갈 수 있어요.
                 </p>
               </div>
             </div>
+            <Link
+              href="/match/start?mode=solo"
+              className="mb-3 flex min-h-[96px] items-center gap-4 rounded-[28px] border border-boot-primary/20 bg-gradient-to-br from-white via-boot-soft to-rose-50 px-4 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-boot-primary/40 hover:shadow-md"
+            >
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-boot-primary text-white shadow-[0_14px_28px_rgba(255,79,105,0.24)]">
+                <Heart size={22} fill="currentColor" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-boot-primary">1:1 소개팅</p>
+                <p className="mt-1 text-lg font-black leading-tight text-boot-ink">혼자 바로 매칭받기</p>
+                <p className="mt-1 text-[11px] leading-5 text-boot-muted">
+                  친구 초대 없이 내 설정만 끝내고 조건이 맞는 한 명을 찾아요.
+                </p>
+              </div>
+              <ChevronRight size={17} className="shrink-0 text-boot-primary" />
+            </Link>
             <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/group/create?size=2"
@@ -375,7 +443,9 @@ export default function MatchesPage() {
   )
 }
 
-function MatchSearchingPrivacyCard() {
+function MatchSearchingPrivacyCard({ mode }: { mode: 'group' | 'solo' }) {
+  const isSolo = mode === 'solo'
+
   return (
     <section className="mb-5 rounded-[30px] border border-boot-primary/15 bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
       <div className="flex items-start gap-4">
@@ -386,7 +456,9 @@ function MatchSearchingPrivacyCard() {
           <p className="text-[11px] font-black uppercase tracking-[0.24em] text-boot-primary">Searching privately</p>
           <h2 className="mt-2 text-xl font-black leading-tight text-boot-ink">상대 카드는 매칭 후에 열려요</h2>
           <p className="mt-2 text-sm leading-6 text-boot-muted">
-            매칭 찾기를 시작했으니 이제 조건이 맞는 팀을 기다리는 단계예요. 상대팀이 잡히기 전까지는
+            {isSolo
+              ? '1:1 소개팅 찾기를 시작했으니 조건이 맞는 한 명을 기다리는 단계예요. 상대가 잡히기 전까지는'
+              : '매칭 찾기를 시작했으니 이제 조건이 맞는 팀을 기다리는 단계예요. 상대팀이 잡히기 전까지는'}
             케미 점수와 상세 정보가 공개되지 않습니다.
           </p>
         </div>
@@ -449,6 +521,17 @@ function getMatchActionLabel(status: string): string {
 }
 
 function getMatchActionDescription(match: MatchRow): string {
+  if (match.match_mode === 'solo') {
+    switch (match.match_status) {
+      case 'pending':
+        return '1:1 가매칭이 도착했어요. 보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열립니다.'
+      case 'confirmed':
+        return '1:1 소개팅이 확정됐어요. 오늘 공개 카드, 약속 시간, 장소를 확인해 보세요.'
+      default:
+        return '소개팅 상세에서 다음 단계를 확인해 보세요.'
+    }
+  }
+
   switch (match.match_status) {
     case 'pending':
       return '카드 작성과 보증금 결제를 마치면 상대팀 상세와 약속 정보가 단계적으로 열려요.'
@@ -462,6 +545,12 @@ function getMatchActionDescription(match: MatchRow): string {
 }
 
 function getMatchCardTitle(match: MatchRow): string {
+  if (match.match_mode === 'solo') {
+    return match.match_status === 'pending'
+      ? '1:1 소개팅 상대가 도착했어요'
+      : '소개팅 상대'
+  }
+
   if (match.match_status === 'pending') {
     return '가매칭 후보가 도착했어요'
   }

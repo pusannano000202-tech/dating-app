@@ -248,6 +248,8 @@ test('middleware issues dev auth cookie when opening dev preview', () => {
   const devMatchSetup = readSource('lib/dev-match-setup.ts')
 
   assert.match(middleware, /pathname\.startsWith\('\/dev\/preview'\)/)
+  assert.match(middleware, /isLocalDevRequest/)
+  assert.match(middleware, /shouldAutoIssueLocalDevAuth/)
   assert.match(middleware, /response\.cookies\.set\(DEV_AUTH_COOKIE/)
   assert.match(devMatchSetup, /function hasDevAuthCookie/)
   assert.match(devMatchSetup, /document\.cookie/)

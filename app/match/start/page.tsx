@@ -34,41 +34,52 @@ type SetupStep = {
   Icon: typeof HeartHandshake
 }
 
-const REDIRECT_TO = '/match/start'
+type MatchStartMode = 'group' | 'solo'
 
-function buildSetupSteps(profile: MatchSetupProfile | null, cardDraftDone: boolean): SetupStep[] {
+const GROUP_REDIRECT_TO = '/match/start'
+const SOLO_REDIRECT_TO = '/match/start?mode=solo'
+
+function buildSetupSteps(
+  profile: MatchSetupProfile | null,
+  cardDraftDone: boolean,
+  redirectTo: string,
+): SetupStep[] {
   const status = getMatchSetupStatus(profile)
 
   return [
     {
-      href: `/profile/personality-preference?redirect=${encodeURIComponent(REDIRECT_TO)}`,
+      href: `/profile/personality-preference?redirect=${encodeURIComponent(redirectTo)}`,
       label: '성향 선호',
       desc: '어떤 성향의 상대와 편한지 선택합니다.',
       done: status.personality,
       Icon: HeartHandshake,
     },
     {
-      href: `/profile/schedule?redirect=${encodeURIComponent(REDIRECT_TO)}`,
+      href: `/profile/schedule?redirect=${encodeURIComponent(redirectTo)}`,
       label: '안 되는 시간',
       desc: '이번 주 만날 수 없는 시간만 눌러서 막아둡니다.',
       done: status.schedule,
       Icon: CalendarClock,
     },
     {
-      href: `/profile/preferences?redirect=${encodeURIComponent(REDIRECT_TO)}`,
+      href: `/profile/preferences?redirect=${encodeURIComponent(redirectTo)}`,
       label: '매칭 비중',
       desc: '외모, 성격, 키, 체형 중 무엇을 더 볼지 정합니다.',
       done: status.preferences,
       Icon: SlidersHorizontal,
     },
     {
-      href: `/profile/match-card?redirect=${encodeURIComponent(REDIRECT_TO)}`,
+      href: `/profile/match-card?redirect=${encodeURIComponent(redirectTo)}`,
       label: '사전 카드 초안',
       desc: '매칭 후 하루 한 장씩 공개될 내 카드 초안을 미리 적습니다.',
       done: cardDraftDone,
       Icon: StickyNote,
     },
   ]
+}
+
+function getMatchStartMode(searchParams?: { mode?: string | string[] }): MatchStartMode {
+  return searchParams?.mode === 'solo' ? 'solo' : 'group'
 }
 
 function buildDevMatchSetupProfile(cookieStore: ReturnType<typeof cookies>): MatchSetupProfile {
@@ -94,9 +105,10 @@ function getCurrentSetupState(steps: SetupStep[]) {
   }
 }
 
-function MatchStartView({ steps }: { steps: SetupStep[] }) {
+function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupStep[] }) {
   const current = getCurrentSetupState(steps)
   const currentStep = current.currentStep
+  const isSoloMode = mode === 'solo'
 
   if (!currentStep) {
     return (
@@ -107,9 +119,13 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
               <ChevronLeft size={18} />
             </Link>
             <div>
-              <h1 className="text-2xl font-black">매칭찾기 준비 완료</h1>
+              <h1 className="text-2xl font-black">
+                {isSoloMode ? '1:1 소개팅 준비 완료' : '매칭찾기 준비 완료'}
+              </h1>
               <p className="mt-0.5 text-xs text-boot-muted">
-                이제 친구와 그룹을 만들고 큐에 들어가면 됩니다.
+                {isSoloMode
+                  ? '이제 혼자 바로 소개팅 큐에 들어갈 수 있어요.'
+                  : '이제 친구와 그룹을 만들고 큐에 들어가면 됩니다.'}
               </p>
             </div>
           </header>
@@ -120,10 +136,30 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             </div>
             <h2 className="text-xl font-black">설정이 모두 끝났어요</h2>
             <p className="mt-2 text-sm leading-6 text-boot-muted">
-              성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안이 준비됐습니다.
+              {isSoloMode
+                ? '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안이 준비됐습니다. 친구 초대 없이 바로 한 명을 찾아요.'
+                : '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안이 준비됐습니다.'}
             </p>
           </section>
 
+          {isSoloMode ? (
+            <div className="space-y-3">
+              <Link
+                href="/match?mode=solo&soloStatus=in_pool"
+                className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
+              >
+                1:1 매칭 큐 들어가기
+                <ArrowRight size={18} />
+              </Link>
+              <Link
+                href="/match?mode=solo&sampleMatches=1"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
+              >
+                mock 가매칭 화면 보기
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          ) : (
           <div className="grid grid-cols-2 gap-3">
             <Link
               href="/group/create?size=2"
@@ -148,6 +184,7 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
               </span>
             </Link>
           </div>
+          )}
         </div>
       </main>
     )
@@ -163,9 +200,13 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             <ChevronLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-2xl font-black">매칭찾기 준비</h1>
+            <h1 className="text-2xl font-black">
+              {isSoloMode ? '1:1 소개팅 준비' : '매칭찾기 준비'}
+            </h1>
             <p className="mt-0.5 text-xs text-boot-muted">
-              매칭에 필요한 정보만 차례대로 확인합니다.
+              {isSoloMode
+                ? '친구 초대 없이 내 정보만 차례대로 확인합니다.'
+                : '매칭에 필요한 정보만 차례대로 확인합니다.'}
             </p>
           </div>
         </header>
@@ -176,8 +217,9 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
             매칭 찾기는 이렇게 진행돼요
           </summary>
           <p className="mt-2 text-xs leading-5 text-boot-muted">
-            내 성향, 안 되는 시간, 매칭 비중, 사전 카드 초안을 먼저 끝내고 친구 그룹을 만들어요.
-            그룹원이 준비되면 큐에 들어가고, 매칭이 잡힌 뒤 상대 카드와 오늘의 카드가 보입니다.
+            {isSoloMode
+              ? '내 성향, 안 되는 시간, 매칭 비중, 사전 카드 초안을 끝내면 1:1 큐에 들어가요. 매칭이 잡힌 뒤에만 상대 카드와 케미가 보입니다.'
+              : '내 성향, 안 되는 시간, 매칭 비중, 사전 카드 초안을 먼저 끝내고 친구 그룹을 만들어요. 그룹원이 준비되면 큐에 들어가고, 매칭이 잡힌 뒤 상대 카드와 오늘의 카드가 보입니다.'}
           </p>
         </details>
 
@@ -212,9 +254,13 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
               <UsersRound size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-black">그룹 매칭 전 설정</h2>
+              <h2 className="text-lg font-black">
+                {isSoloMode ? '1:1 소개팅 전 설정' : '그룹 매칭 전 설정'}
+              </h2>
               <p className="mt-1 text-sm leading-6 text-boot-muted">
-                내가 원하는 성향과 시간, 중요하게 보는 기준이 실제 매칭 점수에 반영됩니다.
+                {isSoloMode
+                  ? '내가 원하는 성향과 시간, 중요하게 보는 기준이 소개팅 매칭 점수에 반영됩니다.'
+                  : '내가 원하는 성향과 시간, 중요하게 보는 기준이 실제 매칭 점수에 반영됩니다.'}
               </p>
             </div>
           </div>
@@ -243,7 +289,13 @@ function MatchStartView({ steps }: { steps: SetupStep[] }) {
   )
 }
 
-export default async function MatchStartPage() {
+export default async function MatchStartPage({
+  searchParams,
+}: {
+  searchParams?: { mode?: string | string[] }
+}) {
+  const mode = getMatchStartMode(searchParams)
+  const redirectTo = mode === 'solo' ? SOLO_REDIRECT_TO : GROUP_REDIRECT_TO
   const cookieStore = cookies()
   const devAuthed =
     isDevAuthBypassEnabled() &&
@@ -254,12 +306,12 @@ export default async function MatchStartPage() {
     const cardDraftDone = isPreMatchCardDraftCookieDone(
       cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
     )
-    return <MatchStartView steps={buildSetupSteps(profile, cardDraftDone)} />
+    return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} />
   }
 
   const supabase = createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/login?redirect=${encodeURIComponent(REDIRECT_TO)}`)
+  if (!user) redirect(`/login?redirect=${encodeURIComponent(redirectTo)}`)
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -276,8 +328,8 @@ export default async function MatchStartPage() {
   const cardDraftDone =
     typeof cardDraft?.completed_items === 'number' &&
     cardDraft.completed_items >= 4
-  const steps = buildSetupSteps((profile as MatchSetupProfile | null) ?? null, cardDraftDone)
-  if (steps.every((step) => step.done)) redirect('/group/create')
+  const steps = buildSetupSteps((profile as MatchSetupProfile | null) ?? null, cardDraftDone, redirectTo)
+  if (steps.every((step) => step.done) && mode === 'group') redirect('/group/create')
 
-  return <MatchStartView steps={steps} />
+  return <MatchStartView mode={mode} steps={steps} />
 }

@@ -7,7 +7,7 @@ export function getSafeClientRedirect(fallback: string): string {
 
 export function getSequentialMatchStartRedirect(nextPath: string, fallback: string): string {
   const redirect = getSafeClientRedirect(fallback)
-  if (redirect !== '/match/start') return redirect
-  return `${nextPath}?redirect=${encodeURIComponent('/match/start')}`
+  if (!redirect.startsWith('/match/start')) return redirect
+  return `${nextPath}?redirect=${encodeURIComponent(redirect)}`
 }
 

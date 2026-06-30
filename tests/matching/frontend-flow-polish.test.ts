@@ -14,8 +14,8 @@ test('match setup pages continue directly to the next setup step from match star
   const preferencesPage = readSource('app/profile/preferences/page.tsx')
 
   assert.match(redirectHelper, /function getSequentialMatchStartRedirect/)
-  assert.match(redirectHelper, /redirect !== '\/match\/start'/)
-  assert.match(redirectHelper, /encodeURIComponent\('\/match\/start'\)/)
+  assert.match(redirectHelper, /!redirect\.startsWith\('\/match\/start'\)/)
+  assert.match(redirectHelper, /encodeURIComponent\(redirect\)/)
   assert.match(personalityPage, /getSequentialMatchStartRedirect\('\/profile\/schedule'/)
   assert.match(schedulePage, /getSequentialMatchStartRedirect\('\/profile\/preferences'/)
   assert.match(preferencesPage, /getSequentialMatchStartRedirect\('\/profile\/match-card'/)
@@ -60,7 +60,7 @@ test('match hub renders opponent cards only after match results exist', () => {
   assert.match(matchPage, /\{loading \? \(/)
   assert.match(matchPage, /: hasMatchResults \? \(/)
   assert.match(matchPage, /hasStartedMatching && !hasMatchResults/)
-  assert.match(matchPage, /<MatchSearchingPrivacyCard \/>/)
+  assert.match(matchPage, /<MatchSearchingPrivacyCard mode=\{matchMode\} \/>/)
   assert.match(matchPage, /상대 카드는 매칭 후에 열려요/)
   assert.match(matchPage, /!loading && !hasStartedMatching && \(/)
   assert.doesNotMatch(matchPage, /title=\{matches\.length > 0 \?/)
@@ -80,6 +80,10 @@ test('home routes the main matching CTA through the matching hub', () => {
 test('matching pool uses circular queue visuals instead of horizontal bars', () => {
   const matchingPool = readSource('components/MatchingPool.tsx')
 
+  assert.match(matchingPool, /1:1 소개팅 매치/)
+  assert.match(matchingPool, /href="\/match\/start\?mode=solo"/)
+  assert.match(matchingPool, /남자 대기자/)
+  assert.match(matchingPool, /여자 대기자/)
   assert.match(matchingPool, /function QueueCircleCard/)
   assert.match(matchingPool, /buildRingGradient/)
   assert.match(matchingPool, /conic-gradient/)
@@ -89,6 +93,28 @@ test('matching pool uses circular queue visuals instead of horizontal bars', () 
   assert.doesNotMatch(matchingPool, /maleWidth|femaleWidth|mixedWidth/)
   assert.doesNotMatch(matchingPool, /className="absolute h-2\.5 w-2\.5 rounded-full border border-white bg-boot-primary/)
   assert.doesNotMatch(matchingPool, /bg-rose-200|bg-amber-200|bg-sky-200/)
+})
+
+test('solo introduction flow is separate from group creation', () => {
+  const matchPage = readSource('app/match/page.tsx')
+  const matchStartPage = readSource('app/match/start/page.tsx')
+
+  assert.match(matchPage, /mode'\) === 'solo'/)
+  assert.match(matchPage, /soloStatus'\) === 'in_pool'/)
+  assert.match(matchPage, /DEV_SOLO_MATCHES/)
+  assert.match(matchPage, /href="\/match\/start\?mode=solo"/)
+  assert.match(matchPage, /혼자 바로 매칭받기/)
+  assert.match(matchPage, /<MatchSearchingPrivacyCard mode=\{matchMode\} \/>/)
+  assert.match(matchPage, /소개팅 상대 후보/)
+  assert.match(matchPage, /1:1 소개팅 상대가 도착했어요/)
+  assert.match(matchPage, /상대 카드는 매칭 후에 열려요/)
+
+  assert.match(matchStartPage, /type MatchStartMode = 'group' \| 'solo'/)
+  assert.match(matchStartPage, /SOLO_REDIRECT_TO = '\/match\/start\?mode=solo'/)
+  assert.match(matchStartPage, /1:1 소개팅 준비 완료/)
+  assert.match(matchStartPage, /href="\/match\?mode=solo&soloStatus=in_pool"/)
+  assert.match(matchStartPage, /href="\/match\?mode=solo&sampleMatches=1"/)
+  assert.match(matchStartPage, /if \(steps\.every\(\(step\) => step\.done\) && mode === 'group'\) redirect\('\/group\/create'\)/)
 })
 
 test('home info modal explains the whole app flow with visual cards', () => {

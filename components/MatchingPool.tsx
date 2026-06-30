@@ -2,12 +2,16 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { CalendarClock, LockKeyhole, ShieldCheck, Users } from 'lucide-react'
+import { CalendarClock, Heart, LockKeyhole, ShieldCheck, UserRound, Users } from 'lucide-react'
 
 export interface PoolStats {
   female: number
   male: number
   mixed: number
+  solo?: {
+    female: number
+    male: number
+  }
   bySize?: {
     '2': { female: number; male: number; mixed: number }
     '3': { female: number; male: number; mixed: number }
@@ -34,6 +38,10 @@ const FALLBACK_STATS: PoolStats = {
   female: 0,
   male: 0,
   mixed: 0,
+  solo: {
+    female: 0,
+    male: 0,
+  },
   bySize: {
     '2': { female: 0, male: 0, mixed: 0 },
     '3': { female: 0, male: 0, mixed: 0 },
@@ -64,6 +72,8 @@ export default function MatchingPool({ stats, className = '' }: Props) {
   }, [target.female, target.male, target.mixed])
 
   const totalGroups = displayed.female + displayed.male + displayed.mixed
+  const soloStats = target.solo ?? { female: 0, male: 0 }
+  const totalSoloUsers = soloStats.female + soloStats.male
 
   const queueRows = useMemo<QueueRow[]>(() => {
     const bySize = target.bySize
@@ -108,6 +118,8 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         </div>
       </div>
 
+      <SoloIntroCard female={soloStats.female} male={soloStats.male} total={totalSoloUsers} />
+
       <div className="mb-4 rounded-[30px] border border-boot-hairline bg-white p-4 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -146,6 +158,83 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         <LockKeyhole size={12} />
         대기 숫자는 그룹 단위 기준입니다.
       </div>
+    </div>
+  )
+}
+
+function SoloIntroCard({
+  female,
+  male,
+  total,
+}: {
+  female: number
+  male: number
+  total: number
+}) {
+  const maleEnd = total > 0 ? (male / total) * 360 : 0
+
+  return (
+    <div className="mb-4 overflow-hidden rounded-[30px] border border-boot-primary/20 bg-white shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+      <div className="relative p-4">
+        <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-boot-primary/12 blur-2xl" />
+        <div className="relative flex items-start gap-4">
+          <div
+            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full p-[9px] shadow-[0_16px_30px_rgba(255,79,105,0.18)]"
+            style={{
+              background: total > 0
+                ? `conic-gradient(#93d8f2 0deg ${maleEnd}deg, #ff8fa2 ${maleEnd}deg 360deg)`
+                : 'conic-gradient(#f8f1ec 0deg 360deg)',
+            }}
+          >
+            <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white text-center">
+              <Heart size={17} className="text-boot-primary" fill="currentColor" />
+              <span className="mt-1 text-2xl font-black tabular-nums text-boot-ink">{total}</span>
+              <span className="text-[10px] font-bold text-boot-muted">대기자</span>
+            </div>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+              Solo Match
+            </p>
+            <h3 className="mt-1 text-xl font-black leading-tight text-boot-ink">1:1 소개팅 매치</h3>
+            <p className="mt-1 text-xs leading-5 text-boot-muted">
+              친구를 모으지 않아도 혼자 신청할 수 있어요. 내 성향, 시간, 비중, 사전 카드만 준비하면 조건이 맞는 한 명을 찾아요.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <SoloStat label="남자 대기자" value={male} tone="sky" />
+              <SoloStat label="여자 대기자" value={female} tone="rose" />
+            </div>
+          </div>
+        </div>
+        <Link
+          href="/match/start?mode=solo"
+          className="relative mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-boot-ink text-sm font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
+        >
+          1:1 소개팅 시작하기
+          <UserRound size={16} />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+function SoloStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: number
+  tone: 'sky' | 'rose'
+}) {
+  const toneClass = tone === 'sky'
+    ? 'border-sky-100 bg-sky-50 text-sky-600'
+    : 'border-rose-100 bg-rose-50 text-boot-primary'
+
+  return (
+    <div className={`rounded-2xl border px-3 py-2 ${toneClass}`}>
+      <p className="text-lg font-black tabular-nums">{value}명</p>
+      <p className="mt-0.5 text-[10px] font-bold opacity-75">{label}</p>
     </div>
   )
 }

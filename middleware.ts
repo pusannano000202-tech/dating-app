@@ -7,6 +7,11 @@ import { getSupabasePublicKey, getSupabaseUrl, isSupabaseConfigured } from './li
 const PROTECTED_PREFIXES = ['/profile', '/group', '/match', '/friends', '/notifications', '/admin']
 const DEV_AUTH_MAX_AGE = 60 * 60 * 24 * 7
 
+function isLocalDevRequest(request: NextRequest): boolean {
+  const hostname = request.nextUrl.hostname
+  return process.env.NODE_ENV !== 'production' && (hostname === 'localhost' || hostname === '127.0.0.1')
+}
+
 function setDevAuthCookie(response: NextResponse): void {
   response.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue(), {
     path: '/',
@@ -19,9 +24,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
   const canBypassAuth = isDevAuthBypassEnabled()
+  const shouldAutoIssueLocalDevAuth =
+    canBypassAuth &&
+    isProtected &&
+    isLocalDevRequest(request)
   const shouldIssueDevAuth =
     canBypassAuth &&
-    pathname.startsWith('/dev/preview')
+    (pathname.startsWith('/dev/preview') || shouldAutoIssueLocalDevAuth)
 
   if (shouldIssueDevAuth) {
     request.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue())
