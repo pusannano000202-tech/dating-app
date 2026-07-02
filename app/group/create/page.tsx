@@ -463,11 +463,11 @@ export default function GroupCreatePage() {
     if (!group || saving || !canCancelQueue) return
 
     if (isDevPreview) {
-      setDevPreviewGroupStatus('forming')
+      setDevPreviewGroupStatus('ready')
       setDevPreviewGroupSize(capacity)
       setState((current) => ({
         ...current,
-        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+        group: current.group ? { ...current.group, status: 'ready' } : current.group,
       }))
       return
     }
@@ -614,9 +614,38 @@ export default function GroupCreatePage() {
         <GroupHeader />
 
         {loading ? (
-          <section className="glass rounded-3xl p-5 flex items-center gap-3 text-sm text-boot-muted">
-            <Loader2 size={18} className="animate-spin" />
-            그룹 정보를 준비하는 중
+          <section className="glass-card rounded-3xl p-5">
+            <div className="mb-4 flex items-center gap-3 text-sm font-bold text-boot-muted">
+              <Loader2 size={18} className="animate-spin text-boot-primary" />
+              그룹 정보를 준비하는 중
+            </div>
+
+            <div className="rounded-3xl border border-boot-primary/15 bg-white/85 p-4">
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black text-boot-primary">현재 함께하는 친구</p>
+                  <p className="mt-1 text-sm leading-5 text-boot-muted">
+                    친구 초대와 준비 상태를 불러오고 있어요.
+                  </p>
+                </div>
+                <div className="h-10 w-10 rounded-2xl bg-boot-soft" />
+              </div>
+
+              <div className="space-y-2">
+                {Array.from({ length: capacity }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex min-h-14 items-center gap-3 rounded-2xl border border-boot-hairline bg-white/80 px-3"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-boot-soft" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-2.5 w-24 rounded-full bg-boot-soft" />
+                      <div className="h-2 w-32 rounded-full bg-boot-soft/70" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </section>
         ) : (
           <>

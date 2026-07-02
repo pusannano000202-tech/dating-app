@@ -2,7 +2,19 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Bell, CheckCheck, ChevronLeft, ChevronRight, Heart, Loader2, MessageSquareText, PartyPopper, Phone, Users } from 'lucide-react'
+import {
+  Bell,
+  CheckCheck,
+  ChevronLeft,
+  ChevronRight,
+  Gift,
+  Heart,
+  Loader2,
+  MessageSquareText,
+  PartyPopper,
+  Phone,
+  Users,
+} from 'lucide-react'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 
 interface NotificationRow {
@@ -15,14 +27,25 @@ interface NotificationRow {
 
 const DEV_NOTIFICATIONS: NotificationRow[] = [
   {
+    id: 'dev-notification-solo-match-created',
+    kind: 'match_created',
+    payload: {
+      match_id: 'dev-solo-match-pending',
+      match_mode: 'solo',
+      opp_group_size: 1,
+      opp_group_gender: 'female',
+    },
+    read_at: null,
+    created_at: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+  },
+  {
     id: 'dev-notification-match-created',
     kind: 'match_created',
     payload: {
       match_id: 'dev-match-pending',
+      match_mode: 'group',
       opp_group_size: 3,
       opp_group_gender: 'female',
-      opp_school: '부산대학교',
-      opp_department: '경영학과',
     },
     read_at: null,
     created_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
@@ -32,6 +55,7 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
     kind: 'match_confirmed',
     payload: {
       match_id: 'dev-match-1',
+      match_mode: 'group',
       opp_group_size: 2,
       opp_group_gender: 'male',
       opp_school: '부산대학교',
@@ -39,6 +63,16 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
     },
     read_at: null,
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+  },
+  {
+    id: 'dev-notification-daily-card',
+    kind: 'daily_card_available',
+    payload: {
+      match_id: 'dev-match-1',
+      reveal_window: '16:00-20:00',
+    },
+    read_at: null,
+    created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
   {
     id: 'dev-notification-meeting-reminder',
@@ -100,7 +134,11 @@ export default function NotificationsPage() {
         setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? now })))
         return
       }
-      await fetch('/api/notifications/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+      await fetch('/api/notifications/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
       await refresh()
     } finally {
       setBusy(false)
@@ -120,7 +158,7 @@ export default function NotificationsPage() {
       })
       setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: n.read_at ?? new Date().toISOString() } : n)))
     } catch {
-      // ignore
+      // 알림 읽음 실패는 화면 진행을 막지 않는다.
     }
   }
 
@@ -200,6 +238,7 @@ function MatchNotificationCard({
   onClick: () => void
 }) {
   const isMatchArrival = notification.kind === 'match_created'
+  const isSolo = isSoloMatchNotification(notification.payload)
 
   return (
     <Link
@@ -221,7 +260,7 @@ function MatchNotificationCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate text-base font-black">{kindLabel(notification.kind)}</p>
+            <p className="truncate text-base font-black">{kindLabel(notification.kind, isSolo)}</p>
             {unread && <span className="h-2 w-2 flex-shrink-0 rounded-full bg-boot-primary" />}
           </div>
           <p className="mt-1 text-xs leading-5 text-boot-muted">{kindSummary(notification.kind, notification.payload)}</p>
@@ -229,8 +268,8 @@ function MatchNotificationCard({
           {isMatchArrival && (
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
               <CardChip label="상태" value="가매칭 도착" />
-              <CardChip label="상대 그룹" value="상세는 확정 후 공개" />
-              <CardChip label="내가 할 일" value="사전 힌트 작성" />
+              <CardChip label={isSolo ? '상대' : '상대 정보'} value="상세는 확정 후 공개" />
+              <CardChip label="내가 할 일" value="사전 카드 작성" />
               <CardChip label="다음 단계" value="보증금 결제 후 확정" />
             </div>
           )}
@@ -257,50 +296,72 @@ function CardChip({ label, value }: { label: string; value: string }) {
   )
 }
 
+function isSoloMatchNotification(payload: Record<string, unknown>): boolean {
+  if (payload?.match_mode === 'solo') return true
+  if (payload?.opp_group_size === 1) return true
+  if (payload?.opponent_group_size === 1) return true
+  if (payload?.group_size === 1) return true
+  return false
+}
+
 function KindIcon({ kind }: { kind: string }) {
   switch (kind) {
-    case 'match_created':   return <Users size={18} />
+    case 'match_created': return <Users size={18} />
     case 'match_confirmed': return <PartyPopper size={18} />
+    case 'daily_card_available': return <Gift size={18} />
     case 'match_completed': return <CheckCheck size={18} />
-    case 'phone_revealed':  return <Phone size={18} />
-    case 'review_request':  return <MessageSquareText size={18} />
+    case 'phone_revealed': return <Phone size={18} />
+    case 'review_request': return <MessageSquareText size={18} />
     case 'friend_request_received': return <Heart size={18} />
     case 'meeting_reminder': return <Bell size={18} />
-    default:                  return <Bell size={18} />
+    default: return <Bell size={18} />
   }
 }
 
-function kindLabel(kind: string): string {
+function kindLabel(kind: string, isSolo = false): string {
+  if (kind === 'daily_card_available') return '오늘의 데일리카드를 열어보세요!'
   switch (kind) {
-    case 'match_created':   return '새 가매칭이 도착했어요!'
+    case 'match_created': return isSolo ? '1:1 가매칭이 도착했어요!' : '새 가매칭이 도착했어요!'
     case 'match_confirmed': return '매칭이 확정되었습니다. 축하합니다!'
-    case 'match_completed': return '만남이 완료됐어요'
-    case 'phone_revealed':  return '상대 핸드폰이 공개됐어요'
-    case 'review_request':  return '평가를 작성해주세요'
+    case 'match_completed': return '만남이 완료되었어요'
+    case 'phone_revealed': return '상대 연락처가 공개됐어요'
+    case 'review_request': return '평가를 작성해주세요'
     case 'friend_request_received': return '친구 요청이 도착했어요'
     case 'meeting_reminder': return '약속이 다가오고 있어요'
-    case 'continuation_choice_request': return '이 만남, 이어가실래요?'
-    case 'both_continue':   return '양쪽 모두 이어가기 선택'
+    case 'continuation_choice_request': return '이 만남, 이어갈래요?'
+    case 'both_continue': return '양쪽 모두 이어가기 선택'
     case 'partner_paid_zero': return '보증금 정산'
     case 'refund_processed': return '환불 완료'
     case 'attendance_confirmed': return '출석 확인됨'
     case 'no_show_confirmed': return '노쇼 확정'
-    default:                  return '알림'
+    default: return '알림'
   }
 }
 
 function kindSummary(kind: string, payload: Record<string, unknown>): string {
+  if (kind === 'daily_card_available') {
+    return '16시부터 20시 사이에 하루 한 장을 직접 열 수 있어요. 내가 열어야 상대 힌트가 보여요.'
+  }
+
   switch (kind) {
     case 'match_created':
-      return '상대팀 상세는 확정 후 열려요. 먼저 사전 힌트와 보증금을 확인해주세요.'
-    case 'match_confirmed': return '약속 정보와 오늘의 카드를 확인하세요.'
-    case 'match_completed': return '평가 작성 + 핸드폰 자동 공개.'
-    case 'phone_revealed':  return '약속 시간이 되어 상대 핸드폰이 공개됐어요.'
-    case 'review_request':  return '5점 별점 + 이슈 chip + 코멘트.'
-    case 'friend_request_received': return '받은 요청을 친구 목록에서 확인하세요.'
-    case 'meeting_reminder': return '오늘 만남 시간과 장소를 다시 확인해주세요.'
-    case 'continuation_choice_request': return '이어갈지 선택해주세요. 둘 다 이어가면 보증금 정산 화면이 열려요.'
-    case 'both_continue': return '양쪽 모두 이어가기를 선택했어요. 환불/정산을 진행해주세요.'
+      return '상대 상세는 확정 후 열려요. 먼저 사전 카드와 보증금을 확인해주세요.'
+    case 'match_confirmed':
+      return '약속 정보와 오늘의 카드를 확인하세요.'
+    case 'match_completed':
+      return '평가 작성과 환불 정산으로 이어져요.'
+    case 'phone_revealed':
+      return '약속 시간이 가까워져 상대 연락처가 공개됐어요.'
+    case 'review_request':
+      return '5점 별점과 한 줄 후기를 남겨주세요.'
+    case 'friend_request_received':
+      return '받은 요청을 친구 목록에서 확인하세요.'
+    case 'meeting_reminder':
+      return '오늘 만남 시간과 장소를 다시 확인해주세요.'
+    case 'continuation_choice_request':
+      return '이어갈지 선택해주세요. 둘 다 이어가면 정산 화면이 열려요.'
+    case 'both_continue':
+      return '양쪽 모두 이어가기를 선택했어요. 환불/정산을 진행해주세요.'
     case 'partner_paid_zero': {
       const reasons = Array.isArray(payload?.reasons) ? payload.reasons.join(', ') : ''
       return reasons ? `사유: ${reasons}` : '상대가 앱 기여금을 0원으로 선택했어요.'
@@ -313,12 +374,13 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
       const pool = typeof payload?.forfeited_pool === 'number' ? payload.forfeited_pool : 0
       const ns = typeof payload?.no_show_count === 'number' ? payload.no_show_count : 0
       return ns > 0
-        ? `노쇼 ${ns}명. ${pool.toLocaleString()}원 분배 받음.`
+        ? `노쇼 ${ns}명, ${pool.toLocaleString()}원 분배 받음.`
         : '양쪽 모두 출석 확인.'
     }
     case 'no_show_confirmed':
-      return '약속 장소에 안 나타난 기록이 남았어요. 보증금 환불이 제한되고 보증금이 몰수될 수 있어요.'
-    default:                  return ''
+      return '약속 장소에 오지 않은 기록이 남았어요. 보증금 환불이 제한될 수 있어요.'
+    default:
+      return ''
   }
 }
 

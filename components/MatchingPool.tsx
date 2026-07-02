@@ -29,6 +29,14 @@ export interface PoolStats {
 interface Props {
   stats?: PoolStats
   className?: string
+  mode?: 'group' | 'solo'
+  soloDisabled?: boolean
+  soloQueueActive?: boolean
+  soloCanceling?: boolean
+  onCancelSoloQueue?: () => void
+  soloResultHref?: string
+  groupQueueActive?: boolean
+  activeGroupSize?: 2 | 3
 }
 
 type QueueTone = 'sky' | 'rose' | 'amber'
@@ -57,9 +65,22 @@ const FALLBACK_STATS: PoolStats = {
   },
 }
 
-export default function MatchingPool({ stats, className = '' }: Props) {
+export default function MatchingPool({
+  stats,
+  className = '',
+  mode = 'group',
+  soloDisabled = false,
+  soloQueueActive = false,
+  soloCanceling = false,
+  onCancelSoloQueue,
+  soloResultHref,
+  groupQueueActive = false,
+  activeGroupSize,
+}: Props) {
   const target = stats ?? FALLBACK_STATS
   const [displayed, setDisplayed] = useState({ female: 0, male: 0, mixed: 0 })
+  const showSoloPool = mode === 'solo'
+  const showGroupPool = mode === 'group'
 
   useEffect(() => {
     const duration = 900
@@ -116,12 +137,18 @@ export default function MatchingPool({ stats, className = '' }: Props) {
     <div className={`w-full ${className}`}>
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-boot-primary">
-            Weekly Queue
+          <p className="text-xs font-black tracking-[0.18em] text-boot-primary">
+            이번 주 대기 현황
           </p>
-          <h2 className="mt-2 text-xl font-black text-boot-ink">이번 주 매칭 대기</h2>
+          <h2 className="mt-2 text-xl font-black text-boot-ink">
+            {showSoloPool ? '이번 주 소개팅 대기' : groupQueueActive ? '현재 과팅 매칭대기' : '이번 주 과팅 대기'}
+          </h2>
           <p className="mt-1 text-xs text-boot-muted">
-            토요일 14:00에 조건이 맞는 사람끼리 자동 배정돼요.
+            {showSoloPool
+              ? '혼자 신청한 사람 중 조건이 맞는 한 명을 찾아요.'
+              : groupQueueActive
+                ? '이미 큐에 들어가 있어요. 시작 버튼 대신 현재 대기 규모만 보여드릴게요.'
+              : '토요일 14:00에 조건이 맞는 그룹끼리 자동 배정돼요.'}
           </p>
         </div>
         <div className="flex h-11 w-11 items-center justify-center rounded-full border border-boot-hairline bg-boot-soft text-boot-primary">
@@ -129,36 +156,56 @@ export default function MatchingPool({ stats, className = '' }: Props) {
         </div>
       </div>
 
-      <SoloIntroCard female={soloStats.female} male={soloStats.male} total={totalSoloUsers} />
+      {showSoloPool && (
+        <SoloIntroCard
+          female={soloStats.female}
+          male={soloStats.male}
+          total={totalSoloUsers}
+          disabled={soloDisabled}
+          active={soloQueueActive}
+          canceling={soloCanceling}
+          onCancel={onCancelSoloQueue}
+          resultHref={soloResultHref}
+        />
+      )}
 
-      <div className="grid gap-4">
-        {queueRows.map((row) => (
-          <QueueCircleCard key={row.label} row={row} />
-        ))}
-      </div>
+      {showGroupPool && (
+        <>
+          <div className="grid gap-4">
+            {queueRows.map((row) => (
+              <QueueCircleCard
+                key={row.label}
+                row={row}
+                hideStartAction={groupQueueActive}
+                active={activeGroupSize === row.size}
+              />
+            ))}
+          </div>
 
-      <div className="mt-4 grid grid-cols-4 gap-2">
-        <StatBox value={displayed.male} label="남자 그룹" tone="text-sky-600" />
-        <StatBox value={displayed.female} label="여자 그룹" tone="text-boot-primary" />
-        <StatBox value={displayed.mixed} label="혼성 그룹" tone="text-amber-600" />
-        <StatBox value="2~3" label="그룹 인원" tone="text-amber-600" />
-      </div>
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            <StatBox value={displayed.male} label="남자 그룹" tone="text-sky-600" />
+            <StatBox value={displayed.female} label="여자 그룹" tone="text-boot-primary" />
+            <StatBox value={displayed.mixed} label="혼성 그룹" tone="text-amber-600" />
+            <StatBox value="2~3" label="그룹 인원" tone="text-amber-600" />
+          </div>
 
-      <div className="mt-4 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-        <ShieldCheck size={17} className="mt-0.5 flex-shrink-0 text-emerald-600" />
-        <div>
-          <p className="text-xs font-black text-emerald-700">혼성 그룹도 가능해요</p>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
-            친구 성별이 섞인 그룹도 만들 수 있어요. 대기 통계는 남자팀, 여자팀,
-            혼성팀으로 나누고 2:2와 3:3은 같은 인원 규모끼리 매칭돼요.
-          </p>
-        </div>
-      </div>
+          <div className="mt-4 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+            <ShieldCheck size={17} className="mt-0.5 flex-shrink-0 text-emerald-600" />
+            <div>
+              <p className="text-xs font-black text-emerald-700">혼성 그룹도 가능해요</p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
+                친구 성별이 섞인 그룹도 만들 수 있어요. 대기 통계는 남자팀, 여자팀,
+                혼성팀으로 나누고 2:2와 3:3은 같은 인원 규모끼리 매칭돼요.
+              </p>
+            </div>
+          </div>
 
-      <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-boot-muted">
-        <LockKeyhole size={12} />
-        대기 숫자는 그룹 단위 기준입니다.
-      </div>
+          <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-boot-muted">
+            <LockKeyhole size={12} />
+            대기 숫자는 그룹 단위 기준입니다.
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -167,12 +214,34 @@ function SoloIntroCard({
   female,
   male,
   total,
+  disabled,
+  active,
+  canceling,
+  onCancel,
+  resultHref,
 }: {
   female: number
   male: number
   total: number
+  disabled: boolean
+  active: boolean
+  canceling: boolean
+  onCancel?: () => void
+  resultHref?: string
 }) {
   const maleEnd = total > 0 ? (male / total) * 360 : 0
+  const hasResult = Boolean(resultHref)
+  const eyebrow = active ? '소개팅 진행 상태' : '소개팅 큐'
+  const headline = active
+    ? hasResult
+      ? '1:1 가매칭이 도착했어요'
+      : '1:1 상대를 찾는 중이에요'
+    : '1:1 소개팅 매치'
+  const description = active
+    ? hasResult
+      ? '상대가 잡혔어요. 이제 사전 카드와 보증금으로 만남 확정 준비를 이어가요.'
+      : '이미 큐에 들어가 있어요. 조건이 맞는 상대가 잡히면 알림과 가매칭 카드가 열립니다.'
+    : '친구를 모으지 않아도 혼자 신청할 수 있어요. 내 성향, 시간, 비중, 사전 카드만 준비하면 조건이 맞는 한 명을 찾아요.'
 
   return (
     <div className="mb-4 overflow-hidden rounded-[30px] border border-boot-primary/20 bg-white shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
@@ -190,15 +259,14 @@ function SoloIntroCard({
             badge={<Heart size={17} className="text-boot-primary" fill="currentColor" />}
           />
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
-              Solo Match
+            <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">
+              {eyebrow}
             </p>
             <h3 className="mt-1 text-xl font-black leading-tight text-boot-ink">
-              1:1 소개팅 매치
+              {headline}
             </h3>
             <p className="mt-1 text-xs leading-5 text-boot-muted">
-              친구를 모으지 않아도 혼자 신청할 수 있어요. 내 성향, 시간, 비중,
-              사전 카드만 준비하면 조건이 맞는 한 명을 찾아요.
+              {description}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <QueueStat label="남자 대기자" value={`${male}명`} tone="sky" />
@@ -206,19 +274,60 @@ function SoloIntroCard({
             </div>
           </div>
         </div>
-        <Link
-          href="/match/start?mode=solo"
-          className="relative mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-boot-ink text-sm font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
-        >
-          1:1 소개팅 시작하기
-          <UserRound size={16} />
-        </Link>
+        {active ? (
+          <div className="relative mt-4 grid gap-2 rounded-2xl border border-emerald-400/25 bg-emerald-50 px-4 py-3">
+            <p className="text-sm font-black text-emerald-700">
+              {hasResult ? '보증금과 사전 카드로 확정 준비' : '시작은 끝났고, 이제 기다리는 단계예요'}
+            </p>
+            <p className="text-xs leading-5 text-boot-muted">
+              {hasResult
+                ? '상대 상세는 아직 잠겨 있어요. 보증금과 사전 카드를 끝내면 확정 단계로 넘어갑니다.'
+                : '조건이 맞는 상대가 잡히면 알림으로 알려드리고, 그때 보증금과 사전 카드 단계로 넘어가요.'}
+            </p>
+            <Link
+              href={resultHref ?? '/notifications'}
+              className="inline-flex h-10 items-center justify-center rounded-full bg-white px-4 text-xs font-black text-emerald-700 shadow-sm"
+            >
+              {hasResult ? '가매칭 준비 이어가기' : '알림 확인하기'}
+            </Link>
+            {!hasResult && onCancel && (
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={canceling}
+                className="inline-flex h-10 items-center justify-center rounded-full border border-boot-primary/25 bg-white px-4 text-xs font-black text-boot-primary shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {canceling ? '취소하는 중...' : '매칭 취소하기'}
+              </button>
+            )}
+          </div>
+        ) : disabled ? (
+          <div className="relative mt-4 rounded-2xl border border-boot-primary/20 bg-boot-soft px-4 py-3 text-center text-xs font-bold leading-5 text-boot-primary">
+            과팅 진행 중에는 소개팅을 잠시 막아둘게요. 먼저 진행 중인 과팅을 마무리해 주세요.
+          </div>
+        ) : (
+          <Link
+            href="/match/start?mode=solo"
+            className="relative mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-boot-ink text-sm font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
+          >
+            1:1 소개팅 시작하기
+            <UserRound size={16} />
+          </Link>
+        )}
       </div>
     </div>
   )
 }
 
-function QueueCircleCard({ row }: { row: QueueRow }) {
+function QueueCircleCard({
+  row,
+  hideStartAction = false,
+  active = false,
+}: {
+  row: QueueRow
+  hideStartAction?: boolean
+  active?: boolean
+}) {
   const totalTeams = row.male + row.female + row.mixed
   const totalPeople = totalTeams * row.size
   const malePeople = row.male * row.size
@@ -242,8 +351,8 @@ function QueueCircleCard({ row }: { row: QueueRow }) {
           />
 
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
-              Group Match
+            <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">
+              과팅 큐
             </p>
             <div className="mt-1 flex items-start justify-between gap-2">
               <h3 className="min-w-0 text-xl font-black leading-tight text-boot-ink">
@@ -262,19 +371,44 @@ function QueueCircleCard({ row }: { row: QueueRow }) {
           </div>
         </div>
 
-        <Link
-          href={`/group/create?size=${row.size}`}
-          className="relative mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-boot-ink text-sm font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
-        >
-          {row.size}:{row.size} 그룹으로 시작하기
-          <ChevronRight size={17} />
-        </Link>
+        <QueueCardAction row={row} hideStartAction={hideStartAction} active={active} />
 
         <p className="mt-2 text-center text-[10px] font-bold text-boot-muted">
           총 {totalPeople}명이 같은 규모 매칭을 기다리는 중이에요.
         </p>
       </div>
     </div>
+  )
+}
+
+function QueueCardAction({
+  row,
+  hideStartAction,
+  active,
+}: {
+  row: QueueRow
+  hideStartAction: boolean
+  active: boolean
+}) {
+  return hideStartAction ? (
+    <div
+      className={[
+        'relative mt-4 flex h-12 items-center justify-center rounded-full px-4 text-sm font-black',
+        active
+          ? 'bg-boot-ink text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]'
+          : 'border border-boot-hairline bg-boot-soft text-boot-muted',
+      ].join(' ')}
+    >
+      {active ? '현재 들어간 큐' : '다른 규모 큐는 대기 현황만 볼 수 있어요'}
+    </div>
+  ) : (
+    <Link
+      href={`/group/create?size=${row.size}`}
+      className="relative mt-4 flex h-12 items-center justify-center gap-2 rounded-full bg-boot-ink text-sm font-black text-white shadow-[0_12px_24px_rgba(23,20,18,0.16)]"
+    >
+      {row.size}:{row.size} 그룹으로 시작하기
+      <ChevronRight size={17} />
+    </Link>
   )
 }
 

@@ -7,6 +7,7 @@ type DepositPaymentPanelProps = {
   totalCount: number
   saving: boolean
   disabled?: boolean
+  mode?: 'group' | 'solo'
   onPay: () => void
 }
 
@@ -16,6 +17,7 @@ export default function DepositPaymentPanel({
   totalCount,
   saving,
   disabled = false,
+  mode = 'group',
   onPay,
 }: DepositPaymentPanelProps) {
   const [mockReviewOpen, setMockReviewOpen] = useState(false)
@@ -23,10 +25,11 @@ export default function DepositPaymentPanel({
   const tossClientReady = Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
   const paid = totalCount > 0 && paidCount >= totalCount
   const isToss = provider === 'toss'
+  const isSolo = mode === 'solo'
   const providerLabel = isToss ? 'Toss sandbox' : '로컬 mock'
-  const providerTone = isToss && tossClientReady ? '준비됨' : isToss ? '키 설정 필요' : '검토용'
+  const providerTone = isToss && tossClientReady ? '준비됨' : isToss ? '설정 필요' : '검토용'
   const primaryLabel = paid
-    ? '우리 그룹 보증금 완료'
+    ? isSolo ? '내 보증금 완료' : '우리 그룹 보증금 완료'
     : isToss
       ? 'Toss sandbox 결제하기'
       : mockReviewOpen
@@ -52,7 +55,7 @@ export default function DepositPaymentPanel({
             </p>
             <h3 className="mt-2 text-xl font-black text-boot-ink">보증금으로 매칭 확정하기</h3>
             <p className="mt-2 text-xs leading-relaxed text-boot-muted">
-              노쇼를 막기 위한 1인 보증금이에요. 정상 만남이 끝나면 환불 단계로 넘어갑니다.
+              매칭이 잡힌 뒤에만 내는 1인 보증금이에요. 정상 만남이 끝나면 환불 단계로 넘어갑니다.
             </p>
           </div>
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-ink text-white shadow-[0_12px_28px_rgba(23,20,18,0.22)]">
@@ -62,7 +65,7 @@ export default function DepositPaymentPanel({
 
         <div className="grid grid-cols-2 gap-2">
           <InfoTile label="보증금" value={`${amount.toLocaleString('ko-KR')}원`} />
-          <InfoTile label="그룹 결제" value={`${paidCount}/${totalCount}명`} />
+          <InfoTile label={isSolo ? '내 결제' : '그룹 결제'} value={`${paidCount}/${totalCount}명`} />
         </div>
 
         <div className="mt-3 rounded-2xl border border-boot-hairline bg-white/80 px-3 py-3">
@@ -74,8 +77,8 @@ export default function DepositPaymentPanel({
           </div>
           <p className="text-[11px] leading-relaxed text-boot-muted">
             {isToss
-              ? '공개 키는 브라우저에서 확인하고, 비밀 키와 환불용 내부 키는 서버에서만 확인합니다.'
-              : '지금은 실제 돈이 나가지 않는 로컬 검토 모드예요. Toss sandbox 키가 들어오면 같은 버튼에서 결제창으로 이어집니다.'}
+              ? '공개 키는 브라우저에서 확인하고, 비밀 키와 환불 처리는 서버에서만 확인합니다.'
+              : '지금은 실제 돈이 나가지 않는 로컬 검토 모드예요. Toss sandbox 키가 들어오면 같은 위치에서 결제창으로 이어집니다.'}
           </p>
         </div>
       </div>
@@ -84,7 +87,9 @@ export default function DepositPaymentPanel({
         <StepRow
           icon={<ShieldCheck size={15} />}
           title="결제 후 공개"
-          desc="상대팀 이름, 자세한 약속 정보, 연락처는 확정 단계에서 순서대로 열려요."
+          desc={isSolo
+            ? '상대 이름, 자세한 약속 정보, 연락처는 확정 단계에서 순서대로 열려요.'
+            : '상대팀 이름, 자세한 약속 정보, 연락처는 확정 단계에서 순서대로 열려요.'}
           done={paid}
         />
         <StepRow
@@ -108,7 +113,8 @@ export default function DepositPaymentPanel({
               </span>
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-boot-muted">
-              실제 돈은 나가지 않아요. 내일 시연에서는 이 확인 단계로 보증금을 냈다는 흐름을 보여주고, 실제 운영 전에는 Toss sandbox/운영키로 같은 위치를 연결하면 됩니다.
+              실제 돈은 나가지 않아요. 내일 시연에서는 이 확인 단계로 보증금을 냈다는 흐름을 보여주고,
+              실제 운영 전에는 Toss sandbox/운영키로 같은 위치를 연결하면 됩니다.
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <InfoTile label="결제 상태" value="시연 확인" />

@@ -199,7 +199,7 @@ function QueueRadarCardInner({
 
   const handleCancel = () => {
     if (!canCancel || saving) return
-    if (!window.confirm('매칭 큐에서 빠져나가시겠어요?')) return
+    if (!window.confirm('진행 중인 매칭 찾기를 취소할까요?')) return
     onCancel()
   }
 
@@ -508,7 +508,7 @@ function QueueRadarCardInner({
         disabled={saving || !canCancel}
         className="w-full border border-red-200/60 py-2.5 text-[12px] font-bold text-red-400 transition-all disabled:cursor-not-allowed disabled:opacity-45"
       >
-        큐에서 빠지기
+        매칭 취소하기
       </button>
 
       <style jsx global>{`

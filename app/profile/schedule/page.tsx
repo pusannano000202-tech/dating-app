@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Info } from 'lucide-react'
 import SchedulePicker from '@/components/profile/SchedulePicker'
 import { getSequentialMatchStartRedirect } from '@/lib/client-redirect'
-import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
+import { isDevPreviewClientSession, markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 import type { AvailableTimeslots } from '@/lib/types'
+import { isSupabaseConfigured } from '@/lib/utils'
 
 export default function SchedulePage() {
   const router = useRouter()
@@ -18,6 +19,11 @@ export default function SchedulePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (isDevPreviewClientSession() || !isSupabaseConfigured()) {
+      setLoaded(true)
+      return
+    }
+
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { setLoaded(true); return }
@@ -34,13 +40,22 @@ export default function SchedulePage() {
           }
           setLoaded(true)
         })
-    })
+    }).catch(() => setLoaded(true))
   }, [])
 
   async function handleNext() {
     if (timeslots.slots.length === 0) { setError('모든 시간이 막혀 있어요. 최소 한 시간은 가능하게 남겨줘.'); return }
     setSaving(true); setError(null)
     try {
+      if (isDevPreviewClientSession() || !isSupabaseConfigured()) {
+        if (markDevMatchSetupStepComplete('schedule')) {
+          router.push(getSequentialMatchStartRedirect('/profile/preferences', '/profile/preferences'))
+          return
+        }
+        router.push('/login')
+        return
+      }
+
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {

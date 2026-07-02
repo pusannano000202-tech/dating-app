@@ -7,6 +7,12 @@ type DarkTeamProgressCardProps = {
   members?: string[]
   status?: string
   className?: string
+  showOpenSlot?: boolean
+  action?: {
+    label: string
+    onClick: () => void
+    disabled?: boolean
+  }
 }
 
 export default function DarkTeamProgressCard({
@@ -16,6 +22,8 @@ export default function DarkTeamProgressCard({
   members = ['나'],
   status = '매칭 탐색 중',
   className = '',
+  showOpenSlot = true,
+  action,
 }: DarkTeamProgressCardProps) {
   const clampedProgress = Math.max(0, Math.min(100, progressValue))
 
@@ -25,10 +33,22 @@ export default function DarkTeamProgressCard({
         <div className="min-w-0">
           <h2 className="truncate text-2xl font-black text-white">{groupName}</h2>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5A3325] px-3 py-2 text-xs font-black text-[#FFB08C]">
-          <span className="h-2.5 w-2.5 rounded-full bg-boot-coral" />
-          {status}
-        </span>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5A3325] px-3 py-2 text-xs font-black text-[#FFB08C]">
+            <span className="h-2.5 w-2.5 rounded-full bg-boot-coral" />
+            {status}
+          </span>
+          {action && (
+            <button
+              type="button"
+              onClick={action.onClick}
+              disabled={action.disabled}
+              className="rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[11px] font-black text-white shadow-sm transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {action.label}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mb-5 flex items-center gap-2">
@@ -40,7 +60,7 @@ export default function DarkTeamProgressCard({
             {member.trim().slice(0, 1) || '나'}
           </span>
         ))}
-        {members.length < 3 && (
+        {members.length < 3 && showOpenSlot && (
           <span className="flex h-11 w-11 items-center justify-center rounded-full border border-dashed border-white/35 text-white/70">
             <Plus size={16} />
           </span>

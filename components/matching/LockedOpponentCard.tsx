@@ -1,7 +1,9 @@
 import { LockKeyhole } from 'lucide-react'
 
 type LockedOpponentCardProps = {
+  eyebrow?: string
   title?: string
+  scoreLabel?: string
   chemi?: number
   chips?: string[]
   description?: string
@@ -10,7 +12,9 @@ type LockedOpponentCardProps = {
 }
 
 export default function LockedOpponentCard({
+  eyebrow = '추천 상대팀',
   title = '간호 트리오',
+  scoreLabel = '케미',
   chemi = 92,
   chips = ['차분한', '카페파', '수요일'],
   description = '프로필은 매칭 확정 후에 공개돼요',
@@ -21,10 +25,10 @@ export default function LockedOpponentCard({
     <section className={['booting-soft-card rounded-[30px] p-6', className].filter(Boolean).join(' ')}>
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-black text-boot-muted">추천 상대팀</p>
+          <p className="text-xs font-black text-boot-muted">{eyebrow}</p>
           <h2 className="mt-3 text-2xl font-black leading-tight text-boot-ink">{title}</h2>
         </div>
-        <p className="text-xl font-black text-boot-primary">케미 {chemi}%</p>
+        <p className="text-xl font-black text-boot-primary">{scoreLabel} {chemi}%</p>
       </div>
 
       <div className="mb-4 flex items-center">

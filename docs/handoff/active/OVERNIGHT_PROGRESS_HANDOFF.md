@@ -1,5 +1,81 @@
 # 야간 장시간 작업 진행 인수인계
 
+## 2026-07-02 clean server recheck and daily-card visibility
+
+- 추가 발견:
+  - 로컬에 Next dev server가 여러 개 살아 있어서 `.next` 캐시가 꼬였고, `/match/[id]` 상세가 `Cannot find module './1682.js'` 500으로 깨졌다.
+  - 작업 폴더에서 실행된 Next 프로세스만 종료하고 `.next`를 삭제한 뒤 `http://127.0.0.1:3034` 하나로 다시 띄웠다.
+- 추가 수정:
+  - `app/notifications/page.tsx`에서 1:1 알림 판별을 `match_mode === 'solo'`뿐 아니라 `opp_group_size === 1`, `opponent_group_size === 1`, `group_size === 1`도 보도록 보강했다.
+  - 실제 DB 알림 payload에 `match_mode`가 없어도 1:1 가매칭이 그룹 가매칭처럼 보이지 않게 했다.
+  - `app/match/[id]/page.tsx` 확정 상세에서 `TodayCardSummary`를 추가했다.
+  - 확정 후에는 매칭 요약 바로 아래에서 `오늘의 공개 카드를 열어요`, `16:00-20:00`, `만남까지`를 먼저 보여주고, 실제 카드 리스트는 기존 섹션에서 계속 확인한다.
+- 로컬 확인:
+  - `http://127.0.0.1:3034/match?mode=solo&soloStatus=in_pool`
+    - `1:1 매칭 찾기 취소` 표시, `1:1 소개팅 시작하기` 비표시 확인.
+  - `http://127.0.0.1:3034/match/dev-solo-match-pending`
+    - `1:1 가매칭이 도착했어요`, 보증금, 사전 카드, 데일리카드 흐름 표시 확인.
+    - `3:3` 문구 비표시 확인.
+  - `http://127.0.0.1:3034/match/dev-match-pending`
+    - 그룹 가매칭 상세, 보증금, 사전 카드, 데일리카드 흐름 표시 확인.
+  - `http://127.0.0.1:3034/match/dev-match-1`
+    - 확정 상세에서 약속 정보와 오늘의 공개 카드 섹션 표시 확인.
+  - `http://127.0.0.1:3034/notifications`
+    - `1:1 가매칭이 도착했어요!`, 그룹 가매칭, 데일리카드 알림 표시 확인.
+
+## 2026-07-02 visible queue cancel action
+
+- 사용자 지적:
+  - 매칭 탐색 중인데 `매칭 취소하기` 버튼이 사용자가 바로 찾기 어렵다.
+  - 큐에 들어간 뒤에는 시작 버튼이 다시 보이면 안 되고, 취소/홈 이동 같은 현재 상태 액션이 먼저 보여야 한다.
+- 수정:
+  - `/match`에서 매칭 탐색 중 상태면 상단 팀 카드 바로 아래에 `QueueControlStrip`을 추가했다.
+  - 1:1 큐 상태에서는 `1:1 매칭 찾기 취소`, 과팅 큐 상태에서는 `과팅 매칭 찾기 취소`가 즉시 보인다.
+  - 같은 줄에 `홈으로` 버튼도 함께 노출해 대기 화면에서 빠져나갈 수 있게 했다.
+  - 기존 아래쪽 대기 카드의 취소 버튼은 유지해서 스크롤 위치가 달라도 취소 동선이 남아 있게 했다.
+- 로컬 확인:
+  - `http://127.0.0.1:3034/match?mode=solo&soloStatus=in_pool`
+    - `MATCHING ACTIVE`, `1:1 매칭 찾기 취소`, `홈으로` 표시 확인.
+    - `1:1 소개팅 시작하기`가 다시 뜨지 않는 것 확인.
+  - `http://127.0.0.1:3034/match`
+    - dev group 상태를 `in_pool`, size `2`로 세팅한 뒤 확인.
+    - `MATCHING ACTIVE`, `과팅 매칭 찾기 취소`, `홈으로` 표시 확인.
+    - `2:2 그룹으로 시작하기`, `3:3 그룹으로 시작하기`가 큐 대기 중에는 뜨지 않는 것 확인.
+- 백엔드 확인:
+  - 과팅 큐 취소는 `/api/match-pool/cancel` route가 있고, 내부에서 `cancel_match_pool` RPC를 호출한다.
+  - 1:1 취소는 현재 로컬/데모 상태값을 `idle`로 되돌리는 프론트 상태 취소다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과. 58개 route 생성 확인.
+
+## 2026-07-02 matching cancel and route-flow check
+
+- 추가 수정:
+  - `/match`에서 현재 선택한 모드의 결과만 보이도록 `visibleMatches`를 분리했다.
+  - 1:1 모드에서는 1:1 결과만, 과팅 모드에서는 그룹 결과만 보여준다.
+  - 1:1 큐 대기 중에는 `매칭 찾기 취소`가 보이고, 새로 `1:1 소개팅 시작하기`가 다시 뜨지 않게 확인했다.
+  - 그룹 큐 대기 중에는 `매칭 찾기 취소`가 보이고, 취소 후 준비 화면으로 돌아가는 흐름을 확인했다.
+- 로컬 확인:
+  - 기존 `3034` 서버는 `.next` 캐시가 깨져 정적 청크 500 오류가 났다.
+  - `.next`를 삭제하고 `3035` 포트로 새 dev server를 띄웠다.
+  - 확인 주소: `http://127.0.0.1:3035/match`
+  - `http://127.0.0.1:3035/match?mode=solo&soloStatus=in_pool`
+    - `매칭 찾기 취소` 표시 확인.
+    - `1:1 소개팅 시작하기` 비표시 확인.
+  - `http://127.0.0.1:3035/match?mode=solo&sampleMatches=1`
+    - 1:1 가매칭 카드만 표시 확인.
+    - `3:3 그룹`, `상대팀은 아직 잠겨 있어요` 비표시 확인.
+  - `http://127.0.0.1:3035/match/dev-solo-match-pending`
+    - 1:1 상세 흐름만 표시 확인.
+  - 그룹 큐 상태 쿠키를 넣고 `/match`에서 `매칭 찾기 취소`를 눌렀을 때 준비 화면으로 돌아오는 것 확인.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과. 58개 route 생성 확인.
+
 ## 현재 목표
 
 `docs/plans/2026-06-21-overnight-user-flow-frontend-backend-plan.md` 기준으로 장시간 자율 실행 작업을 진행한다.
@@ -218,6 +294,38 @@
 
 1. 실제 브라우저에서 `/profile/basic` 학과 input 포커스 시 후보가 뜨는지 확인한다.
 2. 실제 브라우저에서 `/group/create` 보증금 요약과 그룹 멤버가 같은 사람으로 보이는지 확인한다.
+
+## 2026-07-01 현재 이어받기 메모
+
+- 현재 실제 작업 브랜치: `main`.
+- 현재 로컬 서버 확인 포트: `http://localhost:3032`.
+- 이번 이어받기에서 확인한 문제:
+  - `1:1` 소개팅 큐에 이미 들어간 상태에서도 `MatchingPool` 카드가 `1:1 소개팅 매치` 중심으로 보여 사용자가 다시 시작 화면처럼 느낄 수 있었다.
+  - 같은 상태에서 `/match` 하단에 `매칭 큐에서 1:1 상대를 찾는 중이에요` 보조 카드가 한 번 더 떠서 `MatchSearchingPrivacyCard`와 설명이 중복됐다.
+- 이번 이어받기에서 수정한 것:
+  - `components/MatchingPool.tsx`
+    - active 1:1 큐 상태의 제목을 `1:1 상대를 찾는 중이에요`로 바꿨다.
+    - active 1:1 큐 상태의 설명을 `이미 큐에 들어가 있음 / 조건이 맞는 상대가 잡히면 알림과 가매칭 카드가 열림`으로 정리했다.
+    - active 1:1 큐 하단 상태 문구를 `시작은 끝났고, 이제 기다리는 단계예요`로 바꿨다.
+  - `app/match/page.tsx`
+    - 하단 보조 대기 카드 조건에 `!soloFlowActive`를 추가해서 1:1 큐 진행 중에는 중복 카드가 나오지 않게 했다.
+  - `tests/matching/frontend-flow-polish.test.ts`
+    - 1:1 active 큐 문구와 `!soloFlowActive` 조건을 테스트로 고정했다.
+  - `app/notifications/page.tsx`
+    - 확정 전 `match_created` dev mock payload에서 `opp_school`, `opp_department`를 제거했다.
+    - 화면은 원래도 `상세는 확정 후 공개`로 표시했지만, mock 데이터 자체에도 확정 전 상세가 섞이지 않게 했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `http://localhost:3032/notifications` 200.
+  - `http://localhost:3032/match?mode=solo&soloStatus=in_pool` 200.
+  - `http://localhost:3032/match?mode=solo&sampleMatches=1` 200.
+  - `http://localhost:3032/group/create?size=2` 200.
+  - `http://localhost:3032/match/dev-solo-match-pending` 200.
+- 아직 주의할 것:
+  - `supabase/migrations/20260701000000_daily_card_available_notifications.sql`는 아직 untracked이고, 실제 Supabase 프로젝트가 MCP에서 확정되지 않았으므로 production DB에 적용하지 않았다.
+  - 현재 작업트리에 여러 파일이 이미 수정된 상태다. 다음 커밋 전에는 `git status`와 staged diff를 반드시 다시 분류해야 한다.
 3. 성준 Toss `prepare/confirm/cancel/orders/toss helper/internal secret` 구조를 실제 코드로 흡수할지 별도 phase로 분리한다.
 4. `preference_weights` 4개/7개 계약 충돌은 구현하지 말고 성준과 합의 질문으로 남긴다.
 5. `gwating-app` Q&A/채팅 프로토타입은 UX 참고 대상으로만 보고, Supabase 스키마 합의 전 DB 구현으로 옮기지 않는다.
@@ -1332,3 +1440,368 @@ production Supabase/Vercel/Toss는 건드리지 마.
   - project ref가 올바른지 확인.
   - `supabase/migrations` 중 미적용 migration만 적용.
   - 적용 후 `npm run test:config`, `npm run test:matching`, 배포 URL 기준 결제/웹훅 smoke test 수행.
+
+## 2026-07-01 매칭 흐름/데일리카드/1:1 큐 최신 상태
+
+- 이번 작업에서 정리한 핵심:
+  - 1:1 소개팅 큐에 이미 들어간 상태에서는 `혼자 바로 매칭받기` 시작 카드가 다시 보이지 않게 했다.
+  - 매칭 전에는 상대 카드/케미가 결과처럼 보이지 않고, `상대 카드는 매칭 후에 열려요` 안내만 보이게 했다.
+  - 1:1 가매칭 상태에서는 3:3/과팅 후보 문구가 섞이지 않고 `1:1 소개팅 가매칭 도착`, `보증금과 사전 카드`, `확정 후 오늘의 카드` 순서로 보이게 했다.
+  - 알림 화면에는 `1:1 가매칭이 도착했어요`, `오늘의 데일리카드를 열어보세요`, `16시부터 20시` 안내가 보이게 했다.
+  - `/group/create?size=2` 화면은 친구 관리/친구 내보내기/혼성 그룹/가매칭 후 보증금 문구가 보이도록 확인했다.
+- DB/API 변경:
+  - `supabase/migrations/20260701000000_daily_card_available_notifications.sql` 추가.
+  - `notify_available_daily_cards(match_id)` 함수는 현재 로그인한 사용자 `auth.uid()` 기준으로만 알림을 만들도록 제한했다.
+  - `SECURITY DEFINER` 함수의 기본 `PUBLIC` 실행 권한을 `REVOKE ALL ... FROM PUBLIC`로 명시적으로 제거하고 `authenticated`에만 실행 권한을 부여했다.
+  - `app/api/notifications/route.ts`에서 알림 조회 전에 데일리카드 가능 알림 생성을 시도한다. 실패해도 알림 조회 자체는 막지 않는다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+  - `git diff --check` 통과. CRLF 경고만 있음.
+  - 로컬 3013 라우트 200 확인: `/match`, `/match?mode=solo&soloStatus=in_pool`, `/match?mode=solo&sampleMatches=1`, `/match/dev-solo-match-pending`, `/notifications`, `/group/create?size=2`.
+  - 브라우저 실제 텍스트 확인:
+    - `/group/create?size=2`: `현재 함께하는 친구`, `친구 내보내기`, `보증금은 가매칭 후 확정 단계에서 결제` 확인.
+    - `/match?mode=solo&soloStatus=in_pool`: `현재 1:1 소개팅 큐에 들어가 있어요` 확인, `혼자 바로 매칭받기` 없음, `3:3` 없음.
+    - `/match?mode=solo&sampleMatches=1`: `1:1 소개팅 가매칭 도착`, `보증금과 사전 카드`, `오늘의 카드` 확인, `3:3` 없음.
+    - `/notifications`: `1:1 가매칭이 도착했어요`, `오늘의 데일리카드를 열어보세요`, `보증금` 확인.
+- 아직 남은 실제 배포/DB 작업:
+  - Supabase CLI가 현재 PC에 없고, 현재 노출된 Supabase 도구도 SQL 실행 도구가 아니라서 production Supabase에는 이 migration을 아직 적용하지 못했다.
+  - 실제 DB 적용은 성준/충현 합의 후 Supabase dashboard SQL editor 또는 Supabase CLI로 진행해야 한다.
+  - 적용 후에는 `notify_available_daily_cards` 함수 권한, `notifications` insert 결과, 실제 매칭 확정 상태에서 데일리카드 알림이 생기는지 확인해야 한다.
+- 다음 사람에게 바로 줄 명령:
+  - `git status --short --branch`로 변경 파일 확인.
+  - `npm run test:matching && npm run typecheck && npm run lint` 재확인.
+  - production DB에 적용하기 전 `supabase/migrations/20260701000000_daily_card_available_notifications.sql`을 성준과 함께 리뷰.
+
+## 2026-07-01 그룹 생성 초기 렌더 보강
+
+- 추가로 정리한 내용:
+  - `/group/create?size=2`가 클라이언트 데이터 로딩 전에도 기본 HTML처럼 보이지 않도록 로딩 화면을 앱 스타일 카드로 교체했다.
+  - 그룹 화면 상단의 `Group Match` 라벨을 `그룹 과팅`으로 바꿨다.
+  - 초기 HTML에도 `현재 함께하는 친구`, `친구 초대와 준비 상태를 불러오고 있어요`가 포함되게 해서, 새로고침 직후에도 화면 구조가 보이도록 했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `http://127.0.0.1:3013/group/create?size=2` 응답 200 확인.
+  - 초기 HTML 기준 `친구와 같이 매칭받기`, `현재 함께하는 친구`, `그룹 과팅` 포함 확인.
+  - 초기 HTML 기준 `Group Match` 미포함 확인.
+
+## 2026-07-01 검증 기준 최신화
+
+- 추가로 정리한 내용:
+  - `/match` 화면이 `2:2 매칭찾기`를 직접 들고 있는 구조가 아니라 `어떤 방식으로 만날까요`에서 과팅/소개팅을 나누고, 실제 큐 문구는 `components/MatchingPool.tsx`가 담당하도록 테스트 기준을 맞췄다.
+  - 빌드 후 기존 dev 서버가 `.next` 캐시 때문에 500을 반환할 수 있어, dev 서버를 재시작하고 3013 라우트를 다시 확인했다.
+- 검증:
+  - `npm run test:config` 통과. 60개 테스트 통과.
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run test:profile` 통과. 25개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과.
+  - 백그라운드 dev 서버 재기동 후 `http://127.0.0.1:3013/match`, `/group/create?size=2`, `/notifications` 모두 200 확인.
+
+## 2026-07-01 matching flow wording verification
+
+- 추가 정리:
+  - 매칭 찾기 전 기본 `/match` 화면에서는 케미, 상대 카드, `매칭을 찾아주세요!` 문구가 결과처럼 뜨지 않도록 확인했다.
+  - 1:1 큐 진입 상태(`/match?mode=solo&soloStatus=in_pool`)에서는 예전 문구 `상대 카드는 매칭 후에 열려요`를 제거하고 `지금은 상대를 찾는 중이에요`로 바꿨다.
+  - 가매칭이 도착한 상태(`/match?mode=solo&sampleMatches=1`)에서만 케미와 사전 카드/보증금/데일리카드 안내가 보이도록 브라우저에서 확인했다.
+  - `/group/create?size=2`는 가매칭 후 보증금 결제 문구와 2:2/3:3/혼성 그룹 안내가 유지되는지 확인했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run test:config` 통과. 60개 테스트 통과.
+  - `npm run test:profile` 통과. 25개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과.
+  - 브라우저 확인 주소:
+    - `http://127.0.0.1:3013/match`
+    - `http://127.0.0.1:3013/match?mode=solo&soloStatus=in_pool`
+    - `http://127.0.0.1:3013/match?mode=solo&sampleMatches=1`
+    - `http://127.0.0.1:3013/match/start?mode=solo`
+    - `http://127.0.0.1:3013/match/dev-solo-match-pending`
+    - `http://127.0.0.1:3013/notifications`
+    - `http://127.0.0.1:3013/group/create?size=2`
+
+## 2026-07-01 local preview setup and verification refresh
+
+- 추가 정리:
+  - 로컬 미리보기에서 `/profile/personality-preference`, `/profile/schedule`, `/profile/preferences`가 Supabase user 조회 대기나 미설정 상태 때문에 빈 화면처럼 보일 수 있는 문제를 보강했다.
+  - `localhost`, `127.0.0.1`, `::1` 브라우저 미리보기에서는 `booting_dev_auth` 쿠키가 없어도 디자인 검토용 dev preview로 처리되게 했다. production 도메인에서는 이 우회가 적용되지 않는다.
+  - 1:1 큐 진입/가매칭/그룹 큐 문구 정합성은 기존 `tests/matching/frontend-flow-polish.test.ts`와 `tests/config/booting-branding.test.ts`에 회귀 조건을 추가해 고정했다.
+- 검증:
+  - `npm run test:config` 통과. 60개 테스트 통과.
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run test:profile` 통과. 25개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과. 58개 라우트 production build 생성 완료.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+  - `git diff --check` 통과. CRLF 경고만 있음.
+  - 새 dev server 기준 `http://127.0.0.1:3015`에서 아래 라우트 200 확인:
+    - `/profile/personality-preference?redirect=%2Fmatch%2Fstart%3Fmode%3Dsolo`
+    - `/profile/schedule?redirect=%2Fmatch%2Fstart%3Fmode%3Dsolo`
+    - `/profile/preferences?redirect=%2Fmatch%2Fstart%3Fmode%3Dsolo`
+    - `/profile/match-card?redirect=%2Fmatch%2Fstart%3Fmode%3Dsolo`
+    - `/match`
+    - `/match?mode=solo&soloStatus=in_pool`
+    - `/match?mode=solo&sampleMatches=1`
+    - `/notifications`
+    - `/group/create?size=2`
+- 한계:
+  - Codex 인앱 브라우저 플러그인은 이번 확인 중 열린 탭을 잡지 못했고 새 탭 attach도 실패했다. 그래서 최종 시각 검수는 route 200 + 소스 기반 회귀 테스트 + build 기준으로 대체했다.
+  - 실제 production Supabase에는 `supabase/migrations/20260701000000_daily_card_available_notifications.sql`가 아직 적용되었다는 증거가 없다. 적용 전에는 실제 DB에서 데일리카드 알림 자동 생성이 검증되지 않는다.
+
+## 2026-07-01 1:1 큐 상태와 홈 동선 정합성 보강
+
+- 추가 정리:
+  - dev preview에서 1:1 큐 상태를 `booting_dev_solo_status` 쿠키/localStorage로 보존하게 했다.
+  - `/match?mode=solo&soloStatus=in_pool`로 1:1 큐에 들어간 뒤 홈으로 나가도 다시 `매칭을 찾아주세요` 같은 시작 전 CTA가 뜨지 않고, `1:1 상대를 찾고 있어요` 상태가 보이게 했다.
+  - `/match?mode=solo&sampleMatches=1`은 1:1 가매칭 흐름으로 유지되고, 3:3/그룹 문구가 섞이지 않도록 테스트로 고정했다.
+  - `/group/create?size=2`는 초기 HTML fallback처럼 깨진 화면이 아니라 앱 스타일의 그룹 준비 화면으로 렌더링되는지 확인했다.
+- 검증:
+  - `npm run lint` 통과.
+  - `npm run test:config` 통과. 60개 테스트 통과.
+  - `npm run test:profile` 통과. 25개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `.next` 캐시 삭제 후 `npm run build` 통과. 58개 라우트 production build 완료.
+  - 새 dev server `http://localhost:3016`에서 route 200 확인:
+    - `/match`
+    - `/match?mode=solo&soloStatus=in_pool`
+    - `/match?mode=solo&sampleMatches=1`
+    - `/group/create?size=2`
+    - `/dev/preview`
+    - `/notifications`
+    - `/profile/preferences`
+    - `/profile/personality-preference`
+    - `/profile/schedule`
+    - `/match/start`
+    - `/match/dev-match-1`
+  - Playwright + Edge 렌더링 텍스트 확인:
+    - 1:1 큐 화면에 `1:1 소개팅 시작하기`가 남지 않음.
+    - 홈으로 나가도 1:1 큐 상태를 표시하고 `매칭을 찾아주세요`로 되돌아가지 않음.
+    - 1:1 가매칭 화면에 3:3/3명 문구가 섞이지 않음.
+    - `/group/create?size=2`에서 깨진 fallback 문구가 보이지 않음.
+- 남은 한계:
+  - production Supabase migration 적용/검증은 아직 하지 않았다.
+  - 현재 변경분은 커밋/푸시 전이다.
+
+## 2026-07-01 Supabase 적용 상태 확인
+
+- Supabase 플러그인 확인:
+  - 플러그인에서 보이는 프로젝트는 `prswrczjvamphxwzcnyq` 하나이고, 상태는 `INACTIVE`로 표시됐다.
+  - 사용자가 언급한 `tmkxrwqbikzbtyqpkmkc` 프로젝트는 현재 플러그인 프로젝트 목록에 보이지 않았다.
+  - `prswrczjvamphxwzcnyq`의 migration 목록 조회는 database connection timeout으로 실패했다.
+- 결론:
+  - 이번 코드 변경에는 데일리카드 알림용 migration 파일이 추가되어 있지만, production Supabase에 적용됐다고 볼 증거는 아직 없다.
+  - production DB 적용은 별도 확인/권한/대상 프로젝트 확정 후 진행해야 한다.
+  - 현재 완료 증거는 로컬 코드, 테스트, 빌드, 라우트, 렌더링 검증 기준이다.
+
+## 2026-07-01 데일리카드 알림 migration 보안 보강
+
+- 추가 정리:
+  - `notify_available_daily_cards`는 `SECURITY DEFINER` 함수라서 Supabase 함수 권장 방식에 맞춰 `SET search_path = ''`로 좁혔다.
+  - `notifications`, `match_daily_card_schedule`, `group_members` 참조는 `public.` 스키마를 명시하도록 정리했다.
+  - `to_regclass`, `set_config`, `now`는 `pg_catalog.`를 명시해 search_path 의존도를 줄였다.
+  - 테스트에 `SET search_path = ''`, `INSERT INTO public.notifications`, `FROM public.notifications n` 고정을 추가했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `node scripts/check-secret-leaks.mjs` 통과.
+  - `git diff --check` 통과. CRLF 경고만 있음.
+
+## 2026-07-01 최신 검증 상태 보강
+
+- 추가 수정:
+  - `/match?mode=solo&soloStatus=in_pool` 직접 진입 시 로딩 중에 2:2/3:3 그룹 큐가 잠깐 보일 수 있던 조건을 막았다.
+  - `DarkTeamProgressCard`의 빈 친구 자리도 로딩 중에는 열리지 않게 해서 1:1 큐 화면에서 그룹 준비 UI가 섞이지 않게 했다.
+  - 변경된 조건에 맞춰 `frontend-flow-polish` 테스트의 `showOpenSlot` 기대값을 갱신했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run test:config` 통과. 60개 테스트 통과.
+  - `npm run test:profile` 통과. 25개 테스트 통과.
+  - `npm run build` 통과. 58개 라우트 production build 완료.
+  - 로컬 dev server `http://localhost:3020` 기준 아래 라우트 200 확인:
+    - `/match?mode=solo&soloStatus=in_pool`
+    - `/match?mode=solo&sampleMatches=1`
+    - `/match/dev-solo-match-pending`
+    - `/group/create?size=2`
+    - `/notifications`
+- 남은 한계:
+  - production Supabase에 `supabase/migrations/20260701000000_daily_card_available_notifications.sql`이 실제 적용됐다는 증거는 아직 없다.
+  - 현재 완료 증거는 로컬 코드, 테스트, build, route 확인 기준이다.
+
+## 2026-07-01 Supabase production target check
+
+- Local `.env.local` currently points to:
+  - `NEXT_PUBLIC_SUPABASE_URL=https://tmkxrwqbikzbtyqpkmkc.supabase.co`
+- Supabase MCP plugin currently exposes only:
+  - `prswrczjvamphxwzcnyq`
+  - status: `INACTIVE`
+  - migration list call failed with database connection timeout.
+- Decision:
+  - Do not apply the new migration through the current Supabase MCP connection.
+  - It would target `prswrczjvamphxwzcnyq`, while the local app is configured for `tmkxrwqbikzbtyqpkmkc`.
+  - The correct next step is to connect/authenticate the Supabase tool or dashboard session for `tmkxrwqbikzbtyqpkmkc`, then apply `supabase/migrations/20260701000000_daily_card_available_notifications.sql`.
+- Local DB tools:
+  - `supabase --version`: command not found.
+  - `psql --version`: command not found.
+  - `docker --version`: available, but Docker config access warned with `Access is denied`.
+- Current safe evidence:
+  - migration SQL references existing repo schema: `public.notifications`, `public.match_daily_card_schedule`, `public.group_members.left_at`.
+  - notification API catches missing helper errors, so older DBs still keep notifications readable.
+  - `node scripts/check-secret-leaks.mjs` passed after this check.
+
+## 2026-07-01 match preview loading hardening
+
+- Additional frontend hardening:
+  - `app/match/page.tsx` now checks `isDevPreviewClientSession()` inside `refresh()` instead of keeping the value from render time.
+  - This reduces the chance that local preview / query-string solo states stay on the initial "checking matching status" shell after hydration timing differences.
+  - Group queue cancellation now checks the current preview session at action time as well.
+- Verification after this change:
+  - `npm run test:matching` passed. 72 tests passed.
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - `node scripts/check-secret-leaks.mjs` passed.
+  - `npm run build` passed. 58 routes generated successfully.
+  - `curl.exe -I` returned 200 for:
+    - `http://localhost:3031/match?mode=solo&soloStatus=in_pool`
+    - `http://localhost:3031/match?mode=solo&sampleMatches=1`
+    - `http://localhost:3031/match/dev-solo-match-pending`
+    - `http://localhost:3031/group/create?size=2`
+    - `http://localhost:3031/notifications`
+- Browser automation note:
+  - The in-app browser automation timed out while navigating local dev pages on `3031`.
+  - Because of that, do not claim final visual completion from browser automation alone.
+  - Current reliable evidence is tests, typecheck/lint, secret scan, diff check, and local route 200 checks.
+
+## 2026-07-02 1:1 queue cancel action
+
+- 추가 수정:
+  - `/match?mode=solo&soloStatus=in_pool`의 1:1 매칭 대기 화면에 `매칭 찾기 취소` 버튼을 추가했다.
+  - 1:1 대기 중에는 `알림 확인하기`와 `매칭 찾기 취소`가 같이 보이고, 가매칭 결과가 생기면 취소 버튼은 숨기고 `가매칭 준비 이어가기`만 보이게 했다.
+  - 취소 시 로컬 검토 상태를 `soloStatus=idle`로 되돌리고, 매치 목록을 비운 뒤 URL을 `/match?mode=solo`로 정리한다.
+  - 그룹 큐 취소와 1:1 큐 취소 모두 `confirmAction`을 거치도록 맞췄다. 일반 브라우저에서는 확인창을 띄우고, 인앱 브라우저 자동화처럼 `window.confirm`이 없는 환경에서는 흐름이 막히지 않게 처리한다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `npm run build` 통과. 58개 route build 완료.
+  - `http://127.0.0.1:3034/match?mode=solo&soloStatus=in_pool` 텍스트 확인:
+    - `1:1 상대를 찾는 중이에요` 표시됨.
+    - `매칭 찾기 취소` 표시됨.
+    - 대기 중에는 새로 `1:1 소개팅 시작하기`를 다시 띄우지 않음.
+- 남은 확인:
+  - 인앱 브라우저 CDP 자동 클릭은 타임아웃이 나서 클릭 후 상태 변화까지 자동 검증하지 못했다.
+  - 실제 화면에서 `매칭 찾기 취소`를 한 번 눌러 `/match?mode=solo`로 돌아가는지 수동 눈검수하면 된다.
+
+## 2026-07-02 1:1 pending detail flow polish
+
+- 추가 수정:
+  - `app/match/[id]/page.tsx`의 pending overview 단계에 `PendingUnlockPreview`를 추가했다.
+  - 1:1 가매칭 상세에서 상대 상세를 미리 공개하지 않으면서, 확정 후 열리는 `데일리카드`, `약속 정보`, `채팅/연락처` 흐름을 바로 보이게 했다.
+  - `tests/matching/frontend-flow-polish.test.ts`에 `확정 후 열리는 것`, `16-20시에 하루 한 장씩 직접 열고`, `채팅/연락처` 문구 고정을 추가했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `http://localhost:3034/group/create?size=2` 200 OK 확인.
+  - `http://localhost:3034/match/dev-solo-match-pending` 200 OK 확인.
+  - 인앱 브라우저에서 `http://127.0.0.1:3034/group/create?size=2` 확인:
+    - `친구와 같이 매칭받기` 표시됨.
+    - `Group Match` 원문 깨짐 없음.
+    - 2:2, 혼성 그룹, 친구 초대, 가매칭 후 보증금 안내 표시됨.
+  - 인앱 브라우저에서 `http://127.0.0.1:3034/match/dev-solo-match-pending` 확인:
+    - `1:1 가매칭이 도착했어요` 표시됨.
+    - `확정 후 열리는 것`, `데일리카드`, `16-20시에 하루 한 장씩 직접 열고`, `채팅/연락처` 표시됨.
+    - `3:3`, `상대팀 이름은 아직 비공개예요` 같은 그룹 문구 섞임 없음.
+    - 콘솔 error/warning 없음.
+- 남은 한계:
+  - production Supabase에 `20260701000000_daily_card_available_notifications.sql`이 적용됐다는 증거는 아직 없다.
+  - 현재 DB 관련 증거는 코드/테스트 기준이며, 실제 production DB 적용은 별도 확인이 필요하다.
+
+## 2026-07-02 matching cancel CTA consolidation
+
+- 추가 수정:
+  - `/match`에서 매칭 진행 중 취소 액션을 `QueueControlStrip` 한 곳으로 통일했다.
+  - 1:1 대기 중에는 `1:1 매칭 취소하기`, 과팅 대기 중에는 `과팅 매칭 취소하기`가 상단 진행 카드 아래에 바로 보인다.
+  - 대기 상태 카드 내부의 중복 취소 버튼은 제거했다. 사용자가 취소 버튼을 찾아야 하는 위치가 한 군데로 고정된다.
+  - 홈 카드와 매칭 풀의 취소 문구도 `매칭 취소하기` 계열로 맞췄다.
+  - 실패 메시지도 `매칭 취소에 실패했어요. 잠시 후 다시 시도해 주세요.`로 맞췄다.
+  - `/match`의 과팅 시작 패널에 남아 있던 `Group Match` 영어 라벨을 `과팅하기`로 정리했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - 3034 로컬 서버에서 `HEAD` 200 확인:
+    - `/match`
+    - `/match?mode=solo&soloStatus=in_pool`
+    - `/match/dev-match-1`
+    - `/match/dev-solo-match-pending`
+    - `/notifications`
+    - `/group/create?size=2`
+- 남은 한계:
+  - 인앱 브라우저 직접 자동화는 연결 타임아웃으로 클릭 후 상태 변화까지는 자동 검증하지 못했다.
+  - 현재 확실한 증거는 테스트, 타입 체크, 린트, route 200 확인이다.
+
+## 2026-07-02 active flow mode guard
+
+- 추가 수정:
+  - `/match`에서 URL이나 내부 상태가 `mode=solo`로 남아 있어도, 이미 과팅 큐 또는 과팅 결과가 살아 있으면 화면 표시 기준을 `group`으로 강제하는 `effectiveMatchMode`를 추가했다.
+  - `hasAnyStartedMatching`을 추가해서 과팅/1:1 중 어느 한 흐름이라도 진행 중이면 시작 카드와 큐 선택 카드가 다시 뜨지 않게 막았다.
+  - 이 수정으로 “과팅 큐에 이미 들어갔는데 1:1 시작 화면이 다시 보임” 같은 상태 엇갈림을 줄였다.
+  - 1:1 큐가 실제로 진행 중일 때만 `1:1 매칭 취소하기`가 뜨고, 과팅 큐가 진행 중이면 `과팅 매칭 취소하기`가 뜨도록 `QueueControlStrip` 표시 기준을 `effectiveMatchMode`로 맞췄다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - 3034 로컬 서버 `HEAD` 200 확인:
+    - `/match`
+    - `/match?mode=solo&soloStatus=in_pool`
+    - `/match?mode=solo&sampleMatches=1`
+    - `/match/dev-solo-match-pending`
+    - `/notifications`
+    - `/group/create?size=2`
+- 남은 한계:
+  - Playwright DOM 검증은 `node.exe` 실행 권한 문제로 막혔고, 권한 요청은 승인되지 않아 자동 브라우저 클릭 검증은 수행하지 못했다.
+  - 그래도 코드 조건과 테스트는 “진행 중인 흐름이 있으면 새 시작 버튼을 숨긴다”는 요구를 직접 고정한다.
+
+## 2026-07-02 queue cancel and daily-card handoff verification
+
+- 추가 수정:
+  - `/match` 과팅 큐 진입 상태에 `NEXT AFTER MATCH` 안내 카드를 추가했다.
+  - 과팅 큐에서 상대팀이 잡힌 뒤 `가매칭 -> 보증금 -> 데일리카드`로 이어진다는 흐름을 한눈에 보이게 했다.
+  - 1:1/과팅 큐 상태 모두에서 시작 버튼 대신 취소 버튼이 노출되도록 점검했다.
+- 검증:
+  - `npm run test:matching` 통과. 72개 테스트 통과.
+  - `npm run test:config` 통과. 60개 테스트 통과.
+  - `npm run typecheck` 통과.
+  - `npm run lint` 통과.
+  - `.next` dev cache 충돌을 제거한 뒤 `npm run build` 통과. 58개 route build 완료.
+  - `http://localhost:3036/match?mode=solo&soloStatus=in_pool` Chrome DOM 검증:
+    - 큐 진입 상태에서 `1:1 매칭 취소하기` 표시.
+    - 큐 진입 상태에서 `혼자 바로 매칭받기`와 `1:1 소개팅 시작하기` 숨김.
+    - `3:3 그룹 매치` 문구 섞임 없음.
+    - 취소 클릭 후 `1:1 매칭 취소하기`가 사라지고 시작 상태로 복귀.
+  - `http://localhost:3036/match?mode=group` Chrome DOM 검증:
+    - 과팅 큐 진입 상태에서 `과팅 매칭 취소하기` 표시.
+    - 큐 진입 상태에서 `2:2 그룹으로 시작하기`, `3:3 그룹으로 시작하기` 숨김.
+    - `가매칭이 잡히면 데일리카드까지 이어져요` 표시.
+    - `가매칭`, `보증금`, `데일리카드` 단계 표시.
+    - 취소 클릭 후 `과팅 매칭 취소하기`가 사라지고 그룹 시작 상태로 복귀.
+  - `http://localhost:3036/match?mode=solo&sampleMatches=1` Chrome DOM 검증:
+    - `1:1 가매칭 도착`, `보증금`, `하루 한 장` 표시.
+    - `3:3 그룹 매치` 문구 섞임 없음.
+  - `http://localhost:3036/notifications` Chrome DOM 검증:
+    - `가매칭이 도착` 알림 표시.
+    - `데일리카드` 알림 표시.
+- 남은 한계:
+  - `supabase/migrations/20260701000000_daily_card_available_notifications.sql`는 코드에 추가되어 있으나 production Supabase에 실제 적용했다는 증거는 아직 없다.
+  - 실제 Supabase/Vercel production 데이터 기준의 end-to-end 검증은 별도 배포/DB 적용 후 다시 확인해야 한다.
