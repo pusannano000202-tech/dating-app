@@ -23,6 +23,7 @@ import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 
 type MatchMode = 'group' | 'solo'
+type MatchScope = 'same_school' | 'cross_school'
 
 interface MatchRow {
   match_id: string
@@ -132,6 +133,7 @@ export default function MatchesPage() {
   const [poolStats, setPoolStats] = useState<PoolStats>(EMPTY_POOL)
   const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
   const [matchMode, setMatchMode] = useState<MatchMode>('group')
+  const [matchScope, setMatchScope] = useState<MatchScope>('same_school')
   const [soloQueueActive, setSoloQueueActive] = useState(false)
   const [cancelingQueue, setCancelingQueue] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -146,28 +148,28 @@ export default function MatchesPage() {
     if (isDevPreview) {
       const params = new URLSearchParams(window.location.search)
       const storedSoloStatus = getDevPreviewSoloStatusFromClient()
-      const requestedSoloStatus = params.get('sampleMatches') === '1'
+      const devRequestedSoloStatus = params.get('sampleMatches') === '1'
         ? 'matched'
         : params.get('soloStatus') === 'in_pool'
           ? 'in_pool'
           : storedSoloStatus
-      const requestedMode: MatchMode = params.get('mode') === 'solo' || (params.get('mode') == null && requestedSoloStatus !== 'idle')
+      const requestedMode: MatchMode = params.get('mode') === 'solo' || (params.get('mode') == null && devRequestedSoloStatus !== 'idle')
         ? 'solo'
         : 'group'
       const previewGroupSize = getDevPreviewGroupSizeFromClient(DEV_PREVIEW_GROUP.size)
       const previewGroupStatus = getDevPreviewGroupStatusFromClient()
       const explicitSoloPreview =
         requestedMode === 'solo'
-        && requestedSoloStatus !== 'idle'
+        && devRequestedSoloStatus !== 'idle'
       const nextMode = requestedMode === 'solo' && previewGroupStatus === 'in_pool' && !explicitSoloPreview
         ? 'group'
         : requestedMode
       if (nextMode === 'solo') {
-        setDevPreviewSoloStatus(requestedSoloStatus)
+        setDevPreviewSoloStatus(devRequestedSoloStatus)
       }
       setMatchMode(nextMode)
-      setSoloQueueActive(nextMode === 'solo' && requestedSoloStatus === 'in_pool')
-      setMatches(requestedSoloStatus === 'matched'
+      setSoloQueueActive(nextMode === 'solo' && devRequestedSoloStatus === 'in_pool')
+      setMatches(devRequestedSoloStatus === 'matched'
         ? nextMode === 'solo' ? DEV_SOLO_MATCHES : DEV_MATCHES
         : [])
       setPoolStats(DEV_POOL)
@@ -187,19 +189,8 @@ export default function MatchesPage() {
     try {
       const params = new URLSearchParams(window.location.search)
       const requestedMode: MatchMode = params.get('mode') === 'solo' ? 'solo' : 'group'
-      const explicitSoloPreview =
-        requestedMode === 'solo'
-        && (params.get('soloStatus') === 'in_pool' || params.get('sampleMatches') === '1')
       setMatchMode(requestedMode)
-      setSoloQueueActive(requestedMode === 'solo' && params.get('soloStatus') === 'in_pool')
-
-      if (explicitSoloPreview) {
-        setMatches(params.get('sampleMatches') === '1' ? DEV_SOLO_MATCHES : [])
-        setPoolStats(DEV_POOL)
-        setGroupSummary(EMPTY_GROUP_SUMMARY)
-        setLoading(false)
-        return
-      }
+      setSoloQueueActive(false)
 
       const [matchRes, poolRes, groupRes] = await Promise.all([
         fetch('/api/matches'),
@@ -545,6 +536,7 @@ export default function MatchesPage() {
               setMatchMode={setMatchMode}
               soloBlockedByGroupFlow={soloBlockedByGroupFlow}
             />
+            <MatchScopeSelector scope={matchScope} setScope={setMatchScope} />
             <MatchModeBody
               mode={matchMode}
               groupSummary={groupSummary}
@@ -847,6 +839,83 @@ function MatchModeSelector({
         </span>
       </button>
     </div>
+  )
+}
+
+function MatchScopeSelector({
+  scope,
+  setScope,
+}: {
+  scope: MatchScope
+  setScope: (scope: MatchScope) => void
+}) {
+  const options: Array<{
+    value: MatchScope
+    title: string
+    desc: string
+    badge: string
+  }> = [
+    {
+      value: 'same_school',
+      title: '우리 학교끼리',
+      desc: '부산대 안에서 먼저 조건이 맞는 팀을 찾아요.',
+      badge: 'PNU',
+    },
+    {
+      value: 'cross_school',
+      title: '다른 학교도 허용',
+      desc: '서로 허용한 학교끼리만 확장 매칭해요.',
+      badge: '확장',
+    },
+  ]
+
+  return (
+    <section className="mb-4 rounded-[26px] border border-boot-primary/15 bg-white px-4 py-4">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+            Campus Range
+          </p>
+          <h2 className="mt-1 text-base font-black text-boot-ink">어느 학교까지 열어둘까요?</h2>
+        </div>
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-600">
+          부산대 mock
+        </span>
+      </div>
+      <div className="grid gap-2">
+        {options.map((option) => {
+          const active = scope === option.value
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setScope(option.value)}
+              className={[
+                'flex min-h-[74px] items-center gap-3 rounded-[22px] border px-4 py-3 text-left transition',
+                active
+                  ? 'border-boot-primary/35 bg-boot-soft text-boot-ink shadow-[0_12px_26px_rgba(255,79,105,0.12)]'
+                  : 'border-boot-hairline bg-white text-boot-ink hover:bg-boot-soft/60',
+              ].join(' ')}
+            >
+              <span className={[
+                'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xs font-black',
+                active ? 'bg-boot-primary text-white' : 'bg-boot-soft text-boot-primary',
+              ].join(' ')}>
+                {option.badge}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-black">{option.title}</span>
+                <span className="mt-0.5 block text-xs leading-5 text-boot-muted">{option.desc}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      <p className="mt-3 text-[11px] leading-5 text-boot-muted">
+        지금은 프론트 검토용 선택 UI입니다. 실제 학교 간 매칭 허용 여부는 다음 단계에서 DB 필터와 큐 API에 연결해야 합니다.
+      </p>
+    </section>
   )
 }
 

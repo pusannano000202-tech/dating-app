@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, MessageCircle, UserRound, Zap } from 'lucide-react'
+import { Home, Sparkles, UserRound, Zap } from 'lucide-react'
 
 const hiddenExactRoutes = new Set(['/login', '/dev/preview'])
 
 const tabs = [
   { href: '/', label: '홈', Icon: Home },
   { href: '/match', label: '매칭', Icon: Zap },
-  { href: '/chat', label: '채팅', Icon: MessageCircle },
+  { href: '/community', label: '모임', Icon: Sparkles },
   { href: '/profile/edit', label: '마이', Icon: UserRound },
 ]
 
@@ -22,7 +22,7 @@ function shouldHide(pathname: string): boolean {
 function isActive(pathname: string, href: string): boolean {
   if (href === '/') return pathname === '/'
   if (href === '/match') return pathname === '/match' || pathname.startsWith('/match/')
-  if (href === '/chat') return pathname === '/chat' || /^\/match\/[^/]+\/chat/.test(pathname)
+  if (href === '/community') return pathname === '/community' || pathname.startsWith('/community/')
   if (href === '/profile/edit') return pathname === '/profile/edit' || pathname.startsWith('/profile/')
   return pathname === href || pathname.startsWith(`${href}/`)
 }

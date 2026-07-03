@@ -41,11 +41,11 @@ export default function BootingLogo({
       </div>
       <div>
         <p className={`${s.title} font-black leading-none tracking-normal text-boot-ink`}>
-          부팅
+          Quantum
         </p>
         {showSubtitle && (
           <p className={`${s.subtitle} mt-1 font-bold uppercase tracking-[0.18em] text-boot-muted`}>
-            부산대 과팅
+            퀀텀 과팅
           </p>
         )}
       </div>

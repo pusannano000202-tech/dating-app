@@ -93,6 +93,12 @@ function HomeDashboard() {
 
         <div className="grid gap-2.5">
           <UtilityLink
+            href="/community"
+            label="모임 둘러보기"
+            desc="밥약, 카공, 게임, 학교별 커뮤니티 카드"
+            Icon={Sparkles}
+          />
+          <UtilityLink
             href="/group/create"
             label="내 그룹 보기"
             desc="초대, 준비 상태, 큐 진입 상태 확인"

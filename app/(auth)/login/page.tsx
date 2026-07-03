@@ -282,7 +282,7 @@ function LoginContent() {
             <div className="rounded-[30px] border border-white/60 bg-white/92 p-6 shadow-[0_26px_70px_rgba(23,18,15,0.22)] backdrop-blur-2xl">
               <div className="mb-6">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary">Login</p>
-                <h1 className="mt-2 text-2xl font-black leading-tight">부팅 시작하기</h1>
+                <h1 className="mt-2 text-2xl font-black leading-tight">Quantum 시작하기</h1>
                 <p className="mt-2 text-sm leading-6 text-boot-muted">
                   로그인하면 기본정보 입력부터 매칭 준비까지 이어서 진행돼요.
                 </p>

@@ -164,7 +164,7 @@ function SoloBlockedByGroupFlowView() {
           </div>
           <h2 className="text-xl font-black">진행 중인 과팅을 먼저 마무리해 주세요</h2>
           <p className="mt-2 text-sm leading-6 text-boot-muted">
-            부팅은 시간과 장소까지 자동으로 잡아주는 구조라, 과팅 큐에 들어간 뒤에는 동시에 소개팅을 시작하지 않도록 막아뒀어요.
+            Quantum은 시간과 장소까지 자동으로 잡아주는 구조라, 과팅 큐에 들어간 뒤에는 동시에 소개팅을 시작하지 않도록 막아뒀어요.
           </p>
           <Link
             href="/match"
@@ -179,7 +179,15 @@ function SoloBlockedByGroupFlowView() {
   )
 }
 
-function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupStep[] }) {
+function MatchStartView({
+  mode,
+  steps,
+  allowPreviewShortcuts = false,
+}: {
+  mode: MatchStartMode
+  steps: SetupStep[]
+  allowPreviewShortcuts?: boolean
+}) {
   const current = getCurrentSetupState(steps)
   const currentStep = current.currentStep
   const isSoloMode = mode === 'solo'
@@ -218,20 +226,37 @@ function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupSte
 
           {isSoloMode ? (
             <div className="space-y-3">
-              <Link
-                href="/match?mode=solo&soloStatus=in_pool"
-                className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
-              >
-                1:1 매칭 큐 들어가기
-                <ArrowRight size={18} />
-              </Link>
-              <Link
-                href="/match?mode=solo&sampleMatches=1"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
-              >
-                mock 가매칭 화면 보기
-                <ArrowRight size={16} />
-              </Link>
+              {allowPreviewShortcuts ? (
+                <>
+                  <Link
+                    href="/match?mode=solo&soloStatus=in_pool"
+                    className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
+                  >
+                    1:1 매칭 큐 들어가기
+                    <ArrowRight size={18} />
+                  </Link>
+                  <Link
+                    href="/match?mode=solo&sampleMatches=1"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
+                  >
+                    가매칭 미리보기
+                    <ArrowRight size={16} />
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-800">
+                    1:1 소개팅 큐는 실제 API 연결 후 열릴 예정입니다. 지금은 과팅 큐를 먼저 이용해 주세요.
+                  </div>
+                  <Link
+                    href="/match"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-boot-ink py-4 text-center text-base font-black text-white"
+                  >
+                    매칭 화면으로 돌아가기
+                    <ArrowRight size={18} />
+                  </Link>
+                </>
+              )}
             </div>
           ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -383,7 +408,13 @@ export default async function MatchStartPage({
     const cardDraftDone = isPreMatchCardDraftCookieDone(
       cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
     )
-    return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} />
+    return (
+      <MatchStartView
+        mode={mode}
+        steps={buildSetupSteps(profile, cardDraftDone, redirectTo)}
+        allowPreviewShortcuts
+      />
+    )
   }
 
   const supabase = createSupabaseServerClient()

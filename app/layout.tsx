@@ -3,13 +3,13 @@ import './globals.css'
 import AppBottomNav from '@/components/navigation/AppBottomNav'
 
 export const metadata: Metadata = {
-  title: '부팅 — 부산대 과팅',
-  description: '부산대생끼리 친구들과 팀을 만들고, 조건이 맞는 상대팀과 안전하게 만나는 과팅 서비스입니다.',
+  title: 'Quantum — 대학 과팅',
+  description: '학교별 분위기와 친구 그룹을 바탕으로 조건이 맞는 상대팀과 안전하게 만나는 과팅 서비스입니다.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: '부팅',
+    title: 'Quantum',
   },
   formatDetection: { telephone: false },
 }
