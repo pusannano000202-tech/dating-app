@@ -61,7 +61,7 @@ export default function DepositPaymentPanel({
               {theme.copy.matchWaiting}. 정상 만남이 끝나면 환불 단계로 넘어갑니다.
             </p>
           </div>
-          <UniversityMascot kind="waiting" size="md" className="h-14 w-14 rounded-2xl" />
+          <UniversityMascot kind="support" size="md" className="h-14 w-14 rounded-2xl" />
         </div>
 
         <div className="grid grid-cols-2 gap-2">

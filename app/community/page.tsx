@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import BootingLogo from '@/components/BootingLogo'
+import UniversityMascot from '@/components/theme/UniversityMascot'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 import { communityRooms, mannerSummary, missions, todayDebate } from '@/lib/community/mock-data'
 
@@ -80,7 +81,10 @@ export default function CommunityPage() {
               </p>
               <h2 className="text-lg font-black">오늘 할 일</h2>
             </div>
-            <Sparkles size={18} className="text-boot-primary" />
+            <div className="flex items-center gap-2">
+              <Sparkles size={18} className="text-boot-primary" />
+              <UniversityMascot kind="guide" size="sm" className="h-12 w-12 rounded-2xl shadow-sm" />
+            </div>
           </div>
 
           <div className="grid gap-2">
