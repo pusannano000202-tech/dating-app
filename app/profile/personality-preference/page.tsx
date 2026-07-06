@@ -13,8 +13,9 @@ import {
 } from '@/lib/matching/personality-preference'
 import type { Big5Vector } from '@/lib/matching/types'
 import { getSequentialMatchStartRedirect } from '@/lib/client-redirect'
-import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
+import { isDevPreviewClientSession, markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
+import { isSupabaseConfigured } from '@/lib/utils'
 
 type Phase = 'survey' | 'result'
 
@@ -36,6 +37,11 @@ export default function PersonalityPreferencePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (isDevPreviewClientSession() || !isSupabaseConfigured()) {
+      setLoaded(true)
+      return
+    }
+
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
@@ -66,7 +72,7 @@ export default function PersonalityPreferencePage() {
           }
           setLoaded(true)
         })
-    })
+    }).catch(() => setLoaded(true))
   }, [])
 
   function handleSurveyComplete(nextProfile: PersonalityPreferenceProfile) {
@@ -80,10 +86,19 @@ export default function PersonalityPreferencePage() {
     setError(null)
 
     try {
+      if (isDevPreviewClientSession() || !isSupabaseConfigured()) {
+        if (markDevMatchSetupStepComplete('personality')) {
+          router.push(getSequentialMatchStartRedirect('/profile/schedule', '/profile/schedule'))
+          return
+        }
+        router.push('/login')
+        return
+      }
+
       const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-          if (markDevMatchSetupStepComplete('personality')) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        if (markDevMatchSetupStepComplete('personality')) {
           router.push(getSequentialMatchStartRedirect('/profile/schedule', '/profile/schedule'))
           return
         }

@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PreferenceWeightInputs from '@/components/profile/PreferenceWeightInputs'
 import { getSequentialMatchStartRedirect } from '@/lib/client-redirect'
-import { markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
+import { isDevPreviewClientSession, markDevMatchSetupStepComplete } from '@/lib/dev-match-setup'
 import { createClient } from '@/lib/supabase'
 import type { PreferenceWeights } from '@/lib/types'
+import { isSupabaseConfigured } from '@/lib/utils'
 
 const DEFAULT_WEIGHTS: PreferenceWeights = {
   appearance: 0.35,
@@ -58,6 +59,13 @@ export default function PreferencesPage() {
   const [ageMax, setAgeMax] = useState<number>(AGE_INPUT_MAX)
 
   useEffect(() => {
+    if (isDevPreviewClientSession() || !isSupabaseConfigured()) {
+      setAgeMin(20)
+      setAgeMax(35)
+      setLoaded(true)
+      return
+    }
+
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
@@ -86,7 +94,7 @@ export default function PreferencesPage() {
           setAgeMax(typeof data?.preferred_age_max === 'number' ? data.preferred_age_max : fallbackMax)
           setLoaded(true)
         })
-    })
+    }).catch(() => setLoaded(true))
   }, [])
 
   const total = Math.round(Object.values(weights).reduce((sum, value) => sum + value, 0) * 100)
@@ -108,6 +116,16 @@ export default function PreferencesPage() {
     setError(null)
 
     try {
+      if (isDevPreviewClientSession() || !isSupabaseConfigured()) {
+        if (markDevMatchSetupStepComplete('preferences')) {
+          router.push(getSequentialMatchStartRedirect('/profile/match-card', '/'))
+          return
+        }
+
+        router.push('/login')
+        return
+      }
+
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {

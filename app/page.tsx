@@ -17,6 +17,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
 import HomeInfoButton from '@/components/matching/HomeInfoButton'
 import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
+import { HomeUniversityCoachCard } from '@/components/theme/HomeUniversityCoachCard'
 
 type ServerSupabaseClient = ReturnType<typeof createSupabaseServerClient>
 
@@ -73,6 +74,8 @@ function HomeDashboard() {
           <h1 className="mt-1 text-4xl font-black leading-tight">오늘의 매칭</h1>
         </section>
 
+        <HomeUniversityCoachCard />
+
         <HomeTodayTaskCard />
 
         <section className="mb-5 grid grid-cols-2 gap-3">
@@ -92,6 +95,12 @@ function HomeDashboard() {
         </section>
 
         <div className="grid gap-2.5">
+          <UtilityLink
+            href="/community"
+            label="모임 둘러보기"
+            desc="밥약, 카공, 게임, 학교별 커뮤니티 카드"
+            Icon={Sparkles}
+          />
           <UtilityLink
             href="/group/create"
             label="내 그룹 보기"

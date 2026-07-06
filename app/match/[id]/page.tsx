@@ -7,6 +7,8 @@ import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, 
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
 import DepositPaymentPanel from '@/components/matching/DepositPaymentPanel'
 import MatchFoundSummary from '@/components/matching/MatchFoundSummary'
+import UniversityMascot from '@/components/theme/UniversityMascot'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
@@ -27,6 +29,7 @@ import { getDevMatchPreviewStatus } from '@/lib/matching/dev-match-preview'
 
 interface MatchDetail {
   match_id: string
+  match_mode?: 'group' | 'solo'
   my_group_id: string
   opp_group_id: string
   opp_group_size: number
@@ -122,17 +125,54 @@ const PENDING_MATCH_STEPS = [
 ] as const
 
 type PendingMatchStepKey = typeof PENDING_MATCH_STEPS[number]['key']
+type PendingMatchStep = typeof PENDING_MATCH_STEPS[number]
+type PendingMatchStepCopy = Omit<PendingMatchStep, 'title' | 'description'> & {
+  title: string
+  description: string
+}
 
-function createDevMatchDetail(matchId: string): MatchDetail {
+function getPendingStepCopy(step: PendingMatchStep, match?: MatchDetail | null): PendingMatchStepCopy {
+  if (match?.match_mode !== 'solo') return step
+
+  if (step.key === 'overview') {
+    return {
+      ...step,
+      title: '1:1 가매칭이 도착했어요',
+      description: '상대 상세는 잠겨 있고, 지금은 내 준비 상태만 확인해요.',
+    }
+  }
+
+  if (step.key === 'card') {
+    return {
+      ...step,
+      title: '나를 소개해요',
+      description: '상대가 확정 전에 볼 수 있는 최소 힌트를 항목별로 작성해요.',
+    }
+  }
+
+  return step
+}
+
+function isSoloMatchId(matchId: string): boolean {
+  return matchId.startsWith('dev-solo-') || matchId.includes('solo')
+}
+
+function createDevMatchDetail(
+  matchId: string,
+  venue: { name: string; address: string },
+): MatchDetail {
   const isPending = getDevMatchPreviewStatus(matchId) === 'pending'
+  const isSolo = isSoloMatchId(matchId)
+  const participantCount = isSolo ? 1 : 3
   const start = new Date(Date.now() + 1000 * 60 * 60 * 26)
   const end = new Date(start.getTime() + 1000 * 60 * 90)
 
   return {
     match_id: matchId,
-    my_group_id: 'dev-group-1',
-    opp_group_id: 'dev-group-2',
-    opp_group_size: 3,
+    match_mode: isSolo ? 'solo' : 'group',
+    my_group_id: isSolo ? 'dev-solo-user' : 'dev-group-1',
+    opp_group_id: isSolo ? 'dev-solo-opponent' : 'dev-group-2',
+    opp_group_size: participantCount,
     opp_group_gender: 'female',
     match_status: isPending ? 'pending' : 'confirmed',
     matched_at: new Date().toISOString(),
@@ -142,19 +182,28 @@ function createDevMatchDetail(matchId: string): MatchDetail {
     opp_confirmed_at: isPending ? null : new Date().toISOString(),
     scheduled_start: isPending ? null : start.toISOString(),
     scheduled_end: isPending ? null : end.toISOString(),
-    venue_name: isPending ? null : 'PNU Station Cafe',
-    venue_address: isPending ? null : 'Busan National University',
+    venue_name: isPending ? null : venue.name,
+    venue_address: isPending ? null : venue.address,
     venue_map_url: isPending ? null : 'https://map.naver.com',
     my_card_submitted_at: null,
-    my_card_content_text: '첫 만남 전에 우리 그룹 분위기를 짧게 적어볼게요.',
-    my_group_active_count: 3,
-    my_group_card_submitted_count: 2,
-    my_group_deposit_paid_count: isPending ? 1 : 3,
+    my_card_content_text: isSolo
+      ? '첫 만남 전에 내 분위기를 짧게 적어볼게요.'
+      : '첫 만남 전에 우리 그룹 분위기를 짧게 적어볼게요.',
+    my_group_active_count: participantCount,
+    my_group_card_submitted_count: isPending ? 0 : participantCount,
+    my_group_deposit_paid_count: isPending ? 0 : participantCount,
     my_group_ready: !isPending,
-    opp_group_active_count: 3,
-    opp_group_card_submitted_count: 2,
-    opp_group_deposit_paid_count: 3,
+    opp_group_active_count: participantCount,
+    opp_group_card_submitted_count: isPending ? 0 : participantCount,
+    opp_group_deposit_paid_count: isPending ? 0 : participantCount,
     opp_group_ready: !isPending,
+  }
+}
+
+function getDevPreviewVenue(theme: ReturnType<typeof useUniversityTheme>['theme']) {
+  return {
+    name: `${theme.shortName} 캠퍼스 카페`,
+    address: theme.designTheme.landmarkCue,
   }
 }
 
@@ -175,6 +224,10 @@ const DEV_CONNECTIONS: ConnectionRow[] = [
   },
 ]
 
+function createDevConnections(matchId: string): ConnectionRow[] {
+  return isSoloMatchId(matchId) ? DEV_CONNECTIONS.slice(0, 1) : DEV_CONNECTIONS
+}
+
 const DEV_ATTENDANCE: AttendanceState = {
   my_checked_in: false,
   my_within_radius: false,
@@ -184,6 +237,13 @@ const DEV_ATTENDANCE: AttendanceState = {
   finalize_available: false,
   no_show_finalized: false,
   caller_is_no_show: false,
+}
+
+function createDevAttendance(matchId: string): AttendanceState {
+  return {
+    ...DEV_ATTENDANCE,
+    total_participants: isSoloMatchId(matchId) ? 2 : 6,
+  }
 }
 
 const DEV_DAILY_CARDS: DailyCard[] = [
@@ -200,7 +260,7 @@ const DEV_DAILY_CARDS: DailyCard[] = [
     alias: 'A',
     card_kind: 'music',
     title: '첫 플레이리스트',
-    content_text: '상대 그룹은 조용한 인디 음악보다 같이 따라 부를 수 있는 노래를 좋아해요.',
+    content_text: '상대는 조용한 인디 음악보다 같이 따라 부를 수 있는 노래를 좋아해요.',
     selected_slot: 2,
   },
   {
@@ -255,8 +315,9 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
+  const { theme } = useUniversityTheme()
   const matchId = params.id
-  const isDevPreview = isDevPreviewClientSession() || matchId.startsWith('dev-match')
+  const isDevPreview = isDevPreviewClientSession()
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -279,7 +340,7 @@ export default function MatchDetailPage() {
     setError(null)
 
     if (isDevPreview) {
-      const devMatch = createDevMatchDetail(matchId)
+      const devMatch = createDevMatchDetail(matchId, getDevPreviewVenue(theme))
       setMatch(devMatch)
       setCardDraft(createDailyCardDraftFromSubmissionText(devMatch.my_card_content_text))
       setLoading(false)
@@ -308,7 +369,7 @@ export default function MatchDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [isDevPreview, matchId, theme])
 
   useEffect(() => {
     refresh()
@@ -323,7 +384,7 @@ export default function MatchDetailPage() {
   const refreshConnections = useCallback(async () => {
     setConnectionsLoading(true)
     if (isDevPreview) {
-      setConnections(DEV_CONNECTIONS)
+      setConnections(createDevConnections(matchId))
       setConnectionsLoading(false)
       return
     }
@@ -380,7 +441,7 @@ export default function MatchDetailPage() {
 
   const refreshAttendance = useCallback(async () => {
     if (isDevPreview) {
-      setAttendance(DEV_ATTENDANCE)
+      setAttendance(createDevAttendance(matchId))
       return
     }
 
@@ -499,8 +560,8 @@ export default function MatchDetailPage() {
             opp_confirmed_at: now,
             scheduled_start: start.toISOString(),
             scheduled_end: end.toISOString(),
-            venue_name: 'PNU Station Cafe',
-            venue_address: 'Busan National University',
+            venue_name: getDevPreviewVenue(theme).name,
+            venue_address: getDevPreviewVenue(theme).address,
             venue_map_url: 'https://map.naver.com',
             my_group_ready: true,
             opp_group_ready: true,
@@ -710,8 +771,8 @@ export default function MatchDetailPage() {
       case 'not_match_leader':    return '그룹 리더만 확정하거나 취소할 수 있어요.'
       case 'match_not_pending':   return '이미 처리된 매칭이에요.'
       case 'match_not_cancelable': return '지금은 취소할 수 없는 매칭이에요.'
-      case 'match_card_incomplete': return '우리 그룹 카드 작성이 끝나야 확정할 수 있어요.'
-      case 'deposit_not_paid':    return '우리 그룹의 보증금 결제가 끝나야 확정할 수 있어요.'
+      case 'match_card_incomplete': return '사전 카드 작성이 끝나야 확정할 수 있어요.'
+      case 'deposit_not_paid':    return '보증금 결제가 끝나야 확정할 수 있어요.'
       case 'invalid_card_content': return '카드는 10자 이상 500자 이하로 작성해 주세요.'
       case 'deposit_already_exists': return '이미 보증금 결제가 확인됐어요.'
       case 'not_group_member':    return '그룹 멤버만 보증금 결제를 할 수 있어요.'
@@ -813,6 +874,7 @@ export default function MatchDetailPage() {
     && dailyCardSubmissionText.trim().length >= 10
     && !dailyCardTooLong
   const pendingStep = PENDING_MATCH_STEPS[pendingStepIndex] ?? PENDING_MATCH_STEPS[0]
+  const pendingStepCopy = getPendingStepCopy(pendingStep, match)
   const isFirstPendingStep = pendingStepIndex === 0
   const isLastPendingStep = pendingStepIndex === PENDING_MATCH_STEPS.length - 1
 
@@ -825,10 +887,11 @@ export default function MatchDetailPage() {
               score={70}
               department="확정 후 공개"
               ageRange="20~23세"
-              genderSummary={`${formatGroupGender(currentMatch.opp_group_gender)} ${currentMatch.opp_group_size}명`}
-              title="가매칭됐어요!"
-              subtitle="보증금과 사전 카드를 끝내면 확정돼요"
-              lockedMessage="상대팀 이름과 자세한 정보는 확정 후 공개돼요."
+              genderSummary={getOpponentSummary(currentMatch)}
+              title={currentMatch.match_mode === 'solo' ? '1:1 가매칭이 도착했어요!' : '가매칭됐어요!'}
+              subtitle={currentMatch.match_mode === 'solo' ? '보증금과 내 사전 카드를 끝내면 확정돼요' : '보증금과 사전 카드를 끝내면 확정돼요'}
+              lockedTitle={currentMatch.match_mode === 'solo' ? '상대 이름은 아직 비공개예요' : '상대팀 이름은 아직 비공개예요'}
+              lockedMessage={currentMatch.match_mode === 'solo' ? '상대 이름과 자세한 정보는 확정 후 공개돼요.' : '상대팀 이름과 자세한 정보는 확정 후 공개돼요.'}
             />
 
             <div className="rounded-3xl border border-boot-hairline bg-white/80 p-4">
@@ -837,7 +900,7 @@ export default function MatchDetailPage() {
                 <div className="rounded-2xl bg-boot-soft px-2 py-3">
                   <p className="text-[11px] text-boot-muted">상대 구성</p>
                   <p className="mt-1 text-sm font-black text-boot-ink">
-                    {formatGroupGender(currentMatch.opp_group_gender)} {currentMatch.opp_group_size}명
+                    {getOpponentSummary(currentMatch)}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-boot-soft px-2 py-3">
@@ -850,9 +913,13 @@ export default function MatchDetailPage() {
                 </div>
               </div>
               <p className="mt-3 text-[11px] leading-relaxed text-boot-muted">
-                이 단계에서는 상대팀을 전부 공개하지 않아요. 우리 팀이 카드와 보증금을 끝내면 확정 단계에서 더 많은 정보가 열려요.
+                {currentMatch.match_mode === 'solo'
+                  ? '이 단계에서는 상대를 전부 공개하지 않아요. 내 카드와 보증금이 끝나면 확정 단계에서 더 많은 정보가 열려요.'
+                : '이 단계에서는 상대팀을 전부 공개하지 않아요. 우리 팀이 카드와 보증금을 끝내면 확정 단계에서 더 많은 정보가 열려요.'}
               </p>
             </div>
+
+            <PendingUnlockPreview mode={currentMatch.match_mode} />
           </div>
         )
 
@@ -886,17 +953,31 @@ export default function MatchDetailPage() {
               formatSubmittedAt={formatDateTime}
             />
 
-            <div className="rounded-2xl border border-boot-hairline bg-white/70 px-3 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-[11px] font-black text-boot-primary">그룹 전체 카드 작성</p>
-                <p className="text-xs font-black text-boot-ink">
-                  {currentMatch.my_group_card_submitted_count}/{currentMatch.my_group_active_count}명 완료
+            {currentMatch.match_mode === 'solo' ? (
+              <div className="rounded-2xl border border-boot-hairline bg-white/70 px-3 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[11px] font-black text-boot-primary">내 소개 카드 작성</p>
+                  <p className="text-xs font-black text-boot-ink">
+                    {completedDailyCardItemCount}/6개 완료
+                  </p>
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                  1:1 소개팅은 내 카드와 보증금만 끝내면 확정 대기 상태로 넘어가요. 상대도 준비를 끝내면 약속 정보와 오늘의 카드가 열립니다.
                 </p>
               </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
-                내 카드 완료율과 그룹 전체 완료율은 따로 봐야 해요. 다른 멤버도 자기 카드 작성을 끝내야 확정할 수 있어요.
-              </p>
-            </div>
+            ) : (
+              <div className="rounded-2xl border border-boot-hairline bg-white/70 px-3 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[11px] font-black text-boot-primary">그룹 전체 카드 작성</p>
+                  <p className="text-xs font-black text-boot-ink">
+                    {currentMatch.my_group_card_submitted_count}/{currentMatch.my_group_active_count}명 완료
+                  </p>
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                  내 카드 완료율과 그룹 전체 완료율은 따로 봐야 해요. 다른 멤버도 자기 카드 작성을 끝내야 확정할 수 있어요.
+                </p>
+              </div>
+            )}
           </div>
         )
 
@@ -908,6 +989,7 @@ export default function MatchDetailPage() {
               paidCount={currentMatch.my_group_deposit_paid_count}
               totalCount={currentMatch.my_group_active_count}
               saving={depositSaving}
+              mode={currentMatch.match_mode === 'solo' ? 'solo' : 'group'}
               onPay={payDeposit}
             />
 
@@ -920,7 +1002,7 @@ export default function MatchDetailPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <ProgressPill
-                label="우리 보증금"
+                label={currentMatch.match_mode === 'solo' ? '내 보증금' : '우리 보증금'}
                 current={currentMatch.my_group_deposit_paid_count}
                 total={currentMatch.my_group_active_count}
               />
@@ -943,7 +1025,7 @@ export default function MatchDetailPage() {
                 total={currentMatch.my_group_active_count}
               />
               <ProgressPill
-                label="우리 보증금"
+                label={currentMatch.match_mode === 'solo' ? '내 보증금' : '우리 보증금'}
                 current={currentMatch.my_group_deposit_paid_count}
                 total={currentMatch.my_group_active_count}
               />
@@ -961,7 +1043,9 @@ export default function MatchDetailPage() {
 
             {currentMatch.my_confirmed_at && !currentMatch.opp_confirmed_at ? (
               <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-700">
-                우리 그룹은 확정 완료. 상대 그룹 리더의 확인을 기다리는 중이에요.
+                {currentMatch.match_mode === 'solo'
+                  ? '나는 확정 완료. 상대 확인을 기다리는 중이에요.'
+                  : '우리 그룹은 확정 완료. 상대 그룹 리더의 확인을 기다리는 중이에요.'}
               </div>
             ) : (
               <>
@@ -969,7 +1053,9 @@ export default function MatchDetailPage() {
                   <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3">
                     <p className="text-xs font-black text-amber-700">아직 확정할 수 없어요</p>
                     <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
-                      사전 카드와 우리 팀 보증금이 모두 완료되면 아래 버튼이 활성화돼요.
+                      {currentMatch.match_mode === 'solo'
+                        ? '사전 카드와 내 보증금이 모두 완료되면 아래 버튼이 활성화돼요.'
+                        : '사전 카드와 우리 팀 보증금이 모두 완료되면 아래 버튼이 활성화돼요.'}
                     </p>
                   </div>
                 )}
@@ -987,9 +1073,9 @@ export default function MatchDetailPage() {
                     type="button"
                     onClick={cancelMatch}
                     disabled={saving}
-                    className="flex-1 py-3 rounded-2xl text-sm text-boot-body border border-boot-hairline hover:border-boot-primary/30 disabled:opacity-40"
+                    className="flex-1 py-3 rounded-2xl text-sm font-bold text-boot-primary border border-boot-primary/25 bg-boot-soft hover:border-boot-primary/40 disabled:opacity-40"
                   >
-                    나중에 하기
+                    가매칭 취소하기
                   </button>
                 </div>
               </>
@@ -1038,8 +1124,8 @@ export default function MatchDetailPage() {
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">MATCH FLOW</p>
-                    <h2 className="mt-1 text-xl font-black text-boot-ink">{pendingStep.title}</h2>
-                    <p className="mt-1 text-xs leading-relaxed text-boot-muted">{pendingStep.description}</p>
+                    <h2 className="mt-1 text-xl font-black text-boot-ink">{pendingStepCopy.title}</h2>
+                    <p className="mt-1 text-xs leading-relaxed text-boot-muted">{pendingStepCopy.description}</p>
                   </div>
                   <div className="rounded-full bg-boot-soft px-3 py-1 text-xs font-black text-boot-primary">
                     {pendingStepIndex + 1}/{PENDING_MATCH_STEPS.length}
@@ -1095,6 +1181,14 @@ export default function MatchDetailPage() {
                     다음 단계
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={cancelMatch}
+                  disabled={saving}
+                  className="mt-3 w-full rounded-2xl border border-boot-primary/25 bg-white/80 py-3 text-sm font-black text-boot-primary shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {saving ? '처리 중...' : '가매칭 취소하기'}
+                </button>
               </section>
             ) : (
               <>
@@ -1103,11 +1197,19 @@ export default function MatchDetailPage() {
                   score={92}
                   department="경영학과"
                   ageRange="20~23세"
-                  genderSummary={`${formatGroupGender(match.opp_group_gender)} ${match.opp_group_size}명`}
+                  genderSummary={getOpponentSummary(match)}
                   title="매칭됐어요!"
-                  subtitle="딱 맞는 팀을 찾았어요"
+                  subtitle={match.match_mode === 'solo' ? '딱 맞는 상대를 찾았어요' : '딱 맞는 팀을 찾았어요'}
+                  lockedTitle={match.match_mode === 'solo' ? '상대 이름은 아직 비공개예요' : '상대팀 이름은 아직 비공개예요'}
                   lockedMessage="날짜를 정하고 만남 전까지 하루씩 Q&A로 알아가요."
                 />
+
+                {match.scheduled_start && (
+                  <TodayCardSummary
+                    mode={match.match_mode}
+                    scheduledStart={match.scheduled_start}
+                  />
+                )}
 
                 <section className="glass rounded-3xl p-4 mb-4">
                   {match.scheduled_start ? (
@@ -1194,7 +1296,7 @@ export default function MatchDetailPage() {
                 disabled={saving}
                 className="w-full py-3 rounded-2xl text-sm text-red-300/80 border border-red-400/15 hover:border-red-400/30 hover:bg-red-500/5 disabled:opacity-40 mb-4"
               >
-                매칭 취소
+                매칭 취소하기
               </button>
             )}
             {match.match_status === 'completed' && attendance?.no_show_finalized ? (
@@ -1205,7 +1307,9 @@ export default function MatchDetailPage() {
                   <p className="text-sm font-bold text-boot-coral">
                     {attendance.caller_is_no_show
                         ? '내가 노쇼로 처리되면 다음 매칭으로 바로 이동돼요'
-                        : '상대가 노쇼 처리하면 우리 그룹도 정산이 완료돼요'}
+                        : match.match_mode === 'solo'
+                          ? '상대가 노쇼 처리되면 내 정산이 완료돼요'
+                          : '상대가 노쇼 처리하면 우리 그룹도 정산이 완료돼요'}
                     </p>
                     <p className="mt-1.5 text-xs text-boot-muted leading-relaxed">
                       {attendance.caller_is_no_show
@@ -1248,12 +1352,10 @@ export default function MatchDetailPage() {
                     </div>
                     <h3 className="text-base font-black text-boot-ink">오늘의 공개 카드</h3>
                     <p className="mt-1 text-xs leading-relaxed text-boot-muted">
-                      16시부터 20시 사이에 카드 하나를 고르면 상대 그룹의 작은 힌트가 열려요.
+                      16시부터 20시 사이에 카드 하나를 고르면 {match.match_mode === 'solo' ? '상대의 작은 힌트' : '상대 그룹의 작은 힌트'}가 열려요.
                     </p>
                   </div>
-                  <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-boot-primary/20 bg-white text-boot-primary shadow-sm">
-                    <Gift size={19} />
-                  </div>
+                  <UniversityMascot kind="waiting" size="sm" className="h-12 w-12 rounded-2xl" />
                 </div>
 
                 {dailyCardsLoading && dailyCards.length === 0 ? (
@@ -1442,7 +1544,7 @@ export default function MatchDetailPage() {
                   <h3 className="text-sm font-bold">상대 연락처</h3>
                 </div>
                 <p className="text-xs text-boot-muted mb-3 leading-relaxed">
-                  약속 시간이 가까워지면 상대 그룹 연락처가 자동으로 공개돼요.
+                  약속 시간이 가까워지면 {match.match_mode === 'solo' ? '상대 연락처' : '상대 그룹 연락처'}가 자동으로 공개돼요.
                   장소를 못 찾거나 늦을 때 바로 연락할 수 있어요.
                 </p>
 
@@ -1510,6 +1612,106 @@ export default function MatchDetailPage() {
         )}
       </div>
     </main>
+  )
+}
+
+function PendingUnlockPreview({ mode }: { mode?: MatchDetail['match_mode'] }) {
+  const targetLabel = mode === 'solo' ? '상대' : '상대팀'
+  const items = [
+    {
+      icon: Gift,
+      label: '데일리카드',
+      title: '확정 후 오늘 한 장을 열어요',
+      body: '16-20시에 하루 한 장씩 직접 열고, 내가 써야 상대 힌트가 열려요.',
+    },
+    {
+      icon: CalendarClock,
+      label: '약속 정보',
+      title: '시간과 장소를 확인해요',
+      body: '보증금과 준비가 끝난 뒤 만남 일정과 장소가 단계적으로 공개돼요.',
+    },
+    {
+      icon: MessageCircle,
+      label: '채팅/연락처',
+      title: '약속 조건에 맞춰 열려요',
+      body: `${targetLabel}가 확정되고 약속 시간이 가까워지면 채팅과 연락처 공개 조건을 확인해요.`,
+    },
+  ]
+
+  return (
+    <div className="rounded-3xl border border-boot-primary/15 bg-gradient-to-br from-white via-boot-soft/80 to-white p-4">
+      <div className="flex items-start gap-3">
+        <UniversityMascot kind="waiting" size="sm" className="h-11 w-11 rounded-2xl" />
+        <div>
+          <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">NEXT UNLOCK</p>
+          <h3 className="mt-1 text-base font-black text-boot-ink">확정 후 열리는 것</h3>
+          <p className="mt-1 text-xs leading-relaxed text-boot-muted">
+            지금은 가매칭 단계라 상대 상세를 숨기고, 준비가 끝난 뒤 아래 흐름이 순서대로 열려요.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 space-y-2">
+        {items.map((item, index) => {
+          const Icon = item.icon
+          return (
+            <div key={item.label} className="flex gap-3 rounded-2xl border border-boot-hairline bg-white/80 px-3 py-3">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-boot-soft text-boot-primary">
+                <Icon size={16} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-black text-boot-primary">
+                    {index + 1}
+                  </span>
+                  <p className="text-[11px] font-black text-boot-primary">{item.label}</p>
+                </div>
+                <p className="mt-1 text-sm font-black text-boot-ink">{item.title}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">{item.body}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function TodayCardSummary({
+  mode,
+  scheduledStart,
+}: {
+  mode?: MatchDetail['match_mode']
+  scheduledStart: string
+}) {
+  return (
+    <section className="mb-4 rounded-[28px] border border-boot-primary/18 bg-gradient-to-br from-white via-rose-50 to-orange-50 px-4 py-4 shadow-[0_16px_38px_rgba(23,20,18,0.08)]">
+      <div className="flex items-start gap-3">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-boot-primary/20 bg-white text-boot-primary shadow-sm">
+          <Gift size={20} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-boot-primary">TODAY CARD</p>
+          <h3 className="mt-1 text-lg font-black leading-tight text-boot-ink">오늘의 공개 카드를 열어요</h3>
+          <p className="mt-1 text-xs leading-5 text-boot-muted">
+            16시부터 20시 사이에 한 장을 직접 열면 {mode === 'solo' ? '상대의 작은 힌트' : '상대 그룹의 작은 힌트'}가 보여요.
+          </p>
+        </div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="rounded-2xl border border-boot-hairline bg-white/80 px-3 py-3">
+          <p className="text-[11px] font-bold text-boot-muted">공개 시간</p>
+          <p className="mt-1 text-sm font-black text-boot-ink">16:00-20:00</p>
+        </div>
+        <div className="rounded-2xl border border-boot-hairline bg-white/80 px-3 py-3">
+          <p className="text-[11px] font-bold text-boot-muted">만남까지</p>
+          <p className="mt-1 text-sm font-black text-boot-ink">{formatCountdown(scheduledStart)}</p>
+        </div>
+      </div>
+      <p className="mt-3 text-[11px] leading-5 text-boot-muted">
+        아래 카드 목록에서 오늘 뽑기 버튼을 누르면 됩니다. 내가 열어야 상대 힌트도 순서대로 열려요.
+      </p>
+    </section>
   )
 }
 
@@ -1613,6 +1815,11 @@ function formatGroupGender(gender: MatchDetail['opp_group_gender']): string {
     case 'female': return '여'
     case 'mixed': return '혼성'
   }
+}
+
+function getOpponentSummary(match: MatchDetail): string {
+  if (match.match_mode === 'solo') return '1:1 상대'
+  return `${formatGroupGender(match.opp_group_gender)} ${match.opp_group_size}명`
 }
 
 function translateStatus(status: string): string {

@@ -4,8 +4,8 @@ export function GroupHeader() {
   return (
     <header className="mb-6 flex items-start justify-between gap-3">
       <div className="flex-1">
-        <p className="text-xs font-bold uppercase tracking-[0.24em] text-boot-primary">
-          Group Match
+        <p className="text-xs font-bold tracking-[0.24em] text-boot-primary">
+          그룹 과팅
         </p>
         <h1 className="mt-2 text-2xl font-black">친구와 같이 매칭받기</h1>
         <p className="mt-2 text-sm leading-relaxed text-boot-muted">

@@ -6,6 +6,8 @@ import BasicInfoForm, { type BasicInfoData } from '@/components/profile/BasicInf
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { DEV_BASIC_PROFILE_STORAGE_KEY } from '@/lib/profile/dev-basic-profile'
 import { createClient } from '@/lib/supabase'
+import { setStoredUniversityThemeFromSchool } from '@/lib/university-theme'
+import { isSupabaseConfigured } from '@/lib/utils'
 
 export default function BasicInfoPage() {
   const router = useRouter()
@@ -15,9 +17,22 @@ export default function BasicInfoPage() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   useEffect(() => {
+    let mounted = true
+    const finishLoading = () => {
+      if (mounted) setLoaded(true)
+    }
+
+    if (isDevPreviewClientSession() && !isSupabaseConfigured()) {
+      finishLoading()
+      return () => {
+        mounted = false
+      }
+    }
+
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { setLoaded(true); return }
+      if (!mounted) return
+      if (!user) { finishLoading(); return }
       Promise.all([
         supabase
           .from('profiles')
@@ -37,25 +52,38 @@ export default function BasicInfoPage() {
               phone: typeof userResult.data?.phone === 'string' ? userResult.data.phone : '',
             })
           }
-          setLoaded(true)
+          finishLoading()
         })
+        .catch(finishLoading)
     })
+      .catch(finishLoading)
+
+    return () => {
+      mounted = false
+    }
   }, [])
 
   async function handleSubmit(data: BasicInfoData) {
     setSaving(true)
     setServerError(null)
     try {
+      setStoredUniversityThemeFromSchool(data.school)
+      if (isDevPreviewClientSession() && !isSupabaseConfigured()) {
+        saveDevPreviewProfile(data)
+        return
+      }
+
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      let user = null
+      try {
+        const result = await supabase.auth.getUser()
+        user = result.data.user
+      } catch {
+        user = null
+      }
+
       if (!user) {
-        if (isDevPreviewClientSession()) {
-          try {
-            sessionStorage.setItem(DEV_BASIC_PROFILE_STORAGE_KEY, JSON.stringify(data))
-          } catch {}
-          router.push('/profile/worldcup')
-          return
-        }
+        if (saveDevPreviewProfile(data)) return
         router.push('/login')
         return
       }
@@ -85,6 +113,15 @@ export default function BasicInfoPage() {
     }
   }
 
+  function saveDevPreviewProfile(data: BasicInfoData): boolean {
+    if (!isDevPreviewClientSession()) return false
+    try {
+      sessionStorage.setItem(DEV_BASIC_PROFILE_STORAGE_KEY, JSON.stringify(data))
+    } catch {}
+    router.push('/profile/worldcup')
+    return true
+  }
+
   return (
     <div className="flex min-h-screen flex-col px-5 pb-28">
       <div className="mb-6">
@@ -97,16 +134,20 @@ export default function BasicInfoPage() {
 
       {loaded && (
         <section className="mb-4 rounded-2xl border border-boot-primary/25 bg-white/90 px-4 py-3">
-          <p className="text-[11px] font-black text-boot-primary">오늘 할 일</p>
-          <div className="mt-2 flex items-center gap-2 overflow-x-auto text-[11px]">
-            <span className="whitespace-nowrap rounded-full bg-boot-soft px-3 py-1 text-boot-ink">기본정보 입력</span>
-            <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">이상형 월드컵</span>
-            <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">성향 질문</span>
-            <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">사진 업로드</span>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-black text-boot-primary">오늘 할 일</p>
+              <div className="mt-2 flex items-center gap-2 overflow-x-auto text-[11px]">
+                <span className="whitespace-nowrap rounded-full bg-boot-soft px-3 py-1 text-boot-ink">기본정보 입력</span>
+                <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">이상형 월드컵</span>
+                <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">성향 질문</span>
+                <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">사진 업로드</span>
+              </div>
+              <p className="mt-2 text-xs text-boot-muted">
+                필수 항목을 채우면 아래 버튼으로 바로 다음 화면을 확인할 수 있어요.
+              </p>
+            </div>
           </div>
-          <p className="mt-2 text-xs text-boot-muted">
-            필수 항목을 채우면 아래 버튼으로 바로 다음 화면을 확인할 수 있어요.
-          </p>
         </section>
       )}
 

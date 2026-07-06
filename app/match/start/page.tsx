@@ -13,7 +13,11 @@ import {
   UsersRound,
 } from 'lucide-react'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
-import { DEV_MATCH_SETUP_COOKIES, getDevMatchSetupCookieValue } from '@/lib/dev-match-setup'
+import {
+  DEV_MATCH_SETUP_COOKIES,
+  DEV_PREVIEW_GROUP_STATUS_COOKIE,
+  getDevMatchSetupCookieValue,
+} from '@/lib/dev-match-setup'
 import {
   DEFAULT_MATCH_PREFERENCE_WEIGHTS,
   getMatchSetupStatus,
@@ -35,6 +39,7 @@ type SetupStep = {
 }
 
 type MatchStartMode = 'group' | 'solo'
+type ActiveGroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 
 const GROUP_REDIRECT_TO = '/match/start'
 const SOLO_REDIRECT_TO = '/match/start?mode=solo'
@@ -105,7 +110,84 @@ function getCurrentSetupState(steps: SetupStep[]) {
   }
 }
 
-function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupStep[] }) {
+function getDevPreviewGroupStatusFromServer(cookieStore: ReturnType<typeof cookies>): ActiveGroupStatus {
+  const value = cookieStore.get(DEV_PREVIEW_GROUP_STATUS_COOKIE)?.value
+  if (value === 'in_pool') return 'in_pool'
+  if (value === 'ready') return 'ready'
+  return 'forming'
+}
+
+function isActiveGroupFlowStatus(status: string | null | undefined): boolean {
+  return status === 'in_pool' || status === 'matched'
+}
+
+async function hasActiveGroupFlow(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  userId: string,
+): Promise<boolean> {
+  const { data: membership } = await supabase
+    .from('group_members')
+    .select('group_id')
+    .eq('user_id', userId)
+    .is('left_at', null)
+    .maybeSingle()
+
+  const groupId = (membership as { group_id?: string } | null)?.group_id
+  if (!groupId) return false
+
+  const { data: group } = await supabase
+    .from('groups')
+    .select('status')
+    .eq('id', groupId)
+    .maybeSingle()
+
+  return isActiveGroupFlowStatus((group as { status?: string } | null)?.status)
+}
+
+function SoloBlockedByGroupFlowView() {
+  return (
+    <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
+      <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
+        <header className="mb-6 flex items-center gap-3">
+          <Link href="/match" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
+            <ChevronLeft size={18} />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-black">소개팅은 잠시 막아둘게요</h1>
+            <p className="mt-0.5 text-xs text-boot-muted">진행 중인 과팅과 일정이 꼬이지 않게 막아둔 상태예요.</p>
+          </div>
+        </header>
+
+        <section className="glass-card rounded-3xl border border-boot-primary/20 p-6 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+            <UsersRound size={24} />
+          </div>
+          <h2 className="text-xl font-black">진행 중인 과팅을 먼저 마무리해 주세요</h2>
+          <p className="mt-2 text-sm leading-6 text-boot-muted">
+            Quantum은 시간과 장소까지 자동으로 잡아주는 구조라, 과팅 큐에 들어간 뒤에는 동시에 소개팅을 시작하지 않도록 막아뒀어요.
+          </p>
+          <Link
+            href="/match"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-boot-ink py-4 text-center text-sm font-black text-white"
+          >
+            매칭 화면으로 돌아가기
+            <ArrowRight size={16} />
+          </Link>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function MatchStartView({
+  mode,
+  steps,
+  allowPreviewShortcuts = false,
+}: {
+  mode: MatchStartMode
+  steps: SetupStep[]
+  allowPreviewShortcuts?: boolean
+}) {
   const current = getCurrentSetupState(steps)
   const currentStep = current.currentStep
   const isSoloMode = mode === 'solo'
@@ -144,20 +226,37 @@ function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupSte
 
           {isSoloMode ? (
             <div className="space-y-3">
-              <Link
-                href="/match?mode=solo&soloStatus=in_pool"
-                className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
-              >
-                1:1 매칭 큐 들어가기
-                <ArrowRight size={18} />
-              </Link>
-              <Link
-                href="/match?mode=solo&sampleMatches=1"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
-              >
-                mock 가매칭 화면 보기
-                <ArrowRight size={16} />
-              </Link>
+              {allowPreviewShortcuts ? (
+                <>
+                  <Link
+                    href="/match?mode=solo&soloStatus=in_pool"
+                    className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
+                  >
+                    1:1 매칭 큐 들어가기
+                    <ArrowRight size={18} />
+                  </Link>
+                  <Link
+                    href="/match?mode=solo&sampleMatches=1"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
+                  >
+                    가매칭 미리보기
+                    <ArrowRight size={16} />
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-800">
+                    1:1 소개팅 큐는 실제 API 연결 후 열릴 예정입니다. 지금은 과팅 큐를 먼저 이용해 주세요.
+                  </div>
+                  <Link
+                    href="/match"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-boot-ink py-4 text-center text-base font-black text-white"
+                  >
+                    매칭 화면으로 돌아가기
+                    <ArrowRight size={18} />
+                  </Link>
+                </>
+              )}
             </div>
           ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -302,16 +401,28 @@ export default async function MatchStartPage({
     cookieStore.get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
 
   if (devAuthed || !isSupabaseConfigured()) {
+    const soloBlockedByGroupFlow = mode === 'solo' && isActiveGroupFlowStatus(getDevPreviewGroupStatusFromServer(cookieStore))
+    if (soloBlockedByGroupFlow) return <SoloBlockedByGroupFlowView />
+
     const profile = devAuthed ? buildDevMatchSetupProfile(cookieStore) : null
     const cardDraftDone = isPreMatchCardDraftCookieDone(
       cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
     )
-    return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} />
+    return (
+      <MatchStartView
+        mode={mode}
+        steps={buildSetupSteps(profile, cardDraftDone, redirectTo)}
+        allowPreviewShortcuts
+      />
+    )
   }
 
   const supabase = createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login?redirect=${encodeURIComponent(redirectTo)}`)
+
+  const soloBlockedByGroupFlow = mode === 'solo' && await hasActiveGroupFlow(supabase, user.id)
+  if (soloBlockedByGroupFlow) return <SoloBlockedByGroupFlowView />
 
   const { data: profile } = await supabase
     .from('profiles')

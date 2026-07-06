@@ -1,4 +1,7 @@
+'use client'
+
 import { Zap } from 'lucide-react'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 
 interface BootingLogoProps {
   size?: 'sm' | 'md' | 'lg'
@@ -33,6 +36,7 @@ export default function BootingLogo({
   className = '',
 }: BootingLogoProps) {
   const s = sizes[size]
+  const { theme } = useUniversityTheme()
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
@@ -41,11 +45,11 @@ export default function BootingLogo({
       </div>
       <div>
         <p className={`${s.title} font-black leading-none tracking-normal text-boot-ink`}>
-          부팅
+          Quantum
         </p>
         {showSubtitle && (
           <p className={`${s.subtitle} mt-1 font-bold uppercase tracking-[0.18em] text-boot-muted`}>
-            부산대 과팅
+            {theme.displayName}
           </p>
         )}
       </div>
