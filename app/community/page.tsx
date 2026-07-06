@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import {
   CalendarDays,
@@ -10,47 +12,51 @@ import {
 } from 'lucide-react'
 import BootingLogo from '@/components/BootingLogo'
 import { CampusCommunityCard } from '@/components/community/CampusCommunityCard'
-
-const pnuCommunityCards = [
-  {
-    title: '넉터 경찰과 도둑',
-    category: '게임',
-    description: '처음 만난 사람도 바로 섞일 수 있게 팀을 나눠 가볍게 노는 캠퍼스 게임 모임이에요.',
-    meta: '오늘 19:00 · 넉넉한 터 · 남녀 혼성 가능',
-    members: '18명 관심',
-    Icon: Gamepad2,
-    tone: 'coral' as const,
-  },
-  {
-    title: '부산대 밥약 테이블',
-    category: '밥약',
-    description: '학과가 달라도 부담 없이 한 끼부터 시작해요. 같은 학교 우선, 다른 학교 허용은 다음 단계에서 붙입니다.',
-    meta: '금정구 맛집 · 2~4명 소규모 · 저녁 추천',
-    members: '12명 관심',
-    Icon: Utensils,
-    tone: 'amber' as const,
-  },
-  {
-    title: '중도 카공 체크인',
-    category: '카공',
-    description: '말을 많이 하지 않아도 괜찮은 조용한 모임. 시험기간에 같이 앉을 사람을 찾아요.',
-    meta: '중앙도서관 근처 · 90분 집중 · 끝나고 커피',
-    members: '9명 관심',
-    Icon: Coffee,
-    tone: 'sky' as const,
-  },
-  {
-    title: '새내기 동아리 둘러보기',
-    category: '동아리',
-    description: '동아리처럼 느슨하게 들어와서 분위기만 보고 나가도 되는 학교 안 모임 허브예요.',
-    meta: '부산대 재학생 중심 · 초대 링크 기반',
-    members: '24명 관심',
-    Icon: UsersRound,
-    tone: 'mint' as const,
-  },
-]
+import MascotCoachCard from '@/components/theme/MascotCoachCard'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 
 export default function CommunityPage() {
+  const { theme } = useUniversityTheme()
+  const campusName = theme.shortName
+  const communityCards = [
+    {
+      title: `${campusName} 캠퍼스 게임`,
+      category: '게임',
+      description: '처음 만난 사람도 바로 섞일 수 있게 팀을 나눠 가볍게 노는 캠퍼스 게임 모임이에요.',
+      meta: `오늘 19:00 · ${theme.designTheme.landmarkCue} 근처 · 남녀 혼성 가능`,
+      members: '18명 관심',
+      Icon: Gamepad2,
+      tone: 'coral' as const,
+    },
+    {
+      title: `${campusName} 밥약 테이블`,
+      category: '밥약',
+      description: '학과가 달라도 부담 없이 한 끼부터 시작해요. 같은 학교 우선, 다른 학교 허용은 다음 단계에서 붙입니다.',
+      meta: `${campusName} 근처 맛집 · 2~4명 소규모 · 저녁 추천`,
+      members: '12명 관심',
+      Icon: Utensils,
+      tone: 'amber' as const,
+    },
+    {
+      title: `${campusName} 카공 체크인`,
+      category: '카공',
+      description: '말을 많이 하지 않아도 괜찮은 조용한 모임. 시험기간에 같이 앉을 사람을 찾아요.',
+      meta: '도서관 근처 · 90분 집중 · 끝나고 커피',
+      members: '9명 관심',
+      Icon: Coffee,
+      tone: 'sky' as const,
+    },
+    {
+      title: `${campusName} 동아리 둘러보기`,
+      category: '동아리',
+      description: '동아리처럼 느슨하게 들어와서 분위기만 보고 나가도 되는 학교 안 모임 허브예요.',
+      meta: `${campusName} 재학생 중심 · 초대 링크 기반`,
+      members: '24명 관심',
+      Icon: UsersRound,
+      tone: 'mint' as const,
+    },
+  ]
+
   return (
     <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
@@ -61,25 +67,15 @@ export default function CommunityPage() {
           </span>
         </header>
 
-        <section className="mb-5 overflow-hidden rounded-[34px] border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-sky-50 px-5 py-5 shadow-[0_22px_50px_rgba(23,20,18,0.08)]">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-emerald-600">
-                PNU Campus Theme
-              </p>
-              <h1 className="mt-2 text-3xl font-black leading-tight text-boot-ink">
-                부산대에서 오늘 뭐하지?
-              </h1>
-              <p className="mt-2 text-sm leading-6 text-boot-muted">
-                과팅만 기다리지 않고, 밥약·카공·게임·동아리 느낌의 모임으로 먼저 사람을 만나요.
-              </p>
-            </div>
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-white text-3xl shadow-sm">
-              Q
-            </div>
-          </div>
+        <section className="mb-5">
+          <MascotCoachCard
+            kind="guide"
+            eyebrow={`${campusName} Campus Theme`}
+            title={`${campusName}에서 오늘 뭐하지?`}
+            body="과팅만 기다리지 않고, 밥약, 카공, 게임, 동아리 느낌의 모임으로 먼저 사람을 만나요."
+          />
           <div className="mt-5 grid grid-cols-3 gap-2">
-            {['부산대 우선', '혼성 가능', '학교별 테마'].map((label) => (
+            {[`${campusName} 우선`, '혼성 가능', '학교별 테마'].map((label) => (
               <span
                 key={label}
                 className="rounded-2xl border border-white/70 bg-white/75 px-2 py-2 text-center text-[11px] font-black text-boot-body shadow-sm"
@@ -101,8 +97,8 @@ export default function CommunityPage() {
               </p>
               <h2 className="mt-1 text-xl font-black leading-tight">학교마다 다른 분위기로 보여줄 수 있어요</h2>
               <p className="mt-2 text-sm leading-6 text-boot-muted">
-                지금은 부산대 mock 테마만 넣었습니다. 다음 단계에서 학교 코드와 테마 데이터를 DB로 분리하면
-                연세대, 고려대, 부경대 등도 같은 기능에 다른 색감과 장소 추천을 입힐 수 있어요.
+                지금은 기본정보의 학교 입력값을 기준으로 프론트 테마를 바꿉니다. 다음 단계에서 학교 코드와 테마 데이터를
+                DB로 분리하면 같은 기능에 다른 색감과 장소 추천을 더 안정적으로 입힐 수 있어요.
               </p>
             </div>
           </div>
@@ -124,7 +120,7 @@ export default function CommunityPage() {
             </Link>
           </div>
           <div className="grid gap-3">
-            {pnuCommunityCards.map((card) => (
+            {communityCards.map((card) => (
               <CampusCommunityCard key={card.title} {...card} />
             ))}
           </div>

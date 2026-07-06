@@ -11,9 +11,13 @@ function readSource(path: string) {
 
 test('root layout uses Booting production metadata and light theme color', () => {
   const layout = readSource('app/layout.tsx')
+  const template = readSource('app/template.tsx')
+  const provider = readSource('components/theme/UniversityThemeProvider.tsx')
 
   assert.match(layout, /themeColor:\s*'#f8f3ec'/)
-  assert.match(layout, /bg-app min-h-screen text-boot-ink/)
+  assert.match(template, /UniversityThemeProvider/)
+  assert.match(template, /AppBottomNav/)
+  assert.match(provider, /className="min-h-screen bg-app text-boot-ink"/)
   assert.doesNotMatch(layout, /Destiny/)
 })
 

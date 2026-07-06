@@ -21,6 +21,8 @@ import CurrentGroupPreview, { type CurrentGroupMember } from '@/components/match
 import NotificationBell from '@/components/NotificationBell'
 import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
+import MascotCoachCard from '@/components/theme/MascotCoachCard'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 
 type MatchMode = 'group' | 'solo'
 type MatchScope = 'same_school' | 'cross_school'
@@ -129,6 +131,7 @@ const DEV_GROUP_SUMMARY: GroupSummary = {
 }
 
 export default function MatchesPage() {
+  const { theme } = useUniversityTheme()
   const [matches, setMatches] = useState<MatchRow[]>([])
   const [poolStats, setPoolStats] = useState<PoolStats>(EMPTY_POOL)
   const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
@@ -519,6 +522,10 @@ export default function MatchesPage() {
         ) : null}
 
         {!loading && !hasAnyStartedMatching && (
+          <MatchScopeSelector scope={matchScope} setScope={setMatchScope} />
+        )}
+
+        {!loading && !hasAnyStartedMatching && (
           <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
             <div className="mb-4 flex items-start gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
@@ -536,7 +543,6 @@ export default function MatchesPage() {
               setMatchMode={setMatchMode}
               soloBlockedByGroupFlow={soloBlockedByGroupFlow}
             />
-            <MatchScopeSelector scope={matchScope} setScope={setMatchScope} />
             <MatchModeBody
               mode={matchMode}
               groupSummary={groupSummary}
@@ -590,19 +596,17 @@ export default function MatchesPage() {
             </Link>
           </section>
         ) : visibleMatches.length === 0 && hasStartedMatching && !isGroupQueueActive && !soloFlowActive ? (
-          <section className="glass rounded-3xl p-5 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-boot-primary/15 bg-boot-soft">
-              <Loader2 size={20} className="animate-spin text-boot-primary" />
-            </div>
-            <p className="text-sm font-bold text-boot-body">
-              {isSoloMode ? '매칭 큐에서 1:1 상대를 찾는 중이에요' : '매칭 큐에서 상대팀을 찾는 중이에요'}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-boot-muted">
-              {isSoloMode
-                ? '이미 소개팅 찾기를 시작했어요. 조건이 맞는 상대가 잡히면 이 화면에서 상대 카드와 다음 행동이 열립니다.'
-                : '이미 매칭 찾기를 시작했어요. 조건이 맞는 팀이 잡히면 이 화면에서 상대 카드와 다음 행동이 열립니다.'}
-            </p>
-          </section>
+          <MascotCoachCard
+            className="mb-5"
+            kind="waiting"
+            eyebrow={`${theme.shortName} ${isSoloMode ? '1:1' : 'Group'} Matching Update`}
+            title="아직 매칭이 안 잡혔어요"
+            body={
+              isSoloMode
+                ? '매칭 큐에서 1:1 상대를 찾는 중이에요. 이미 소개팅 찾기를 시작했어요. 가매칭이 오기 전까지는 상대 정보와 케미 점수를 열지 않아요.'
+                : '이미 매칭 찾기를 시작했어요. 조건이 맞는 팀을 계속 찾는 중이에요. 가매칭이 오면 사전 카드와 보증금 단계로 바로 안내할게요.'
+            }
+          />
         ) : null}
       </div>
     </main>
@@ -849,6 +853,7 @@ function MatchScopeSelector({
   scope: MatchScope
   setScope: (scope: MatchScope) => void
 }) {
+  const { theme } = useUniversityTheme()
   const options: Array<{
     value: MatchScope
     title: string
@@ -858,8 +863,8 @@ function MatchScopeSelector({
     {
       value: 'same_school',
       title: '우리 학교끼리',
-      desc: '부산대 안에서 먼저 조건이 맞는 팀을 찾아요.',
-      badge: 'PNU',
+      desc: `${theme.shortName} 안에서 먼저 조건이 맞는 팀을 찾아요.`,
+      badge: theme.id.toUpperCase(),
     },
     {
       value: 'cross_school',
@@ -870,7 +875,15 @@ function MatchScopeSelector({
   ]
 
   return (
-    <section className="mb-4 rounded-[26px] border border-boot-primary/15 bg-white px-4 py-4">
+    <>
+      <MascotCoachCard
+        className="mb-4"
+        kind="waiting"
+        eyebrow={`${theme.shortName} Campus Range`}
+        title={`${theme.shortName} 기준으로 먼저 볼까요?`}
+        body="기본은 우리 학교끼리 찾고, 서로 허용한 경우에만 가까운 학교까지 확장해요."
+      />
+      <section className="mb-4 rounded-[26px] border border-boot-primary/15 bg-white px-4 py-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
@@ -878,9 +891,11 @@ function MatchScopeSelector({
           </p>
           <h2 className="mt-1 text-base font-black text-boot-ink">어느 학교까지 열어둘까요?</h2>
         </div>
-        <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-600">
-          부산대 mock
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
+            {theme.shortName} theme
+          </span>
+        </div>
       </div>
       <div className="grid gap-2">
         {options.map((option) => {
@@ -899,7 +914,7 @@ function MatchScopeSelector({
               ].join(' ')}
             >
               <span className={[
-                'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-xs font-black',
+                'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-[10px] font-black',
                 active ? 'bg-boot-primary text-white' : 'bg-boot-soft text-boot-primary',
               ].join(' ')}>
                 {option.badge}
@@ -915,7 +930,8 @@ function MatchScopeSelector({
       <p className="mt-3 text-[11px] leading-5 text-boot-muted">
         지금은 프론트 검토용 선택 UI입니다. 실제 학교 간 매칭 허용 여부는 다음 단계에서 DB 필터와 큐 API에 연결해야 합니다.
       </p>
-    </section>
+      </section>
+    </>
   )
 }
 
@@ -1027,9 +1043,22 @@ function MatchSearchingPrivacyCard({
   onCancel: () => void
 }) {
   const isSolo = mode === 'solo'
+  const { theme } = useUniversityTheme()
   const targetLabel = isSolo ? '상대' : '상대팀'
 
   return (
+    <>
+    <MascotCoachCard
+      className="mb-4"
+      kind="waiting"
+      eyebrow={`${theme.shortName} ${isSolo ? '1:1' : 'Group'} Waiting Coach`}
+      title="아직 매칭이 안 잡혔어요"
+      body={
+        isSolo
+          ? '매칭 큐에서 1:1 상대를 찾는 중이에요. 조건이 맞는 한 명이 잡히면 바로 알림으로 알려드릴게요.'
+          : '매칭 큐에서 상대팀을 찾는 중이에요. 조건이 맞는 팀이 잡히면 바로 알림으로 알려드릴게요.'
+      }
+    />
     <section className="mb-5 rounded-[30px] border border-boot-primary/15 bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
       <div className="flex items-start gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
@@ -1073,6 +1102,7 @@ function MatchSearchingPrivacyCard({
         {canceling ? '취소하는 중...' : isSolo ? '1:1 매칭 취소하기' : '과팅 매칭 취소하기'}
       </button>
     </section>
+    </>
   )
 }
 

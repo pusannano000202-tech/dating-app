@@ -7,6 +7,8 @@ import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, 
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
 import DepositPaymentPanel from '@/components/matching/DepositPaymentPanel'
 import MatchFoundSummary from '@/components/matching/MatchFoundSummary'
+import UniversityMascot from '@/components/theme/UniversityMascot'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
@@ -155,7 +157,10 @@ function isSoloMatchId(matchId: string): boolean {
   return matchId.startsWith('dev-solo-') || matchId.includes('solo')
 }
 
-function createDevMatchDetail(matchId: string): MatchDetail {
+function createDevMatchDetail(
+  matchId: string,
+  venue: { name: string; address: string },
+): MatchDetail {
   const isPending = getDevMatchPreviewStatus(matchId) === 'pending'
   const isSolo = isSoloMatchId(matchId)
   const participantCount = isSolo ? 1 : 3
@@ -177,8 +182,8 @@ function createDevMatchDetail(matchId: string): MatchDetail {
     opp_confirmed_at: isPending ? null : new Date().toISOString(),
     scheduled_start: isPending ? null : start.toISOString(),
     scheduled_end: isPending ? null : end.toISOString(),
-    venue_name: isPending ? null : 'PNU Station Cafe',
-    venue_address: isPending ? null : 'Busan National University',
+    venue_name: isPending ? null : venue.name,
+    venue_address: isPending ? null : venue.address,
     venue_map_url: isPending ? null : 'https://map.naver.com',
     my_card_submitted_at: null,
     my_card_content_text: isSolo
@@ -192,6 +197,13 @@ function createDevMatchDetail(matchId: string): MatchDetail {
     opp_group_card_submitted_count: isPending ? 0 : participantCount,
     opp_group_deposit_paid_count: isPending ? 0 : participantCount,
     opp_group_ready: !isPending,
+  }
+}
+
+function getDevPreviewVenue(theme: ReturnType<typeof useUniversityTheme>['theme']) {
+  return {
+    name: `${theme.shortName} 캠퍼스 카페`,
+    address: theme.designTheme.landmarkCue,
   }
 }
 
@@ -303,6 +315,7 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
+  const { theme } = useUniversityTheme()
   const matchId = params.id
   const isDevPreview = isDevPreviewClientSession()
   const [match, setMatch] = useState<MatchDetail | null>(null)
@@ -327,7 +340,7 @@ export default function MatchDetailPage() {
     setError(null)
 
     if (isDevPreview) {
-      const devMatch = createDevMatchDetail(matchId)
+      const devMatch = createDevMatchDetail(matchId, getDevPreviewVenue(theme))
       setMatch(devMatch)
       setCardDraft(createDailyCardDraftFromSubmissionText(devMatch.my_card_content_text))
       setLoading(false)
@@ -356,7 +369,7 @@ export default function MatchDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [isDevPreview, matchId, theme])
 
   useEffect(() => {
     refresh()
@@ -547,8 +560,8 @@ export default function MatchDetailPage() {
             opp_confirmed_at: now,
             scheduled_start: start.toISOString(),
             scheduled_end: end.toISOString(),
-            venue_name: 'PNU Station Cafe',
-            venue_address: 'Busan National University',
+            venue_name: getDevPreviewVenue(theme).name,
+            venue_address: getDevPreviewVenue(theme).address,
             venue_map_url: 'https://map.naver.com',
             my_group_ready: true,
             opp_group_ready: true,
@@ -1342,9 +1355,7 @@ export default function MatchDetailPage() {
                       16시부터 20시 사이에 카드 하나를 고르면 {match.match_mode === 'solo' ? '상대의 작은 힌트' : '상대 그룹의 작은 힌트'}가 열려요.
                     </p>
                   </div>
-                  <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-boot-primary/20 bg-white text-boot-primary shadow-sm">
-                    <Gift size={19} />
-                  </div>
+                  <UniversityMascot kind="waiting" size="sm" className="h-12 w-12 rounded-2xl" />
                 </div>
 
                 {dailyCardsLoading && dailyCards.length === 0 ? (
@@ -1630,9 +1641,7 @@ function PendingUnlockPreview({ mode }: { mode?: MatchDetail['match_mode'] }) {
   return (
     <div className="rounded-3xl border border-boot-primary/15 bg-gradient-to-br from-white via-boot-soft/80 to-white p-4">
       <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-white text-boot-primary shadow-sm">
-          <LockKeyhole size={18} />
-        </div>
+        <UniversityMascot kind="waiting" size="sm" className="h-11 w-11 rounded-2xl" />
         <div>
           <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">NEXT UNLOCK</p>
           <h3 className="mt-1 text-base font-black text-boot-ink">확정 후 열리는 것</h3>

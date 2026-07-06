@@ -12,7 +12,8 @@ import {
 } from '@/lib/refund/fee-flow'
 import { createClient } from '@/lib/supabase'
 import { isSupabaseConfigured } from '@/lib/utils'
-import SanjiCharacter, { type SanjiMood } from '@/components/SanjiCharacter'
+import UniversityMascot from '@/components/theme/UniversityMascot'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 
 type Stage = 'select' | 'ask_support' | 'notify_zero' | 'done'
 type UserGender = 'male' | 'female' | null
@@ -20,6 +21,7 @@ type UserGender = 'male' | 'female' | null
 export default function RefundPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
+  const { theme } = useUniversityTheme()
   const matchId = params.id
   const total = DEPOSIT_AMOUNT
   const totalLabel = `${total.toLocaleString()}원`
@@ -123,8 +125,13 @@ export default function RefundPage() {
 
         {stage === 'select' && (
           <section className="glass-card rounded-3xl border border-boot-hairline p-5">
-            <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
-            <p className="gradient-fate-text mb-6 text-3xl font-black tabular-nums">{total.toLocaleString()} 원</p>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
+                <p className="gradient-fate-text text-3xl font-black tabular-nums">{total.toLocaleString()} 원</p>
+              </div>
+              <UniversityMascot kind="refund" size="md" className="h-20 w-20 rounded-[28px]" />
+            </div>
 
             <label className="text-xs text-gray-500 mb-2 block">앱 기여금</label>
             <input
@@ -181,9 +188,8 @@ export default function RefundPage() {
         )}
 
         {stage === 'ask_support' && (
-          <SanjiCard
-            mood="pleading"
-            speech={`${currentBegAmount.toLocaleString()}원만 남겨주실래요?`}
+          <SchoolMascotCard
+            speech={theme.copy.refundAsk}
             sub={`보증금 ${totalLabel} 중 ${currentBegAmount.toLocaleString()}원만 앱 운영비로 남기고 나머지는 환불돼요.`}
             acceptLabel={`${currentBegAmount.toLocaleString()}원 남기기`}
             rejectLabel={nextBegAmount ? `${nextBegAmount.toLocaleString()}원도 부담돼요` : '그래도 전액 환불'}
@@ -237,8 +243,7 @@ export default function RefundPage() {
   )
 }
 
-function SanjiCard({
-  mood,
+function SchoolMascotCard({
   speech,
   sub,
   acceptLabel,
@@ -247,7 +252,6 @@ function SanjiCard({
   onReject,
   busy,
 }: {
-  mood: SanjiMood
   speech: string
   sub: string
   acceptLabel: string
@@ -277,7 +281,7 @@ function SanjiCard({
       </div>
 
       <div className="mt-[-8px]">
-        <SanjiCharacter mood={mood} />
+        <UniversityMascot kind="refund" size="lg" className="h-32 w-32 rounded-[34px]" />
       </div>
 
       <div className="flex gap-2 mt-3 w-full max-w-[320px]">

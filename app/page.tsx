@@ -17,6 +17,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
 import HomeInfoButton from '@/components/matching/HomeInfoButton'
 import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
+import { HomeUniversityCoachCard } from '@/components/theme/HomeUniversityCoachCard'
 
 type ServerSupabaseClient = ReturnType<typeof createSupabaseServerClient>
 
@@ -72,6 +73,8 @@ function HomeDashboard() {
           <p className="text-sm font-bold text-boot-muted">좋은 저녁이에요</p>
           <h1 className="mt-1 text-4xl font-black leading-tight">오늘의 매칭</h1>
         </section>
+
+        <HomeUniversityCoachCard />
 
         <HomeTodayTaskCard />
 

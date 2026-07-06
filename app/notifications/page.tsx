@@ -16,6 +16,9 @@ import {
   Users,
 } from 'lucide-react'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import MascotCoachCard from '@/components/theme/MascotCoachCard'
+import UniversityMascot from '@/components/theme/UniversityMascot'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 
 interface NotificationRow {
   id: string
@@ -26,6 +29,17 @@ interface NotificationRow {
 }
 
 const DEV_NOTIFICATIONS: NotificationRow[] = [
+  {
+    id: 'dev-notification-match-delayed',
+    kind: 'match_delayed',
+    payload: {
+      match_mode: 'group',
+      group_size: 3,
+      queue_minutes: 45,
+    },
+    read_at: null,
+    created_at: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
+  },
   {
     id: 'dev-notification-solo-match-created',
     kind: 'match_created',
@@ -86,11 +100,13 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
 ]
 
 export default function NotificationsPage() {
+  const { theme } = useUniversityTheme()
   const isDevPreview = isDevPreviewClientSession()
   const [items, setItems] = useState<NotificationRow[]>([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const delayedMatchNotice = items.find((n) => n.kind === 'match_delayed')
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -171,8 +187,9 @@ export default function NotificationsPage() {
           </Link>
           <div className="flex-1">
             <h1 className="text-2xl font-black">알림</h1>
-            <p className="text-xs text-gray-500 mt-0.5">매칭 진행 상황을 한눈에.</p>
+            <p className="text-xs text-gray-500 mt-0.5">{theme.copy.notificationTone}</p>
           </div>
+          <UniversityMascot kind="avatar" size="sm" className="h-11 w-11 rounded-2xl" />
           {items.some((n) => !n.read_at) && (
             <button
               type="button"
@@ -190,6 +207,16 @@ export default function NotificationsPage() {
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
             {error}
           </div>
+        )}
+
+        {!loading && delayedMatchNotice && (
+          <MascotCoachCard
+            className="mb-4"
+            kind="waiting"
+            eyebrow={`${theme.shortName} Matching Update`}
+            title="아직 매칭이 안 잡혔어요"
+            body="조건이 맞는 팀을 계속 찾는 중이에요. 가매칭이 오기 전까지는 상대 정보와 케미 점수를 열지 않고, 도착하면 바로 알림으로 알려드릴게요."
+          />
         )}
 
         {loading ? (
@@ -306,6 +333,7 @@ function isSoloMatchNotification(payload: Record<string, unknown>): boolean {
 
 function KindIcon({ kind }: { kind: string }) {
   switch (kind) {
+    case 'match_delayed': return <Loader2 size={18} className="animate-spin" />
     case 'match_created': return <Users size={18} />
     case 'match_confirmed': return <PartyPopper size={18} />
     case 'daily_card_available': return <Gift size={18} />
@@ -321,6 +349,7 @@ function KindIcon({ kind }: { kind: string }) {
 function kindLabel(kind: string, isSolo = false): string {
   if (kind === 'daily_card_available') return '오늘의 데일리카드를 열어보세요!'
   switch (kind) {
+    case 'match_delayed': return '아직 매칭이 안 잡혔어요'
     case 'match_created': return isSolo ? '1:1 가매칭이 도착했어요!' : '새 가매칭이 도착했어요!'
     case 'match_confirmed': return '매칭이 확정되었습니다. 축하합니다!'
     case 'match_completed': return '만남이 완료되었어요'
@@ -344,6 +373,8 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
   }
 
   switch (kind) {
+    case 'match_delayed':
+      return '조건이 맞는 상대를 계속 찾는 중이에요. 잡히면 사전 카드와 보증금 단계로 바로 안내할게요.'
     case 'match_created':
       return '상대 상세는 확정 후 열려요. 먼저 사전 카드와 보증금을 확인해주세요.'
     case 'match_confirmed':

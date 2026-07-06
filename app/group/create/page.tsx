@@ -35,6 +35,8 @@ import { GroupHeader } from '@/components/matching/group-create/GroupHeader'
 import { GroupMemberStatusPanel } from '@/components/matching/group-create/GroupMemberStatusPanel'
 import { InviteFriendPanel } from '@/components/matching/group-create/InviteFriendPanel'
 import { getGroupCompositionSummary, getQueueStatusText } from '@/components/matching/group-create/status'
+import MascotCoachCard from '@/components/theme/MascotCoachCard'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 import type {
   FriendSummary,
   GroupInviteRecord,
@@ -45,6 +47,7 @@ import type {
 
 export default function GroupCreatePage() {
   const searchParams = useSearchParams()
+  const { theme } = useUniversityTheme()
   const isDevPreview = isDevPreviewClientSession()
   const requestedSize = normalizeGroupSize(searchParams.get('size'))
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
@@ -684,6 +687,17 @@ export default function GroupCreatePage() {
               </>
             ) : (
               <>
+                <MascotCoachCard
+                  className="mb-5"
+                  kind="waiting"
+                  eyebrow={`${theme.shortName} Group Coach`}
+                  title={`${capacity}:${capacity} ${theme.shortName} 팀 준비 중`}
+                  body={
+                    groupIsFull
+                      ? '정원이 찼어요. 이제 각자 성향, 시간, 사전 카드만 맞추면 큐에 들어갈 수 있어요.'
+                      : `친구 ${openSlots}명만 더 오면 같은 규모 팀끼리 매칭을 시작할 수 있어요.`
+                  }
+                />
                 <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div>
@@ -695,9 +709,11 @@ export default function GroupCreatePage() {
                         2:2와 3:3 중 하나를 고르면 같은 규모의 그룹끼리 매칭돼요. 친구 성별이 섞인 혼성 그룹도 만들 수 있어요.
                       </p>
                     </div>
-                    <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
-                      {members.length}/{capacity}명
-                    </span>
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
+                        {members.length}/{capacity}명
+                      </span>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">

@@ -47,6 +47,15 @@ test('dev basic profile stores gender under the key worldcup reads', () => {
   assert.equal(DEV_BASIC_PROFILE_STORAGE_KEY, 'booting_dev_basic_profile')
 })
 
+test('basic profile form opens in local dev preview without waiting for Supabase auth', () => {
+  const basicPage = readSource('app/profile/basic/page.tsx')
+
+  assert.match(basicPage, /isSupabaseConfigured/)
+  assert.match(basicPage, /isDevPreviewClientSession\(\) && !isSupabaseConfigured\(\)/)
+  assert.match(basicPage, /setLoaded\(true\)/)
+  assert.match(basicPage, /\.catch\(/)
+})
+
 test('worldcup page passes the opposite candidate gender into IdealWorldcup', () => {
   const worldcupPage = readSource('app/profile/worldcup/page.tsx')
 

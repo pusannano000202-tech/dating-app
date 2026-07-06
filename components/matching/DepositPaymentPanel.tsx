@@ -1,5 +1,7 @@
 import { CheckCircle2, CreditCard, Loader2, LockKeyhole, ShieldCheck } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
+import UniversityMascot from '@/components/theme/UniversityMascot'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 
 type DepositPaymentPanelProps = {
   amount: number
@@ -20,6 +22,7 @@ export default function DepositPaymentPanel({
   mode = 'group',
   onPay,
 }: DepositPaymentPanelProps) {
+  const { theme } = useUniversityTheme()
   const [mockReviewOpen, setMockReviewOpen] = useState(false)
   const provider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER || 'mock').toLowerCase()
   const tossClientReady = Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
@@ -55,12 +58,10 @@ export default function DepositPaymentPanel({
             </p>
             <h3 className="mt-2 text-xl font-black text-boot-ink">보증금으로 매칭 확정하기</h3>
             <p className="mt-2 text-xs leading-relaxed text-boot-muted">
-              매칭이 잡힌 뒤에만 내는 1인 보증금이에요. 정상 만남이 끝나면 환불 단계로 넘어갑니다.
+              {theme.copy.matchWaiting}. 정상 만남이 끝나면 환불 단계로 넘어갑니다.
             </p>
           </div>
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-ink text-white shadow-[0_12px_28px_rgba(23,20,18,0.22)]">
-            <CreditCard size={20} />
-          </div>
+          <UniversityMascot kind="waiting" size="md" className="h-14 w-14 rounded-2xl" />
         </div>
 
         <div className="grid grid-cols-2 gap-2">
