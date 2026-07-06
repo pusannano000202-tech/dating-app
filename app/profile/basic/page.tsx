@@ -21,6 +21,15 @@ export default function BasicInfoPage() {
 
   useEffect(() => {
     let mounted = true
+    const storedDevProfile = readStoredDevPreviewProfile()
+
+    if (storedDevProfile) {
+      setInitialData(storedDevProfile)
+      if (typeof storedDevProfile.school === 'string') {
+        setStoredUniversityThemeFromSchool(storedDevProfile.school)
+      }
+    }
+
     const finishLoading = () => {
       if (mounted) setLoaded(true)
     }
@@ -183,6 +192,20 @@ export default function BasicInfoPage() {
       )}
     </div>
   )
+}
+
+function readStoredDevPreviewProfile(): Partial<BasicInfoData> | null {
+  if (!isDevPreviewClientSession()) return null
+
+  try {
+    const stored = sessionStorage.getItem(DEV_BASIC_PROFILE_STORAGE_KEY)
+    if (!stored) return null
+
+    const parsed = JSON.parse(stored) as Partial<BasicInfoData>
+    return parsed && typeof parsed === 'object' ? parsed : null
+  } catch {
+    return null
+  }
 }
 
 async function claimNickname(nickname: string): Promise<{ ok: true } | { ok: false; error?: string }> {
