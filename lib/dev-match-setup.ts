@@ -14,13 +14,16 @@ export const DEV_MATCH_SETUP_COOKIES: Record<DevMatchSetupStep, string> = {
 }
 
 export type DevPreviewGroupStatus = 'forming' | 'ready' | 'in_pool'
+export type DevPreviewSoloStatus = 'idle' | 'in_pool' | 'matched'
 
 export const DEV_PREVIEW_GROUP_STATUS_COOKIE = 'booting_dev_group_status'
 export const DEV_PREVIEW_GROUP_SIZE_COOKIE = 'booting_dev_group_size'
+export const DEV_PREVIEW_SOLO_STATUS_COOKIE = 'booting_dev_solo_status'
 
 const COOKIE_VALUE = '1'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const DEV_PREVIEW_GROUP_STATUSES = new Set<DevPreviewGroupStatus>(['forming', 'ready', 'in_pool'])
+const DEV_PREVIEW_SOLO_STATUSES = new Set<DevPreviewSoloStatus>(['idle', 'in_pool', 'matched'])
 
 export function getDevMatchSetupCookieValue(): string {
   return COOKIE_VALUE
@@ -41,9 +44,16 @@ function hasDevAuthCookie(): boolean {
     .some((cookie) => cookie.trim() === expected)
 }
 
+function isLocalBrowserPreview(): boolean {
+  const host = window.location.hostname
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1'
+}
+
 export function isDevPreviewClientSession(): boolean {
   if (typeof window === 'undefined') return false
-  return isDevAuthBypassEnabled() && (hasDevAuthLocalStorage() || hasDevAuthCookie())
+  if (isLocalBrowserPreview()) return true
+  if (!isDevAuthBypassEnabled()) return false
+  return hasDevAuthLocalStorage() || hasDevAuthCookie()
 }
 
 export function markDevMatchSetupStepComplete(step: DevMatchSetupStep): boolean {
@@ -119,6 +129,33 @@ export function getDevPreviewGroupSizeFromClient(fallback: number): 2 | 3 {
   if (value === '2') return 2
   if (value === '3') return 3
   return fallback === 2 ? 2 : 3
+}
+
+export function setDevPreviewSoloStatus(status: DevPreviewSoloStatus): boolean {
+  if (!isDevPreviewClientSession()) return false
+  writeDevPreviewCookie(DEV_PREVIEW_SOLO_STATUS_COOKIE, status)
+  try {
+    window.localStorage.setItem(DEV_PREVIEW_SOLO_STATUS_COOKIE, status)
+  } catch {
+    // Cookie persistence is enough for the preview flow.
+  }
+  return true
+}
+
+export function getDevPreviewSoloStatusFromClient(): DevPreviewSoloStatus {
+  if (!isDevPreviewClientSession()) return 'idle'
+  const stored = readCookieValue(DEV_PREVIEW_SOLO_STATUS_COOKIE)
+  const fallback = (() => {
+    try {
+      return window.localStorage.getItem(DEV_PREVIEW_SOLO_STATUS_COOKIE)
+    } catch {
+      return null
+    }
+  })()
+  const value = stored ?? fallback
+  return DEV_PREVIEW_SOLO_STATUSES.has(value as DevPreviewSoloStatus)
+    ? value as DevPreviewSoloStatus
+    : 'idle'
 }
 
 function hasDevMatchSetupCookie(step: DevMatchSetupStep): boolean {

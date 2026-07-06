@@ -1,9 +1,17 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, GraduationCap, Loader2, Phone, Ruler, UserRound } from 'lucide-react'
 import type { BodyType, Gender, HairDensity } from '@/lib/types'
-import { getDepartmentCollege, searchDepartments } from '@/lib/pnu-departments'
+import {
+  getUniversityDepartmentGroupsBySchool,
+  searchUniversityDepartments,
+  type UniversityDepartmentOption,
+} from '@/lib/university-departments'
+import {
+  getUniversityThemeSchoolOptions,
+  setStoredUniversityThemeFromSchool,
+} from '@/lib/university-theme'
 
 export interface BasicInfoData {
   display_name: string
@@ -43,6 +51,8 @@ const GENDER_OPTIONS: { key: Gender; label: string; description: string }[] = [
   { key: 'female', label: '여자', description: '여자 그룹으로 매칭돼요' },
 ]
 
+const UNIVERSITY_SCHOOL_OPTIONS = getUniversityThemeSchoolOptions()
+
 export default function BasicInfoForm({ initialValue, onSubmit, saving, serverError }: Props) {
   const [displayName, setDisplayName] = useState(initialValue?.display_name ?? '')
   const [nicknameCheck, setNicknameCheck] = useState<{ value: string; available: boolean; message: string } | null>(null)
@@ -55,10 +65,15 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
   const [hairDensity, setHairDensity] = useState<HairDensity | null>(initialValue?.hair_density ?? null)
   const [school, setSchool] = useState(initialValue?.school ?? '부산대학교')
   const [department, setDepartment] = useState(initialValue?.department ?? '')
-  const [deptSuggestions, setDeptSuggestions] = useState<string[]>([])
+  const [deptSuggestions, setDeptSuggestions] = useState<UniversityDepartmentOption[]>([])
   const [year, setYear] = useState<number | null>(initialValue?.year ?? null)
   const [error, setError] = useState<string | null>(null)
   const deptRef = useRef<HTMLDivElement>(null)
+  const departmentOptions = useMemo(
+    () => getUniversityDepartmentGroupsBySchool(school),
+    [school],
+  )
+  const hasOfficialDepartmentOptions = departmentOptions.length > 0
 
   const requiredDone = [
     displayName.trim().length >= 2,
@@ -71,6 +86,14 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
   const inputClass = 'w-full rounded-2xl border border-boot-hairline bg-white px-4 py-3.5 text-sm font-bold text-boot-ink outline-none transition placeholder:text-boot-muted/70 focus:border-boot-primary disabled:opacity-50'
   const cardOff = 'border-boot-hairline bg-white text-boot-body hover:border-boot-primary/35 hover:bg-boot-soft/60'
   const cardOn = 'border-boot-primary bg-boot-soft text-boot-primary shadow-sm'
+
+  function handleSchoolChange(nextSchool: string) {
+    setSchool(nextSchool)
+    if (nextSchool.trim()) {
+      setStoredUniversityThemeFromSchool(nextSchool)
+    }
+    setDeptSuggestions(searchUniversityDepartments(nextSchool, department))
+  }
 
   const checkNicknameAvailability = useCallback(async function checkNicknameAvailability(value = displayName.trim()): Promise<boolean> {
     const trimmedName = value.trim()
@@ -367,22 +390,59 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
         </div>
       )}
 
-      <label className="block">
-        <span className="mb-3 block text-sm font-bold">
+      <div className="block">
+        <label htmlFor="basic-school-input" className="mb-3 block text-sm font-bold">
           학교 <span className="text-rose-500">*</span>
-        </span>
+        </label>
         <div className="relative">
           <GraduationCap size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-boot-muted" />
           <input
+            id="basic-school-input"
             type="text"
             placeholder="부산대학교"
+            list="university-school-options"
             value={school}
-            onChange={(event) => setSchool(event.target.value)}
+            onChange={(event) => handleSchoolChange(event.target.value)}
             disabled={saving}
             className={`${inputClass} pl-11`}
           />
         </div>
-      </label>
+        <datalist id="university-school-options">
+          {UNIVERSITY_SCHOOL_OPTIONS.map((option) => (
+            <option key={option.id} value={option.value}>
+              {option.displayName}
+            </option>
+          ))}
+        </datalist>
+        <div className="mt-3 rounded-2xl border border-boot-hairline bg-boot-soft/35 px-3 py-3">
+          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+            학교 빠른 선택
+          </p>
+          <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto pr-1">
+            {UNIVERSITY_SCHOOL_OPTIONS.map((option) => {
+              const selected = school.trim() === option.label
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleSchoolChange(option.label)}
+                  disabled={saving}
+                  aria-pressed={selected}
+                  aria-label={`${option.label} 테마로 바꾸기`}
+                  className={[
+                    'rounded-full border px-3 py-1.5 text-[11px] font-black transition',
+                    selected
+                      ? 'border-boot-primary bg-white text-boot-primary shadow-sm'
+                      : 'border-transparent bg-white/70 text-boot-body hover:border-boot-primary/25 hover:text-boot-primary',
+                  ].join(' ')}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
@@ -392,37 +452,49 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
           <div ref={deptRef} className="relative">
             <input
               type="text"
-              placeholder="컴퓨터공학전공"
+              placeholder="학과명 검색 또는 직접 입력"
+              aria-label="official department search"
               value={department}
               onChange={(event) => {
-                setDepartment(event.target.value)
-                setDeptSuggestions(searchDepartments(event.target.value))
+                const nextDepartment = event.target.value
+                setDepartment(nextDepartment)
+                setDeptSuggestions(searchUniversityDepartments(school, nextDepartment))
               }}
-              onFocus={() => setDeptSuggestions(searchDepartments(department))}
+              onFocus={() => setDeptSuggestions(searchUniversityDepartments(school, department))}
               onBlur={() => setTimeout(() => setDeptSuggestions([]), 150)}
               disabled={saving}
               className={inputClass}
             />
             {deptSuggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-2xl border border-boot-hairline bg-white shadow-lg">
+              <div
+                aria-label="official department suggestions"
+                className="absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-2xl border border-boot-hairline bg-white shadow-lg"
+              >
                 {deptSuggestions.map((suggestion) => (
                   <button
-                    key={suggestion}
+                    key={`${suggestion.universityId}-${suggestion.college}-${suggestion.departmentCode}-${suggestion.name}`}
                     type="button"
                     onMouseDown={() => {
-                      setDepartment(suggestion)
+                      setDepartment(suggestion.name)
                       setDeptSuggestions([])
                     }}
                     className="w-full px-4 py-2.5 text-left transition-colors hover:bg-boot-soft"
                   >
-                    <span className="block text-sm font-black text-boot-ink">{suggestion}</span>
+                    <span className="block text-sm font-black text-boot-ink">{suggestion.name}</span>
                     <span className="mt-0.5 block text-[11px] font-bold text-boot-muted">
-                      {getDepartmentCollege(suggestion) ?? '부산대학교'}
+                      {[suggestion.college, suggestion.dayNight, suggestion.degreeCourse]
+                        .filter(Boolean)
+                        .join(' · ')}
                     </span>
                   </button>
                 ))}
               </div>
             )}
+            <p className="mt-2 text-[11px] font-bold text-boot-muted">
+              {hasOfficialDepartmentOptions
+                ? `${school.trim() || '선택한 학교'} 공식 학과 후보 ${departmentOptions.reduce((sum, group) => sum + group.departments.length, 0)}개를 기준으로 검색해요. 못 찾으면 직접 입력할 수 있어요.`
+                : '이 학교는 아직 공식 학과 데이터가 연결되지 않아 직접 입력으로 진행할 수 있어요.'}
+            </p>
           </div>
         </div>
         <div>

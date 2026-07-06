@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ChevronLeft, StickyNote } from 'lucide-react'
+import { ArrowRight, ChevronLeft } from 'lucide-react'
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
 import { ButtonLink } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Chip } from '@/components/ui/Chip'
 import { PageShell } from '@/components/ui/PageShell'
+import UniversityMascot from '@/components/theme/UniversityMascot'
 import {
   buildDailyCardSubmissionText,
   countCompletedDailyCardItems,
@@ -168,9 +169,7 @@ export default function ProfileMatchCardPage() {
 
       <Card variant="soft" className="mb-4">
         <div className="flex items-start gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-boot-primary">
-            <StickyNote size={20} />
-          </div>
+          <UniversityMascot kind="guide" size="sm" className="h-11 w-11 rounded-2xl" />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-base font-black">내 카드 항목 {completedCount}/{TOTAL_DAILY_CARD_ITEMS} 완료</h2>

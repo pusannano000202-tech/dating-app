@@ -5,6 +5,7 @@ type MatchFoundSummaryProps = {
   department?: string
   ageRange?: string
   genderSummary?: string
+  lockedTitle?: string
   lockedMessage?: string
   title?: string
   subtitle?: string
@@ -16,6 +17,7 @@ export default function MatchFoundSummary({
   department = '경영학과',
   ageRange = '20~23세',
   genderSummary = '여 0명 · 남 0명',
+  lockedTitle = '상대팀 이름은 아직 비공개예요',
   lockedMessage = '날짜를 정하고 만남 전까지 하루씩 Q&A로 알아가요.',
   title = '매칭됐어요!',
   subtitle = '딱 맞는 팀을 찾았어요',
@@ -33,7 +35,7 @@ export default function MatchFoundSummary({
         <InfoPill label="나이대" value={ageRange} />
         <InfoPill label="성별 구성" value={genderSummary} />
         <div className="rounded-[26px] bg-white px-5 py-5 shadow-[0_14px_34px_rgba(23,20,18,0.08)]">
-          <p className="text-base font-black text-boot-ink">상대팀 이름은 아직 비공개예요</p>
+          <p className="text-base font-black text-boot-ink">{lockedTitle}</p>
           <p className="mt-2 text-sm leading-6 text-boot-muted">{lockedMessage}</p>
         </div>
       </div>

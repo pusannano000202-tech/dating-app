@@ -200,12 +200,12 @@ function LoginContent() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#17120f] text-boot-ink">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,142,95,0.30),transparent_34%),linear-gradient(135deg,#271b16_0%,#17120f_42%,#fff3ec_100%)]" />
+    <main className="relative min-h-screen overflow-hidden bg-boot-ink text-boot-ink">
+      <div className="absolute inset-0 bg-[var(--boot-hero-gradient)]" />
       <video
         className={[
           'absolute inset-0 h-full w-full object-cover transition-opacity duration-700 motion-reduce:hidden',
-          videoReady && !videoFailed ? 'opacity-100' : 'opacity-0',
+          videoReady && !videoFailed ? 'opacity-45' : 'opacity-0',
         ].join(' ')}
         autoPlay
         muted
@@ -224,7 +224,7 @@ function LoginContent() {
 
       <section className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-7 pt-7">
         <header className="flex items-center justify-between">
-          <BootingLogo size="md" />
+          <BootingLogo size="md" showSubtitle={false} />
           {showAuth && (
             <button
               type="button"
@@ -244,13 +244,11 @@ function LoginContent() {
           <div className="flex flex-1 flex-col justify-end pb-8">
             <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/45 bg-white/78 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary shadow-sm backdrop-blur-xl">
               <Sparkles size={12} />
-              PNU GROUP MATCHING
+              Quantum Campus Match
             </div>
 
             <h1 className="max-w-[20rem] text-[2.75rem] font-black leading-[1.05] tracking-normal text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.42)]">
-              지금 과팅을
-              <br />
-              시작해보세요
+              친구와 함께 만나는 대학 과팅
             </h1>
             <p className="mt-4 max-w-[19rem] text-[15px] font-bold leading-7 text-white/86 drop-shadow-[0_4px_12px_rgba(0,0,0,0.38)]">
               친구를 모으고, 조건이 맞는 팀을 찾고, 만남 전까지 필요한 정보만 차례로 열어봐요.
@@ -282,7 +280,7 @@ function LoginContent() {
             <div className="rounded-[30px] border border-white/60 bg-white/92 p-6 shadow-[0_26px_70px_rgba(23,18,15,0.22)] backdrop-blur-2xl">
               <div className="mb-6">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary">Login</p>
-                <h1 className="mt-2 text-2xl font-black leading-tight">부팅 시작하기</h1>
+                <h1 className="mt-2 text-2xl font-black leading-tight">Quantum 시작하기</h1>
                 <p className="mt-2 text-sm leading-6 text-boot-muted">
                   로그인하면 기본정보 입력부터 매칭 준비까지 이어서 진행돼요.
                 </p>

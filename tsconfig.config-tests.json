@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -14,8 +15,12 @@
   },
   "include": [
     "lib/utils.ts",
+    "lib/university-theme.ts",
+    "lib/university-departments.ts",
     "lib/payments/**/*.ts",
     "lib/refund/**/*.ts",
+    "docs/design-mockups/**/*.json",
+    "docs/research/university-departments/**/*.json",
     "tests/config/**/*.ts"
   ]
 }

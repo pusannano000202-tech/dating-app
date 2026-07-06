@@ -11,9 +11,13 @@ function readSource(path: string) {
 
 test('root layout uses Booting production metadata and light theme color', () => {
   const layout = readSource('app/layout.tsx')
+  const template = readSource('app/template.tsx')
+  const provider = readSource('components/theme/UniversityThemeProvider.tsx')
 
   assert.match(layout, /themeColor:\s*'#f8f3ec'/)
-  assert.match(layout, /bg-app min-h-screen text-boot-ink/)
+  assert.match(template, /UniversityThemeProvider/)
+  assert.match(template, /AppBottomNav/)
+  assert.match(provider, /className="min-h-screen bg-app text-boot-ink"/)
   assert.doesNotMatch(layout, /Destiny/)
 })
 
@@ -89,8 +93,11 @@ test('matching entry surfaces expose 2:2, 3:3, and mixed-group queue visuals', (
   const statsMigration = readSource('supabase/migrations/20260622183100_match_pool_mixed_group_stats.sql')
   const exactSizeMigration = readSource('supabase/migrations/20260622183000_match_pool_exact_group_size.sql')
 
-  assert.match(matchList, /2:2 매칭찾기/)
-  assert.match(matchList, /3:3 매칭찾기/)
+  assert.match(matchList, /어떤 방식으로 만날까요/)
+  assert.match(matchList, /과팅하기/)
+  assert.match(matchList, /소개팅하기/)
+  assert.match(matchingPool, /2:2 매칭찾기/)
+  assert.match(matchingPool, /3:3 매칭찾기/)
   assert.match(matchStart, /href="\/group\/create\?size=2"/)
   assert.match(matchStart, /href="\/group\/create\?size=3"/)
   assert.match(groupCreate, /매칭 규모 선택/)
@@ -107,6 +114,8 @@ test('pending match detail uses page steps instead of one long scroll', () => {
   assert.match(matchDetail, /PENDING_MATCH_STEPS/)
   assert.match(matchDetail, /pendingStepIndex/)
   assert.match(matchDetail, /renderPendingStep/)
+  assert.match(matchDetail, /onClick=\{cancelMatch\}/)
+  assert.match(matchDetail, /매칭 취소/)
   assert.match(matchDetail, /가매칭/)
   assert.match(matchDetail, /사전 카드/)
   assert.match(matchDetail, /보증금/)
@@ -237,9 +246,17 @@ test('profile onboarding pages allow dev preview without Supabase user redirects
   const basic = readSource('app/profile/basic/page.tsx')
   const worldcup = readSource('app/profile/worldcup/page.tsx')
   const survey = readSource('app/profile/survey/page.tsx')
+  const personalityPreference = readSource('app/profile/personality-preference/page.tsx')
+  const schedule = readSource('app/profile/schedule/page.tsx')
+  const preferences = readSource('app/profile/preferences/page.tsx')
 
-  for (const source of [basic, worldcup, survey]) {
+  for (const source of [basic, worldcup, survey, personalityPreference, schedule, preferences]) {
     assert.match(source, /isDevPreviewClientSession/)
+  }
+
+  for (const source of [personalityPreference, schedule, preferences]) {
+    assert.match(source, /isSupabaseConfigured/)
+    assert.match(source, /isDevPreviewClientSession\(\) \|\| !isSupabaseConfigured\(\)/)
   }
 })
 
@@ -253,7 +270,10 @@ test('middleware issues dev auth cookie when opening dev preview', () => {
   assert.match(middleware, /response\.cookies\.set\(DEV_AUTH_COOKIE/)
   assert.match(devMatchSetup, /function hasDevAuthCookie/)
   assert.match(devMatchSetup, /document\.cookie/)
-  assert.match(devMatchSetup, /hasDevAuthLocalStorage\(\) \|\| hasDevAuthCookie\(\)/)
+  assert.match(devMatchSetup, /function isLocalBrowserPreview/)
+  assert.match(devMatchSetup, /host === 'localhost' \|\| host === '127\.0\.0\.1' \|\| host === '::1'/)
+  assert.match(devMatchSetup, /if \(isLocalBrowserPreview\(\)\) return true/)
+  assert.match(devMatchSetup, /return hasDevAuthLocalStorage\(\) \|\| hasDevAuthCookie\(\)/)
 })
 
 test('temporary school demo mode keeps login visible and exposes a local preview button', () => {

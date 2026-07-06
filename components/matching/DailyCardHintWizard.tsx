@@ -175,7 +175,7 @@ export default function DailyCardHintWizard({
             <div>
               <p className="text-[11px] font-black text-boot-primary">어떻게 공개돼요?</p>
               <p className="mt-1 text-xs leading-5 text-boot-body">
-                지금 쓰는 것은 <b>사전 힌트 재료</b>예요. 매칭이 확정되면 상대 그룹이 16:00-20:00에
+                지금 쓰는 것은 <b>사전 힌트 재료</b>예요. 매칭이 확정되면 상대 쪽이 16:00-20:00에
                 <b> 오늘의 카드</b>를 직접 뽑아서 하루 한 장씩 보게 됩니다.
               </p>
             </div>

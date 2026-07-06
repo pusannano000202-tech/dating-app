@@ -207,6 +207,6 @@ test('getGroupExitActionState tells leaders to cancel queue before structural ch
   })
 
   assert.equal(state.kind, 'locked')
-  assert.equal(state.primaryLabel, '큐 진행 중')
-  assert.match(state.description, /큐에서 먼저 빠져야/)
+  assert.equal(state.primaryLabel, '매칭 진행 중')
+  assert.match(state.description, /매칭 찾기를 먼저 취소/)
 })

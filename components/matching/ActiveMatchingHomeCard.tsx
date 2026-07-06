@@ -49,12 +49,13 @@ export default function ActiveMatchingHomeCard() {
 
   if (loading || error || groupStatus === null) return null
 
-  const inQueue = groupStatus === 'ready' || groupStatus === 'in_pool'
+  const canEnterQueue = groupStatus === 'ready'
+  const inQueue = groupStatus === 'in_pool'
   const hasResult = groupStatus === 'matched'
 
-  if (!inQueue && !hasResult) return null
+  if (!canEnterQueue && !inQueue && !hasResult) return null
 
-  if (inQueue) {
+  if (canEnterQueue || inQueue) {
     return (
       <section className="mb-5 rounded-3xl border border-boot-primary/20 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center gap-3">
@@ -62,14 +63,18 @@ export default function ActiveMatchingHomeCard() {
             <Search size={18} />
           </span>
           <div>
-            <p className="text-sm font-black text-boot-ink">매칭 찾는 중</p>
+            <p className="text-sm font-black text-boot-ink">
+              {canEnterQueue ? '매칭 큐 진입 준비 완료' : '매칭 찾는 중'}
+            </p>
             <p className="text-xs text-boot-muted">
-              지금 들어간 매칭 큐 상태를 바로 확인할 수 있어요.
+              {canEnterQueue
+                ? '그룹 준비가 끝났어요. 이제 큐에 들어가면 상대팀을 찾기 시작해요.'
+                : '지금 들어간 매칭 큐 상태를 바로 확인할 수 있어요.'}
             </p>
           </div>
         </div>
         <div className="mb-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
-          {groupStatus === 'ready'
+          {canEnterQueue
             ? '준비 완료 · 큐 진입 대기 중'
             : '큐 진입 완료 · 매칭 탐색 중'}
         </div>
@@ -77,7 +82,7 @@ export default function ActiveMatchingHomeCard() {
           href="/group/create?from=home-queue"
           className="btn-gradient block w-full rounded-2xl py-2.5 text-center text-sm font-black"
         >
-          진행중인 매칭 결과 확인하기
+          {canEnterQueue ? '이번 주 매칭 큐에 들어가기' : '진행중인 매칭 상태 확인하기'}
         </Link>
       </section>
     )
