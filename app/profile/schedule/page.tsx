@@ -79,7 +79,7 @@ export default function SchedulePage() {
       <div className="mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-[calc(100vw-2.5rem)] flex-col sm:max-w-md">
       <div className="mb-7">
         <h1 className="text-2xl font-black gradient-fate-text">언제 절대 안 돼?</h1>
-        <p className="text-sm text-gray-500 mt-1">기본은 가능으로 보고, 안 되는 시간만 체크해줘</p>
+        <p className="text-sm text-boot-body mt-1">기본은 가능으로 보고, 안 되는 시간만 체크해줘</p>
         <details className="mt-3 rounded-2xl border border-boot-primary/15 bg-white/85 px-4 py-3 shadow-sm">
           <summary className="flex cursor-pointer items-center gap-2 text-xs font-black text-boot-ink">
             <Info size={15} className="text-boot-primary" />
@@ -114,7 +114,7 @@ export default function SchedulePage() {
 
       {timeslots.slots.length > 0 && (
         <div className="mt-4 glass rounded-2xl px-4 py-3 border border-violet-500/30">
-          <p className="text-sm text-violet-300 font-medium">
+          <p className="text-sm text-boot-body font-medium">
             {timeslots.slots.length}개 가능 시간 구간 저장 준비됨 ✓
           </p>
         </div>

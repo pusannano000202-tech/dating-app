@@ -38,7 +38,7 @@ export default function StepProgress() {
                   isActive
                     ? 'text-boot-primary'
                     : isDone
-                      ? 'text-boot-coral'
+                      ? 'text-boot-primary'
                       : 'text-boot-muted'
                 }`}
               >

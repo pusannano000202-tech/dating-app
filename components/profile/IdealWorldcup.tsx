@@ -180,7 +180,7 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
   if (pool.length < 2) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p className="text-center text-gray-300 text-sm leading-relaxed">
+        <p className="text-center text-boot-body text-sm leading-relaxed">
           이상형 월드컵에 사용할 이미지가 아직 준비되지 않았어.<br />
           잠시 후 다시 시도해줘.
         </p>
@@ -189,7 +189,7 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
   }
 
   if (matches.length === 0) {
-    return <div className="text-center py-20 text-gray-400">불러오는 중...</div>
+    return <div className="text-center py-20 text-boot-muted">불러오는 중...</div>
   }
 
   const cur = matches[0]
@@ -199,10 +199,10 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
     <div className="flex flex-col items-center min-h-screen px-4 py-6">
       <div className="w-full max-w-md mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-violet-400 tracking-widest uppercase">
+          <span className="text-xs font-bold text-boot-primary tracking-widest uppercase">
             {currentRound}
           </span>
-          <span className="text-xs text-gray-500 tabular-nums">
+          <span className="text-xs text-boot-muted tabular-nums">
             {totalDone + 1} / {totalMatches}
           </span>
         </div>
@@ -215,7 +215,7 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
         <p className="mt-5 text-center text-xl font-black tracking-tight">
           어떤 사람이 더 끌려?
         </p>
-        <p className="text-center text-sm text-gray-500 mt-1">직관적으로 골라봐</p>
+        <p className="text-center text-sm text-boot-muted mt-1">직관적으로 골라봐</p>
       </div>
 
       <div className="w-full max-w-md flex gap-3">
@@ -272,7 +272,7 @@ export default function IdealWorldcup({ metadata, gender, onComplete }: Props) {
         })}
       </div>
 
-      <p className="mt-5 text-xs text-gray-700">탭해서 선택 · ← → 키보드 사용 가능</p>
+      <p className="mt-5 text-xs text-boot-body">탭해서 선택 · ← → 키보드 사용 가능</p>
     </div>
   )
 }

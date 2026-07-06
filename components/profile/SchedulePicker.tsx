@@ -198,7 +198,7 @@ export default function SchedulePicker({ initialValue, onChange }: Props) {
                     className={[
                       'flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-black',
                       isFullBlocked
-                        ? 'bg-rose-50 text-rose-600'
+                        ? 'bg-rose-50 text-rose-700'
                         : isWeekend
                           ? 'bg-boot-soft text-boot-primary'
                           : 'bg-boot-soft text-boot-ink',
@@ -224,7 +224,7 @@ export default function SchedulePicker({ initialValue, onChange }: Props) {
                     'rounded-2xl border px-3 py-2 text-[11px] font-black',
                     isFullBlocked
                       ? 'border-boot-primary/20 bg-boot-soft text-boot-primary'
-                      : 'border-rose-200 bg-rose-50 text-rose-600',
+                      : 'border-rose-200 bg-rose-50 text-rose-700',
                   ].join(' ')}
                 >
                   {isFullBlocked ? '다시 가능' : '이날 안 됨'}
@@ -242,7 +242,7 @@ export default function SchedulePicker({ initialValue, onChange }: Props) {
                       className={[
                         'min-h-[58px] rounded-2xl border px-1.5 py-2 text-center transition',
                         selected
-                          ? 'border-rose-300 bg-rose-50 text-rose-600'
+                          ? 'border-rose-300 bg-rose-50 text-rose-700'
                           : 'border-boot-hairline bg-boot-soft text-boot-ink',
                       ].join(' ')}
                     >
@@ -268,9 +268,9 @@ export default function SchedulePicker({ initialValue, onChange }: Props) {
 
       {allBlocked && (
         <div className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3">
-          <Ban size={17} className="mt-0.5 flex-shrink-0 text-rose-600" />
+          <Ban size={17} className="mt-0.5 flex-shrink-0 text-rose-700" />
           <div>
-            <p className="text-xs font-black text-rose-600">모든 시간이 막혀 있어요</p>
+            <p className="text-xs font-black text-rose-700">모든 시간이 막혀 있어요</p>
             <p className="mt-0.5 text-[11px] leading-relaxed text-boot-muted">
               매칭을 찾으려면 최소 한 구간은 가능해야 해요.
             </p>

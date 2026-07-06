@@ -1,8 +1,10 @@
-'use client'
+﻿'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import BasicInfoForm, { type BasicInfoData } from '@/components/profile/BasicInfoForm'
+import MascotCoachCard from '@/components/theme/MascotCoachCard'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { DEV_BASIC_PROFILE_STORAGE_KEY } from '@/lib/profile/dev-basic-profile'
 import { createClient } from '@/lib/supabase'
@@ -11,6 +13,7 @@ import { isSupabaseConfigured } from '@/lib/utils'
 
 export default function BasicInfoPage() {
   const router = useRouter()
+  const { theme } = useUniversityTheme()
   const [initialData, setInitialData] = useState<Partial<BasicInfoData> | undefined>(undefined)
   const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -32,7 +35,11 @@ export default function BasicInfoPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!mounted) return
-      if (!user) { finishLoading(); return }
+      if (!user) {
+        finishLoading()
+        return
+      }
+
       Promise.all([
         supabase
           .from('profiles')
@@ -48,7 +55,7 @@ export default function BasicInfoPage() {
         .then(([profileResult, userResult]) => {
           if (profileResult.data || userResult.data) {
             setInitialData({
-              ...(profileResult.data as Partial<BasicInfoData> | null ?? {}),
+              ...((profileResult.data as Partial<BasicInfoData> | null) ?? {}),
               phone: typeof userResult.data?.phone === 'string' ? userResult.data.phone : '',
             })
           }
@@ -107,7 +114,7 @@ export default function BasicInfoPage() {
 
       router.push('/profile/worldcup')
     } catch {
-      setServerError('저장 중 오류가 생겼어요. 잠시 뒤 다시 시도해 주세요.')
+      setServerError('저장 중 오류가 생겼어요. 잠시 후 다시 시도해 주세요.')
     } finally {
       setSaving(false)
     }
@@ -125,12 +132,20 @@ export default function BasicInfoPage() {
   return (
     <div className="flex min-h-screen flex-col px-5 pb-28">
       <div className="mb-6">
-        <p className="mb-2 text-xs font-black text-boot-primary">1단계 / 내 정보</p>
-        <h1 className="text-2xl font-black gradient-fate-text">내 정보 등록</h1>
-        <p className="mt-1 text-sm leading-relaxed text-gray-500">
+        <p className="mb-2 text-xs font-black text-boot-primary">1단계 / 기본정보</p>
+        <h1 className="text-2xl font-black gradient-fate-text">기본정보 등록</h1>
+        <p className="mt-1 text-sm leading-relaxed text-boot-body">
           매칭 전에 필요한 기본정보만 먼저 채워요. 여기서 입력한 내용은 그룹 매칭과 다음 이상형 월드컵에 이어집니다.
         </p>
       </div>
+
+      <MascotCoachCard
+        className="mb-4"
+        kind="guide"
+        eyebrow={`${theme.shortName} Onboarding`}
+        title={`${theme.shortName} 기준으로 과팅 준비를 시작할게요`}
+        body="학교와 학과를 고르면 색감, 안내 문구, 마스코트가 해당 학교 분위기에 맞춰 자연스럽게 바뀝니다."
+      />
 
       {loaded && (
         <section className="mb-4 rounded-2xl border border-boot-primary/25 bg-white/90 px-4 py-3">
@@ -144,7 +159,7 @@ export default function BasicInfoPage() {
                 <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">사진 업로드</span>
               </div>
               <p className="mt-2 text-xs text-boot-muted">
-                필수 항목을 채우면 아래 버튼으로 바로 다음 화면을 확인할 수 있어요.
+                필수 항목을 채우면 아래 버튼으로 바로 다음 화면에 갈 수 있어요.
               </p>
             </div>
           </div>

@@ -85,7 +85,7 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
   return (
     <div className="flex flex-col gap-6">
       <div className="glass rounded-2xl p-4 border border-violet-500/20">
-        <p className="text-xs text-violet-300 font-medium leading-relaxed">
+        <p className="text-xs text-boot-body font-medium leading-relaxed">
           📸 사진은 매칭 확정 후에만 상대방에게 공개돼. 지금은 AI가 점수만 매겨.
         </p>
       </div>
@@ -137,7 +137,7 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
                 }`}
               >
                 <span className="text-2xl">{dragOver === idx ? '📥' : idx === 0 ? '📷' : '+'}</span>
-                <span className="text-[10px] text-gray-500">
+                <span className="text-[10px] text-boot-muted">
                   {dragOver === idx ? '놓으면 추가!' : idx === 0 ? '대표 사진' : `${idx + 1}번째`}
                 </span>
               </button>
@@ -155,7 +155,7 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
 
       {/* 진행 상태 */}
       <div className="flex items-center justify-between px-1">
-        <span className="text-xs text-gray-500">{filledCount}/{MAX_PHOTOS}장 선택됨</span>
+        <span className="text-xs text-boot-muted">{filledCount}/{MAX_PHOTOS}장 선택됨</span>
         <div className="flex gap-1.5">
           {slots.map((s, i) => (
             <div key={i} className={`w-2 h-2 rounded-full transition-colors ${s ? 'bg-violet-500' : 'bg-white/15'}`} />
@@ -172,8 +172,8 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
           '사진을 슬롯에 드래그해서 바로 추가할 수 있어',
         ].map((tip) => (
           <div key={tip} className="flex items-start gap-2">
-            <span className="text-violet-400 text-xs mt-0.5">•</span>
-            <span className="text-xs text-gray-500">{tip}</span>
+            <span className="text-boot-primary text-xs mt-0.5">•</span>
+            <span className="text-xs text-boot-muted">{tip}</span>
           </div>
         ))}
       </div>

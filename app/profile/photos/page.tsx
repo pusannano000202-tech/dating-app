@@ -147,7 +147,7 @@ export default function PhotosPage() {
     <div className="flex flex-col min-h-screen px-5 pb-10">
       <div className="mb-7">
         <h1 className="text-2xl font-black gradient-fate-text">사진 등록</h1>
-        <p className="text-sm text-gray-500 mt-1">AI가 사진으로 외모를 분석해. 얼굴이 잘 보이는 사진으로 올려줘.</p>
+        <p className="text-sm text-boot-body mt-1">AI가 사진으로 외모를 분석해. 얼굴이 잘 보이는 사진으로 올려줘.</p>
       </div>
 
       {/* 기존 사진 로딩 스켈레톤 */}
@@ -163,7 +163,7 @@ export default function PhotosPage() {
       {/* 기존 사진이 있는 경우 유지 옵션 표시 */}
       {photosLoaded && existingPhotos.length > 0 && (
         <div className="glass rounded-2xl p-4 mb-5 border border-violet-500/20">
-          <p className="text-xs text-violet-300 font-medium mb-3">기존 등록 사진</p>
+          <p className="text-xs text-boot-primary font-bold mb-3">기존 등록 사진</p>
           <div className="flex gap-2 mb-3">
             {existingPhotos.map((url, i) => (
               <div key={i} className="relative w-16 h-20 rounded-xl overflow-hidden flex-shrink-0">
@@ -174,7 +174,7 @@ export default function PhotosPage() {
           <button
             onClick={handleKeepExistingPhotos}
             disabled={saving}
-            className="glass w-full py-2.5 rounded-xl text-sm text-gray-300 hover:text-white border border-white/10 transition-colors"
+            className="glass w-full py-2.5 rounded-xl text-sm font-bold text-boot-body hover:text-boot-primary border border-boot-hairline transition-colors"
           >
             기존 사진 유지하고 다음으로 →
           </button>

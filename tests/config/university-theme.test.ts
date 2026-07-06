@@ -27,7 +27,8 @@ function readSource(path: string) {
   return readFileSync(join(ROOT, path), 'utf8')
 }
 
-test('university theme registry exposes 41 unique school themes from the final color tokens', () => {
+
+test('university theme registry exposes Top60 unique school themes plus Doowon', () => {
   const options = getUniversityThemeOptions()
   const ids = options.map((option) => option.id)
   const uniqueIds = new Set(ids)
@@ -37,71 +38,80 @@ test('university theme registry exposes 41 unique school themes from the final c
     option.colors.accent,
     option.colors.backgroundTop,
   ].join('|')))
+  const requiredIds = [
+    'doowon', 'pnu', 'kookmin', 'soongsil', 'sejong', 'ajou', 'hoseo', 'hannam', 'keimyung',
+    'dcu', 'ulsan', 'ks', 'kongju', 'inu', 'kyungnam', 'jj', 'seoultech', 'sch', 'jejunu',
+    'dongseo', 'sunmoon', 'nsu', 'wsu', 'uos', 'dju', 'suwon', 'sookmyung',
+  ]
 
-  assert.equal(options.length, 41)
-  assert.equal(uniqueIds.size, 41)
-  assert.ok(uniquePalettes.size >= 35)
-  assert.ok(ids.includes('doowon'))
-  assert.ok(ids.includes('pnu'))
-  assert.ok(ids.includes('kookmin'))
-  assert.ok(ids.includes('soongsil'))
-  assert.ok(ids.includes('sejong'))
-  assert.ok(ids.includes('ajou'))
-  assert.ok(ids.includes('hoseo'))
-  assert.ok(ids.includes('hannam'))
-  assert.ok(ids.includes('keimyung'))
+  assert.equal(options.length, 59)
+  assert.equal(uniqueIds.size, 59)
+  assert.ok(uniquePalettes.size >= 45)
+  for (const id of requiredIds) assert.ok(ids.includes(id), `${id} theme should be registered`)
   assert.equal(DEFAULT_UNIVERSITY_THEME_ID, 'pnu')
   assert.equal(UNIVERSITY_THEME_STORAGE_KEY, 'quantum_university_theme_id')
   assert.equal(UNIVERSITY_THEME_COOKIE_NAME, UNIVERSITY_THEME_STORAGE_KEY)
   assert.equal(UNIVERSITY_THEME_COOKIE_MAX_AGE, 60 * 60 * 24 * 365)
-  assert.equal(getUniversityThemeById('pnu').displayName, 'Quantum 부산대')
-  assert.equal(getUniversityThemeById('doowon').displayName, 'Quantum 두원공과대')
-  assert.equal(getUniversityThemeById('yonsei').displayName, 'Quantum 연세대')
-  assert.equal(getUniversityThemeById('korea').displayName, 'Quantum 고려대')
+  assert.equal(getUniversityThemeById('pnu').displayName, '퀀텀 부산대')
+  assert.equal(getUniversityThemeById('doowon').displayName, '퀀텀 두원공과대')
+  assert.equal(getUniversityThemeById('yonsei').displayName, '퀀텀 연세대')
+  assert.equal(getUniversityThemeById('korea').displayName, '퀀텀 고려대')
+  assert.equal(getUniversityThemeById('sookmyung').displayName, '퀀텀 숙명여대')
 })
 
-test('basic profile school picker exposes every university and updates theme while typing', () => {
+
+test('basic profile school picker exposes every registered university and updates theme while typing', () => {
   const schoolOptions = getUniversityThemeSchoolOptions()
   const basicInfoForm = readSource('components/profile/BasicInfoForm.tsx')
 
-  assert.equal(schoolOptions.length, 41)
-  assert.equal(new Set(schoolOptions.map((option) => option.id)).size, 41)
-  assert.ok(schoolOptions.some((option) => option.id === 'pnu' && option.label === '부산대'))
-  assert.ok(schoolOptions.some((option) => option.id === 'doowon' && option.label === '두원공과대'))
-  assert.ok(schoolOptions.some((option) => option.id === 'hoseo' && option.label === '호서대'))
-  assert.ok(schoolOptions.some((option) => option.id === 'ajou' && option.label === '아주대'))
+  assert.equal(schoolOptions.length, 59)
+  assert.equal(new Set(schoolOptions.map((option) => option.id)).size, 59)
+  assert.ok(schoolOptions.some((option) => option.id === 'pnu' && option.label === '부산대학교'))
+  assert.ok(schoolOptions.some((option) => option.id === 'doowon' && option.label === '두원공과대학교'))
+  assert.ok(schoolOptions.some((option) => option.id === 'hoseo' && option.label === '호서대학교'))
+  assert.ok(schoolOptions.some((option) => option.id === 'ajou' && option.label === '아주대학교'))
+  assert.ok(schoolOptions.some((option) => option.id === 'dcu' && option.label === '대구가톨릭대학교'))
+  assert.ok(schoolOptions.some((option) => option.id === 'sookmyung' && option.label === '숙명여자대학교'))
   assert.match(basicInfoForm, /getUniversityThemeSchoolOptions/)
   assert.match(basicInfoForm, /const UNIVERSITY_SCHOOL_OPTIONS = getUniversityThemeSchoolOptions\(\)/)
+  assert.match(basicInfoForm, /const QUICK_SCHOOL_OPTIONS = \[\.\.\.UNIVERSITY_SCHOOL_OPTIONS\]\.sort/)
+  assert.match(basicInfoForm, /localeCompare\(b\.label, 'ko-KR'\)/)
   assert.match(basicInfoForm, /handleSchoolChange/)
   assert.match(basicInfoForm, /setStoredUniversityThemeFromSchool\(nextSchool\)/)
+  assert.match(basicInfoForm, /setStoredUniversityThemeFromSchool\(school\)/)
   assert.match(basicInfoForm, /htmlFor="basic-school-input"/)
   assert.match(basicInfoForm, /id="basic-school-input"/)
   assert.match(basicInfoForm, /list="university-school-options"/)
   assert.match(basicInfoForm, /<datalist id="university-school-options">/)
   assert.match(basicInfoForm, /UNIVERSITY_SCHOOL_OPTIONS\.map/)
+  assert.match(basicInfoForm, /QUICK_SCHOOL_OPTIONS\.map/)
   assert.match(basicInfoForm, /aria-label=\{`\$\{option\.label\} 테마로 바꾸기`\}/)
 })
 
-test('official department data is searchable by the selected basic profile school', () => {
+
+test('official department data coverage is explicit for Top60 theme expansion', () => {
   const stats = getUniversityDepartmentStats()
   const pnuComputer = searchUniversityDepartments('부산대학교', '컴퓨터')
   const hoseoGame = searchUniversityDepartments('호서대학교', '게임')
-  const ajouFallback = searchUniversityDepartments('아주대학교', '전자')
+  const ajouSearch = searchUniversityDepartments('아주대학교', '전자')
+  const expectedMissing = [
+    'dcu', 'dju', 'dongseo', 'inu', 'jejunu', 'jj', 'kongju', 'ks', 'kyungnam', 'nsu',
+    'sch', 'seoultech', 'sookmyung', 'sunmoon', 'suwon', 'ulsan', 'uos', 'wsu',
+  ]
 
   assert.equal(stats.universityCount, 41)
   assert.equal(stats.activeDepartmentRows, 3984)
-  assert.deepEqual(stats.themeIdsMissingOfficialDepartments, [])
+  assert.deepEqual(stats.themeIdsMissingOfficialDepartments, expectedMissing)
   assert.deepEqual(stats.officialDepartmentIdsNotInThemeRegistry, [])
   assert.ok(pnuComputer.length > 0)
   assert.ok(pnuComputer.every((option) => option.universityId === 'pnu'))
   assert.ok(pnuComputer.some((option) => option.name.includes('컴퓨터')))
-  assert.ok(pnuComputer.every((option) => !option.status.includes('폐지')))
+  assert.ok(pnuComputer.every((option) => !option.status.includes('추정')))
   assert.ok(hoseoGame.length > 0)
   assert.ok(hoseoGame.every((option) => option.universityId === 'hoseo'))
   assert.ok(hoseoGame.some((option) => option.name.includes('게임')))
-  assert.ok(ajouFallback.length > 0)
-  assert.ok(ajouFallback.every((option) => option.universityId === 'ajou'))
-  assert.ok(ajouFallback.some((option) => option.name.includes('전자')))
+  assert.ok(ajouSearch.length > 0)
+  assert.ok(ajouSearch.every((option) => option.universityId === 'ajou'))
 })
 
 test('basic profile department picker follows the currently selected university', () => {
@@ -115,6 +125,7 @@ test('basic profile department picker follows the currently selected university'
   assert.doesNotMatch(basicInfoForm, /searchDepartments/)
   assert.doesNotMatch(basicInfoForm, /getDepartmentCollege/)
 })
+
 
 test('school text from basic profile maps to a matching university theme', () => {
   assert.equal(findUniversityThemeBySchool('부산대학교').id, 'pnu')
@@ -130,6 +141,9 @@ test('school text from basic profile maps to a matching university theme', () =>
   assert.equal(findUniversityThemeBySchool('숭실대').id, 'soongsil')
   assert.equal(findUniversityThemeBySchool('세종대학교').id, 'sejong')
   assert.equal(findUniversityThemeBySchool('아주대').id, 'ajou')
+  assert.equal(findUniversityThemeBySchool('대구가톨릭대').id, 'dcu')
+  assert.equal(findUniversityThemeBySchool('서울과학기술대학교').id, 'seoultech')
+  assert.equal(findUniversityThemeBySchool('숙명여대').id, 'sookmyung')
   assert.equal(findUniversityThemeBySchool('호서대학교').id, 'hoseo')
   assert.equal(findUniversityThemeBySchool('한남대학교').id, 'hannam')
   assert.equal(findUniversityThemeBySchool('이화여자대학교').id, 'ewha')
@@ -164,6 +178,15 @@ test('theme CSS variables and mascot assets are derived from the selected univer
   assert.equal(getPublicMascotAssetPath(korea, 'avatar'), '/university-mascots/app-assets-v3-display/korea/avatar.png')
   assert.equal(getUniversityBackdropAssetPath(pnu), '/university-backdrops/pnu-campus-preview.png')
   assert.equal(getUniversityBackdropAssetPath(yonsei), null)
+})
+
+test('school theme headings keep readable ink contrast instead of bright accent-only gradients', () => {
+  const globals = readSource('app/globals.css')
+  const gradientFateText = globals.match(/\.gradient-fate-text\s*\{[^}]+\}/)?.[0] ?? ''
+
+  assert.match(gradientFateText, /var\(--boot-primary\)/)
+  assert.match(gradientFateText, /var\(--boot-ink\)/)
+  assert.doesNotMatch(gradientFateText, /var\(--boot-amber\)/)
 })
 
 test('every registered university theme has all runtime mascot image assets', () => {

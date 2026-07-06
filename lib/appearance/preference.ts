@@ -26,6 +26,8 @@ export const ROUND_WEIGHT: Record<RoundLabel, number> = {
   '최종우승': 2.80,
 }
 
+const DECISIVE_ROUNDS = new Set<RoundLabel>(['16강', '8강', '4강', '결승'])
+
 export interface ChoiceLog {
   round: RoundLabel
   match_index: number
@@ -87,6 +89,27 @@ function emptyVector(gender: 'female' | 'male'): AppearanceVector {
   return zeroVector(gender)
 }
 
+function buildPreferenceSignals(
+  choiceLogs: ChoiceLog[],
+  finalWinnerId: string | null,
+): Array<{ log: ChoiceLog; weight: number }> {
+  const signals = choiceLogs
+    .map((log) => {
+      const isFinalWinnerPath = finalWinnerId != null && log.winner_id === finalWinnerId
+      const isLateRound = DECISIVE_ROUNDS.has(log.round)
+      return {
+        log,
+        weight: isFinalWinnerPath || isLateRound ? log.weight : 0,
+      }
+    })
+    .filter(({ weight }) => weight > 0)
+
+  // 작은 풀이나 비정상 로그에서도 결과가 비지 않도록 기존 전체 winner 평균으로 폴백한다.
+  return signals.length > 0
+    ? signals
+    : choiceLogs.map((log) => ({ log, weight: log.weight }))
+}
+
 export interface ComputeArgs {
   gender: 'female' | 'male'
   choiceLogs: ChoiceLog[]
@@ -99,25 +122,26 @@ export interface ComputeArgs {
 
 export function computePreference(args: ComputeArgs): PreferenceResult {
   const { gender, choiceLogs, poolMeanVector, poolAxisStats, winnerItems, finalWinnerId } = args
+  const winnerItemById = new Map(winnerItems.map((item) => [item.id, item]))
+  const preferenceSignals = buildPreferenceSignals(choiceLogs, finalWinnerId)
+  const finalItem = finalWinnerId ? winnerItemById.get(finalWinnerId) : null
 
   // 1. preferred_appearance_vector
-  //    = winner 이미지들의 measured_vector 의 라운드 가중 평균
-  //    같은 winner 가 여러 라운드에서 이기면(우승자처럼) 각 라운드 가중치가 누적된다.
+  //    = 후반 라운드/최종 우승 경로 winner measured_vector 의 가중 평균.
+  //    초반에는 둘 다 취향이 아닐 때도 강제로 골라야 하므로, 전체 winner 평균으로 잡으면
+  //    청순/자연형처럼 풀 평균이 높은 축이 실제 이상형을 덮을 수 있다.
   let weightedSum = emptyVector(gender)
   let weightTotal = 0
-  for (const log of choiceLogs) {
-    const w = log.weight
+  for (const { log, weight } of preferenceSignals) {
+    const w = weight
     weightedSum = addVector(weightedSum, scaleVector(log.winner_vector, w))
     weightTotal += w
   }
   // 최종 우승 가중치는 별도 추가
-  if (finalWinnerId) {
-    const finalItem = winnerItems.find((it) => it.id === finalWinnerId)
-    if (finalItem?.measured) {
-      const w = ROUND_WEIGHT['최종우승']
-      weightedSum = addVector(weightedSum, scaleVector(finalItem.measured.appearance_vector, w))
-      weightTotal += w
-    }
+  if (finalItem?.measured) {
+    const w = ROUND_WEIGHT['최종우승']
+    weightedSum = addVector(weightedSum, scaleVector(finalItem.measured.appearance_vector, w))
+    weightTotal += w
   }
   const preferred_appearance_vector =
     weightTotal > 0 ? scaleVector(weightedSum, 1 / weightTotal) : emptyVector(gender)
@@ -152,23 +176,28 @@ export function computePreference(args: ComputeArgs): PreferenceResult {
 
   // 5. preferred_score_range — winner item 의 measured score 통계
   const winnerScores: number[] = []
-  for (const log of choiceLogs) {
-    const item = winnerItems.find((it) => it.id === log.winner_id)
+  for (const { log } of preferenceSignals) {
+    const item = winnerItemById.get(log.winner_id)
     if (item?.measured) winnerScores.push(item.measured.appearance_score_normalized)
   }
+  if (finalItem?.measured) winnerScores.push(finalItem.measured.appearance_score_normalized)
   const preferred_score_range = {
     mean: winnerScores.length ? winnerScores.reduce((a, b) => a + b, 0) / winnerScores.length : 0,
     min: winnerScores.length ? Math.min(...winnerScores) : 0,
     max: winnerScores.length ? Math.max(...winnerScores) : 0,
   }
 
-  // 6. preferred_bucket_weights — winner item 의 final_bucket 빈도 × 라운드 가중치
+  // 6. preferred_bucket_weights — 공개 결과용. 후반/최종 선택 신호만 사용한다.
   const bucketWeights: Record<string, number> = {}
-  for (const log of choiceLogs) {
-    const item = winnerItems.find((it) => it.id === log.winner_id)
+  for (const { log, weight } of preferenceSignals) {
+    const item = winnerItemById.get(log.winner_id)
     if (item?.final_bucket) {
-      bucketWeights[item.final_bucket] = (bucketWeights[item.final_bucket] ?? 0) + log.weight
+      bucketWeights[item.final_bucket] = (bucketWeights[item.final_bucket] ?? 0) + weight
     }
+  }
+  if (finalItem?.final_bucket) {
+    bucketWeights[finalItem.final_bucket] =
+      (bucketWeights[finalItem.final_bucket] ?? 0) + ROUND_WEIGHT['최종우승']
   }
   // 정규화 (합이 1이 되도록)
   const bwTotal = Object.values(bucketWeights).reduce((a, b) => a + b, 0)

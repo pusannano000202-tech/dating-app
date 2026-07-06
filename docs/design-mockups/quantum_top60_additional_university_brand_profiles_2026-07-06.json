@@ -1,0 +1,1080 @@
+{
+  "generatedAt": "2026-07-06",
+  "scope": "Top60 재학생수 표 기준, 기존 41개 색상/마스코트 구현과 중복되는 본교 제외 후 신규 18개 추가 v1",
+  "excludedAsDuplicateCampus": [
+    {
+      "name": "단국대학교 제2캠퍼스",
+      "reason": "단국대학교 본교 디자인 variant로 처리"
+    },
+    {
+      "name": "한양대학교 ERICA",
+      "reason": "한양대학교 본교 디자인 variant로 처리"
+    }
+  ],
+  "knownDataMismatch": [
+    {
+      "issue": "기존 색상 41개에는 대구가톨릭대가 있고 아주대가 없음. 기존 학과 JSON에는 아주대가 있고 대구가톨릭대가 없음.",
+      "action": "Top60 canonical 데이터 통합 시 ajou와 dcu를 모두 포함하도록 merge 필요."
+    }
+  ],
+  "canvaReportCandidate": {
+    "jobId": "dba4df09-4686-4be6-a4a8-1b0dd06fcd3d",
+    "candidateUrls": [
+      "https://www.canva.com/d/AA66x0n6gPQZFO2",
+      "https://www.canva.com/d/62RY9QtUJ5a13_G",
+      "https://www.canva.com/d/7uQwrlGiRFOgbpT",
+      "https://www.canva.com/d/QB3nXqGQiHmIERH"
+    ]
+  },
+  "deprecatedAssets": [],
+  "universities": [
+    {
+      "id": "ulsan",
+      "name": "울산대학교",
+      "short": "울산대",
+      "rank": 33,
+      "students": 17338,
+      "animal": "기린/기린형 루오니·울리니 계열 후보",
+      "character": "초록 갈기 기린-기린수(qilin) 빛 친구",
+      "colors": {
+        "primary": "#00843D",
+        "secondary": "#F2C94C",
+        "accent": "#6BCB77",
+        "background": "#EAF7EF"
+      },
+      "confidence": "high",
+      "source": "울산대 웹진 공식 기사에서 공식 마스코트 캐릭터 공모전 수상작 루오니를 기린 모티브로 설명. 2026년 SNS/미디어에서는 울리니 명칭도 확인되어 명칭 최신성은 별도 메모.",
+      "notes": "기린형 캐릭터는 적합. 단, 루오니/울리니 명칭 혼재 가능성 있어 공식 최신 명칭 확인 필요.",
+      "avoid": "공식 캐릭터 얼굴/로고/탑 아이콘 직접 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_ULSAN_KS_KONGJU_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://u-zine.ulsan.ac.kr/10/2?action=view&arcNo=447&seq=244",
+        "https://u-media.ulsan.ac.kr/main/3?action=view&arcNo=12&seq=111"
+      ]
+    },
+    {
+      "id": "ks",
+      "name": "경성대학교",
+      "short": "경성대",
+      "rank": 34,
+      "students": 16576,
+      "animal": "별 캐릭터/공식 캐릭터 경성이·별이 후보",
+      "character": "보라색 별+크림 별 듀오",
+      "colors": {
+        "primary": "#7B3FA1",
+        "secondary": "#F5E1FF",
+        "accent": "#F2C94C",
+        "background": "#F6EEFA"
+      },
+      "confidence": "high",
+      "source": "경성대 공식 캐릭터 페이지에서 경성이·별이를 홍보 캐릭터로 명시하고 저작권/상표권 주의사항을 안내.",
+      "notes": "동물 억지화하지 않고 별 듀오로 처리. 기존 학교와 잘 구분됨.",
+      "avoid": "공식 경성이/별이 원본 형태 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_ULSAN_KS_KONGJU_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://kscms.ks.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN193"
+      ]
+    },
+    {
+      "id": "kongju",
+      "name": "공주대학교",
+      "short": "공주대",
+      "rank": 35,
+      "students": 16478,
+      "animal": "곰 캐릭터 후보",
+      "character": "초록 스카프 곰 캠퍼스 버디",
+      "colors": {
+        "primary": "#006A4E",
+        "secondary": "#00A6A6",
+        "accent": "#F4A261",
+        "background": "#EAF7F1"
+      },
+      "confidence": "high",
+      "source": "공주대 공식 캐릭터 페이지에서 곰 캐릭터 크눙이를 공식 커뮤니케이션 수단으로 안내하고 색상까지 제공.",
+      "notes": "단국대 검은곰, 강원대 산곰과 구분되도록 국립대 green/tri-campus scarf 사용.",
+      "avoid": "공식 곰 캐릭터 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_ULSAN_KS_KONGJU_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.kongju.ac.kr/KNU/16666/subview.do"
+      ]
+    },
+    {
+      "id": "inu",
+      "name": "인천대학교",
+      "short": "인천대",
+      "rank": 39,
+      "students": 16066,
+      "animal": "횃불이/불꽃 사자 후보",
+      "character": "파랑 갈기+노랑 불꽃 사자",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#FFD200",
+        "accent": "#FFFFFF",
+        "background": "#EAF5FF"
+      },
+      "confidence": "high",
+      "source": "인천대 공식 횃불이 캐릭터 페이지에서 불꽃 갈기 사자 캐릭터로 설명.",
+      "notes": "생성물 옷의 INU 글자는 제거 필요. 사자+불꽃은 학교 구분력 좋음.",
+      "avoid": "INU 문자, 공식 로고, 공식 횃불이 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_INU_KYUNGNAM_JJ_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.inu.ac.kr/inu/731/subview.do"
+      ]
+    },
+    {
+      "id": "kyungnam",
+      "name": "경남대학교",
+      "short": "경남대",
+      "rank": 43,
+      "students": 15855,
+      "animal": "한마/汗馬",
+      "character": "흰 한마 말 캐릭터",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#8AA6C1",
+        "accent": "#F2C94C",
+        "background": "#EEF5FB"
+      },
+      "confidence": "medium",
+      "source": "경남대 한마 방향은 한마 상징·캠퍼스 조형물 보조자료 기반. 공식 상징동물 URL 추가 확인 필요.",
+      "notes": "생성물 옷의 KNU 글자는 경북대/강원대와 혼동되므로 제거 필요.",
+      "avoid": "KNU 문자 사용 금지, 공식 말 문양 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_INU_KYUNGNAM_JJ_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.kyungnam.ac.kr/"
+      ]
+    },
+    {
+      "id": "jj",
+      "name": "전주대학교",
+      "short": "전주대",
+      "rank": 45,
+      "students": 15618,
+      "animal": "제이제이/백마 계열 캐릭터",
+      "character": "전주대 제이제이의 백마 맥락을 참고한 파랑 망토 흰 말 자체 캐릭터",
+      "colors": {
+        "primary": "#005EB8",
+        "secondary": "#F2C94C",
+        "accent": "#FFFFFF",
+        "background": "#EAF5FF"
+      },
+      "confidence": "high",
+      "source": "전주대 공식 UI 캐릭터 페이지와 보조 검색 기준, 대표 캐릭터 제이제이/JJU 계열을 확인. 앱 asset은 공식 캐릭터 복제가 아니라 백마형 자체 캐릭터로 교체.",
+      "notes": "기존 노란 별 캐릭터 asset은 폐기. 별은 보조 장식으로만 사용하고 메인 실루엣은 백마 계열로 유지.",
+      "avoid": "JJ 문자, 공식 제이제이 얼굴/비율/의상 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_INU_KYUNGNAM_JJ_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://jj.ac.kr/jj/introduction/symbol.do",
+        "https://jj.ac.kr/jj/introduction/ui-character.do"
+      ]
+    },
+    {
+      "id": "seoultech",
+      "name": "서울과학기술대학교",
+      "short": "서울과기대",
+      "rank": 48,
+      "students": 14088,
+      "animal": "흑룡",
+      "character": "아기 흑룡 테크 탐험가",
+      "colors": {
+        "primary": "#003A70",
+        "secondary": "#C8102E",
+        "accent": "#4B4F54",
+        "background": "#EAF1FA"
+      },
+      "confidence": "high",
+      "source": "서울과기대 공식 마스코트 페이지에서 테크뇽과 지정색상을 안내하고, 대학뉴스에서 흑룡 상징동물 및 네이밍 과정을 설명.",
+      "notes": "글자/로고 위험 낮고 포즈도 앱 슬롯에 적합.",
+      "avoid": "공식 흑룡 캐릭터 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_SEOULTECH_SCH_JEJUNU_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.seoultech.ac.kr/intro/symbol/mascot/intro",
+        "https://www.seoultech.ac.kr/service/info/news?bidx=640564&bnum=3596&do=commonview"
+      ]
+    },
+    {
+      "id": "sch",
+      "name": "순천향대학교",
+      "short": "순천향대",
+      "rank": 49,
+      "students": 14075,
+      "animal": "슈크림/크림 학생 듀오 후보",
+      "character": "크림 퍼프 학생 듀오",
+      "colors": {
+        "primary": "#004EA2",
+        "secondary": "#F7941D",
+        "accent": "#F6E7C8",
+        "background": "#EEF5FB"
+      },
+      "confidence": "medium",
+      "source": "순천향대 슈크림 방향은 공식 SNS/보조자료 기반. 공식 캐릭터 매뉴얼 URL 추가 확인 필요.",
+      "notes": "동물 억지화하지 않아 안전. 다만 공식 캐릭터와 이름/형태 유사도 확인 필요.",
+      "avoid": "공식 슈크림 캐릭터 직접 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_SEOULTECH_SCH_JEJUNU_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.sch.ac.kr/"
+      ]
+    },
+    {
+      "id": "jejunu",
+      "name": "제주대학교",
+      "short": "제주대",
+      "rank": 50,
+      "students": 13799,
+      "animal": "사슴",
+      "character": "제주 오름/파도 사슴",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#009A44",
+        "accent": "#F58220",
+        "background": "#EAF7F1"
+      },
+      "confidence": "medium",
+      "source": "제주대 사슴 방향은 학교 상징/보조자료 기반. 공식 캐릭터 매뉴얼 URL 추가 확인 필요.",
+      "notes": "바다/오름/현무암 소품으로 학교성 명확.",
+      "avoid": "공식 사슴 캐릭터 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_SEOULTECH_SCH_JEJUNU_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.jejunu.ac.kr/"
+      ]
+    },
+    {
+      "id": "ajou",
+      "name": "아주대학교",
+      "short": "아주대",
+      "rank": 51,
+      "students": 13783,
+      "animal": "치토/불꽃 캐릭터 후보",
+      "character": "파랑+금빛 불꽃 요정",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#2F61D5",
+        "accent": "#F2A900",
+        "background": "#EAF3FF"
+      },
+      "confidence": "high",
+      "source": "아주대 치토/불꽃·횃불 계열 공식 캐릭터 방향. 공식 캐릭터 페이지 URL 추가 확인 필요.",
+      "notes": "이미 이전 학과 JSON에 들어갔으나 색상 token 41개에는 빠져 있어 이번에 보강 대상.",
+      "avoid": "치토 공식 캐릭터 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_AJOU_DONGSEO_SUNMOON_CORRECTED_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.ajou.ac.kr/"
+      ]
+    },
+    {
+      "id": "dongseo",
+      "name": "동서대학교",
+      "short": "동서대",
+      "rank": 52,
+      "students": 13676,
+      "animal": "동물 아님: 아토프렌즈/ATO 계열",
+      "character": "우주·미디어 캠퍼스 친구",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#D71920",
+        "accent": "#B7E3F4",
+        "background": "#EEF5FB"
+      },
+      "confidence": "high",
+      "source": "동서대 공식 상징물 페이지에서 상징동물 독수리를 명시. 아토프렌즈는 동서대 학교기업 애니모션 자체 제작 캐릭터로 확인. 이번 앱용은 동물 독수리도 가능하지만, 공식 캐릭터 IP 복제 위험을 낮추기 위해 ATO-inspired 비동물 우주/미디어 companion을 선택.",
+      "notes": "중요 교정: 독수리 금지. 비동물 ATO-inspired 캐릭터 사용.",
+      "avoid": "동서대 독수리를 틀렸다고 표현하지 말 것. 단, 이번 앱용 기본 asset은 ATO-inspired 비동물 companion이며 공식 독수리/ATO 캐릭터 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_AJOU_DONGSEO_SUNMOON_CORRECTED_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.dongseo.ac.kr/kr/index.php?pCode=symbol",
+        "https://www.instagram.com/p/CcpDI83Linv/"
+      ]
+    },
+    {
+      "id": "sunmoon",
+      "name": "선문대학교",
+      "short": "선문대",
+      "rank": 54,
+      "students": 12775,
+      "animal": "해달이 프렌즈/해달",
+      "character": "달·해 파카를 입은 해달 친구",
+      "colors": {
+        "primary": "#003876",
+        "secondary": "#5DADE2",
+        "accent": "#F9C74F",
+        "background": "#EAF6FB"
+      },
+      "confidence": "medium",
+      "source": "선문대 해달이 프렌즈 방향은 공식 SNS/보조자료 기반. 공식 캐릭터 매뉴얼 URL 추가 확인 필요.",
+      "notes": "파도/해/달 소품으로 학교 구분력 좋음.",
+      "avoid": "공식 해달이 얼굴/의상 직접 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_AJOU_DONGSEO_SUNMOON_CORRECTED_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.sunmoon.ac.kr/"
+      ]
+    },
+    {
+      "id": "nsu",
+      "name": "남서울대학교",
+      "short": "남서울대",
+      "rank": 55,
+      "students": 12556,
+      "animal": "백마/홀리 후보",
+      "character": "부드러운 흰 말/유니콘 캠퍼스 가디언",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#C6A664",
+        "accent": "#F5F0E6",
+        "background": "#EEF5FB"
+      },
+      "confidence": "medium",
+      "source": "남서울대 홀리/백마 방향은 공식 SNS/보조 자료 기반. 공식 캐릭터 매뉴얼 URL 추가 확인 필요.",
+      "notes": "낮은 신뢰도. production 전 공식 확인 없으면 기본 Quantum 캐릭터 variant로 처리.",
+      "avoid": "백마가 공식이 아닐 경우 사용 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_NSU_WSU_UOS_CORRECTED_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "high",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.nsu.ac.kr/"
+      ]
+    },
+    {
+      "id": "wsu",
+      "name": "우송대학교",
+      "short": "우송대",
+      "rank": 56,
+      "students": 12490,
+      "animal": "동물 확정 안 함: 소나무/철도·글로벌 상징 기반",
+      "character": "소나무 새싹+철도/글로벌 네비게이터",
+      "colors": {
+        "primary": "#003876",
+        "secondary": "#009A44",
+        "accent": "#A7A8AA",
+        "background": "#EAF2FA"
+      },
+      "confidence": "medium",
+      "source": "우송대 송골매는 공식 페이지 근거가 약해 production 기본에서 제외. 공식/보조 검색에서 소나무 상징 쪽이 더 안전하므로 비동물 pine-sprout rail/global companion으로 교정.",
+      "notes": "송골매 버전은 공식 근거 부족으로 미선택 alternates 폴더로 분리. 새 교정본은 비동물이라 안전성이 높음.",
+      "avoid": "송골매/새 캐릭터 production 사용 금지. 공식 상징동물 페이지 확인 전 새 동물화 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_NSU_WSU_UOS_CORRECTED_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "high",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.wsu.ac.kr/"
+      ]
+    },
+    {
+      "id": "uos",
+      "name": "서울시립대학교",
+      "short": "서울시립대",
+      "rank": 57,
+      "students": 12331,
+      "animal": "장산곶매/이루매 후보",
+      "character": "도시 캠퍼스 매",
+      "colors": {
+        "primary": "#005BAC",
+        "secondary": "#009A44",
+        "accent": "#8B6F47",
+        "background": "#EEF5FB"
+      },
+      "confidence": "medium",
+      "source": "서울시립대 이루매/장산곶매 방향은 공식·준공식 자료 기반으로 보이나, 공식 캐릭터 매뉴얼 URL 추가 확인 필요.",
+      "notes": "도시 실루엣과 갈색 매로 차별화 좋음.",
+      "avoid": "공식 이루매 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_NSU_WSU_UOS_CORRECTED_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.uos.ac.kr/"
+      ]
+    },
+    {
+      "id": "dju",
+      "name": "대전대학교",
+      "short": "대전대",
+      "rank": 58,
+      "students": 12241,
+      "animal": "까치/소나무 후보",
+      "character": "솔잎 스카프 까치 메신저",
+      "colors": {
+        "primary": "#006B3F",
+        "secondary": "#003876",
+        "accent": "#FFFFFF",
+        "background": "#EAF7EF"
+      },
+      "confidence": "high",
+      "source": "대전대 공식 캐릭터/상징 페이지에서 캐릭터 스토리와 상징 체계를 확인. 까치/소나무 모티브는 앱용 자체화에 사용 가능.",
+      "notes": "소나무 가지 소품으로 상징성 보강.",
+      "avoid": "까치가 공식 상징이 아니면 symbol-neutral variant로 변경",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_DJU_SUWON_SOOKMYUNG_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.dju.ac.kr/dju/cm/cntnts/cntntsView.do?cntntsId=1045&mi=1132"
+      ]
+    },
+    {
+      "id": "suwon",
+      "name": "수원대학교",
+      "short": "수원대",
+      "rank": 59,
+      "students": 12168,
+      "animal": "페가수스/천마",
+      "character": "남색 망토의 날개 달린 백마",
+      "colors": {
+        "primary": "#002D62",
+        "secondary": "#FFD200",
+        "accent": "#FFFFFF",
+        "background": "#EAF1FA"
+      },
+      "confidence": "high",
+      "source": "수원대 상징동물 페가수스 방향. 공식 출처 추가 클릭 검수 필요하지만 상징 동물 일치성이 높음.",
+      "notes": "두원공과대/영남대 천마와 겹치므로 날개와 수원대 navy/gold로 차별화.",
+      "avoid": "공식 페가수스 문양 직접 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_DJU_SUWON_SOOKMYUNG_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.suwon.ac.kr/"
+      ]
+    },
+    {
+      "id": "sookmyung",
+      "name": "숙명여자대학교",
+      "short": "숙명여대",
+      "rank": 60,
+      "students": 12065,
+      "animal": "눈송이 프렌즈/눈송이",
+      "character": "푸른 눈송이 친구",
+      "colors": {
+        "primary": "#003876",
+        "secondary": "#B7D7F0",
+        "accent": "#FFFFFF",
+        "background": "#EEF6FF"
+      },
+      "confidence": "medium",
+      "source": "숙명여대 공식 계정/학교 상징의 청색·눈송이 문화 기반. 공식 Snowflake Friends 매뉴얼 URL 추가 확인 필요.",
+      "notes": "동물이 아니므로 눈송이 자체 캐릭터로 유지.",
+      "avoid": "공식 눈송이 캐릭터 원본 복제 금지",
+      "assetPath": "docs/design-mockups/mascots/top60-additions-v2/QUANTUM_DJU_SUWON_SOOKMYUNG_5POSE_SAMPLE_2026-07-06.png",
+      "positions": [
+        {
+          "route": "homeTop",
+          "pose": "welcome",
+          "slot": "상단 안내 카드 우측 작은 avatar",
+          "size": "40-56px"
+        },
+        {
+          "route": "/profile/basic",
+          "pose": "guide",
+          "slot": "학교 선택/기본정보 입력 카드 우측",
+          "size": "56-72px"
+        },
+        {
+          "route": "/match",
+          "pose": "waiting",
+          "slot": "매칭 대기 카드 우하단",
+          "size": "64-88px"
+        },
+        {
+          "route": "/group/create",
+          "pose": "guide",
+          "slot": "친구 초대/그룹 생성 안내 카드 우측",
+          "size": "56-80px"
+        },
+        {
+          "route": "deposit/refund",
+          "pose": "support",
+          "slot": "보증금/환불 카드 우하단",
+          "size": "64-132px"
+        }
+      ],
+      "usageRisk": "medium",
+      "frontendRule": "기존 Quantum 화면 구조 유지. 카드 우측/우하단 보조 slot에만 배치. CTA 위로 올라오면 실패.",
+      "sourceUrls": [
+        "https://www.sookmyung.ac.kr/kr/index.do",
+        "https://www.instagram.com/sookmyung_womens_univ/"
+      ]
+    }
+  ],
+  "notSelectedAlternateAssets": [
+    "docs/design-mockups/mascots/not-selected-alternates-2026-07-06/NOT_SELECTED_DONGSEO_EAGLE_OFFICIAL_SYMBOL_BUT_ATOFRIENDS_SELECTED_2026-07-06.png",
+    "docs/design-mockups/mascots/not-selected-alternates-2026-07-06/NOT_SELECTED_WOOSONG_FALCON_LOW_CONFIDENCE_NSU_WSU_UOS_2026-07-06.png"
+  ],
+  "officialAuditSummary": {
+    "corrected": [
+      "동서대: 독수리는 공식 상징동물이라 wrong 표현 삭제. 앱 기본은 ATO-inspired 비동물 캐릭터 선택.",
+      "우송대: 송골매 공식 근거 부족으로 새/송골매 캐릭터 미선택. 비동물 소나무+철도 companion으로 교정."
+    ],
+    "stillNeedsManualClick": [
+      "남서울대 홀리/백마 공식 매뉴얼",
+      "우송대 공식 상징동물 여부",
+      "서울시립대 이루매 공식 매뉴얼",
+      "숙명여대 Snowflake Friends 공식 매뉴얼",
+      "순천향대 슈크림 공식 매뉴얼"
+    ]
+  }
+}

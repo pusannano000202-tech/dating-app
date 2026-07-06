@@ -216,7 +216,7 @@ export default function WorldcupPage() {
   if (loadError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p className="text-center text-gray-300 text-sm leading-relaxed">{loadError}</p>
+        <p className="text-center text-boot-body text-sm leading-relaxed">{loadError}</p>
         <button
           onClick={() => router.push('/profile/basic')}
           className="mt-6 btn-gradient py-3 px-6 rounded-2xl font-bold text-sm"
@@ -230,7 +230,7 @@ export default function WorldcupPage() {
   if (!metadata || !gender) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p className="text-center text-gray-300 text-sm">월드컵을 준비할 수 없어.</p>
+        <p className="text-center text-boot-body text-sm">월드컵을 준비할 수 없어.</p>
       </div>
     )
   }
@@ -252,7 +252,7 @@ export default function WorldcupPage() {
   if (!oppositeGender) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
-        <p className="text-center text-gray-300 text-sm">성별 정보를 다시 확인해줘.</p>
+        <p className="text-center text-boot-body text-sm">성별 정보를 다시 확인해줘.</p>
       </div>
     )
   }

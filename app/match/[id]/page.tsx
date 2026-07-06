@@ -25,7 +25,12 @@ import {
   type DailyCardDraft,
   type DailyCardFieldId,
 } from '@/lib/matching/daily-card-authoring'
-import { getDevMatchPreviewStatus } from '@/lib/matching/dev-match-preview'
+import {
+  canUseDevMatchPreview,
+  getDevMatchPreviewStatus,
+  isDevMatchPreviewId,
+  isDevSoloMatchPreviewId,
+} from '@/lib/matching/dev-match-preview'
 
 interface MatchDetail {
   match_id: string
@@ -154,7 +159,7 @@ function getPendingStepCopy(step: PendingMatchStep, match?: MatchDetail | null):
 }
 
 function isSoloMatchId(matchId: string): boolean {
-  return matchId.startsWith('dev-solo-') || matchId.includes('solo')
+  return isDevSoloMatchPreviewId(matchId)
 }
 
 function createDevMatchDetail(
@@ -318,6 +323,8 @@ export default function MatchDetailPage() {
   const { theme } = useUniversityTheme()
   const matchId = params.id
   const isDevPreview = isDevPreviewClientSession()
+  const isDevMatchPreviewRoute = isDevMatchPreviewId(matchId)
+  const canUseDevPreview = canUseDevMatchPreview(matchId, isDevPreview)
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -339,7 +346,13 @@ export default function MatchDetailPage() {
     setLoading(true)
     setError(null)
 
-    if (isDevPreview) {
+    if (isDevMatchPreviewRoute && !canUseDevPreview) {
+      setError('개발용 미리보기 매칭은 dev preview 세션에서만 열 수 있어요.')
+      setLoading(false)
+      return
+    }
+
+    if (canUseDevPreview) {
       const devMatch = createDevMatchDetail(matchId, getDevPreviewVenue(theme))
       setMatch(devMatch)
       setCardDraft(createDailyCardDraftFromSubmissionText(devMatch.my_card_content_text))
@@ -369,7 +382,7 @@ export default function MatchDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview, matchId, theme])
+  }, [canUseDevPreview, isDevMatchPreviewRoute, matchId, theme])
 
   useEffect(() => {
     refresh()
@@ -383,7 +396,7 @@ export default function MatchDetailPage() {
 
   const refreshConnections = useCallback(async () => {
     setConnectionsLoading(true)
-    if (isDevPreview) {
+    if (canUseDevPreview) {
       setConnections(createDevConnections(matchId))
       setConnectionsLoading(false)
       return
@@ -400,7 +413,7 @@ export default function MatchDetailPage() {
     } finally {
       setConnectionsLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [canUseDevPreview, matchId])
 
   useEffect(() => {
     if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {
@@ -412,7 +425,7 @@ export default function MatchDetailPage() {
 
   const refreshDailyCards = useCallback(async () => {
     setDailyCardsLoading(true)
-    if (isDevPreview) {
+    if (canUseDevPreview) {
       setDailyCards(DEV_DAILY_CARDS)
       setDailyCardsLoading(false)
       return
@@ -429,7 +442,7 @@ export default function MatchDetailPage() {
     } finally {
       setDailyCardsLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [canUseDevPreview, matchId])
 
   useEffect(() => {
     if (match?.scheduled_start) {
@@ -440,7 +453,7 @@ export default function MatchDetailPage() {
   }, [match?.scheduled_start, refreshDailyCards])
 
   const refreshAttendance = useCallback(async () => {
-    if (isDevPreview) {
+    if (canUseDevPreview) {
       setAttendance(createDevAttendance(matchId))
       return
     }
@@ -454,7 +467,7 @@ export default function MatchDetailPage() {
     } catch {
       // ignore
     }
-  }, [isDevPreview, matchId])
+  }, [canUseDevPreview, matchId])
 
   useEffect(() => {
     if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {

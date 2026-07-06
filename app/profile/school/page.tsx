@@ -123,14 +123,14 @@ export default function SchoolEmailPage() {
               : <Mail className="w-8 h-8 text-violet-300" />}
           </div>
           <h1 className="text-2xl font-black gradient-fate-text">부산대 메일 인증</h1>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-boot-muted mt-2">
             과팅 참여는 부산대 구성원 인증 후 가능해요.
           </p>
         </div>
 
         <div className="glass-card rounded-2xl p-5 space-y-4">
           <label className="block">
-            <span className="block text-xs font-semibold text-gray-400 mb-2">부산대 이메일</span>
+            <span className="block text-xs font-semibold text-boot-muted mb-2">부산대 이메일</span>
             <input
               type="email"
               value={email}
@@ -138,28 +138,28 @@ export default function SchoolEmailPage() {
               onKeyDown={(event) => event.key === 'Enter' && requestCode()}
               placeholder="student@pusan.ac.kr"
               disabled={phase === 'verified'}
-              className="w-full glass rounded-xl px-4 py-3.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-violet-500/60"
+              className="w-full glass rounded-xl px-4 py-3.5 text-sm text-boot-ink placeholder:text-boot-muted focus:outline-none focus:ring-1 focus:ring-boot-primary/40"
             />
           </label>
 
           {phase === 'sent' && (
             <label className="block">
-              <span className="block text-xs font-semibold text-gray-400 mb-2">인증번호</span>
+              <span className="block text-xs font-semibold text-boot-muted mb-2">인증번호</span>
               <input
                 inputMode="numeric"
                 value={code}
                 onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
                 onKeyDown={(event) => event.key === 'Enter' && verifyCode()}
                 placeholder="000000"
-                className="w-full glass rounded-xl px-4 py-3.5 text-lg tracking-[0.35em] text-center font-black text-white placeholder-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-500/60"
+                className="w-full glass rounded-xl px-4 py-3.5 text-lg tracking-[0.35em] text-center font-black text-boot-ink placeholder:text-boot-muted focus:outline-none focus:ring-1 focus:ring-boot-primary/40"
               />
             </label>
           )}
 
           {devCode && (
             <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 px-4 py-3">
-              <p className="text-xs text-violet-200">로컬 개발용 인증번호</p>
-              <p className="text-xl font-black tracking-[0.25em] text-white mt-1">{devCode}</p>
+              <p className="text-xs font-bold text-boot-primary">로컬 개발용 인증번호</p>
+              <p className="text-xl font-black tracking-[0.25em] text-boot-ink mt-1">{devCode}</p>
             </div>
           )}
 

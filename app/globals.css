@@ -138,7 +138,8 @@
     background-clip: text;
   }
   .gradient-fate-text {
-    background: linear-gradient(135deg, var(--boot-primary) 0%, var(--boot-coral) 45%, var(--boot-amber) 100%);
+    color: var(--boot-ink);
+    background: linear-gradient(135deg, var(--boot-primary) 0%, var(--boot-ink) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

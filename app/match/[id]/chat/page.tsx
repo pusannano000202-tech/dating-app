@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, Loader2, MessageCircleMore, SendHorizontal } from 'lucide-react'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { canUseDevMatchPreview, isDevMatchPreviewId } from '@/lib/matching/dev-match-preview'
 
 interface MatchChatMessage {
   id: string
@@ -62,6 +63,8 @@ export default function MatchChatPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
   const isDevPreview = isDevPreviewClientSession()
+  const isDevMatchPreviewRoute = isDevMatchPreviewId(matchId)
+  const canUseDevPreview = canUseDevMatchPreview(matchId, isDevPreview)
   const [messages, setMessages] = useState<MatchChatMessage[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [message, setMessage] = useState('')
@@ -74,7 +77,15 @@ export default function MatchChatPage() {
     setLoading(true)
     setError(null)
 
-    if (isDevPreview) {
+    if (isDevMatchPreviewRoute && !canUseDevPreview) {
+      setError('개발용 미리보기 채팅은 dev preview 세션에서만 열 수 있습니다.')
+      setMessages([])
+      setCurrentUserId(null)
+      setLoading(false)
+      return
+    }
+
+    if (canUseDevPreview) {
       setMessages(DEV_CHAT_MESSAGES)
       setCurrentUserId(DEV_USER_ID)
       setLoading(false)
@@ -99,21 +110,21 @@ export default function MatchChatPage() {
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [canUseDevPreview, isDevMatchPreviewRoute, matchId])
 
   useEffect(() => {
     refresh()
   }, [refresh])
 
   useEffect(() => {
-    if (isDevPreview) return
+    if (canUseDevPreview) return
 
     const poller = setInterval(() => {
       refresh()
     }, 12000)
 
     return () => clearInterval(poller)
-  }, [refresh, isDevPreview])
+  }, [refresh, canUseDevPreview])
 
   useEffect(() => {
     if (listRef.current) {
@@ -125,7 +136,7 @@ export default function MatchChatPage() {
     event.preventDefault()
     if (!message.trim() || sending) return
 
-    if (isDevPreview) {
+    if (canUseDevPreview) {
       setMessages((prev) => [
         ...prev,
         {

@@ -26,8 +26,8 @@ export default function ProfileError({
       <div className="relative text-center max-w-xs w-full">
         <p className="text-5xl mb-4">😵</p>
         <h1 className="text-xl font-black mb-2">프로필 입력 중 오류가 생겼어</h1>
-        <p className="text-gray-500 text-sm mb-1">입력한 내용은 자동 저장됐을 수 있어.</p>
-        <p className="text-gray-600 text-xs mb-8">네트워크 연결을 확인하고 다시 시도해봐.</p>
+        <p className="text-boot-body text-sm mb-1">입력한 내용은 자동 저장됐을 수 있어.</p>
+        <p className="text-boot-muted text-xs mb-8">네트워크 연결을 확인하고 다시 시도해봐.</p>
 
         <div className="flex flex-col gap-3">
           <button
@@ -38,7 +38,7 @@ export default function ProfileError({
           </button>
           <button
             onClick={() => router.push('/profile/edit')}
-            className="w-full py-3 rounded-2xl glass text-sm text-gray-400 hover:text-gray-200 border border-white/5 transition-colors"
+            className="w-full py-3 rounded-2xl glass text-sm text-boot-body hover:text-boot-primary border border-boot-hairline transition-colors"
           >
             프로필 편집으로 이동
           </button>

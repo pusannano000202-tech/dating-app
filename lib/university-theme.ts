@@ -1,4 +1,5 @@
-import rawColorTokens from '../docs/design-mockups/quantum_41_frontend_color_tokens_2026-07-04.json'
+﻿import rawColorTokens from '../docs/design-mockups/quantum_41_frontend_color_tokens_2026-07-04.json'
+import additionalBrandProfiles from '../docs/design-mockups/quantum_top60_additional_university_brand_profiles_2026-07-06.json'
 
 export const DEFAULT_UNIVERSITY_THEME_ID = 'pnu'
 export const UNIVERSITY_THEME_STORAGE_KEY = 'quantum_university_theme_id'
@@ -13,6 +14,7 @@ export type UniversityThemeTokenStatus = 'locked' | 'draft' | 'needsOfficialChec
 export interface UniversityThemeToken {
   id: string
   name: string
+  shortName?: string
   primary: string
   secondary: string
   accent: string
@@ -20,197 +22,343 @@ export interface UniversityThemeToken {
   textOnPrimary: string
   status: UniversityThemeTokenStatus
   source: string
+  sourceUrls?: string[]
+  rank?: number
+  students?: number
+  mascotAnimal?: string
+  mascotCharacter?: string
+  notes?: string
 }
 
 export interface UniversityTheme {
   id: string
+  name: string
   shortName: string
   displayName: string
   tokenStatus: UniversityThemeTokenStatus
   source: string
+  sourceUrls: string[]
+  mascotAnimal: string
+  mascotCharacter: string
+  notes?: string
+  rank?: number
+  students?: number
   colors: {
     primary: string
     secondary: string
     accent: string
     backgroundTop: string
     backgroundBottom: string
-    surface: string
     surfaceTint: string
-    deepCard: string
-    deepCardText: string
+    surface: string
     cta: string
-    ctaText: string
-    ctaShadow: string
-    border: string
     muted: string
-    danger: string
     success: string
     queueMale: string
-    queueFemale: string
     queueMixed: string
+    textOnPrimary: string
   }
-  gradients: {
-    page: string
-    hero: string
-    primaryButton: string
-    queueRing: string
-    deepCard: string
-  }
-  shadow: {
-    card: string
-    button: string
-    deepCard: string
-    bottomNav: string
-  }
-  assets: Record<UniversityThemeAssetKind, string>
   copy: {
-    loginKicker: string
-    loginTitle: string
-    homeGreeting: string
     matchWaiting: string
-    refundAsk: string
     notificationTone: string
+    refundAsk: string
   }
   designTheme: {
-    mascotRole: string
+    moodKeywords: string[]
     landmarkCue: string
-    pattern: string
+    loginBackground: string
+    matchingQueueMood: string
+    depositRefundScene: string
+    dailyCardMood: string
+    notificationTone: string
   }
+  assets: Record<UniversityThemeAssetKind, string>
+  searchAliases: string[]
 }
 
 export interface UniversityThemeSchoolOption {
   id: string
-  label: string
   value: string
+  label: string
+  name: string
+  shortName: string
   displayName: string
+  aliases: string[]
+  tokenStatus: UniversityThemeTokenStatus
 }
 
 export type UniversityThemeCssVariables = Record<`--${string}`, string>
 
+type RawColorToken = {
+  id: string
+  name: string
+  primary: string
+  secondary: string
+  accent: string
+  backgroundTint: string
+  textOnPrimary?: string
+  status?: string
+  source?: string
+}
+
+type AdditionalBrandProfile = {
+  id: string
+  name: string
+  short?: string
+  rank?: number
+  students?: number
+  animal?: string
+  character?: string
+  colors?: {
+    primary?: string
+    secondary?: string
+    accent?: string
+    background?: string
+    backgroundTint?: string
+  }
+  confidence?: string
+  source?: string
+  notes?: string
+  sourceUrls?: string[]
+}
+
+type AdditionalBrandProfilesPayload = {
+  universities?: AdditionalBrandProfile[]
+}
+
 const MASCOT_POSES: MascotPose[] = ['welcome', 'guide', 'waiting', 'support', 'confirm', 'refund', 'avatar']
 const DISPLAY_MASCOT_ROOT = '/university-mascots/app-assets-v3-display'
 
-const HANDOFF_SUPPLEMENTAL_COLOR_TOKENS: UniversityThemeToken[] = [
-  {
-    id: 'ajou',
-    name: '아주대',
-    primary: '#005BAC',
-    secondary: '#F7941D',
-    accent: '#FDB813',
-    backgroundTint: '#EAF3FF',
-    textOnPrimary: '#FFFFFF',
-    status: 'draft',
-    source: '아주대 치토/불씨/횃불 교정본 기준. 2026-07-04 색상 JSON에는 누락되어 런타임 QA용으로 보강.',
-  },
-]
+const OFFICIAL_NAME_OVERRIDES: Record<string, string> = {
+  doowon: '두원공과대학교',
+  konkuk: '건국대학교',
+  pnu: '부산대학교',
+  yonsei: '연세대학교',
+  skku: '성균관대학교',
+  hanyang: '한양대학교',
+  korea: '고려대학교',
+  khu: '경희대학교',
+  cau: '중앙대학교',
+  snu: '서울대학교',
+  hufs: '한국외국어대학교',
+  ewha: '이화여자대학교',
+  knu: '경북대학교',
+  gachon: '가천대학교',
+  yeungnam: '영남대학교',
+  keimyung: '계명대학교',
+  chosun: '조선대학교',
+  inha: '인하대학교',
+  jbnu: '전북대학교',
+  cnu: '충남대학교',
+  donga: '동아대학교',
+  jnu: '전남대학교',
+  gnu: '경상국립대학교',
+  daegu: '대구대학교',
+  pknu: '부경대학교',
+  kookmin: '국민대학교',
+  soongsil: '숭실대학교',
+  dongeui: '동의대학교',
+  kangwon: '강원대학교',
+  dongguk: '동국대학교',
+  chungbuk: '충북대학교',
+  sejong: '세종대학교',
+  hongik: '홍익대학교',
+  wonkwang: '원광대학교',
+  hoseo: '호서대학교',
+  cheongju: '청주대학교',
+  kyonggi: '경기대학교',
+  hannam: '한남대학교',
+  baekseok: '백석대학교',
+  dankook: '단국대학교',
+  dcu: '대구가톨릭대학교',
+  ajou: '아주대학교',
+}
 
-const UNIVERSITY_COLOR_TOKENS = [
-  ...(rawColorTokens as UniversityThemeToken[]).filter((token) => token.id !== 'dcu'),
-  ...HANDOFF_SUPPLEMENTAL_COLOR_TOKENS,
-]
+const SHORT_NAME_OVERRIDES: Record<string, string> = {
+  doowon: '두원공과대',
+  konkuk: '건국대',
+  pnu: '부산대',
+  yonsei: '연세대',
+  skku: '성균관대',
+  hanyang: '한양대',
+  korea: '고려대',
+  khu: '경희대',
+  cau: '중앙대',
+  snu: '서울대',
+  hufs: '한국외대',
+  ewha: '이화여대',
+  knu: '경북대',
+  gachon: '가천대',
+  yeungnam: '영남대',
+  keimyung: '계명대',
+  chosun: '조선대',
+  inha: '인하대',
+  jbnu: '전북대',
+  cnu: '충남대',
+  donga: '동아대',
+  jnu: '전남대',
+  gnu: '경상국립대',
+  daegu: '대구대',
+  pknu: '부경대',
+  kookmin: '국민대',
+  soongsil: '숭실대',
+  dongeui: '동의대',
+  kangwon: '강원대',
+  dongguk: '동국대',
+  chungbuk: '충북대',
+  sejong: '세종대',
+  hongik: '홍익대',
+  wonkwang: '원광대',
+  hoseo: '호서대',
+  cheongju: '청주대',
+  kyonggi: '경기대',
+  hannam: '한남대',
+  baekseok: '백석대',
+  dankook: '단국대',
+  dcu: '대구가톨릭대',
+  ulsan: '울산대',
+  ks: '경성대',
+  kongju: '공주대',
+  inu: '인천대',
+  kyungnam: '경남대',
+  jj: '전주대',
+  seoultech: '서울과기대',
+  sch: '순천향대',
+  jejunu: '제주대',
+  ajou: '아주대',
+  dongseo: '동서대',
+  sunmoon: '선문대',
+  nsu: '남서울대',
+  wsu: '우송대',
+  uos: '서울시립대',
+  dju: '대전대',
+  suwon: '수원대',
+  sookmyung: '숙명여대',
+}
+
+const THEME_ALIASES: Record<string, string[]> = {
+  doowon: ['두원공과대학교', '두원공대', '두원공과대', 'doowon', 'dtu'],
+  konkuk: ['건국대학교', '건국대', 'konkuk', 'ku'],
+  pnu: ['부산대학교', '부산대', 'pusan national university', 'pnu'],
+  yonsei: ['연세대학교', '연세대', 'yonsei', 'ysu'],
+  skku: ['성균관대학교', '성균관대', 'skku'],
+  hanyang: ['한양대학교', '한양대', 'hanyang', 'hyu'],
+  korea: ['고려대학교', '고려대', 'korea university', 'ku'],
+  khu: ['경희대학교', '경희대', 'kyung hee', 'khu'],
+  cau: ['중앙대학교', '중앙대', 'chung-ang', 'cau'],
+  snu: ['서울대학교', '서울대', 'seoul national university', 'snu'],
+  hufs: ['한국외국어대학교', '한국외대', '외대', 'hufs'],
+  ewha: ['이화여자대학교', '이화여대', '이대', 'ewha'],
+  knu: ['경북대학교', '경북대', 'knu'],
+  gachon: ['가천대학교', '가천대', 'gachon'],
+  yeungnam: ['영남대학교', '영남대', 'ynu'],
+  keimyung: ['계명대학교', '계명대', 'kmu'],
+  chosun: ['조선대학교', '조선대', 'chosun'],
+  inha: ['인하대학교', '인하대', 'inha'],
+  jbnu: ['전북대학교', '전북대', 'jbnu'],
+  cnu: ['충남대학교', '충남대', 'cnu'],
+  donga: ['동아대학교', '동아대', 'donga'],
+  jnu: ['전남대학교', '전남대', 'jnu'],
+  gnu: ['경상국립대학교', '경상국립대', '경상대', 'gnu'],
+  daegu: ['대구대학교', '대구대', 'daegu university'],
+  pknu: ['부경대학교', '부경대', 'pknu'],
+  kookmin: ['국민대학교', '국민대', 'kookmin'],
+  soongsil: ['숭실대학교', '숭실대', 'soongsil', 'ssu'],
+  dongeui: ['동의대학교', '동의대', 'dongeui'],
+  kangwon: ['강원대학교', '강원대', 'kangwon', 'knu'],
+  dongguk: ['동국대학교', '동국대', 'dongguk'],
+  chungbuk: ['충북대학교', '충북대', 'chungbuk', 'cbnu'],
+  sejong: ['세종대학교', '세종대', 'sejong'],
+  hongik: ['홍익대학교', '홍익대', 'hongik'],
+  wonkwang: ['원광대학교', '원광대', 'wonkwang'],
+  hoseo: ['호서대학교', '호서대', 'hoseo'],
+  cheongju: ['청주대학교', '청주대', 'cheongju'],
+  kyonggi: ['경기대학교', '경기대', 'kyonggi'],
+  hannam: ['한남대학교', '한남대', 'hannam'],
+  baekseok: ['백석대학교', '백석대', 'baekseok'],
+  dankook: ['단국대학교', '단국대', 'dankook', 'dku'],
+  dcu: ['대구가톨릭대학교', '대구가톨릭대', '대가대', 'dcu'],
+  ulsan: ['울산대학교', '울산대', 'ulsan'],
+  ks: ['경성대학교', '경성대', 'kyungsung', 'ksu'],
+  kongju: ['공주대학교', '공주대', 'kongju', 'knu'],
+  inu: ['인천대학교', '인천대', 'incheon national university', 'inu'],
+  kyungnam: ['경남대학교', '경남대', 'kyungnam'],
+  jj: ['전주대학교', '전주대', 'jeonju'],
+  seoultech: ['서울과학기술대학교', '서울과기대', '서울과학기술대', 'seoultech'],
+  sch: ['순천향대학교', '순천향대', 'soonchunhyang', 'sch'],
+  jejunu: ['제주대학교', '제주대', 'jejunu'],
+  ajou: ['아주대학교', '아주대', 'ajou'],
+  dongseo: ['동서대학교', '동서대', 'dongseo'],
+  sunmoon: ['선문대학교', '선문대', 'sunmoon'],
+  nsu: ['남서울대학교', '남서울대', 'namseoul', 'nsu'],
+  wsu: ['우송대학교', '우송대', 'woosong', 'wsu'],
+  uos: ['서울시립대학교', '서울시립대', '시립대', 'uos'],
+  dju: ['대전대학교', '대전대', 'daejeon', 'dju'],
+  suwon: ['수원대학교', '수원대', 'suwon'],
+  sookmyung: ['숙명여자대학교', '숙명여대', '숙대', 'sookmyung'],
+}
+
+const LANDMARK_CUES: Record<string, string> = {
+  pnu: '넉넉한터/새벽벌도서관',
+  yonsei: '언더우드관/백양로',
+  korea: '본관/민족고대 광장',
+  snu: '샤로수길/중앙도서관',
+  khu: '평화의 전당/캠퍼스 광장',
+  hanyang: '애지문/한양플라자',
+  skku: '명륜당/성균관길',
+  cau: '청룡연못/중앙광장',
+  hufs: '사이버관/외대앞',
+  ewha: 'ECC/이화캠퍼스복합단지',
+  dcu: '효성캠퍼스 중앙도서관',
+  ulsan: '중앙정원/아산스포츠센터',
+  ks: '문화골목/예술관',
+  kongju: '중앙도서관/곰나루',
+  inu: '송도캠퍼스/미추홀공원',
+  kyungnam: '월영지/한마미래관',
+  jj: '스타센터/천잠산 캠퍼스',
+  seoultech: '붕어방/다산관',
+  sch: '향설동문/피닉스광장',
+  jejunu: '아라캠퍼스/중앙도서관',
+  ajou: '원천관/중앙도서관',
+  dongseo: '민석도서관/센텀캠퍼스',
+  sunmoon: '아산캠퍼스/원화관',
+  nsu: '성암문화체육관/캠퍼스 광장',
+  wsu: '솔브릿지/철도물류관',
+  uos: '전농관/중앙로',
+  dju: '혜화문화관/맥센터',
+  suwon: '미래혁신관/벨칸토아트센터',
+  sookmyung: '순헌관/청파로',
+}
+
+const MASCOT_HINTS: Record<string, { animal: string; character: string }> = {
+  doowon: { animal: '천마/말', character: '초록 갈기 천마형 자체 캐릭터' },
+  dcu: { animal: '펠리컨/디쿠 계열', character: '대구가톨릭대 펠리컨 상징을 참고한 파랑·금색 자체 캐릭터' },
+  pnu: { animal: '독수리/산지니 계열', character: '부산대 독수리 상징을 참고한 파랑·청록 자체 캐릭터' },
+  yonsei: { animal: '독수리', character: '연세대 블루 독수리 상징을 참고한 절제형 자체 캐릭터' },
+  korea: { animal: '호랑이', character: '고려대 호랑이 상징을 참고한 크림슨 머플러 자체 캐릭터' },
+  soongsil: { animal: '백마', character: '숭실대 백마 상징을 참고한 흰 말 자체 캐릭터' },
+  konkuk: { animal: '황소', character: '건국대 황소 상징을 참고한 단단한 자체 캐릭터' },
+  cnu: { animal: '백마', character: '충남대 백마 상징을 참고한 남색 망토 흰 말 자체 캐릭터' },
+  kyonggi: { animal: '기룡이/아기거북이', character: '경기대 기룡이의 거북 모티브를 참고한 청록 기룡형 자체 캐릭터' },
+  hoseo: { animal: '호수리·호오리/독수리·오리', character: '호서대 공식 마스코트 모티브를 참고한 붉은 새 계열 자체 캐릭터' },
+  sejong: { animal: '기린형 캠퍼스 캐릭터 후보', character: '세종대 시계탑·기린 문화와 crimson 톤을 참고한 기린형 자체 캐릭터' },
+  ajou: { animal: '치토/불꽃 캐릭터 후보', character: '아주대 파랑+금빛 불꽃 요정형 자체 캐릭터' },
+  dongseo: { animal: '독수리 공식 상징 + ATO 계열 캐릭터 문화', character: '동서대 ATO-inspired 비동물 companion' },
+  wsu: { animal: '공식 동물 확인 낮음', character: '소나무·철도·글로벌 상징 기반 companion' },
+}
+
+const UNIVERSITY_COLOR_TOKENS = buildUniversityColorTokens()
 const UNIVERSITY_THEMES = UNIVERSITY_COLOR_TOKENS.map(buildThemeFromToken)
 const THEMES_BY_ID = new Map(UNIVERSITY_THEMES.map((theme) => [theme.id, theme]))
-const ALIAS_TO_ID = new Map<string, string>()
-
-const EXTRA_ALIASES: Record<string, string> = {
-  pnu: 'pnu',
-  pusan: 'pnu',
-  'pusan national university': 'pnu',
-  부산대학교: 'pnu',
-  부산대: 'pnu',
-
-  doowon: 'doowon',
-  'doowon technical university': 'doowon',
-  'doowon university of technology': 'doowon',
-  두원공과대학교: 'doowon',
-  두원공과대: 'doowon',
-
-  snu: 'snu',
-  'seoul national university': 'snu',
-  서울대학교: 'snu',
-  서울대: 'snu',
-
-  yonsei: 'yonsei',
-  연세대학교: 'yonsei',
-  연세대: 'yonsei',
-
-  korea: 'korea',
-  고려대학교: 'korea',
-  고려대: 'korea',
-
-  skku: 'skku',
-  성균관대학교: 'skku',
-  성균관대: 'skku',
-
-  hanyang: 'hanyang',
-  한양대학교: 'hanyang',
-  한양대: 'hanyang',
-
-  cau: 'cau',
-  중앙대학교: 'cau',
-  중앙대: 'cau',
-
-  khu: 'khu',
-  경희대학교: 'khu',
-  경희대: 'khu',
-
-  hufs: 'hufs',
-  'hankuk university of foreign studies': 'hufs',
-  한국외국어대학교: 'hufs',
-  한국외대: 'hufs',
-  외대: 'hufs',
-
-  ewha: 'ewha',
-  이화여자대학교: 'ewha',
-  이화여대: 'ewha',
-  이화: 'ewha',
-
-  sookmyung: 'sookmyung',
-  숙명여자대학교: 'sookmyung',
-  숙명여대: 'sookmyung',
-  숙명: 'sookmyung',
-
-  pknu: 'pknu',
-  부경대학교: 'pknu',
-  부경대: 'pknu',
-
-  kookmin: 'kookmin',
-  국민대학교: 'kookmin',
-  국민대: 'kookmin',
-
-  soongsil: 'soongsil',
-  숭실대학교: 'soongsil',
-  숭실대: 'soongsil',
-
-  sejong: 'sejong',
-  세종대학교: 'sejong',
-  세종대: 'sejong',
-
-  ajou: 'ajou',
-  아주대학교: 'ajou',
-  아주대: 'ajou',
-
-  hoseo: 'hoseo',
-  호서대학교: 'hoseo',
-  호서대: 'hoseo',
-
-  hannam: 'hannam',
-  한남대학교: 'hannam',
-  한남대: 'hannam',
-
-  keimyung: 'keimyung',
-  계명대학교: 'keimyung',
-  계명대: 'keimyung',
-}
+const THEME_ID_BY_ALIAS = new Map<string, string>()
 
 for (const theme of UNIVERSITY_THEMES) {
-  for (const alias of buildGeneratedAliases(theme)) {
-    ALIAS_TO_ID.set(normalizeSchoolText(alias), theme.id)
+  for (const alias of theme.searchAliases) {
+    const normalized = normalizeSearchKey(alias)
+    if (normalized && !THEME_ID_BY_ALIAS.has(normalized)) {
+      THEME_ID_BY_ALIAS.set(normalized, theme.id)
+    }
   }
-}
-
-for (const [alias, id] of Object.entries(EXTRA_ALIASES)) {
-  ALIAS_TO_ID.set(normalizeSchoolText(alias), id)
 }
 
 export function getUniversityThemeOptions(): UniversityTheme[] {
@@ -220,9 +368,13 @@ export function getUniversityThemeOptions(): UniversityTheme[] {
 export function getUniversityThemeSchoolOptions(): UniversityThemeSchoolOption[] {
   return UNIVERSITY_THEMES.map((theme) => ({
     id: theme.id,
-    label: theme.shortName,
-    value: theme.shortName,
-    displayName: theme.displayName,
+    value: theme.name,
+    label: theme.name,
+    name: theme.name,
+    shortName: theme.shortName,
+    displayName: theme.name,
+    aliases: theme.searchAliases,
+    tokenStatus: theme.tokenStatus,
   }))
 }
 
@@ -235,16 +387,18 @@ export function getDefaultUniversityTheme(): UniversityTheme {
 }
 
 export function findUniversityThemeBySchool(school: string | null | undefined): UniversityTheme {
-  const normalized = normalizeSchoolText(school ?? '')
+  const normalized = normalizeSearchKey(school)
   if (!normalized) return getDefaultUniversityTheme()
 
-  const directId = ALIAS_TO_ID.get(normalized)
+  const directId = THEMES_BY_ID.has(normalized) ? normalized : THEME_ID_BY_ALIAS.get(normalized)
   if (directId) return getUniversityThemeById(directId)
 
-  const looseMatch = UNIVERSITY_THEMES.find((theme) => {
-    const aliases = buildGeneratedAliases(theme).map(normalizeSchoolText)
-    return aliases.some((alias) => alias && (normalized.includes(alias) || alias.includes(normalized)))
-  })
+  const looseMatch = UNIVERSITY_THEMES.find((theme) =>
+    theme.searchAliases.some((alias) => {
+      const normalizedAlias = normalizeSearchKey(alias)
+      return normalizedAlias.length >= 2 && (normalized.includes(normalizedAlias) || normalizedAlias.includes(normalized))
+    }),
+  )
 
   return looseMatch ?? getDefaultUniversityTheme()
 }
@@ -253,15 +407,12 @@ export function getPublicMascotAssetPath(
   theme: UniversityTheme,
   kind: UniversityThemeAssetKind,
 ): string {
-  return theme.assets[kind]
-}
-
-const UNIVERSITY_BACKDROP_PATHS: Record<string, string> = {
-  pnu: '/university-backdrops/pnu-campus-preview.png',
+  return theme.assets[kind] ?? theme.assets.avatar
 }
 
 export function getUniversityBackdropAssetPath(theme: UniversityTheme): string | null {
-  return UNIVERSITY_BACKDROP_PATHS[theme.id] ?? null
+  if (theme.id === 'pnu') return '/university-backdrops/pnu-campus-preview.png'
+  return null
 }
 
 export function buildUniversityThemeCssVariables(theme: UniversityTheme): UniversityThemeCssVariables {
@@ -273,34 +424,26 @@ export function buildUniversityThemeCssVariables(theme: UniversityTheme): Univer
     '--boot-coral': theme.colors.secondary,
     '--boot-amber': theme.colors.accent,
     '--boot-ink': theme.colors.cta,
-    '--boot-body': '#4B433D',
     '--boot-muted': theme.colors.muted,
-    '--boot-hairline': '#E8DED4',
     '--boot-mint': theme.colors.success,
     '--boot-sky': theme.colors.queueMale,
     '--boot-lavender': theme.colors.queueMixed,
+    '--boot-page-gradient': `linear-gradient(180deg, ${theme.colors.backgroundTop} 0%, ${theme.colors.backgroundBottom} 100%)`,
     '--boot-primary-rgb': hexToRgbChannels(theme.colors.primary),
     '--boot-coral-rgb': hexToRgbChannels(theme.colors.secondary),
     '--boot-amber-rgb': hexToRgbChannels(theme.colors.accent),
     '--boot-canvas-rgb': hexToRgbChannels(theme.colors.backgroundTop),
     '--boot-ink-rgb': hexToRgbChannels(theme.colors.cta),
-    '--boot-body-rgb': '75 67 61',
     '--boot-muted-rgb': hexToRgbChannels(theme.colors.muted),
-    '--boot-hairline-rgb': '232 222 212',
     '--boot-soft-rgb': hexToRgbChannels(theme.colors.surfaceTint),
     '--boot-surface-rgb': hexToRgbChannels(theme.colors.surface),
     '--boot-mint-rgb': hexToRgbChannels(theme.colors.success),
     '--boot-sky-rgb': hexToRgbChannels(theme.colors.queueMale),
     '--boot-lavender-rgb': hexToRgbChannels(theme.colors.queueMixed),
-    '--boot-page-gradient': theme.gradients.page,
-    '--boot-hero-gradient': theme.gradients.hero,
-    '--boot-button-gradient': theme.gradients.primaryButton,
-    '--boot-queue-ring': theme.gradients.queueRing,
-    '--boot-deep-card-gradient': theme.gradients.deepCard,
-    '--boot-card-shadow': theme.shadow.card,
-    '--boot-button-shadow': theme.shadow.button,
-    '--boot-deep-shadow': theme.shadow.deepCard,
-    '--boot-bottom-nav-shadow': theme.shadow.bottomNav,
+    '--quantum-university-primary': theme.colors.primary,
+    '--quantum-university-secondary': theme.colors.secondary,
+    '--quantum-university-accent': theme.colors.accent,
+    '--quantum-university-background': theme.colors.backgroundTop,
   }
 }
 
@@ -311,174 +454,218 @@ export function setStoredUniversityThemeFromSchool(school: string): UniversityTh
 }
 
 export function storeUniversityThemeId(themeId: string): void {
-  if (typeof window !== 'undefined') {
+  if (typeof window === 'undefined') return
+
+  try {
     window.localStorage.setItem(UNIVERSITY_THEME_STORAGE_KEY, themeId)
-    window.document.cookie = [
-      `${UNIVERSITY_THEME_COOKIE_NAME}=${encodeURIComponent(themeId)}`,
-      'path=/',
-      `max-age=${UNIVERSITY_THEME_COOKIE_MAX_AGE}`,
-      'samesite=lax',
-    ].join('; ')
-    window.dispatchEvent(new CustomEvent(UNIVERSITY_THEME_CHANGE_EVENT, {
-      detail: { themeId },
-    }))
+  } catch {
+    // Ignore private-mode storage failures. Cookie + event still keep the current screen in sync.
+  }
+
+  window.document.cookie = [
+    `${UNIVERSITY_THEME_COOKIE_NAME}=${encodeURIComponent(themeId)}`,
+    'path=/',
+    `max-age=${UNIVERSITY_THEME_COOKIE_MAX_AGE}`,
+    'samesite=lax',
+  ].join('; ')
+
+  window.dispatchEvent(new CustomEvent(UNIVERSITY_THEME_CHANGE_EVENT, {
+    detail: { themeId },
+  }))
+}
+
+function buildUniversityColorTokens(): UniversityThemeToken[] {
+  const byId = new Map<string, UniversityThemeToken>()
+  const baseTokens = (rawColorTokens as RawColorToken[]).map(normalizeRawColorToken)
+  const additionalTokens = (((additionalBrandProfiles as unknown) as AdditionalBrandProfilesPayload).universities ?? [])
+    .map(normalizeAdditionalProfile)
+
+  for (const token of [...baseTokens, ...additionalTokens]) {
+    byId.set(token.id, token)
+  }
+
+  return Array.from(byId.values())
+}
+
+function normalizeRawColorToken(token: RawColorToken): UniversityThemeToken {
+  const id = normalizeThemeId(token.id)
+  const name = OFFICIAL_NAME_OVERRIDES[id] ?? token.name
+  return {
+    id,
+    name,
+    shortName: SHORT_NAME_OVERRIDES[id] ?? deriveShortName(token.name),
+    primary: normalizeHex(token.primary, '#1F5C99'),
+    secondary: normalizeHex(token.secondary, '#FFFFFF'),
+    accent: normalizeHex(token.accent, '#F2C94C'),
+    backgroundTint: normalizeHex(token.backgroundTint, '#F7FAFC'),
+    textOnPrimary: normalizeHex(token.textOnPrimary, '#FFFFFF'),
+    status: normalizeStatus(token.status),
+    source: token.source ?? '기존 41개 프론트 색상 토큰',
+    sourceUrls: [],
+    mascotAnimal: MASCOT_HINTS[id]?.animal,
+    mascotCharacter: MASCOT_HINTS[id]?.character,
+  }
+}
+
+function normalizeAdditionalProfile(profile: AdditionalBrandProfile): UniversityThemeToken {
+  const id = normalizeThemeId(profile.id)
+  const name = OFFICIAL_NAME_OVERRIDES[id] ?? profile.name
+  return {
+    id,
+    name,
+    shortName: SHORT_NAME_OVERRIDES[id] ?? profile.short ?? deriveShortName(name),
+    primary: normalizeHex(profile.colors?.primary, '#1F5C99'),
+    secondary: normalizeHex(profile.colors?.secondary, '#FFFFFF'),
+    accent: normalizeHex(profile.colors?.accent, '#F2C94C'),
+    backgroundTint: normalizeHex(profile.colors?.background ?? profile.colors?.backgroundTint, '#F7FAFC'),
+    textOnPrimary: '#FFFFFF',
+    status: statusFromConfidence(profile.confidence),
+    source: profile.source ?? 'Top60 추가 학교 리서치 기반 색상 토큰',
+    sourceUrls: profile.sourceUrls ?? [],
+    rank: profile.rank,
+    students: profile.students,
+    mascotAnimal: profile.animal ?? MASCOT_HINTS[id]?.animal,
+    mascotCharacter: profile.character ?? MASCOT_HINTS[id]?.character,
+    notes: profile.notes,
   }
 }
 
 function buildThemeFromToken(token: UniversityThemeToken): UniversityTheme {
-  const backgroundBottom = '#FFFDF8'
-  const surface = '#FFFFFF'
-  const cta = '#171412'
-  const deepCard = mixHex(token.primary, '#171412', 0.72)
-  const secondary = normalizeReadableSecondary(token.secondary, token.primary)
-  const assetRoot = DISPLAY_MASCOT_ROOT
+  const shortName = token.shortName ?? deriveShortName(token.name)
+  const mascotHint = MASCOT_HINTS[token.id]
+  const mascotAnimal = token.mascotAnimal ?? mascotHint?.animal ?? '학교 상징 기반 자체 캐릭터'
+  const mascotCharacter = token.mascotCharacter ?? mascotHint?.character ?? `${shortName} 상징을 참고한 앱 전용 자체 캐릭터`
+  const landmarkCue = LANDMARK_CUES[token.id] ?? `${shortName} 캠퍼스`
 
   return {
     id: token.id,
-    shortName: token.name,
-    displayName: `Quantum ${token.name}`,
+    name: token.name,
+    shortName,
+    displayName: `퀀텀 ${shortName}`,
     tokenStatus: token.status,
     source: token.source,
+    sourceUrls: token.sourceUrls ?? [],
+    mascotAnimal,
+    mascotCharacter,
+    notes: token.notes,
+    rank: token.rank,
+    students: token.students,
     colors: {
       primary: token.primary,
-      secondary,
+      secondary: token.secondary,
       accent: token.accent,
       backgroundTop: token.backgroundTint,
-      backgroundBottom,
-      surface,
+      backgroundBottom: '#FFFFFF',
       surfaceTint: token.backgroundTint,
-      deepCard,
-      deepCardText: backgroundBottom,
-      cta,
-      ctaText: '#FFFFFF',
-      ctaShadow: `0 18px 42px ${hexToRgba(token.primary, 0.28)}`,
-      border: hexToRgba(token.primary, 0.22),
-      muted: '#6F6A63',
-      danger: '#F05858',
-      success: '#2E9D68',
-      queueMale: '#7DD3FC',
-      queueFemale: '#FF8FA2',
+      surface: '#FFFFFF',
+      cta: '#211A1A',
+      muted: '#6F6A65',
+      success: token.secondary === '#FFFFFF' ? token.primary : token.secondary,
+      queueMale: token.primary,
       queueMixed: token.accent,
+      textOnPrimary: token.textOnPrimary,
     },
-    gradients: {
-      page: `linear-gradient(180deg, ${token.backgroundTint} 0%, ${backgroundBottom} 72%)`,
-      hero: [
-        `radial-gradient(circle at 20% 8%, ${hexToRgba(token.accent, 0.40)}, transparent 34%)`,
-        `radial-gradient(circle at 82% 12%, ${hexToRgba(token.primary, 0.22)}, transparent 30%)`,
-        `linear-gradient(180deg, ${token.backgroundTint}, ${backgroundBottom})`,
-      ].join(', '),
-      primaryButton: `linear-gradient(135deg, ${cta} 0%, ${mixHex(token.primary, cta, 0.36)} 72%, ${secondary} 160%)`,
-      queueRing: `conic-gradient(from 180deg, #7DD3FC, #FF8FA2, ${token.accent}, #7DD3FC)`,
-      deepCard: `linear-gradient(145deg, ${deepCard} 0%, ${cta} 64%, ${hexToRgba(token.primary, 0.62)} 140%)`,
-    },
-    shadow: {
-      card: `0 18px 46px ${hexToRgba(token.primary, 0.14)}`,
-      button: `0 18px 42px ${hexToRgba(token.primary, 0.28)}`,
-      deepCard: `0 24px 56px ${hexToRgba(deepCard, 0.34)}`,
-      bottomNav: `0 12px 34px ${hexToRgba(token.primary, 0.15)}`,
-    },
-    assets: Object.fromEntries(
-      MASCOT_POSES.map((pose) => [pose, `${assetRoot}/${token.id}/${pose}.png`]),
-    ) as Record<UniversityThemeAssetKind, string>,
     copy: {
-      loginKicker: `${token.name} Quantum`,
-      loginTitle: `${token.name} 기준으로 과팅을 시작해요`,
-      homeGreeting: `${token.name} 분위기로 오늘의 매칭을 준비했어요`,
-      matchWaiting: `${token.name} 기준으로 조건이 맞는 상대를 찾는 중이에요`,
-      refundAsk: `${token.name} 친구들이 안전하게 만날 수 있게 1,000원만 앱 운영을 응원해줄래요?`,
-      notificationTone: `${token.name} 톤은 친근하지만 과장하지 않고, 다음 행동을 한 문장으로 안내`,
+      matchWaiting: `${shortName} 기준으로 조건이 맞는 팀을 찾는 중입니다`,
+      notificationTone: `${shortName} 분위기에 맞춰 필요한 알림만 차분하게 알려드릴게요.`,
+      refundAsk: `정상 만남 후 보증금은 안전하게 환불돼요. 괜찮았다면 ${shortName} 퀀텀 운영을 1,000원만 응원해줄래요?`,
     },
     designTheme: {
-      mascotRole: `${token.name} Quantum 도우미`,
-      landmarkCue: token.source,
-      pattern: `${token.id} campus tint`,
+      moodKeywords: buildMoodKeywords(token),
+      landmarkCue,
+      loginBackground: `${landmarkCue}의 색감은 배경 tint로만 약하게 반영`,
+      matchingQueueMood: `${shortName} 학생에게 익숙한 색상 포인트로 대기 상태를 표시`,
+      depositRefundScene: `${mascotCharacter}가 CTA를 가리지 않는 우하단 보조 포즈로 안심/부탁`,
+      dailyCardMood: `${shortName} 색상 token의 accent를 카드 뱃지에만 절제 적용`,
+      notificationTone: `${shortName} 말투는 친근하지만 과장하지 않음`,
     },
+    assets: buildMascotAssets(token.id),
+    searchAliases: buildSearchAliases(token.id, token.name, shortName),
   }
 }
 
-function buildGeneratedAliases(theme: UniversityTheme): string[] {
-  const aliases = new Set<string>([
-    theme.id,
-    theme.shortName,
-    theme.displayName,
-    `${theme.shortName}학교`,
-    `${theme.shortName} 학생`,
+function buildMoodKeywords(token: UniversityThemeToken): string[] {
+  const statusKeyword = token.status === 'locked' ? 'official-leaning' : token.status === 'draft' ? 'draft-safe' : 'needs-check'
+  return [statusKeyword, 'campus-native', 'cta-safe']
+}
+
+function buildMascotAssets(id: string): Record<UniversityThemeAssetKind, string> {
+  return Object.fromEntries(
+    MASCOT_POSES.map((pose) => [pose, `${DISPLAY_MASCOT_ROOT}/${id}/${pose}.png`]),
+  ) as Record<UniversityThemeAssetKind, string>
+}
+
+function buildSearchAliases(id: string, name: string, shortName: string): string[] {
+  return uniqueStrings([
+    id,
+    name,
+    shortName,
+    name.replace(/대학교$/, '대'),
+    name.replace(/여자대학교$/, '여대'),
+    name.replace(/공과대학교$/, '공과대'),
+    `퀀텀 ${shortName}`,
+    ...(THEME_ALIASES[id] ?? []),
   ])
+}
 
-  if (theme.shortName.endsWith('대')) {
-    const base = theme.shortName.slice(0, -1)
-    aliases.add(base)
-    aliases.add(`${base}대학교`)
-  }
-
-  if (theme.shortName.endsWith('여대')) {
-    const base = theme.shortName.slice(0, -2)
-    aliases.add(base)
-    aliases.add(`${base}여자대학교`)
-  }
-
-  return Array.from(aliases)
+function deriveShortName(name: string): string {
+  return name
+    .replace(/여자대학교$/, '여대')
+    .replace(/공과대학교$/, '공과대')
+    .replace(/대학교$/, '대')
 }
 
 function normalizeThemeId(id: string | null | undefined): string {
-  return (id ?? '').trim().toLowerCase()
+  return String(id ?? '').trim().toLowerCase()
 }
 
-function normalizeSchoolText(value: string): string {
-  return value
-    .normalize('NFKC')
-    .toLowerCase()
-    .replace(/quantum|퀀텀/g, '')
-    .replace(/university|college|national|technical|polytechnic|institute/g, '')
-    .replace(/대학교|대학|학교/g, '')
-    .replace(/여자/g, '여')
-    .replace(/외국어/g, '외')
-    .replace(/[\s·._\-()]/g, '')
+function normalizeSearchKey(value: string | null | undefined): string {
+  return String(value ?? '')
     .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '')
 }
 
-function normalizeReadableSecondary(secondary: string, primary: string): string {
-  return secondary.toUpperCase() === '#FFFFFF' ? mixHex(primary, '#FFFFFF', 0.70) : secondary
+function normalizeStatus(status: string | null | undefined): UniversityThemeTokenStatus {
+  if (status === 'locked' || status === 'draft' || status === 'needsOfficialCheck') return status
+  return 'draft'
+}
+
+function statusFromConfidence(confidence: string | null | undefined): UniversityThemeTokenStatus {
+  if (confidence === 'high') return 'locked'
+  if (confidence === 'medium') return 'draft'
+  return 'needsOfficialCheck'
+}
+
+function normalizeHex(value: string | null | undefined, fallback: string): string {
+  const raw = String(value ?? '').trim()
+  if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw.toUpperCase()
+  if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
+    return `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`.toUpperCase()
+  }
+  return fallback
 }
 
 function hexToRgbChannels(hex: string): string {
-  const normalized = hex.replace('#', '').trim()
-  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return '23 20 18'
-  const value = Number.parseInt(normalized, 16)
-  const r = (value >> 16) & 255
-  const g = (value >> 8) & 255
-  const b = value & 255
-  return `${r} ${g} ${b}`
+  const normalized = normalizeHex(hex, '#000000')
+  const value = normalized.slice(1)
+  const red = parseInt(value.slice(0, 2), 16)
+  const green = parseInt(value.slice(2, 4), 16)
+  const blue = parseInt(value.slice(4, 6), 16)
+  return `${red} ${green} ${blue}`
 }
 
-function hexToRgba(hex: string, alpha: number): string {
-  return `rgba(${hexToRgbChannels(hex).replaceAll(' ', ', ')}, ${alpha})`
-}
+function uniqueStrings(values: Array<string | null | undefined>): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
 
-function mixHex(hexA: string, hexB: string, weightB: number): string {
-  const a = hexToRgb(hexA)
-  const b = hexToRgb(hexB)
-  if (!a || !b) return hexA
-
-  const weightA = 1 - weightB
-  return rgbToHex({
-    r: Math.round(a.r * weightA + b.r * weightB),
-    g: Math.round(a.g * weightA + b.g * weightB),
-    b: Math.round(a.b * weightA + b.b * weightB),
-  })
-}
-
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const normalized = hex.replace('#', '').trim()
-  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null
-  const value = Number.parseInt(normalized, 16)
-  return {
-    r: (value >> 16) & 255,
-    g: (value >> 8) & 255,
-    b: value & 255,
+  for (const value of values) {
+    const trimmed = String(value ?? '').trim()
+    const key = normalizeSearchKey(trimmed)
+    if (!trimmed || seen.has(key)) continue
+    seen.add(key)
+    result.push(trimmed)
   }
-}
 
-function rgbToHex({ r, g, b }: { r: number; g: number; b: number }): string {
-  return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, '0')).join('').toUpperCase()}`
+  return result
 }

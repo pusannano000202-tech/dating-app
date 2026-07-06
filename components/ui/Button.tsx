@@ -20,7 +20,7 @@ const variants: Record<ButtonVariant, string> = {
   gradient: 'btn-gradient-animated text-white',
   soft: 'border border-boot-primary/20 bg-boot-soft text-boot-primary shadow-sm hover:border-boot-primary/35',
   ghost: 'border border-boot-hairline bg-white/85 text-boot-body shadow-sm hover:border-boot-primary/30',
-  danger: 'border border-red-200 bg-red-50 text-red-600 hover:bg-red-100',
+  danger: 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100',
 }
 
 const sizes: Record<ButtonSize, string> = {

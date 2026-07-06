@@ -74,11 +74,19 @@ test('profile personality flows use Booting surfaces instead of Destiny dark sty
 test('match result surfaces keep real APIs while using Booting chat-style cards', () => {
   const matchList = readSource('app/match/page.tsx')
   const matchDetail = readSource('app/match/[id]/page.tsx')
+  const devPreview = readSource('lib/matching/dev-match-preview.ts')
 
   assert.match(matchList, /fetch\('\/api\/matches'\)/)
+  assert.match(matchList, /if \(isDevPreview\) \{/)
+  assert.match(matchList, /fetch\('\/api\/match-pool\/stats'\)/)
   assert.match(matchList, /text-boot-ink/)
   assert.doesNotMatch(matchList, /text-gray-300/)
 
+  assert.match(devPreview, /function canUseDevMatchPreview/)
+  assert.match(devPreview, /isDevPreviewSession && isDevMatchPreviewId\(matchId\)/)
+  assert.match(matchDetail, /const canUseDevPreview = canUseDevMatchPreview\(matchId, isDevPreview\)/)
+  assert.match(matchDetail, /if \(isDevMatchPreviewRoute && !canUseDevPreview\)/)
+  assert.doesNotMatch(matchDetail, /if \(isDevPreview\)[\s\S]{0,120}createDevMatchDetail/)
   assert.match(matchDetail, /\/api\/matches\/\$\{encodeURIComponent\(matchId\)\}\/daily-cards/)
   assert.match(matchDetail, /rounded-br-\[4px\]/)
   assert.doesNotMatch(matchDetail, /bg-black\/10/)

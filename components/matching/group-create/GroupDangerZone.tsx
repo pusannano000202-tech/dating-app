@@ -64,7 +64,7 @@ export function GroupDangerZone({
             type="button"
             onClick={onLeaveGroup}
             disabled={saving}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-300/35 bg-red-50 px-4 py-3 text-xs font-black text-red-600 transition-colors hover:bg-red-100 disabled:opacity-40"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-300/35 bg-red-50 px-4 py-3 text-xs font-black text-red-700 transition-colors hover:bg-red-100 disabled:opacity-40"
           >
             <LogOut size={14} />
             {exitState.primaryLabel}
@@ -88,7 +88,7 @@ export function GroupDangerZone({
             type="button"
             onClick={onDisbandGroup}
             disabled={saving}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-300/35 bg-white px-4 py-3 text-xs font-black text-red-500 transition-colors hover:bg-red-50 disabled:opacity-40"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-300/35 bg-white px-4 py-3 text-xs font-black text-red-700 transition-colors hover:bg-red-50 disabled:opacity-40"
           >
             <Trash2 size={14} />
             그룹 해체
@@ -109,7 +109,7 @@ export function GroupDangerZone({
       <p className="mt-2 text-[11px] leading-4 text-boot-muted">{exitState.helperText}</p>
       {isLeader && !locked && (
         <p className="mt-1 text-[11px] leading-4 text-boot-muted">
-          특정 친구만 빼야 하면 위의 멤버 카드에서 <span className="font-black text-red-500">내보내기</span>를 누르면 돼요.
+          특정 친구만 빼야 하면 위의 멤버 카드에서 <span className="font-black text-red-700">내보내기</span>를 누르면 돼요.
         </p>
       )}
 

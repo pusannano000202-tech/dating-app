@@ -98,7 +98,7 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
   }, [isAnimating, matchQueue, pick])
 
   if (matchQueue.length === 0) {
-    return <div className="text-center py-20 text-gray-400">로딩 중...</div>
+    return <div className="text-center py-20 text-boot-muted">로딩 중...</div>
   }
 
   const [left, right] = matchQueue[0]
@@ -109,8 +109,8 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
       {/* 헤더 */}
       <div className="w-full max-w-md mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-violet-400 tracking-widest uppercase">{roundLabel}</span>
-          <span className="text-xs text-gray-500 tabular-nums">{currentMatch + 1} / {totalUserChoices}</span>
+          <span className="text-xs font-bold text-boot-primary tracking-widest uppercase">{roundLabel}</span>
+          <span className="text-xs text-boot-muted tabular-nums">{currentMatch + 1} / {totalUserChoices}</span>
         </div>
         <div className="w-full bg-white/10 rounded-full h-1">
           <div
@@ -119,7 +119,7 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
           />
         </div>
         <p className="mt-5 text-center text-xl font-black tracking-tight">어떤 스타일이 더 좋아?</p>
-        <p className="text-center text-sm text-gray-500 mt-1">직관적으로 골라봐</p>
+        <p className="text-center text-sm text-boot-muted mt-1">직관적으로 골라봐</p>
       </div>
 
       {/* 대결 카드 — 사진 기반 */}
@@ -189,7 +189,7 @@ export default function AppearanceWorldcup({ onComplete }: Props) {
         })}
       </div>
 
-      <p className="mt-5 text-xs text-gray-700">탭해서 선택 · ← → 키보드 사용 가능</p>
+      <p className="mt-5 text-xs text-boot-muted">탭해서 선택 · ← → 키보드 사용 가능</p>
     </div>
   )
 }

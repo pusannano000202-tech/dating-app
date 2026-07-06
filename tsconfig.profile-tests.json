@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "module": "commonjs",
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
     "rootDir": ".",
     "outDir": ".tmp/profile-tests",
     "types": ["node"],
@@ -15,6 +19,8 @@
   "include": [
     "lib/pnu-departments.ts",
     "lib/gender.ts",
+    "lib/types.ts",
+    "lib/appearance/**/*.ts",
     "lib/profile/**/*.ts",
     "tests/profile/**/*.ts"
   ]

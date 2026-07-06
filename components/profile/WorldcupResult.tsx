@@ -36,7 +36,7 @@ export default function WorldcupResult({ winner, saving = false, saveError, onCo
       </div>
 
       <div className="relative w-full max-w-xs">
-        <p className="text-xs font-bold text-violet-400 tracking-widest uppercase text-center mb-1">최종 우승</p>
+        <p className="text-xs font-bold text-boot-primary tracking-widest uppercase text-center mb-1">최종 우승</p>
         <h1 className="text-2xl font-black text-center gradient-fate-text mb-6">내 이상형 스타일은</h1>
 
         <div className="relative rounded-3xl overflow-hidden aspect-[3/4] mb-4 ring-2 ring-violet-500/60 shadow-2xl shadow-violet-900/40">
@@ -61,9 +61,9 @@ export default function WorldcupResult({ winner, saving = false, saveError, onCo
           </div>
         </div>
 
-        <p className="text-sm text-gray-400 text-center leading-relaxed px-2">{info.description}</p>
+        <p className="text-sm text-boot-body text-center leading-relaxed px-2">{info.description}</p>
 
-        <p className="mt-5 text-xs text-gray-700 text-center">
+        <p className="mt-5 text-xs text-boot-muted text-center">
           이 결과는 매칭 참고용이에요. 상대방에게 공개되지 않아요.
         </p>
 
@@ -80,7 +80,7 @@ export default function WorldcupResult({ winner, saving = false, saveError, onCo
           </button>
           <button
             onClick={onRetry}
-            className="w-full py-3.5 rounded-2xl glass font-medium text-sm text-gray-300 hover:text-white transition-colors"
+            className="w-full py-3.5 rounded-2xl glass font-medium text-sm text-boot-body hover:text-boot-primary transition-colors"
           >
             다시 해볼게요
           </button>

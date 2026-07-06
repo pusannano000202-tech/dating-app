@@ -52,6 +52,9 @@ const GENDER_OPTIONS: { key: Gender; label: string; description: string }[] = [
 ]
 
 const UNIVERSITY_SCHOOL_OPTIONS = getUniversityThemeSchoolOptions()
+const QUICK_SCHOOL_OPTIONS = [...UNIVERSITY_SCHOOL_OPTIONS].sort((a, b) =>
+  a.label.localeCompare(b.label, 'ko-KR'),
+)
 
 export default function BasicInfoForm({ initialValue, onSubmit, saving, serverError }: Props) {
   const [displayName, setDisplayName] = useState(initialValue?.display_name ?? '')
@@ -94,6 +97,11 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
     }
     setDeptSuggestions(searchUniversityDepartments(nextSchool, department))
   }
+
+  useEffect(() => {
+    if (!school.trim()) return
+    setStoredUniversityThemeFromSchool(school)
+  }, [school])
 
   const checkNicknameAvailability = useCallback(async function checkNicknameAvailability(value = displayName.trim()): Promise<boolean> {
     const trimmedName = value.trim()
@@ -233,7 +241,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
 
       <div className="block">
         <span className="mb-3 block text-sm font-bold">
-          닉네임 <span className="text-rose-500">*</span>
+          닉네임 <span className="text-rose-700">*</span>
           <span className="ml-2 text-xs font-normal text-boot-muted">친구 검색과 그룹원 표시 이름이에요</span>
         </span>
         <div className="flex gap-2">
@@ -270,7 +278,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
 
       <label className="block">
         <span className="mb-3 block text-sm font-bold">
-          휴대폰 번호 <span className="text-rose-500">*</span>
+          휴대폰 번호 <span className="text-rose-700">*</span>
           <span className="ml-2 text-xs font-normal text-boot-muted">친구 초대와 약속 연락에 사용돼요</span>
         </span>
         <div className="relative">
@@ -290,7 +298,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
 
       <div>
         <label className="mb-3 block text-sm font-bold">
-          성별 <span className="text-rose-500">*</span>
+          성별 <span className="text-rose-700">*</span>
         </label>
         <div className="grid grid-cols-2 gap-3">
           {GENDER_OPTIONS.map((item) => {
@@ -316,7 +324,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
           <span className="mb-3 block text-sm font-bold">
-            나이 <span className="text-rose-500">*</span>
+            나이 <span className="text-rose-700">*</span>
           </span>
           <input
             type="number"
@@ -392,7 +400,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
 
       <div className="block">
         <label htmlFor="basic-school-input" className="mb-3 block text-sm font-bold">
-          학교 <span className="text-rose-500">*</span>
+          학교 <span className="text-rose-700">*</span>
         </label>
         <div className="relative">
           <GraduationCap size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-boot-muted" />
@@ -419,7 +427,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
             학교 빠른 선택
           </p>
           <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto pr-1">
-            {UNIVERSITY_SCHOOL_OPTIONS.map((option) => {
+            {QUICK_SCHOOL_OPTIONS.map((option) => {
               const selected = school.trim() === option.label
               return (
                 <button
@@ -519,7 +527,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
       </div>
 
       {(error || serverError) && (
-        <p className="text-center text-xs text-red-500">{error || serverError}</p>
+        <p className="text-center text-xs text-red-700">{error || serverError}</p>
       )}
 
       <button

@@ -51,29 +51,29 @@ export default function IdealWorldcupResult({
         <h1 className="text-2xl font-black text-center gradient-fate-text mb-3">
           내 이상형 분석 완료
         </h1>
-        <p className="text-sm text-gray-400 text-center mb-8 leading-relaxed">
+        <p className="text-sm text-boot-muted text-center mb-8 leading-relaxed">
           {result.meta.total_choices}번의 선택으로 너의 취향을 측정했어.<br />
           매칭에는 더 정밀한 내부 벡터가 함께 반영돼.
         </p>
 
-        <div className="w-full glass-strong rounded-3xl p-5 border border-white/10 mb-8">
-          <p className="text-xs text-violet-400 font-bold tracking-widest uppercase mb-2">
+        <div className="w-full glass-strong rounded-3xl p-5 border border-boot-hairline mb-8">
+          <p className="text-xs text-boot-primary font-bold tracking-widest uppercase mb-2">
             PRIMARY
           </p>
-          <p className="text-xl font-black text-white leading-tight">
+          <p className="text-xl font-black text-boot-ink leading-tight">
             당신은 {primaryType}을 가장 좋아하는 편이에요.
           </p>
           {secondaryType && (
             <>
-              <p className="mt-5 text-xs text-violet-400 font-bold tracking-widest uppercase">
+              <p className="mt-5 text-xs text-boot-primary font-bold tracking-widest uppercase">
                 SECONDARY
               </p>
-              <p className="mt-2 text-sm text-gray-300 leading-relaxed">
+              <p className="mt-2 text-sm text-boot-body leading-relaxed">
                 그리고 {secondaryType} 분위기에도 자연스럽게 끌리는 경향이 있어요.
               </p>
             </>
           )}
-          <p className="mt-5 text-xs text-gray-600 leading-relaxed">
+          <p className="mt-5 text-xs text-boot-muted leading-relaxed">
             세부 점수와 벡터값은 공개하지 않고 매칭 계산에만 사용해요.
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function IdealWorldcupResult({
           type="button"
           onClick={onRetry}
           disabled={saving}
-          className="mt-3 w-full py-3 rounded-2xl glass text-sm text-gray-400 hover:text-gray-200 border border-white/5 transition-colors"
+          className="mt-3 w-full py-3 rounded-2xl glass text-sm text-boot-body hover:text-boot-primary border border-boot-hairline transition-colors"
         >
           다시 하기
         </button>
