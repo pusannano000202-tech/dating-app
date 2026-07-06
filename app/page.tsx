@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   Bell,
@@ -78,6 +79,8 @@ function HomeDashboard() {
 
         <HomeTodayTaskCard />
 
+        <HomeCampusPollEntry />
+
         <section className="mb-5 grid grid-cols-2 gap-3">
           <HomeActionCard
             href="/friends"
@@ -121,6 +124,76 @@ function HomeDashboard() {
         </div>
       </div>
     </main>
+  )
+}
+
+function HomeCampusPollEntry() {
+  return (
+    <section className="mb-5" aria-labelledby="home-campus-poll-title">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-boot-primary">
+            Campus Poll
+          </p>
+          <h2 id="home-campus-poll-title" className="mt-1 text-xl font-black">
+            취향 통계 먼저 골라보기
+          </h2>
+        </div>
+        <span className="rounded-full bg-white/85 px-3 py-1.5 text-[11px] font-black text-boot-muted shadow-sm">
+          mock
+        </span>
+      </div>
+
+      <div className="grid gap-3">
+        <Link
+          href="/community?focus=school"
+          className="group relative overflow-hidden rounded-[28px] border border-boot-primary/15 bg-white p-3 shadow-[var(--boot-card-shadow)] transition hover:border-boot-primary/35"
+        >
+          <div className="grid min-h-[116px] grid-cols-[minmax(0,1fr)_88px] items-center gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+                우리 학교
+              </p>
+              <h3 className="mt-1 text-xl font-black leading-tight">우리학교 취향보기</h3>
+              <p className="mt-2 text-sm font-bold leading-5 text-boot-muted">
+                부산대 컴공은 찍먹? 우리 과 결과부터 가볍게 확인해요.
+              </p>
+            </div>
+            <Image
+              src="/daily-cards/debate/tangsuyuk-dip.png"
+              alt="찍먹 취향 카드"
+              width={88}
+              height={88}
+              className="h-[88px] w-[88px] rounded-3xl object-cover shadow-sm"
+            />
+          </div>
+        </Link>
+
+        <Link
+          href="/community?focus=university"
+          className="group relative overflow-hidden rounded-[28px] border border-boot-primary/15 bg-white p-3 shadow-[var(--boot-card-shadow)] transition hover:border-boot-primary/35"
+        >
+          <div className="grid min-h-[116px] grid-cols-[minmax(0,1fr)_88px] items-center gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+                학교 비교
+              </p>
+              <h3 className="mt-1 text-xl font-black leading-tight">다른학교 취향보기</h3>
+              <p className="mt-2 text-sm font-bold leading-5 text-boot-muted">
+                부경대, 동아대는 민초와 부먹이 얼마나 다른지 눌러봐요.
+              </p>
+            </div>
+            <Image
+              src="/daily-cards/debate/mint-choco-yes.png"
+              alt="민초 취향 카드"
+              width={88}
+              height={88}
+              className="h-[88px] w-[88px] rounded-3xl object-cover shadow-sm"
+            />
+          </div>
+        </Link>
+      </div>
+    </section>
   )
 }
 

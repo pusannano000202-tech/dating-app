@@ -1,23 +1,39 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   CalendarDays,
   Coffee,
   Gamepad2,
-  MapPin,
   Sparkles,
   UsersRound,
   Utensils,
 } from 'lucide-react'
 import BootingLogo from '@/components/BootingLogo'
 import { CampusCommunityCard } from '@/components/community/CampusCommunityCard'
+import CampusPollStatisticsPreview from '@/components/community/CampusPollStatisticsPreview'
 import MascotCoachCard from '@/components/theme/MascotCoachCard'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+
+type PollFocusMode = 'school' | 'university'
+
+function getPollFocus(value: string | null): PollFocusMode | null {
+  if (value === 'school' || value === 'our') return 'school'
+  if (value === 'university' || value === 'other') return 'university'
+  return null
+}
 
 export default function CommunityPage() {
   const { theme } = useUniversityTheme()
   const campusName = theme.shortName
+  const searchParams = useSearchParams()
+  const pollFocus = getPollFocus(searchParams.get('focus'))
+  const pollTab = pollFocus === 'university' ? '다른학교' : '우리학교'
+  const answerParam = searchParams.get('answer')
+  const pollAnswer = answerParam === '부먹' || answerParam === '찍먹' ? answerParam : undefined
+  const pollQuery = searchParams.get('q') ?? ''
   const communityCards = [
     {
       title: `${campusName} 캠퍼스 게임`,
@@ -86,23 +102,29 @@ export default function CommunityPage() {
           </div>
         </section>
 
-        <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
-          <div className="flex items-start gap-3">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
-              <MapPin size={20} />
-            </span>
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-boot-primary">
-                Campus Mode
-              </p>
-              <h2 className="mt-1 text-xl font-black leading-tight">학교마다 다른 분위기로 보여줄 수 있어요</h2>
-              <p className="mt-2 text-sm leading-6 text-boot-muted">
-                지금은 기본정보의 학교 입력값을 기준으로 프론트 테마를 바꿉니다. 다음 단계에서 학교 코드와 테마 데이터를
-                DB로 분리하면 같은 기능에 다른 색감과 장소 추천을 더 안정적으로 입힐 수 있어요.
-              </p>
+        {pollFocus ? (
+          <section className="mb-5">
+            <div className="mb-3 flex items-end justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-boot-primary">
+                  Campus Taste Map
+                </p>
+                <h1 className="mt-1 text-2xl font-black">
+                  {pollFocus === 'school' ? '우리학교 취향보기' : '다른학교 취향보기'}
+                </h1>
+              </div>
+              <Link
+                href="/community"
+                className="rounded-full bg-boot-ink px-4 py-2 text-xs font-black text-white shadow-[0_12px_26px_rgba(23,20,18,0.18)]"
+              >
+                모임으로
+              </Link>
             </div>
-          </div>
-        </section>
+            <CampusPollStatisticsPreview initialTab={pollTab} answer={pollAnswer} query={pollQuery} />
+          </section>
+        ) : (
+          <CampusTasteLauncher />
+        )}
 
         <section className="mb-5">
           <div className="mb-3 flex items-end justify-between gap-3">
@@ -142,5 +164,78 @@ export default function CommunityPage() {
         </section>
       </div>
     </main>
+  )
+}
+
+function CampusTasteLauncher() {
+  return (
+    <section className="mb-5" aria-labelledby="campus-taste-launcher-title">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-boot-primary">
+            Campus Taste Map
+          </p>
+          <h2 id="campus-taste-launcher-title" className="mt-1 text-2xl font-black">
+            보고 싶은 통계만 열기
+          </h2>
+        </div>
+      </div>
+
+      <div className="grid gap-3">
+        <Link
+          href="/community?focus=school"
+          className="relative overflow-hidden rounded-[28px] border border-boot-primary/15 bg-white p-3 shadow-[var(--boot-card-shadow)] transition hover:border-boot-primary/35"
+        >
+          <div className="grid min-h-[128px] grid-cols-[minmax(0,1fr)_92px] items-center gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+                우리 학교
+              </p>
+              <h3 className="mt-1 text-xl font-black leading-tight">우리학교 취향보기</h3>
+              <p className="mt-2 text-sm font-bold leading-5 text-boot-muted">
+                우리 과는 찍먹인지, 민초는 몇 퍼센트인지 가볍게 확인해요.
+              </p>
+              <p className="mt-3 rounded-full bg-boot-soft px-3 py-1.5 text-[11px] font-black text-boot-body">
+                부산대 컴공 68%는 찍먹
+              </p>
+            </div>
+            <Image
+              src="/daily-cards/debate/tangsuyuk-dip.png"
+              alt="우리학교 찍먹 통계 카드"
+              width={92}
+              height={92}
+              className="h-[92px] w-[92px] rounded-3xl object-cover shadow-sm"
+            />
+          </div>
+        </Link>
+
+        <Link
+          href="/community?focus=university"
+          className="relative overflow-hidden rounded-[28px] border border-boot-primary/15 bg-white p-3 shadow-[var(--boot-card-shadow)] transition hover:border-boot-primary/35"
+        >
+          <div className="grid min-h-[128px] grid-cols-[minmax(0,1fr)_92px] items-center gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+                학교 비교
+              </p>
+              <h3 className="mt-1 text-xl font-black leading-tight">다른학교 취향보기</h3>
+              <p className="mt-2 text-sm font-bold leading-5 text-boot-muted">
+                부경대, 동아대, 다른 과 결과를 찾아보는 재미를 남겨둡니다.
+              </p>
+              <p className="mt-3 rounded-full bg-boot-soft px-3 py-1.5 text-[11px] font-black text-boot-body">
+                경영학과 41% 민초 가능
+              </p>
+            </div>
+            <Image
+              src="/daily-cards/debate/mint-choco-yes.png"
+              alt="다른학교 민초 통계 카드"
+              width={92}
+              height={92}
+              className="h-[92px] w-[92px] rounded-3xl object-cover shadow-sm"
+            />
+          </div>
+        </Link>
+      </div>
+    </section>
   )
 }
