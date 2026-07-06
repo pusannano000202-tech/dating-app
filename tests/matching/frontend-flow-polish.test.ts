@@ -367,6 +367,30 @@ test('home info modal explains the whole app flow with visual cards', () => {
   assert.match(homeInfo, /MessageCircle/)
 })
 
+test('daily card availability notification migration is idempotent', () => {
+  const notificationApi = readSource('app/api/notifications/route.ts')
+  const migration = readSource('supabase/migrations/20260701000000_daily_card_available_notifications.sql')
+
+  assert.doesNotMatch(notificationApi, /notify_available_daily_cards/)
+  assert.match(notificationApi, /get_my_notifications/)
+  assert.match(migration, /daily_card_available/)
+  assert.match(migration, /CREATE OR REPLACE FUNCTION public\.notify_available_daily_cards/)
+  assert.match(migration, /CREATE UNIQUE INDEX IF NOT EXISTS notifications_daily_card_available_unique_idx/)
+  assert.match(migration, /SET search_path = ''/)
+  assert.match(migration, /match_daily_card_schedule/)
+  assert.match(migration, /INSERT INTO public\.notifications/)
+  assert.match(migration, /selected_at IS NULL/)
+  assert.match(migration, /forfeited_at IS NULL/)
+  assert.match(migration, /v_user_id UUID := auth\.uid\(\)/)
+  assert.match(migration, /gm\.user_id = v_user_id/)
+  assert.match(
+    migration,
+    /REVOKE ALL ON FUNCTION public\.notify_available_daily_cards\(UUID\) FROM PUBLIC/,
+  )
+  assert.match(migration, /ON CONFLICT DO NOTHING/)
+  assert.doesNotMatch(migration, /WHERE NOT EXISTS/)
+})
+
 test('preference page makes age range selection visually prominent', () => {
   const preferencesPage = readSource('app/profile/preferences/page.tsx')
 
