@@ -11,6 +11,16 @@
 - **성준** — 그룹/매칭 엔진 담당 (Codex + Codex 사용)
 - 기획 문서: `부산대_과팅앱_v1.2_정의서.md` (루트에 위치)
 
+## 현재 운영 메모
+
+이 문서는 원래 충현/성준 2인 협업 기준으로 작성되었다.
+다만 2026-07-07 기준 사용자가 혼자 작업 중이라고 명시한 경우에는 **solo-owner 운영**을 적용한다.
+
+- 사용자가 "main으로 올려", "main 직접 push", "Vercel 배포되게 올려"처럼 명확히 지시하면 Codex는 `main` 직접 push를 수행할 수 있다.
+- 그 전에는 반드시 현재 브랜치, 최근 커밋, dirty 상태, 포함 파일, 보류 파일, 검증 결과, Vercel 자동 배포 영향을 보고한다.
+- `supabase/migrations/`, `lib/types.ts`, `lib/supabase.ts`, DB/API 라우트는 solo-owner 운영에서도 위험 파일로 분리 보고한다.
+- 사용자가 main 반영을 명확히 지시하지 않았으면 기존처럼 작업 브랜치 push 또는 PR 흐름을 기본값으로 둔다.
+
 ## 기술 스택
 
 - Frontend: Next.js 14 (App Router)
@@ -60,5 +70,5 @@
 
 - `lib/types.ts` 수정 시 → 반드시 PR 열고 상대방 리뷰 받기
 - `supabase/migrations/` 신규 파일 추가 시 → 상대방 확인 없이 main 머지 금지
-- `main` 브랜치에 직접 push 금지
+- `main` 브랜치 직접 push는 팀 협업 모드에서는 금지. 단, solo-owner 운영에서 사용자가 명확히 지시하면 허용
 - 인터페이스 계약(`docs/engineering/INTERFACE_CONTRACT.md`)에 정의된 타입/컬럼명 임의 변경 금지

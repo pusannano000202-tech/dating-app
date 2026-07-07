@@ -3,6 +3,8 @@
 > **충현 + 성준 + Claude Code x2 + Codex x2 = 총 6명이 같은 코드베이스를 건드린다.**
 > 이 문서의 규칙을 지키지 않으면 코드가 꼬인다. LLM이 빠르게 코드를 생산할수록 이 규칙이 더 중요하다.
 
+> 현재 사용자가 혼자 작업 중이라고 명시한 경우에는 아래 규칙 중 `solo-owner 운영 예외`를 우선한다.
+
 ---
 
 ## 1. 브랜치 전략
@@ -24,6 +26,25 @@ main
 - `dev` 직접 push **금지** — 반드시 feature 브랜치에서 PR
 - feature 브랜치 네이밍: `{담당자영역}/{기능명}` (예: `profile/appearance-ai`)
 - PR 머지는 상대방 확인 없이도 가능하지만, **공용 파일 수정 시는 상대방 리뷰 필수**
+
+### solo-owner 운영 예외
+
+사용자가 혼자 작업 중이라고 명시했고, "main으로 올려", "main 직접 push", "Vercel 배포되게 올려"처럼 명확히 지시한 경우에는 `main` 직접 push를 허용한다.
+
+이때도 Codex는 다음 순서를 지킨다.
+
+1. `git status --short --branch`, `git log --oneline -5 --decorate`로 현재 상태를 먼저 확인한다.
+2. `main`이 원격보다 앞서 있는지, 뒤처졌는지, 작업 브랜치 커밋이 같이 올라가는지 보고한다.
+3. 포함 파일, 보류 파일, staged diff 요약, 검증 결과를 push 전에 보고한다.
+4. `supabase/migrations/`, `lib/types.ts`, `lib/supabase.ts`, DB/API 라우트는 위험 파일로 따로 표시한다.
+5. 사용자가 main 반영을 명확히 지시한 범위만 `main`에 커밋하고 `git push origin main`을 수행한다.
+
+브랜치에서 작업한 내용을 main에 올릴 때는 아래 둘 중 하나를 선택한다.
+
+- 브랜치 전체를 배포할 때: `main`을 최신화한 뒤 작업 브랜치를 merge하고 테스트 후 `main`을 push한다.
+- 일부 커밋만 배포할 때: `main`에서 필요한 커밋만 cherry-pick하거나 같은 변경만 다시 적용하고 테스트 후 push한다.
+
+코드가 꼬이는 주된 원인은 `main` 직접 push 자체가 아니라, 브랜치에 쌓인 여러 커밋이나 untracked 대용량 파일을 의도치 않게 같이 올리는 것이다.
 
 ### 브랜치 수명
 - feature 브랜치는 `dev`에 머지되면 즉시 삭제한다
@@ -108,7 +129,7 @@ LLM이 코드를 빠르게 생산하는 만큼 **LLM에게 줄 컨텍스트가 �
 ```
 
 ### LLM이 절대 하면 안 되는 것
-- `main` 브랜치에 push
+- 사용자가 명확히 지시하지 않았는데 `main` 브랜치에 push
 - `docs/INTERFACE_CONTRACT.md`의 타입/컬럼명 임의 변경
 - 상대방 담당 파일 수정 (디렉토리 경계 참고)
 - 새 마이그레이션 파일을 상의 없이 `dev`에 머지
@@ -182,6 +203,6 @@ git rebase origin/dev
 # 충돌이 많으면: 충돌 파일 목록을 상대방에게 공유하고 같이 해결
 ```
 
-### "실수로 main에 push했다"
-- 즉시 상대방에게 알린다
+### "지시 없이 main에 push했다"
+- 즉시 사용자에게 알린다
 - `git revert` 로 되돌린다 (절대 force push 금지)
