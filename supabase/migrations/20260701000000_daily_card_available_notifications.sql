@@ -1,10 +1,11 @@
 -- Migration: daily-card availability notifications
 -- Purpose:
 --   Allow in-app notifications for the daily card draw window and provide a
---   safe per-user helper that can be called by the notifications API.
+--   duplicate-safe per-user helper for an explicit scheduler/action path.
 -- Notes:
---   This does not create a cron job by itself. A separate service-role
---   scheduler helper can be added later if global fan-out is needed.
+--   This does not create a cron job by itself, and GET /api/notifications
+--   must remain read-only. A separate service-role scheduler helper can be
+--   added later if global fan-out is needed.
 
 ALTER TABLE public.notifications DROP CONSTRAINT IF EXISTS notifications_kind_check;
 ALTER TABLE public.notifications ADD CONSTRAINT notifications_kind_check
@@ -17,6 +18,15 @@ ALTER TABLE public.notifications ADD CONSTRAINT notifications_kind_check
     'attendance_confirmed', 'no_show_confirmed',
     'daily_card_available'
   ));
+
+CREATE UNIQUE INDEX IF NOT EXISTS notifications_daily_card_available_unique_idx
+  ON public.notifications (
+    user_id,
+    kind,
+    (payload ->> 'match_id'),
+    (payload ->> 'day_offset')
+  )
+  WHERE kind = 'daily_card_available';
 
 CREATE OR REPLACE FUNCTION public.notify_available_daily_cards(
   p_match_id UUID DEFAULT NULL
@@ -69,14 +79,8 @@ BEGIN
         ON gm.group_id = ac.viewer_group_id
        AND gm.left_at IS NULL
        AND gm.user_id = v_user_id
-     WHERE NOT EXISTS (
-       SELECT 1
-         FROM public.notifications n
-        WHERE n.user_id = gm.user_id
-          AND n.kind = 'daily_card_available'
-          AND n.payload ->> 'match_id' = ac.match_id::TEXT
-          AND n.payload ->> 'day_offset' = ac.day_offset::TEXT
-     )
+     WHERE TRUE
+    ON CONFLICT DO NOTHING
     RETURNING 1
   )
   SELECT COUNT(*) INTO v_inserted FROM inserted;
