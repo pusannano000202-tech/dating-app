@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, BarChart3, CheckCircle2 } from 'lucide-react'
-import { findPollById } from '@/lib/community/mock-data'
+import { findPollById, getCrossCampusStatsHref } from '@/lib/community/mock-data'
 
 type DebateDetailPageProps = {
   params: {
@@ -71,7 +71,7 @@ export default function DebateDetailPage({ params, searchParams }: DebateDetailP
 
         <div className="grid gap-2">
           <Link
-            href="/community/stats/explore?q=컴퓨터공학부&scope_ids=pnu,pnu-cse,pukyong-cse"
+            href={getCrossCampusStatsHref()}
             className="flex items-center justify-between rounded-2xl bg-boot-ink px-4 py-3.5 text-sm font-black text-white shadow-[0_12px_26px_rgba(23,20,18,0.18)]"
           >
             <span>다른 학교 비교</span>

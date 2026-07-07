@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   ArrowRight,
   BarChart3,
@@ -16,7 +18,15 @@ import {
 import BootingLogo from '@/components/BootingLogo'
 import UniversityMascot from '@/components/theme/UniversityMascot'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
-import { communityRooms, mannerSummary, missions, todayDebate } from '@/lib/community/mock-data'
+import {
+  communityPolicies,
+  communityRooms,
+  getCrossCampusStatsHref,
+  getSchoolFocusStatsHref,
+  mannerSummary,
+  missions,
+  todayDebate,
+} from '@/lib/community/mock-data'
 
 const roomIcons: Record<string, LucideIcon> = {
   debates: MessageCircleQuestion,
@@ -28,9 +38,40 @@ const roomIcons: Record<string, LucideIcon> = {
 }
 
 export default function CommunityPage() {
+  return (
+    <Suspense fallback={<CommunityPageContent focusOverride={null} />}>
+      <CommunityPageWithSearch />
+    </Suspense>
+  )
+}
+
+function CommunityPageWithSearch() {
+  const searchParams = useSearchParams()
+  return <CommunityPageContent focusOverride={searchParams.get('focus')} />
+}
+
+function CommunityPageContent({ focusOverride }: { focusOverride: string | null }) {
   const { theme } = useUniversityTheme()
   const campusName = theme.shortName
+  const focus = focusOverride
   const pendingMission = missions.find((mission) => !mission.completed) ?? missions[0]
+  const focusCard = focus === 'university'
+    ? {
+        eyebrow: 'Cross Campus',
+        title: '다른 학교 취향도 비교해볼게요',
+        body: '같은 학과나 가까운 학교끼리만 표본이 충분할 때 결과를 열어요.',
+        href: getCrossCampusStatsHref(),
+        cta: '다른 학교 비교 열기',
+      }
+    : focus === 'school'
+      ? {
+          eyebrow: `${campusName} Focus`,
+          title: '우리학교 취향부터 볼게요',
+          body: `${campusName} 안에서 충분히 모인 응답만 공개하고, 부족한 학과는 비공개로 둬요.`,
+          href: getSchoolFocusStatsHref(theme.id, campusName),
+          cta: '우리학교 통계 열기',
+        }
+      : null
 
   return (
     <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
@@ -71,6 +112,36 @@ export default function CommunityPage() {
             <span className="border-x border-boot-hairline py-2.5">방별 이동</span>
             <span className="py-2.5">다시 돌아오기</span>
           </div>
+        </section>
+
+        {focusCard ? (
+          <section className="mb-4 rounded-[28px] border border-boot-primary/20 bg-white p-4 shadow-sm">
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">
+              {focusCard.eyebrow}
+            </p>
+            <h2 className="mt-1 text-lg font-black leading-tight">{focusCard.title}</h2>
+            <p className="mt-2 text-sm font-bold leading-6 text-boot-muted">{focusCard.body}</p>
+            <Link
+              href={focusCard.href}
+              className="mt-3 flex items-center justify-between rounded-2xl bg-boot-ink px-4 py-3 text-sm font-black text-white"
+            >
+              <span>{focusCard.cta}</span>
+              <ArrowRight size={16} />
+            </Link>
+          </section>
+        ) : null}
+
+        <section className="mb-4 grid grid-cols-3 gap-2">
+          {communityPolicies.slice(0, 3).map((policy, index) => (
+            <Link
+              key={policy}
+              href="/community/safety"
+              className="min-h-[74px] rounded-2xl border border-boot-hairline bg-white/85 px-3 py-3 text-[11px] font-black leading-4 text-boot-body shadow-sm"
+            >
+              <span className="mb-1 block text-boot-primary">0{index + 1}</span>
+              <span className="line-clamp-2">{policy}</span>
+            </Link>
+          ))}
         </section>
 
         <section className="mb-4 rounded-[28px] border border-boot-primary/15 bg-white p-4 shadow-sm">
@@ -155,7 +226,7 @@ export default function CommunityPage() {
           </div>
           <div className="grid gap-2">
             <Link
-              href="/community/stats/explore?q=컴퓨터공학부&scope_ids=pnu,pnu-cse,pukyong-cse"
+              href={getCrossCampusStatsHref()}
               className="flex items-center justify-between rounded-2xl bg-boot-soft px-4 py-3 text-sm font-black text-boot-body"
             >
               <span>컴공끼리 탕수육 취향 비교</span>

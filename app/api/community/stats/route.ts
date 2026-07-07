@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { findScopes, getCompareScopes, isScopePublic, MIN_PUBLIC_SAMPLE_SIZE } from '@/lib/community/mock-data'
+import {
+  findScopes,
+  getCompareScopes,
+  getPublicStatsSummary,
+  isScopePublic,
+  MIN_PUBLIC_SAMPLE_SIZE,
+} from '@/lib/community/mock-data'
 
 function serializeScope(scope: ReturnType<typeof findScopes>[number]) {
   const publicResult = isScopePublic(scope)
@@ -32,6 +38,7 @@ export function GET(request: NextRequest) {
     query,
     compareLimit: 3,
     minimumPublicSampleSize: MIN_PUBLIC_SAMPLE_SIZE,
+    summary: getPublicStatsSummary(),
     compare,
     results,
   })

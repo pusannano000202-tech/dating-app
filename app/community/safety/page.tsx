@@ -1,14 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, ShieldCheck } from 'lucide-react'
-import { MIN_PUBLIC_SAMPLE_SIZE } from '@/lib/community/mock-data'
-
-const policies = [
-  '개인 답변은 공개하지 않고 학교/학과 단위 집계만 보여줍니다.',
-  `학과별 통계는 최소 ${MIN_PUBLIC_SAMPLE_SIZE}명 이상일 때만 공개합니다.`,
-  '성별별 통계는 초반에는 숨기고 운영 검토 뒤에만 고려합니다.',
-  '외모, 인기, 성적, 특정 개인을 대상화하는 랭킹은 금지합니다.',
-  '반복 답변, 자동화, 특정 학과 조롱을 유도하는 어뷰징은 제한합니다.',
-]
+import { communityPolicies } from '@/lib/community/mock-data'
 
 export default function SafetyPage() {
   return (
@@ -35,7 +27,7 @@ export default function SafetyPage() {
         </section>
 
         <section className="grid gap-2">
-          {policies.map((policy, index) => (
+          {communityPolicies.map((policy, index) => (
             <div key={policy} className="grid grid-cols-[32px_minmax(0,1fr)] items-start gap-3 rounded-2xl border border-boot-hairline bg-white px-4 py-3 shadow-sm">
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-boot-soft text-sm font-black text-boot-primary">
                 {index + 1}

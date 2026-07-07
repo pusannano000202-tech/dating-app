@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, BarChart3, Plus } from 'lucide-react'
-import { findScopes, getCompareScopes, isScopePublic, statsScopes } from '@/lib/community/mock-data'
+import { ArrowLeft, ArrowRight, BarChart3, Plus, ShieldCheck } from 'lucide-react'
+import { MIN_PUBLIC_SAMPLE_SIZE, findScopes, getCompareScopes, isScopePublic, statsScopes } from '@/lib/community/mock-data'
 
 type StatsExplorePageProps = {
   searchParams?: Record<string, string | string[] | undefined>
@@ -41,13 +41,23 @@ export default function StatsExplorePage({ searchParams }: StatsExplorePageProps
           </p>
         </section>
 
+        <section className="mb-4 flex items-start gap-3 rounded-[24px] border border-boot-primary/15 bg-white/90 px-4 py-3 shadow-sm">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
+            <ShieldCheck size={17} />
+          </span>
+          <p className="text-xs font-bold leading-5 text-boot-muted">
+            개인 답변은 보여주지 않고, 표본이 부족한 학과는 요약과 퍼센트를 모두 숨겨요.
+          </p>
+        </section>
+
         <section className="mb-4 rounded-[26px] border border-boot-primary/15 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-black">선택한 통계 비교</h2>
             <span className="text-xs font-black text-boot-muted">{compareScopes.length}/3</span>
           </div>
-          <div className="grid gap-2">
-            {compareScopes.map((scope) => {
+          {compareScopes.length > 0 ? (
+            <div className="grid gap-2">
+              {compareScopes.map((scope) => {
               const publicResult = isScopePublic(scope)
               return (
                 <div key={scope.id} className="rounded-2xl bg-boot-soft p-3">
@@ -62,17 +72,50 @@ export default function StatsExplorePage({ searchParams }: StatsExplorePageProps
                       {publicResult ? `${scope.percentage}%` : '비공개'}
                     </span>
                   </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                    <div
+                      className={[
+                        'h-full rounded-full',
+                        publicResult ? 'bg-boot-primary' : 'bg-boot-muted/30',
+                      ].join(' ')}
+                      style={{ width: `${scope.percentage ?? Math.min(100, Math.round((scope.sampleSize / MIN_PUBLIC_SAMPLE_SIZE) * 100))}%` }}
+                    />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-[11px] font-black">
+                    <span className={publicResult ? 'text-boot-primary' : 'text-boot-muted'}>
+                      {publicResult ? '공개 가능' : '표본 대기'}
+                    </span>
+                    <span className="text-boot-muted">
+                      {publicResult ? scope.dominantLabel : `${scope.sampleSize}/${MIN_PUBLIC_SAMPLE_SIZE}명`}
+                    </span>
+                  </div>
                   <p className="mt-2 text-sm font-bold text-boot-body">
                     {publicResult ? `${scope.dominantLabel} 쪽이 더 많아요.` : '아직 표본이 부족해요.'}
                   </p>
                 </div>
               )
-            })}
-          </div>
+              })}
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-boot-soft px-4 py-4">
+              <p className="text-sm font-black text-boot-body">아직 공개 가능한 통계가 없어요</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-boot-muted">
+                이 학교나 학과는 mock 데이터가 아직 없어서 실제 DB 연결 전까지 결과를 숨겨둡니다.
+              </p>
+            </div>
+          )}
         </section>
 
+        <Link
+          href="/community/stats"
+          className="mb-4 flex items-center justify-between rounded-2xl bg-boot-ink px-4 py-3 text-sm font-black text-white shadow-[0_12px_26px_rgba(23,20,18,0.18)]"
+        >
+          <span>다른 취향 주제 고르기</span>
+          <ArrowRight size={16} />
+        </Link>
+
         <section className="grid gap-3">
-          {results.map((scope) => {
+          {results.length > 0 ? results.map((scope) => {
             const selectedIds = [...new Set([...compareScopes.map((item) => item.id), scope.id])].slice(0, 3)
             const publicResult = isScopePublic(scope)
             return (
@@ -86,7 +129,9 @@ export default function StatsExplorePage({ searchParams }: StatsExplorePageProps
                     <p className="text-base font-black">
                       {scope.parentLabel ? `${scope.parentLabel} ${scope.label}` : scope.label}
                     </p>
-                    <p className="mt-1 text-sm font-bold text-boot-muted">{scope.summary}</p>
+                    <p className="mt-1 text-sm font-bold text-boot-muted">
+                      {publicResult ? scope.summary : '아직 표본이 부족해요'}
+                    </p>
                   </div>
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
                     {statsScopes.some((item) => item.id === scope.id) ? <Plus size={16} /> : <BarChart3 size={16} />}
@@ -100,7 +145,11 @@ export default function StatsExplorePage({ searchParams }: StatsExplorePageProps
                 </div>
               </Link>
             )
-          })}
+          }) : (
+            <div className="rounded-[24px] border border-boot-hairline bg-white p-4 text-sm font-bold leading-6 text-boot-muted shadow-sm">
+              검색 결과가 없어요. 지금은 부산대/부경대/동아대 일부 mock 통계만 열어두고 있어요.
+            </div>
+          )}
         </section>
       </div>
     </main>

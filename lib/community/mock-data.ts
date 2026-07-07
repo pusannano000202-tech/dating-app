@@ -30,6 +30,15 @@ export type StatsScope = {
   searchText: string
 }
 
+export type StatTopicCard = {
+  id: string
+  title: string
+  description: string
+  metricLabel: string
+  href: string
+  examples: string[]
+}
+
 export type RankingCategory = 'taste' | 'participation' | 'manner' | 'mission'
 
 export type RankingCard = {
@@ -56,6 +65,14 @@ export type Mission = {
 }
 
 export const MIN_PUBLIC_SAMPLE_SIZE = 30
+
+export const communityPolicies = [
+  '개인 답변은 공개하지 않고 학교/학과 단위 집계만 보여줍니다.',
+  `학과별 통계는 최소 ${MIN_PUBLIC_SAMPLE_SIZE}명 이상일 때만 공개합니다.`,
+  '성별별 통계는 초반에는 숨기고 운영 검토 뒤에만 고려합니다.',
+  '외모, 인기, 성적, 특정 개인을 대상화하는 랭킹은 금지합니다.',
+  '반복 답변, 자동화, 특정 학과 조롱을 유도하는 어뷰징은 제한합니다.',
+]
 
 export const todayDebate: DebatePoll = {
   id: 'tangsuyuk-20260707',
@@ -222,6 +239,57 @@ export const statsScopes: StatsScope[] = [
     summary: '아직 표본이 부족해요',
     searchText: '부산대 부산대학교 철학과 표본 부족 민초',
   },
+  {
+    id: 'pnu-psych-campus',
+    type: 'department',
+    label: '심리학과',
+    parentLabel: '부산대',
+    topic: '캠퍼스 약속',
+    dominantLabel: '카공',
+    percentage: 58,
+    sampleSize: 31,
+    summary: '부산대 심리학과 58%는 첫 만남 전 카공을 선호',
+    searchText: '부산대 부산대학교 심리학과 캠퍼스 약속 카공 밥약',
+  },
+  {
+    id: 'pnu-comm-contact',
+    type: 'department',
+    label: '신문방송학과',
+    parentLabel: '부산대',
+    topic: '연락 스타일',
+    dominantLabel: '카톡',
+    percentage: 64,
+    sampleSize: 38,
+    summary: '부산대 신문방송학과 64%는 약속 전 카톡을 선호',
+    searchText: '부산대 부산대학교 신문방송학과 연락 스타일 카톡 전화 채팅',
+  },
+]
+
+export const statTopicCards: StatTopicCard[] = [
+  {
+    id: 'food',
+    title: '맛 취향',
+    description: '탕수육, 민초처럼 가볍게 답하고 바로 비교하기 좋은 주제예요.',
+    metricLabel: '음식 논쟁',
+    href: '/community/stats/explore?q=탕수육&scope_ids=pnu,pnu-cse,pukyong-cse',
+    examples: ['탕수육', '민초', '냉면'],
+  },
+  {
+    id: 'campus-plan',
+    title: '캠퍼스 약속',
+    description: '밥약, 카공, 산책처럼 실제 만남 전 분위기를 맞추는 주제예요.',
+    metricLabel: '만남 전 선호',
+    href: '/community/stats/explore?q=캠퍼스 약속&scope_ids=pnu-psych-campus,pnu,pnu-cse',
+    examples: ['카공', '밥약', '산책'],
+  },
+  {
+    id: 'contact',
+    title: '연락 스타일',
+    description: '확정 전 연락 방식과 속도를 가볍게 맞춰보는 주제예요.',
+    metricLabel: '연락 취향',
+    href: '/community/stats/explore?q=연락 스타일&scope_ids=pnu-comm-contact,pnu,pnu-cse',
+    examples: ['카톡', '전화', '천천히'],
+  },
 ]
 
 export const statSuggestions = [
@@ -241,6 +309,18 @@ export const statSuggestions = [
     href: '/community/stats/explore?q=민초&scope_ids=pnu-business',
   },
 ]
+
+export function getSchoolFocusStatsHref(schoolId: string, schoolLabel: string): string {
+  if (schoolId === 'pnu') {
+    return '/community/stats/explore?q=%EB%B6%80%EC%82%B0%EB%8C%80&scope_ids=pnu,pnu-cse'
+  }
+
+  return `/community/stats/explore?q=${encodeURIComponent(schoolLabel)}`
+}
+
+export function getCrossCampusStatsHref(): string {
+  return '/community/stats/explore?q=%EC%BB%B4%ED%93%A8%ED%84%B0%EA%B3%B5%ED%95%99%EB%B6%80&scope_ids=pnu,pnu-cse,pukyong-cse'
+}
 
 export const rankingCards: RankingCard[] = [
   {
@@ -361,4 +441,20 @@ export function getCompareScopes(scopeIds: string[]): StatsScope[] {
 
 export function isScopePublic(scope: StatsScope): boolean {
   return scope.percentage !== null && scope.sampleSize >= MIN_PUBLIC_SAMPLE_SIZE
+}
+
+export function getPublicStatsSummary() {
+  const publicScopeCount = statsScopes.filter(isScopePublic).length
+  const waitingScopeCount = statsScopes.length - publicScopeCount
+
+  return {
+    minimumSampleSize: MIN_PUBLIC_SAMPLE_SIZE,
+    publicScopeCount,
+    waitingScopeCount,
+    copy: {
+      public: `${publicScopeCount}개 통계 공개 가능`,
+      hidden: `${waitingScopeCount}개 통계 표본 대기`,
+      comparison: '비교는 최대 3개까지만 열어 과열을 막아요.',
+    },
+  }
 }
