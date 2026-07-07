@@ -87,6 +87,23 @@ export interface UniversityThemeSchoolOption {
   tokenStatus: UniversityThemeTokenStatus
 }
 
+export interface UniversityLocalDesignProfile {
+  id: string
+  shortName: string
+  lifeArea: string
+  primaryPlace: string
+  placeChips: string[]
+  matchChips: string[]
+  campusPattern: string
+  notificationTone: string
+  profileCopy: string
+  matchCopy: string
+  groupCopy: string
+  refundCopy: string
+  dailyCardQuestions: string[]
+  mascotGuardrail: string
+}
+
 export type UniversityThemeCssVariables = Record<`--${string}`, string>
 
 type RawColorToken = {
@@ -124,6 +141,14 @@ type AdditionalBrandProfile = {
 
 type AdditionalBrandProfilesPayload = {
   universities?: AdditionalBrandProfile[]
+}
+
+type UniversityLocalDesignSeed = {
+  lifeArea: string
+  placeChips: readonly [string, string, string]
+  campusPattern: string
+  notificationTone: string
+  mascotGuardrail?: string
 }
 
 const MASCOT_POSES: MascotPose[] = ['welcome', 'guide', 'waiting', 'support', 'confirm', 'refund', 'avatar']
@@ -347,6 +372,68 @@ const MASCOT_HINTS: Record<string, { animal: string; character: string }> = {
   wsu: { animal: '공식 동물 확인 낮음', character: '소나무·철도·글로벌 상징 기반 companion' },
 }
 
+const LOCAL_DESIGN_SEEDS: Record<string, UniversityLocalDesignSeed> = {
+  pnu: { lifeArea: '부산대역/장전동', placeChips: ['넉터', '새벽벌', '부산대역'], campusPattern: '금정산 능선+넉터 라인', notificationTone: '담백하고 살짝 직설적' },
+  yonsei: { lifeArea: '신촌/백양로', placeChips: ['백양로', '언더우드관', '신촌'], campusPattern: '백양로 축선+석조 건물 라인', notificationTone: '정중하고 차분함' },
+  korea: { lifeArea: '안암/참살이길', placeChips: ['본관', '중앙광장', '안암'], campusPattern: '고딕 arch+crimson line', notificationTone: '자신감 있지만 과격하지 않게' },
+  snu: { lifeArea: '관악/샤로수길', placeChips: ['관악', '중앙도서관', '샤로수길'], campusPattern: '관악산 능선+도서관 grid', notificationTone: '간결하고 정보형' },
+  khu: { lifeArea: '회기/평화의전당', placeChips: ['평화의 전당', '회기', '노천극장'], campusPattern: '평전 첨탑+gold grain', notificationTone: '우아하지만 가볍게' },
+  hanyang: { lifeArea: '왕십리/서울캠', placeChips: ['애지문', '왕십리', '한양플라자'], campusPattern: 'blueprint grid+gate line', notificationTone: '명확하고 빠름' },
+  skku: { lifeArea: '혜화/명륜/율전', placeChips: ['명륜당', '은행나무', '혜화'], campusPattern: '은행잎+서책 line', notificationTone: '단정하고 신뢰감' },
+  cau: { lifeArea: '흑석/청룡연못', placeChips: ['청룡연못', '중앙광장', '흑석'], campusPattern: '연못 ripple+blue line', notificationTone: '밝고 또렷함' },
+  hufs: { lifeArea: '외대앞/이문동/글로벌캠', placeChips: ['외대앞', '사이버관', '글로벌캠'], campusPattern: 'globe grid+speech dots', notificationTone: '가볍고 국제적' },
+  ewha: { lifeArea: '이대역/ECC/신촌', placeChips: ['ECC', '이대역', '대강당'], campusPattern: 'ECC step line+flower dot', notificationTone: '부드럽고 명확' },
+  konkuk: { lifeArea: '건대입구/일감호', placeChips: ['일감호', '건대입구', '새천년관'], campusPattern: 'lake ripple+green blocks', notificationTone: '친근하고 가벼움' },
+  dongguk: { lifeArea: '충무로/동대입구/남산', placeChips: ['정각원', '남산', '충무로'], campusPattern: 'lotus line+warm gray', notificationTone: '차분하고 온화' },
+  hongik: { lifeArea: '홍대입구/와우산', placeChips: ['홍문관', '와우산', '홍대입구'], campusPattern: 'sketch grid+sticker edge', notificationTone: '재치 있지만 과하지 않게' },
+  sookmyung: { lifeArea: '숙대입구/청파동', placeChips: ['순헌관', '청파로', '숙대입구'], campusPattern: 'snowflake dot+paper grain', notificationTone: '다정하고 또렷' },
+  knu: { lifeArea: '대구 북문', placeChips: ['일청담/북문', '중앙도서관', '대구 북구'], campusPattern: '일청담/북문 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  jnu: { lifeArea: '광주 용봉동', placeChips: ['용봉관', '용봉탑', '민주마루'], campusPattern: '용봉관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  cnu: { lifeArea: '대전 궁동', placeChips: ['백마광장', '중앙도서관', '궁동'], campusPattern: '백마광장 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  jbnu: { lifeArea: '전주 덕진/건지', placeChips: ['건지광장', '중앙도서관', '전주'], campusPattern: '건지광장 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  pknu: { lifeArea: '부산 대연동/광안리', placeChips: ['대연캠', '백경광장', '광안리'], campusPattern: '대연캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  keimyung: { lifeArea: '대구 성서', placeChips: ['성서캠', '동산도서관', '계명아트센터'], campusPattern: '성서캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  gachon: { lifeArea: '가천대역/성남', placeChips: ['비전타워', '가천관', '가천대역'], campusPattern: '비전타워 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  inha: { lifeArea: '인천 용현동', placeChips: ['정석학술정보관', '인하광장', '용현동'], campusPattern: '정석학술정보관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  donga: { lifeArea: '부산 승학/부민', placeChips: ['승학캠', '부민캠', '승학산'], campusPattern: '승학캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  daegu: { lifeArea: '경산', placeChips: ['경산캠', '중앙도서관', '비호동산'], campusPattern: '경산캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  chosun: { lifeArea: '광주 동구', placeChips: ['본관', '장미원', '무등산'], campusPattern: '본관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  gnu: { lifeArea: '진주 가좌', placeChips: ['가좌캠', '중앙도서관', '진주'], campusPattern: '가좌캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  kookmin: { lifeArea: '정릉/북악', placeChips: ['북악관', '정릉', '북악산'], campusPattern: '북악관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  dongeui: { lifeArea: '부산 가야', placeChips: ['가야캠', '중앙도서관', '부산 가야'], campusPattern: '가야캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  wonkwang: { lifeArea: '익산', placeChips: ['중앙도서관', '원광대병원', '익산'], campusPattern: '중앙도서관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  kangwon: { lifeArea: '춘천/강원', placeChips: ['백령광장', '춘천캠', '강원 산맥'], campusPattern: '백령광장 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  chungbuk: { lifeArea: '청주 개신동', placeChips: ['개신문화관', '중앙도서관', '개신동'], campusPattern: '개신문화관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  sejong: { lifeArea: '군자동/어린이대공원', placeChips: ['대양홀', '애지헌', '어린이대공원'], campusPattern: '대양홀 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  hoseo: { lifeArea: '아산/천안', placeChips: ['아산캠', '벤처산학협력관', '천안/아산'], campusPattern: '아산캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  cheongju: { lifeArea: '청주 우암동', placeChips: ['청석학원', '중앙도서관', '우암동'], campusPattern: '청석학원 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  kyonggi: { lifeArea: '수원/서울', placeChips: ['수원캠', '서울캠', '광교/서대문'], campusPattern: '수원캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내', mascotGuardrail: '경기대는 기룡이/아기거북이 맥락을 유지하고 거북 등껍질 인상을 남긴다.' },
+  hannam: { lifeArea: '대전 오정동', placeChips: ['오정동 캠퍼스', '린튼공원', '대전'], campusPattern: '오정동 캠퍼스 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  baekseok: { lifeArea: '천안', placeChips: ['천안캠', '백석홀', '기독교 대학 분위기'], campusPattern: '천안캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  dankook: { lifeArea: '죽전/천안', placeChips: ['죽전캠', '혜당관', '천안캠'], campusPattern: '죽전캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  dcu: { lifeArea: '경산 효성캠', placeChips: ['효성캠퍼스', '중앙도서관', '경산'], campusPattern: '효성캠퍼스 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  ulsan: { lifeArea: '울산 무거동', placeChips: ['중앙정원', '아산스포츠센터', '무거동'], campusPattern: '중앙정원 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  ks: { lifeArea: '부산 대연동', placeChips: ['문화골목', '예술관', '대연동'], campusPattern: '문화골목 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  kongju: { lifeArea: '공주/신관', placeChips: ['중앙도서관', '곰나루', '공주'], campusPattern: '중앙도서관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  inu: { lifeArea: '송도', placeChips: ['송도캠', '미추홀공원', '인천대입구'], campusPattern: '송도캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  kyungnam: { lifeArea: '마산 월영동', placeChips: ['월영지', '한마미래관', '마산'], campusPattern: '월영지 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  jj: { lifeArea: '전주', placeChips: ['스타센터', '천잠산 캠퍼스', '전주'], campusPattern: '스타센터 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내', mascotGuardrail: '전주대는 백마/제이제이 맥락의 흰 말 자체 캐릭터를 유지한다.' },
+  seoultech: { lifeArea: '공릉', placeChips: ['붕어방', '다산관', '공릉'], campusPattern: '붕어방 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  sch: { lifeArea: '아산', placeChips: ['향설동문', '피닉스광장', '아산'], campusPattern: '향설동문 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  jejunu: { lifeArea: '제주 아라동', placeChips: ['아라캠', '중앙도서관', '제주 오름'], campusPattern: '아라캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  ajou: { lifeArea: '수원/광교', placeChips: ['원천관', '중앙도서관', '광교'], campusPattern: '원천관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  dongseo: { lifeArea: '부산 주례/센텀', placeChips: ['민석도서관', '센텀캠퍼스', '부산'], campusPattern: '민석도서관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  sunmoon: { lifeArea: '아산', placeChips: ['아산캠', '원화관', '천안/아산'], campusPattern: '아산캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  nsu: { lifeArea: '천안', placeChips: ['성암문화체육관', '캠퍼스 광장', '천안'], campusPattern: '성암문화체육관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  wsu: { lifeArea: '대전 동구', placeChips: ['솔브릿지', '철도물류관', '대전역권'], campusPattern: '솔브릿지 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  uos: { lifeArea: '전농동/청량리', placeChips: ['전농관', '중앙로', '청량리'], campusPattern: '전농관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  dju: { lifeArea: '대전 용운동', placeChips: ['혜화문화관', '맥센터', '용운동'], campusPattern: '혜화문화관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  suwon: { lifeArea: '수원/화성', placeChips: ['미래혁신관', '벨칸토아트센터', '수원'], campusPattern: '미래혁신관 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  soongsil: { lifeArea: '상도/숭실대입구', placeChips: ['백마상', '조만식기념관', '숭실대입구'], campusPattern: '백마상 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내', mascotGuardrail: '숭실대는 백마형 자체 캐릭터를 유지한다.' },
+  yeungnam: { lifeArea: '경산/영남대역', placeChips: ['천마아트센터', '중앙도서관', '러브로드'], campusPattern: '천마아트센터 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내' },
+  doowon: { lifeArea: '파주/안성', placeChips: ['파주캠', '안성캠', '기술 실습 공간'], campusPattern: '파주캠 silhouette + campus line pattern', notificationTone: '장소 chip 중심의 짧고 다정한 안내', mascotGuardrail: '두원공과대는 초록 갈기 천마형 자체 캐릭터를 유지한다.' },
+}
+
 const UNIVERSITY_COLOR_TOKENS = buildUniversityColorTokens()
 const UNIVERSITY_THEMES = UNIVERSITY_COLOR_TOKENS.map(buildThemeFromToken)
 const THEMES_BY_ID = new Map(UNIVERSITY_THEMES.map((theme) => [theme.id, theme]))
@@ -384,6 +471,43 @@ export function getUniversityThemeById(id: string | null | undefined): Universit
 
 export function getDefaultUniversityTheme(): UniversityTheme {
   return THEMES_BY_ID.get(DEFAULT_UNIVERSITY_THEME_ID) ?? UNIVERSITY_THEMES[0]
+}
+
+export function getUniversityLocalDesignProfiles(): UniversityLocalDesignProfile[] {
+  return UNIVERSITY_THEMES.map((theme) => getUniversityLocalDesignProfile(theme))
+}
+
+export function getUniversityLocalDesignProfile(
+  themeOrId: UniversityTheme | string | null | undefined,
+): UniversityLocalDesignProfile {
+  const theme = typeof themeOrId === 'string' || themeOrId == null
+    ? getUniversityThemeById(themeOrId)
+    : themeOrId
+  const seed = LOCAL_DESIGN_SEEDS[theme.id] ?? buildFallbackLocalDesignSeed(theme)
+  const [primaryPlace, secondaryPlace, tertiaryPlace] = seed.placeChips
+  const matchChips = [primaryPlace, secondaryPlace]
+  const notificationTone = buildLocalNotificationTone(seed, primaryPlace)
+
+  return {
+    id: theme.id,
+    shortName: theme.shortName,
+    lifeArea: seed.lifeArea,
+    primaryPlace,
+    placeChips: [...seed.placeChips],
+    matchChips,
+    campusPattern: seed.campusPattern,
+    notificationTone,
+    profileCopy: `${theme.shortName} 선택 후에는 ${primaryPlace} 기준 생활권, 학과, 매칭 범위가 함께 맞춰져요.`,
+    matchCopy: `${matchChips.join(' · ')} 생활권을 참고하되, 실제 약속 장소는 확정 전까지 단정하지 않아요.`,
+    groupCopy: `${primaryPlace} 기준으로 친구 초대와 팀 준비를 맞춰볼게요. 장소감은 살리고 입력 동선은 그대로 유지해요.`,
+    refundCopy: `${theme.shortName} 기준 정산 화면이에요. 만남 후 보증금은 안전하게 환불되고, 앱 기여금은 자율 선택이에요.`,
+    dailyCardQuestions: [
+      `공강에는 ${primaryPlace} 근처와 ${seed.lifeArea} 쪽 중 어디가 더 편해요?`,
+      `시험기간에는 ${secondaryPlace} 근처 조용한 자리와 학교 앞 카페 중 어디가 좋아요?`,
+      `첫 만남은 ${tertiaryPlace} 쪽 가벼운 약속과 캠퍼스 안 약속 중 어느 쪽이 좋아요?`,
+    ],
+    mascotGuardrail: seed.mascotGuardrail ?? `${theme.shortName} 공식 로고나 원본 캐릭터를 복제하지 않고 앱 전용 자체 캐릭터로만 사용한다.`,
+  }
 }
 
 export function findUniversityThemeBySchool(school: string | null | undefined): UniversityTheme {
@@ -587,6 +711,35 @@ function buildThemeFromToken(token: UniversityThemeToken): UniversityTheme {
 function buildMoodKeywords(token: UniversityThemeToken): string[] {
   const statusKeyword = token.status === 'locked' ? 'official-leaning' : token.status === 'draft' ? 'draft-safe' : 'needs-check'
   return [statusKeyword, 'campus-native', 'cta-safe']
+}
+
+function buildFallbackLocalDesignSeed(theme: UniversityTheme): UniversityLocalDesignSeed {
+  const chips = normalizePlaceChips(theme.designTheme.landmarkCue, theme.shortName)
+
+  return {
+    lifeArea: `${theme.shortName} 생활권`,
+    placeChips: chips,
+    campusPattern: `${chips[0]} silhouette + campus line pattern`,
+    notificationTone: '장소 chip 중심의 짧고 다정한 안내',
+  }
+}
+
+function buildLocalNotificationTone(seed: UniversityLocalDesignSeed, primaryPlace: string): string {
+  if (seed.notificationTone.includes('장소 chip 중심')) {
+    return `${primaryPlace} 기준으로 필요한 순간만 짧고 다정하게 알려드릴게요.`
+  }
+
+  return `${seed.notificationTone}. ${primaryPlace} 기준으로 필요한 순간만 알려드릴게요.`
+}
+
+function normalizePlaceChips(landmarkCue: string, shortName: string): [string, string, string] {
+  const parsed = landmarkCue
+    .split(/[\/,]/)
+    .map((value) => value.trim())
+    .filter(Boolean)
+  const unique = uniqueStrings([...parsed, `${shortName} 캠퍼스`, `${shortName} 생활권`, '학교 앞'])
+
+  return [unique[0], unique[1], unique[2]]
 }
 
 function buildMascotAssets(id: string): Record<UniversityThemeAssetKind, string> {

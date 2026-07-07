@@ -32,7 +32,7 @@ export default function UniversityMascot({
       <img
         src={getPublicMascotAssetPath(theme, kind)}
         alt=""
-        className="h-full max-h-full w-full max-w-full scale-[1.12] object-contain drop-shadow-[0_14px_22px_rgba(var(--boot-primary-rgb),0.18)]"
+        className="h-full max-h-full w-full max-w-full object-contain p-1 drop-shadow-[0_14px_22px_rgba(var(--boot-primary-rgb),0.18)]"
         loading="lazy"
       />
     </div>

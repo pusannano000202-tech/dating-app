@@ -8,12 +8,13 @@ import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { DEV_BASIC_PROFILE_STORAGE_KEY } from '@/lib/profile/dev-basic-profile'
 import { createClient } from '@/lib/supabase'
-import { setStoredUniversityThemeFromSchool } from '@/lib/university-theme'
+import { getUniversityLocalDesignProfile, setStoredUniversityThemeFromSchool } from '@/lib/university-theme'
 import { isSupabaseConfigured } from '@/lib/utils'
 
 export default function BasicInfoPage() {
   const router = useRouter()
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const [initialData, setInitialData] = useState<Partial<BasicInfoData> | undefined>(undefined)
   const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -153,7 +154,8 @@ export default function BasicInfoPage() {
         kind="guide"
         eyebrow={`${theme.shortName} Onboarding`}
         title={`${theme.shortName} 기준으로 과팅 준비를 시작할게요`}
-        body="학교와 학과를 고르면 색감, 안내 문구, 마스코트가 해당 학교 분위기에 맞춰 자연스럽게 바뀝니다."
+        body={localDesign.profileCopy}
+        placeChips={localDesign.placeChips}
       />
 
       {loaded && (

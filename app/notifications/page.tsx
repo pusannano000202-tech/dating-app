@@ -19,6 +19,7 @@ import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import MascotCoachCard from '@/components/theme/MascotCoachCard'
 import UniversityMascot from '@/components/theme/UniversityMascot'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+import { getUniversityLocalDesignProfile } from '@/lib/university-theme'
 
 interface NotificationRow {
   id: string
@@ -101,6 +102,7 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
 
 export default function NotificationsPage() {
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const isDevPreview = isDevPreviewClientSession()
   const [items, setItems] = useState<NotificationRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -187,7 +189,7 @@ export default function NotificationsPage() {
           </Link>
           <div className="flex-1">
             <h1 className="text-2xl font-black">알림</h1>
-            <p className="text-xs text-gray-500 mt-0.5">{theme.copy.notificationTone}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{localDesign.notificationTone}</p>
           </div>
           <UniversityMascot kind="avatar" size="sm" className="h-11 w-11 rounded-2xl" />
           {items.some((n) => !n.read_at) && (
@@ -215,7 +217,8 @@ export default function NotificationsPage() {
             kind="waiting"
             eyebrow={`${theme.shortName} Matching Update`}
             title="아직 매칭이 안 잡혔어요"
-            body="조건이 맞는 팀을 계속 찾는 중이에요. 가매칭이 오기 전까지는 상대 정보와 케미 점수를 열지 않고, 도착하면 바로 알림으로 알려드릴게요."
+            body={`${localDesign.matchChips.join(' · ')} 생활권을 참고해 조건이 맞는 팀을 계속 찾는 중이에요. 가매칭 전까지 상대 정보와 케미 점수는 열지 않아요.`}
+            placeChips={localDesign.matchChips}
           />
         )}
 

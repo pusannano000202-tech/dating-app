@@ -11,6 +11,8 @@ import {
   findUniversityThemeBySchool,
   getUniversityBackdropAssetPath,
   getPublicMascotAssetPath,
+  getUniversityLocalDesignProfile,
+  getUniversityLocalDesignProfiles,
   getUniversityThemeSchoolOptions,
   getUniversityThemeById,
   getUniversityThemeOptions,
@@ -78,7 +80,7 @@ test('basic profile school picker exposes every registered university and update
   assert.match(basicInfoForm, /localeCompare\(b\.label, 'ko-KR'\)/)
   assert.match(basicInfoForm, /handleSchoolChange/)
   assert.match(basicInfoForm, /setStoredUniversityThemeFromSchool\(nextSchool\)/)
-  assert.match(basicInfoForm, /setStoredUniversityThemeFromSchool\(school\)/)
+  assert.doesNotMatch(basicInfoForm, /setStoredUniversityThemeFromSchool\(school\)/)
   assert.match(basicInfoForm, /htmlFor="basic-school-input"/)
   assert.match(basicInfoForm, /id="basic-school-input"/)
   assert.match(basicInfoForm, /list="university-school-options"/)
@@ -204,6 +206,45 @@ test('every registered university theme has all runtime mascot image assets', ()
   }
 })
 
+test('local design profiles cover every registered school with campus-safe copy', () => {
+  const themes = getUniversityThemeOptions()
+  const profiles = getUniversityLocalDesignProfiles()
+
+  assert.equal(profiles.length, themes.length)
+  assert.equal(new Set(profiles.map((profile) => profile.id)).size, themes.length)
+
+  for (const theme of themes) {
+    const profile = getUniversityLocalDesignProfile(theme)
+
+    assert.equal(profile.id, theme.id)
+    assert.ok(profile.primaryPlace.length > 0, `${theme.id} needs a primary place chip`)
+    assert.ok(profile.placeChips.length >= 3, `${theme.id} needs three place chips`)
+    assert.ok(profile.matchChips.length <= 2, `${theme.id} match card should show at most two chips`)
+    assert.equal(profile.dailyCardQuestions.length, 3)
+    assert.ok(profile.dailyCardQuestions.every((question) => question.includes('?')))
+    assert.ok(profile.notificationTone.length > 0)
+    assert.ok(profile.campusPattern.length > 0)
+    assert.ok(profile.profileCopy.includes(profile.primaryPlace))
+    assert.ok(profile.matchCopy.includes(profile.matchChips[0]))
+    assert.ok(profile.groupCopy.includes(profile.primaryPlace))
+    assert.ok(profile.refundCopy.includes(theme.shortName))
+  }
+
+  const pnu = getUniversityLocalDesignProfile(getUniversityThemeById('pnu'))
+  const doowon = getUniversityLocalDesignProfile(getUniversityThemeById('doowon'))
+  const soongsil = getUniversityLocalDesignProfile(getUniversityThemeById('soongsil'))
+  const jj = getUniversityLocalDesignProfile(getUniversityThemeById('jj'))
+  const kyonggi = getUniversityLocalDesignProfile(getUniversityThemeById('kyonggi'))
+
+  assert.deepEqual(pnu.placeChips, ['넉터', '새벽벌', '부산대역'])
+  assert.deepEqual(doowon.placeChips, ['파주캠', '안성캠', '기술 실습 공간'])
+  assert.ok(doowon.mascotGuardrail.includes('초록 갈기'))
+  assert.doesNotMatch(doowon.mascotGuardrail, /파란 갈기|파란 머리/)
+  assert.ok(soongsil.mascotGuardrail.includes('백마'))
+  assert.ok(jj.mascotGuardrail.includes('백마'))
+  assert.ok(kyonggi.mascotGuardrail.includes('거북'))
+})
+
 test('mascot component keeps school assets secondary to existing app actions', () => {
   const mascot = readSource('components/theme/UniversityMascot.tsx')
 
@@ -213,7 +254,9 @@ test('mascot component keeps school assets secondary to existing app actions', (
   assert.match(mascot, /overflow-hidden/)
   assert.doesNotMatch(mascot, /overflow-visible/)
   assert.doesNotMatch(mascot, /scale-\[1\.8\]/)
+  assert.doesNotMatch(mascot, /scale-\[1\.12\]/)
   assert.doesNotMatch(mascot, /scale-100/)
+  assert.match(mascot, /p-1/)
   assert.match(mascot, /xl: 'h-40 w-40'/)
   assert.match(mascot, /max-h-full/)
   assert.match(mascot, /max-w-full/)
@@ -288,13 +331,23 @@ test('mascot coach cards are placed on post-school main app surfaces', () => {
   const home = readSource('app/page.tsx')
   const homeCoach = readSource('components/theme/HomeUniversityCoachCard.tsx')
   const coachCard = readSource('components/theme/MascotCoachCard.tsx')
+  const backdrop = readSource('components/theme/UniversityBackdrop.tsx')
   const community = readSource('app/community/page.tsx')
 
+  assert.match(homeCoach, /getUniversityLocalDesignProfile/)
+  assert.match(homeCoach, /primaryPlace/)
+  assert.match(backdrop, /getUniversityLocalDesignProfile/)
+  assert.match(coachCard, /getUniversityLocalDesignProfile/)
+  assert.match(coachCard, /placeChips/)
   assert.match(coachCard, /overflow-hidden/)
-  assert.match(coachCard, /grid grid-cols-\[minmax\(0,1fr\)_9rem\]/)
+  assert.match(coachCard, /mascotSize = 'xl'/)
+  assert.match(coachCard, /grid-cols-\[minmax\(0,1fr\)_9rem\]/)
+  assert.match(coachCard, /grid-cols-\[minmax\(0,1fr\)_7\.5rem\]/)
   assert.match(coachCard, /min-h-\[156px\]/)
+  assert.match(coachCard, /min-h-\[104px\]/)
   assert.match(coachCard, /h-36 w-36 rounded-\[28px\]/)
-  assert.match(coachCard, /size="xl"/)
+  assert.match(coachCard, /!h-24 !w-24 rounded-\[24px\]/)
+  assert.match(coachCard, /size=\{mascotSize\}/)
   assert.doesNotMatch(coachCard, /absolute right-1/)
   assert.match(home, /HomeUniversityCoachCard/)
   assert.match(homeCoach, /UniversityMascot/)
@@ -306,12 +359,17 @@ test('mascot coach cards are placed on post-school main app surfaces', () => {
   assert.doesNotMatch(home, /부산대 팀 준비/)
   assert.match(matchHub, /MascotCoachCard/)
   assert.match(matchHub, /kind="waiting"/)
+  assert.match(matchHub, /getUniversityLocalDesignProfile/)
+  assert.match(matchHub, /matchChips/)
+  assert.match(matchHub, /mascotSize="lg"/)
   assert.doesNotMatch(matchHub, /1:1 Waiting Coach/)
   assert.doesNotMatch(matchHub, /Group Waiting Coach/)
   assert.doesNotMatch(matchHub, /1:1 Matching Update/)
   assert.doesNotMatch(matchHub, /Group Matching Update/)
   assert.match(groupCreate, /MascotCoachCard/)
-  assert.match(groupCreate, /kind="waiting"/)
+  assert.match(groupCreate, /kind="support"/)
+  assert.match(groupCreate, /getUniversityLocalDesignProfile/)
+  assert.match(groupCreate, /groupCopy/)
   assert.doesNotMatch(groupCreate, /PNU Group Coach/)
   assert.doesNotMatch(groupCreate, /부산대 팀 준비/)
   assert.match(community, /UniversityMascot/)
@@ -319,12 +377,16 @@ test('mascot coach cards are placed on post-school main app surfaces', () => {
   assert.doesNotMatch(community, /MascotCoachCard/)
   assert.match(depositPanel, /kind="support"/)
   assert.match(refundPage, /kind="refund"/)
+  assert.match(refundPage, /getUniversityLocalDesignProfile/)
+  assert.match(refundPage, /refundCopy/)
   assert.doesNotMatch(refundPage, /SanjiCharacter/)
   assert.match(matchDetail, /kind="waiting"/)
   assert.match(matchDetail, /getDevPreviewVenue\(theme\)/)
   assert.doesNotMatch(matchDetail, /PNU Station Cafe/)
   assert.match(notifications, /kind="avatar"/)
+  assert.match(notifications, /notificationTone/)
   assert.match(profileMatchCard, /kind="guide"/)
+  assert.match(profileMatchCard, /dailyCardQuestions/)
 })
 
 test('delayed matching guidance uses waiting mascot without backend notification changes', () => {

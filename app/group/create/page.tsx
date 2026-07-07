@@ -37,6 +37,7 @@ import { InviteFriendPanel } from '@/components/matching/group-create/InviteFrie
 import { getGroupCompositionSummary, getQueueStatusText } from '@/components/matching/group-create/status'
 import MascotCoachCard from '@/components/theme/MascotCoachCard'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+import { getUniversityLocalDesignProfile } from '@/lib/university-theme'
 import type {
   FriendSummary,
   GroupInviteRecord,
@@ -48,6 +49,7 @@ import type {
 export default function GroupCreatePage() {
   const searchParams = useSearchParams()
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const isDevPreview = isDevPreviewClientSession()
   const requestedSize = normalizeGroupSize(searchParams.get('size'))
   const [state, setState] = useState<GroupState>(EMPTY_STATE)
@@ -665,6 +667,15 @@ export default function GroupCreatePage() {
 
             {inQueue ? (
               <>
+                <MascotCoachCard
+                  className="mb-5"
+                  kind="support"
+                  mascotSize="lg"
+                  eyebrow={`${theme.shortName} Group Coach`}
+                  title={`${theme.shortName} 팀이 큐에서 기다리는 중`}
+                  body={`${localDesign.groupCopy} 지금은 팀 구조를 크게 바꾸기보다 매칭 알림을 기다리는 단계예요.`}
+                  placeChips={localDesign.placeChips}
+                />
                 <QueueRadarCard
                   stats={queueVisualState}
                   saving={saving}
@@ -689,14 +700,15 @@ export default function GroupCreatePage() {
               <>
                 <MascotCoachCard
                   className="mb-5"
-                  kind="waiting"
+                  kind="support"
                   eyebrow={`${theme.shortName} Group Coach`}
                   title={`${capacity}:${capacity} ${theme.shortName} 팀 준비 중`}
                   body={
                     groupIsFull
-                      ? '정원이 찼어요. 이제 각자 성향, 시간, 사전 카드만 맞추면 큐에 들어갈 수 있어요.'
-                      : `친구 ${openSlots}명만 더 오면 같은 규모 팀끼리 매칭을 시작할 수 있어요.`
+                      ? `${localDesign.primaryPlace} 기준 팀 정원이 찼어요. 이제 각자 성향, 시간, 사전 카드만 맞추면 큐에 들어갈 수 있어요.`
+                      : `${localDesign.groupCopy} 친구 ${openSlots}명만 더 오면 같은 규모 팀끼리 매칭을 시작할 수 있어요.`
                   }
+                  placeChips={localDesign.placeChips}
                 />
                 <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
                   <div className="mb-3 flex items-start justify-between gap-3">

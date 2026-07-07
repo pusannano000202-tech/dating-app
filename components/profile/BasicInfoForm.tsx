@@ -98,11 +98,6 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving, serverEr
     setDeptSuggestions(searchUniversityDepartments(nextSchool, department))
   }
 
-  useEffect(() => {
-    if (!school.trim()) return
-    setStoredUniversityThemeFromSchool(school)
-  }, [school])
-
   const checkNicknameAvailability = useCallback(async function checkNicknameAvailability(value = displayName.trim()): Promise<boolean> {
     const trimmedName = value.trim()
     if (trimmedName.length < 2 || trimmedName.length > 20) {

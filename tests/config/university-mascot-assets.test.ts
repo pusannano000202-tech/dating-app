@@ -11,7 +11,7 @@ import {
 
 const ROOT = process.cwd()
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
-const DISPLAY_SCALE = 1.12
+const DISPLAY_SCALE = 1
 const MASCOT_KINDS: UniversityThemeAssetKind[] = [
   'welcome',
   'guide',
@@ -35,7 +35,9 @@ type PngAlphaBounds = {
 test('Top60 runtime mascot PNG assets stay visible inside the app mascot slot', () => {
   const source = readFileSync(join(ROOT, 'components/theme/UniversityMascot.tsx'), 'utf8')
 
-  assert.match(source, /scale-\[1\.12\]/)
+  assert.match(source, /object-contain/)
+  assert.match(source, /p-1/)
+  assert.doesNotMatch(source, /scale-\[1\.12\]/)
 
   for (const theme of getUniversityThemeOptions()) {
     for (const kind of MASCOT_KINDS) {

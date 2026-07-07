@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase'
 import { isSupabaseConfigured } from '@/lib/utils'
 import UniversityMascot from '@/components/theme/UniversityMascot'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+import { getUniversityLocalDesignProfile } from '@/lib/university-theme'
 
 type Stage = 'select' | 'ask_support' | 'notify_zero' | 'done'
 type UserGender = 'male' | 'female' | null
@@ -22,6 +23,7 @@ export default function RefundPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const matchId = params.id
   const total = DEPOSIT_AMOUNT
   const totalLabel = `${total.toLocaleString()}원`
@@ -129,6 +131,13 @@ export default function RefundPage() {
               <div className="min-w-0">
                 <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
                 <p className="gradient-fate-text text-3xl font-black tabular-nums">{total.toLocaleString()} 원</p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {localDesign.matchChips.map((chip) => (
+                    <span key={chip} className="rounded-full bg-boot-primary/10 px-3 py-1 text-[11px] font-black text-boot-primary">
+                      {chip}
+                    </span>
+                  ))}
+                </div>
               </div>
               <UniversityMascot kind="refund" size="md" className="h-20 w-20 rounded-[28px]" />
             </div>
@@ -172,7 +181,7 @@ export default function RefundPage() {
                 <span data-testid="refund-amount-preview" className="font-black text-boot-ink tabular-nums">{refundAmount.toLocaleString()}원</span>
               </div>
               <p className="mt-2 text-[11px] text-boot-muted leading-relaxed">
-                보증금은 기본 전액 환불이고, 앱 기여금은 자율 선택이에요. 0원을 선택해도 막지 않으며, 전액 환불 전에는 3,000원, 2,000원, 1,000원 순서로 한 번 더 물어봐요.
+                {localDesign.refundCopy} 0원을 선택해도 막지 않으며, 전액 환불 전에는 3,000원, 2,000원, 1,000원 순서로 한 번 더 물어봐요.
               </p>
             </div>
 
@@ -189,8 +198,9 @@ export default function RefundPage() {
 
         {stage === 'ask_support' && (
           <SchoolMascotCard
-            speech={theme.copy.refundAsk}
+            speech={localDesign.refundCopy}
             sub={`보증금 ${totalLabel} 중 ${currentBegAmount.toLocaleString()}원만 앱 운영비로 남기고 나머지는 환불돼요.`}
+            placeChips={localDesign.matchChips}
             acceptLabel={`${currentBegAmount.toLocaleString()}원 남기기`}
             rejectLabel={nextBegAmount ? `${nextBegAmount.toLocaleString()}원도 부담돼요` : '그래도 전액 환불'}
             onAccept={() => submit(currentBegAmount)}
@@ -246,6 +256,7 @@ export default function RefundPage() {
 function SchoolMascotCard({
   speech,
   sub,
+  placeChips,
   acceptLabel,
   rejectLabel,
   onAccept,
@@ -254,6 +265,7 @@ function SchoolMascotCard({
 }: {
   speech: string
   sub: string
+  placeChips: string[]
   acceptLabel: string
   rejectLabel: string
   onAccept: () => void
@@ -264,8 +276,15 @@ function SchoolMascotCard({
     <div className="flex flex-col items-center">
       <div className="relative mx-auto w-full max-w-[300px] z-10">
         <div className="glass-card rounded-3xl px-5 py-4 text-center shadow-lg">
-          <p className="text-base font-black text-violet-100 leading-snug">{speech}</p>
-          <p className="mt-2 text-xs text-gray-400 leading-relaxed">{sub}</p>
+          <p className="text-base font-black text-boot-ink leading-snug">{speech}</p>
+          <p className="mt-2 text-xs text-boot-muted leading-relaxed">{sub}</p>
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {placeChips.map((chip) => (
+              <span key={chip} className="rounded-full bg-boot-primary/10 px-3 py-1 text-[11px] font-black text-boot-primary">
+                {chip}
+              </span>
+            ))}
+          </div>
         </div>
         <div className="flex justify-center mt-[-1px]">
           <svg width="28" height="14" viewBox="0 0 28 14" fill="none" xmlns="http://www.w3.org/2000/svg">

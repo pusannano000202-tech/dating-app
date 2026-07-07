@@ -23,6 +23,7 @@ import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 import MascotCoachCard from '@/components/theme/MascotCoachCard'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+import { getUniversityLocalDesignProfile } from '@/lib/university-theme'
 
 type MatchMode = 'group' | 'solo'
 type MatchScope = 'same_school' | 'cross_school'
@@ -132,6 +133,7 @@ const DEV_GROUP_SUMMARY: GroupSummary = {
 
 export default function MatchesPage() {
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const [matches, setMatches] = useState<MatchRow[]>([])
   const [poolStats, setPoolStats] = useState<PoolStats>(EMPTY_POOL)
   const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
@@ -456,7 +458,7 @@ export default function MatchesPage() {
               : undefined}
         />
 
-        {(canCancelActiveQueue || canCancelCurrentMatch) && (
+        {canCancelCurrentMatch && (
           <QueueControlStrip
             mode={effectiveMatchMode}
             label={canCancelCurrentMatch ? (isSoloMode ? '1:1 가매칭 취소하기' : '가매칭 취소하기') : undefined}
@@ -506,19 +508,37 @@ export default function MatchesPage() {
             />
           </>
         ) : isGroupQueueActive ? (
-          <ActiveGroupQueuePanel
-            capacity={activeGroupSize}
-            membersCount={groupSummary.members.length}
-            stats={poolStats}
-            canceling={cancelingQueue}
-            onCancel={handleCancelGroupQueue}
-          />
+          <>
+            <ActiveGroupQueuePanel
+              capacity={activeGroupSize}
+              membersCount={groupSummary.members.length}
+              stats={poolStats}
+              canceling={cancelingQueue}
+              onCancel={handleCancelGroupQueue}
+            />
+            {canCancelActiveQueue && (
+              <QueueControlStrip
+                mode={effectiveMatchMode}
+                canceling={cancelingQueue}
+                onCancel={isSoloMode ? handleCancelSoloQueue : handleCancelGroupQueue}
+              />
+            )}
+          </>
         ) : hasStartedMatching && !hasMatchResults ? (
-          <MatchSearchingPrivacyCard
-            mode={effectiveMatchMode}
-            canceling={cancelingQueue}
-            onCancel={isSoloMode ? handleCancelSoloQueue : handleCancelGroupQueue}
-          />
+          <>
+            <MatchSearchingPrivacyCard
+              mode={effectiveMatchMode}
+              canceling={cancelingQueue}
+              onCancel={isSoloMode ? handleCancelSoloQueue : handleCancelGroupQueue}
+            />
+            {canCancelActiveQueue && (
+              <QueueControlStrip
+                mode={effectiveMatchMode}
+                canceling={cancelingQueue}
+                onCancel={isSoloMode ? handleCancelSoloQueue : handleCancelGroupQueue}
+              />
+            )}
+          </>
         ) : null}
 
         {!loading && !hasAnyStartedMatching && (
@@ -603,9 +623,10 @@ export default function MatchesPage() {
             title="아직 매칭이 안 잡혔어요"
             body={
               isSoloMode
-                ? '매칭 큐에서 1:1 상대를 찾는 중이에요. 이미 소개팅 찾기를 시작했어요. 가매칭이 오기 전까지는 상대 정보와 케미 점수를 열지 않아요.'
-                : '이미 매칭 찾기를 시작했어요. 조건이 맞는 팀을 계속 찾는 중이에요. 가매칭이 오면 사전 카드와 보증금 단계로 바로 안내할게요.'
+                ? `매칭 큐에서 1:1 상대를 찾는 중이에요. 이미 소개팅 찾기를 시작했어요. ${localDesign.matchChips.join(' · ')} 기준은 생활권 참고이고, 가매칭 전까지 상대 정보와 케미 점수는 열지 않아요.`
+                : `이미 매칭 찾기를 시작했어요. ${localDesign.matchChips.join(' · ')} 생활권을 참고해 조건이 맞는 팀을 계속 찾는 중이에요.`
             }
+            placeChips={localDesign.matchChips}
           />
         ) : null}
       </div>
@@ -854,6 +875,7 @@ function MatchScopeSelector({
   setScope: (scope: MatchScope) => void
 }) {
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const options: Array<{
     value: MatchScope
     title: string
@@ -863,7 +885,7 @@ function MatchScopeSelector({
     {
       value: 'same_school',
       title: '우리 학교끼리',
-      desc: `${theme.shortName} 안에서 먼저 조건이 맞는 팀을 찾아요.`,
+      desc: `${localDesign.matchChips.join(' · ')} 생활권 안에서 먼저 조건이 맞는 팀을 찾아요.`,
       badge: theme.id.toUpperCase(),
     },
     {
@@ -881,7 +903,8 @@ function MatchScopeSelector({
         kind="waiting"
         eyebrow={`${theme.shortName} Campus Range`}
         title={`${theme.shortName} 기준으로 먼저 볼까요?`}
-        body="기본은 우리 학교끼리 찾고, 서로 허용한 경우에만 가까운 학교까지 확장해요."
+        body={localDesign.matchCopy}
+        placeChips={localDesign.matchChips}
       />
       <section className="mb-4 rounded-[26px] border border-boot-primary/15 bg-white px-4 py-4">
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -1044,6 +1067,7 @@ function MatchSearchingPrivacyCard({
 }) {
   const isSolo = mode === 'solo'
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const targetLabel = isSolo ? '상대' : '상대팀'
 
   return (
@@ -1051,13 +1075,15 @@ function MatchSearchingPrivacyCard({
     <MascotCoachCard
       className="mb-4"
       kind="waiting"
+      mascotSize="lg"
       eyebrow={`${theme.shortName} ${isSolo ? '1:1' : 'Group'} Waiting Coach`}
       title="아직 매칭이 안 잡혔어요"
       body={
         isSolo
-          ? '매칭 큐에서 1:1 상대를 찾는 중이에요. 조건이 맞는 한 명이 잡히면 바로 알림으로 알려드릴게요.'
-          : '매칭 큐에서 상대팀을 찾는 중이에요. 조건이 맞는 팀이 잡히면 바로 알림으로 알려드릴게요.'
+          ? `매칭 큐에서 1:1 상대를 찾는 중이에요. ${localDesign.matchChips.join(' · ')} 기준은 생활권 참고일 뿐, 실제 장소는 확정 전까지 열지 않아요.`
+          : `매칭 큐에서 상대팀을 찾는 중이에요. ${localDesign.matchChips.join(' · ')} 기준은 생활권 참고일 뿐, 실제 장소는 확정 전까지 열지 않아요.`
       }
+      placeChips={localDesign.matchChips}
     />
     <section className="mb-5 rounded-[30px] border border-boot-primary/15 bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
       <div className="flex items-start gap-4">

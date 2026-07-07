@@ -9,6 +9,8 @@ import { Card } from '@/components/ui/Card'
 import { Chip } from '@/components/ui/Chip'
 import { PageShell } from '@/components/ui/PageShell'
 import UniversityMascot from '@/components/theme/UniversityMascot'
+import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+import { getUniversityLocalDesignProfile } from '@/lib/university-theme'
 import {
   buildDailyCardSubmissionText,
   countCompletedDailyCardItems,
@@ -29,6 +31,8 @@ const MINIMUM_DAILY_CARD_ITEMS_TO_SAVE = 4
 const TOTAL_DAILY_CARD_ITEMS = 6
 
 export default function ProfileMatchCardPage() {
+  const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const [draft, setDraft] = useState<DailyCardDraft>(() => createEmptyDailyCardDraft())
   const [submittedAt, setSubmittedAt] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -180,6 +184,16 @@ export default function ProfileMatchCardPage() {
             <p className="mt-1 text-xs leading-5 text-boot-muted">
               음식점, 노래, 논쟁 카드처럼 상대가 눌러보고 대화하기 쉬운 재료를 먼저 만들어둡니다.
             </p>
+            <div className="mt-3 grid gap-1.5">
+              {localDesign.dailyCardQuestions.map((question) => (
+                <p
+                  key={question}
+                  className="rounded-2xl border border-boot-primary/10 bg-white/70 px-3 py-2 text-[11px] font-bold leading-5 text-boot-muted"
+                >
+                  {question}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       </Card>

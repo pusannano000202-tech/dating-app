@@ -2,6 +2,7 @@ import { CheckCircle2, CreditCard, Loader2, LockKeyhole, ShieldCheck } from 'luc
 import { useState, type ReactNode } from 'react'
 import UniversityMascot from '@/components/theme/UniversityMascot'
 import { useUniversityTheme } from '@/components/theme/UniversityThemeProvider'
+import { getUniversityLocalDesignProfile } from '@/lib/university-theme'
 
 type DepositPaymentPanelProps = {
   amount: number
@@ -23,6 +24,7 @@ export default function DepositPaymentPanel({
   onPay,
 }: DepositPaymentPanelProps) {
   const { theme } = useUniversityTheme()
+  const localDesign = getUniversityLocalDesignProfile(theme)
   const [mockReviewOpen, setMockReviewOpen] = useState(false)
   const provider = (process.env.NEXT_PUBLIC_PAYMENT_PROVIDER || 'mock').toLowerCase()
   const tossClientReady = Boolean(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
@@ -58,8 +60,15 @@ export default function DepositPaymentPanel({
             </p>
             <h3 className="mt-2 text-xl font-black text-boot-ink">보증금으로 매칭 확정하기</h3>
             <p className="mt-2 text-xs leading-relaxed text-boot-muted">
-              {theme.copy.matchWaiting}. 정상 만남이 끝나면 환불 단계로 넘어갑니다.
+              {localDesign.matchCopy} 정상 만남이 끝나면 환불 단계로 넘어갑니다.
             </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {localDesign.matchChips.map((chip) => (
+                <span key={chip} className="rounded-full bg-boot-primary/10 px-3 py-1 text-[11px] font-black text-boot-primary">
+                  {chip}
+                </span>
+              ))}
+            </div>
           </div>
           <UniversityMascot kind="support" size="md" className="h-14 w-14 rounded-2xl" />
         </div>
