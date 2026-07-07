@@ -29,8 +29,18 @@ https://dating-bv6bszvnm-pusannano000202-techs-projects.vercel.app/login
 | `product/operations/` | 운영자·환불·노쇼·마이그레이션 검증 리포트 |
 | `engineering/` | 인터페이스 계약·협업 규칙·코드 리뷰 |
 | `handoff/active/` · `handoff/archive/` | 인수인계 (유효 / 과거) |
+| `research/` | 공식 조사 데이터·학교/학과/통계 근거 |
+| `design-mockups/` | 디자인방 생성 산출물·캡처·후보 asset (기본 git ignore, 최종본만 선별 반영) |
 | `archive/` | 날짜 박힌 옛 스냅샷·구 마스터플랜 (보존용) |
 | `delete-candidates/` | 삭제 후보 격리 — 바로 지우지 않고 1회 검토 후 삭제 |
+
+## Quantum 작업방 운영
+
+학교별 취향통계 방, 국내대학/디자인 방, 팀장방을 나눠 운영할 때는 `engineering/QUANTUM_WORKSTREAM_AND_RELEASE_POLICY.md`를 따른다.
+
+- 조사방/디자인방은 설계와 산출물을 만들고, 팀장방은 실제 코드와 main 배포를 담당한다.
+- `docs/design-mockups/`, `tmp/`, `public/university-mascots/app-assets-v2*`는 기본 생성 산출물로 보고 git에 자동 포함하지 않는다.
+- 실제 앱 runtime asset과 최종 handoff 문서는 팀장방이 선별해서 커밋한다.
 
 ## 루트에 남겨둔 문서 (영역 모호 / 활성 마스터)
 

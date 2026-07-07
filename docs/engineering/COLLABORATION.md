@@ -31,6 +31,8 @@ main
 
 사용자가 혼자 작업 중이라고 명시했고, "main으로 올려", "main 직접 push", "Vercel 배포되게 올려"처럼 명확히 지시한 경우에는 `main` 직접 push를 허용한다.
 
+Quantum 조사방/디자인방/팀장방을 나눠 운영할 때는 `docs/engineering/QUANTUM_WORKSTREAM_AND_RELEASE_POLICY.md`를 함께 따른다.
+
 이때도 Codex는 다음 순서를 지킨다.
 
 1. `git status --short --branch`, `git log --oneline -5 --decorate`로 현재 상태를 먼저 확인한다.

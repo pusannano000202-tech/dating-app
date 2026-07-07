@@ -41,5 +41,11 @@ tsconfig.tsbuildinfo
 
 # 생성 산출물
 output/
+tmp/
+
+# Quantum 조사/디자인방 생성 산출물
+# 최종 runtime asset이나 handoff 문서는 선별해서 명시적으로 git add 한다.
+docs/design-mockups/
+public/university-mascots/app-assets-v2*/
 
 .vercel
