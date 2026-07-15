@@ -13,6 +13,8 @@
     "noEmit": false
   },
   "include": [
+    "app/api/debug-env/route.ts",
+    "lib/dev-auth.ts",
     "lib/utils.ts",
     "lib/payments/**/*.ts",
     "lib/refund/**/*.ts",
