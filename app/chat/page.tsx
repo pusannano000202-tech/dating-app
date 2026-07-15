@@ -26,10 +26,10 @@ export default function ChatHubPage() {
           </p>
 
           <Link
-            href="/match/dev-match-1/chat"
+            href="/match"
             className="mt-6 flex h-12 items-center justify-center gap-2 rounded-2xl bg-white px-4 text-sm font-black text-boot-ink"
           >
-            확정 매칭 채팅 미리보기
+            매칭 상세에서 채팅 열기
             <ChevronRight size={16} />
           </Link>
         </section>

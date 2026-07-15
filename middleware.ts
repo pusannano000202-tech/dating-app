@@ -1,16 +1,16 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from './lib/dev-auth'
+import {
+  DEV_AUTH_COOKIE,
+  getDevAuthCookieValue,
+  isDevAuthBypassEnabled,
+  shouldIssueDevAuthCookie,
+} from './lib/dev-auth'
 import { getSupabasePublicKey, getSupabaseUrl, isSupabaseConfigured } from './lib/utils'
 
 const PROTECTED_PREFIXES = ['/profile', '/group', '/match', '/friends', '/notifications', '/admin']
 const DEV_AUTH_MAX_AGE = 60 * 60 * 24 * 7
-
-function isLocalDevRequest(request: NextRequest): boolean {
-  const hostname = request.nextUrl.hostname
-  return process.env.NODE_ENV !== 'production' && (hostname === 'localhost' || hostname === '127.0.0.1')
-}
 
 function setDevAuthCookie(response: NextResponse): void {
   response.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue(), {
@@ -24,13 +24,11 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
   const canBypassAuth = isDevAuthBypassEnabled()
-  const shouldAutoIssueLocalDevAuth =
-    canBypassAuth &&
-    isProtected &&
-    isLocalDevRequest(request)
-  const shouldIssueDevAuth =
-    canBypassAuth &&
-    (pathname.startsWith('/dev/preview') || shouldAutoIssueLocalDevAuth)
+  const shouldIssueDevAuth = shouldIssueDevAuthCookie({ pathname })
+
+  if (pathname === '/dev/preview' && !shouldIssueDevAuth) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
   if (shouldIssueDevAuth) {
     request.cookies.set(DEV_AUTH_COOKIE, getDevAuthCookieValue())

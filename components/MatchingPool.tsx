@@ -303,7 +303,7 @@ function SoloIntroCard({
           </div>
         ) : disabled ? (
           <div className="relative mt-4 rounded-2xl border border-boot-primary/20 bg-boot-soft px-4 py-3 text-center text-xs font-bold leading-5 text-boot-primary">
-            과팅 진행 중에는 소개팅을 잠시 막아둘게요. 먼저 진행 중인 과팅을 마무리해 주세요.
+            소개팅 준비 중이에요. 지금은 친구와 함께하는 과팅 흐름부터 이용해 주세요.
           </div>
         ) : (
           <Link

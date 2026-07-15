@@ -44,14 +44,8 @@ function hasDevAuthCookie(): boolean {
     .some((cookie) => cookie.trim() === expected)
 }
 
-function isLocalBrowserPreview(): boolean {
-  const host = window.location.hostname
-  return host === 'localhost' || host === '127.0.0.1' || host === '::1'
-}
-
 export function isDevPreviewClientSession(): boolean {
   if (typeof window === 'undefined') return false
-  if (isLocalBrowserPreview()) return true
   if (!isDevAuthBypassEnabled()) return false
   return hasDevAuthLocalStorage() || hasDevAuthCookie()
 }

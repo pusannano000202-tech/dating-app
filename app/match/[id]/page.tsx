@@ -304,7 +304,7 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
-  const isDevPreview = isDevPreviewClientSession() || matchId.startsWith('dev-match') || matchId.startsWith('dev-solo-')
+  const isDevPreview = isDevPreviewClientSession()
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

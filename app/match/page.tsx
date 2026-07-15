@@ -133,6 +133,7 @@ export default function MatchesPage() {
   const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
   const [matchMode, setMatchMode] = useState<MatchMode>('group')
   const [soloQueueActive, setSoloQueueActive] = useState(false)
+  const [devPreviewActive, setDevPreviewActive] = useState(false)
   const [cancelingQueue, setCancelingQueue] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -142,6 +143,7 @@ export default function MatchesPage() {
     setError(null)
 
     const isDevPreview = isDevPreviewClientSession()
+    setDevPreviewActive(isDevPreview)
 
     if (isDevPreview) {
       const params = new URLSearchParams(window.location.search)
@@ -187,19 +189,8 @@ export default function MatchesPage() {
     try {
       const params = new URLSearchParams(window.location.search)
       const requestedMode: MatchMode = params.get('mode') === 'solo' ? 'solo' : 'group'
-      const explicitSoloPreview =
-        requestedMode === 'solo'
-        && (params.get('soloStatus') === 'in_pool' || params.get('sampleMatches') === '1')
       setMatchMode(requestedMode)
-      setSoloQueueActive(requestedMode === 'solo' && params.get('soloStatus') === 'in_pool')
-
-      if (explicitSoloPreview) {
-        setMatches(params.get('sampleMatches') === '1' ? DEV_SOLO_MATCHES : [])
-        setPoolStats(DEV_POOL)
-        setGroupSummary(EMPTY_GROUP_SUMMARY)
-        setLoading(false)
-        return
-      }
+      setSoloQueueActive(false)
 
       const [matchRes, poolRes, groupRes] = await Promise.all([
         fetch('/api/matches'),
@@ -544,11 +535,13 @@ export default function MatchesPage() {
               mode={matchMode}
               setMatchMode={setMatchMode}
               soloBlockedByGroupFlow={soloBlockedByGroupFlow}
+              devPreviewActive={devPreviewActive}
             />
             <MatchModeBody
               mode={matchMode}
               groupSummary={groupSummary}
               soloBlockedByGroupFlow={soloBlockedByGroupFlow}
+              devPreviewActive={devPreviewActive}
             />
           </section>
         )}
@@ -558,7 +551,7 @@ export default function MatchesPage() {
           <MatchingPool
             stats={poolStats}
             mode={matchMode}
-            soloDisabled={soloBlockedByGroupFlow}
+            soloDisabled={!devPreviewActive || soloBlockedByGroupFlow}
             soloQueueActive={soloFlowActive}
             soloCanceling={cancelingQueue}
             onCancelSoloQueue={handleCancelSoloQueue}
@@ -793,10 +786,12 @@ function MatchModeSelector({
   mode,
   setMatchMode,
   soloBlockedByGroupFlow,
+  devPreviewActive,
 }: {
   mode: MatchMode
   setMatchMode: (mode: MatchMode) => void
   soloBlockedByGroupFlow: boolean
+  devPreviewActive: boolean
 }) {
   return (
     <div className="mb-4 grid grid-cols-2 gap-2 rounded-[26px] bg-boot-soft p-1.5">
@@ -826,7 +821,7 @@ function MatchModeSelector({
       <button
         type="button"
         aria-pressed={mode === 'solo'}
-        disabled={soloBlockedByGroupFlow}
+        disabled={!devPreviewActive || soloBlockedByGroupFlow}
         onClick={() => setMatchMode('solo')}
         className={[
           'min-h-[96px] rounded-[22px] px-4 py-4 text-left transition disabled:cursor-not-allowed disabled:opacity-50',
@@ -854,15 +849,17 @@ function MatchModeBody({
   mode,
   groupSummary,
   soloBlockedByGroupFlow,
+  devPreviewActive,
 }: {
   mode: MatchMode
   groupSummary: GroupSummary
   soloBlockedByGroupFlow: boolean
+  devPreviewActive: boolean
 }) {
   return mode === 'group' ? (
     <GroupMatchStartPanel groupSummary={groupSummary} />
   ) : (
-    <SoloMatchStartPanel soloBlockedByGroupFlow={soloBlockedByGroupFlow} />
+    <SoloMatchStartPanel soloBlockedByGroupFlow={soloBlockedByGroupFlow} devPreviewActive={devPreviewActive} />
   )
 }
 
@@ -910,7 +907,25 @@ function GroupMatchStartPanel({ groupSummary }: { groupSummary: GroupSummary }) 
   )
 }
 
-function SoloMatchStartPanel({ soloBlockedByGroupFlow }: { soloBlockedByGroupFlow: boolean }) {
+function SoloMatchStartPanel({
+  soloBlockedByGroupFlow,
+  devPreviewActive,
+}: {
+  soloBlockedByGroupFlow: boolean
+  devPreviewActive: boolean
+}) {
+  if (!devPreviewActive) {
+    return (
+      <div className="rounded-[26px] border border-boot-primary/20 bg-boot-soft px-4 py-4">
+        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">Solo Match</p>
+        <h2 className="mt-1 text-xl font-black leading-tight text-boot-ink">소개팅은 준비 중이에요</h2>
+        <p className="mt-2 text-sm leading-6 text-boot-muted">
+          지금 production 화면에서는 1:1 큐를 실제로 열지 않아요. 먼저 과팅 흐름을 이용해 주세요.
+        </p>
+      </div>
+    )
+  }
+
   if (soloBlockedByGroupFlow) {
     return (
       <div className="rounded-[26px] border border-boot-primary/20 bg-boot-soft px-4 py-4">

@@ -61,7 +61,7 @@ function formatError(code?: string) {
 export default function MatchChatPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
-  const isDevPreview = isDevPreviewClientSession() || matchId.startsWith('dev-match')
+  const isDevPreview = isDevPreviewClientSession()
   const [messages, setMessages] = useState<MatchChatMessage[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [message, setMessage] = useState('')

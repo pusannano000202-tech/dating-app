@@ -34,6 +34,7 @@ checks.push({
 
 checks.push(checkSecretLeaks())
 checks.push(checkPaymentEnv())
+checks.push(checkDevPreviewAuthEnv())
 
 checks.push({
   key: 'NEXT_PUBLIC_APP_ORIGIN',
@@ -161,6 +162,17 @@ function checkSecretLeaks() {
   }
 }
 
+function checkDevPreviewAuthEnv() {
+  const devAuthEnabled = env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true'
+  const legacyDemoEnabled = isEnabledLegacyDemoMode(env.NEXT_PUBLIC_BOOTING_DEMO_MODE)
+
+  return {
+    key: 'dev preview auth env',
+    status: devAuthEnabled || legacyDemoEnabled ? 'ACTION_REQUIRED' : 'SET',
+    purpose: 'production deployments must not enable dev preview auth flags',
+  }
+}
+
 function classifyAppOrigin(value) {
   if (!value) return 'MISSING'
   if (isPlaceholderValue(value)) return 'INVALID'
@@ -201,6 +213,11 @@ function isPlaceholderValue(value) {
   return /(?:your-|your_|example|placeholder|replace_me|changeme|<[^>]+>)/i.test(String(value))
 }
 
+function isEnabledLegacyDemoMode(value) {
+  if (!value) return false
+  return !/^(off|false|0)$/i.test(String(value).trim())
+}
+
 function printNextSteps(blockers) {
   console.error('\nNext steps')
   for (const blocker of blockers) {
@@ -222,6 +239,8 @@ function getNextStep(key) {
       return 'remove real secrets from tracked files, then rerun the secret scanner.'
     case 'scripts/check-payment-env.mjs --provider=toss':
       return 'set Toss/Supabase server envs in `.env.local` or Vercel Environment Variables.'
+    case 'dev preview auth env':
+      return 'keep `NEXT_PUBLIC_DEV_AUTH_BYPASS=false` and remove or disable legacy dev preview flags in production.'
     case 'NEXT_PUBLIC_APP_ORIGIN':
       return 'set `NEXT_PUBLIC_APP_ORIGIN` to the https Vercel production or preview URL.'
     default:
