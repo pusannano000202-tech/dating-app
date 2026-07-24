@@ -1,0 +1,85 @@
+{
+  "schools": [
+    {
+      "id": "pnu",
+      "name": "부산대",
+      "livingAreaLabel": "부산대 생활권",
+      "candidates": []
+    },
+    {
+      "id": "ewha",
+      "name": "이화여대",
+      "livingAreaLabel": "이화여대 생활권",
+      "candidates": [
+        { "id": "ewha-1", "name": "사장님돈까스 이화여대점", "neighborhood": "이대역", "district": "이대역", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-2", "name": "훈카츠", "neighborhood": "이대역", "district": "이대역", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-3", "name": "유야케도쿄", "neighborhood": "이대역", "district": "이대역", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-4", "name": "돈천동식당", "neighborhood": "이대역 · 신촌", "district": "신촌", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-5", "name": "무사시", "neighborhood": "신촌", "district": "신촌", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-6", "name": "엠브로돈까스 신촌본점", "neighborhood": "신촌", "district": "신촌", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-7", "name": "은화수식당 신촌점", "neighborhood": "신촌", "district": "신촌", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "ewha-8", "name": "코바코 신촌점", "neighborhood": "신촌", "district": "신촌", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" }
+      ]
+    },
+    {
+      "id": "cu",
+      "name": "대구가톨릭대",
+      "livingAreaLabel": "대구가톨릭대 생활권",
+      "candidates": [
+        { "id": "cu-1", "name": "하양 영천냄비돈까스&빨간지붕", "neighborhood": "하양역 · 대가대 앞", "district": "하양역", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-2", "name": "하루엔소쿠 경산하양점", "neighborhood": "하양 중심", "district": "하양 중심", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-3", "name": "파파돈까스", "neighborhood": "하양 무학 · 서사", "district": "무학·서사", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-4", "name": "카츠3.9(대구가톨릭대 푸드스퀘어 13번가)", "neighborhood": "교내", "district": "교내", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-5", "name": "긴자료코 경산하양점", "neighborhood": "서사 생활권", "district": "무학·서사", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-6", "name": "돈갓 수제돈까스 경산하양점", "neighborhood": "하양 대학로", "district": "하양 중심", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-7", "name": "이백장돈가스 경산하양지구점", "neighborhood": "무학 · 서사", "district": "무학·서사", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cu-8", "name": "오이시이", "neighborhood": "하양 중심", "district": "하양 중심", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" }
+      ]
+    },
+    {
+      "id": "cju",
+      "name": "청주대",
+      "livingAreaLabel": "청주대 생활권",
+      "candidates": [
+        { "id": "cju-1", "name": "자연을담은돈까스 청대점", "neighborhood": "청주대 중문", "district": "청주대 중문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-2", "name": "카페홈", "neighborhood": "우암동 · 청주대 앞", "district": "우암동", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-3", "name": "동백카츠 성안점", "neighborhood": "성안길", "district": "성안길", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-4", "name": "온정돈까스 청주성안길점", "neighborhood": "성안길", "district": "성안길", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-5", "name": "짱이네 돈까스 본점", "neighborhood": "성안길", "district": "성안길", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-6", "name": "돈카츠 만월 성안길점", "neighborhood": "성안길", "district": "성안길", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-7", "name": "봉득식당", "neighborhood": "청주대 중문", "district": "청주대 중문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "cju-8", "name": "돈미정", "neighborhood": "우암동 북부시장", "district": "우암동", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" }
+      ]
+    },
+    {
+      "id": "chosun",
+      "name": "조선대",
+      "livingAreaLabel": "조선대 생활권",
+      "candidates": [
+        { "id": "chosun-1", "name": "월계수식당 본점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-2", "name": "경양카츠 광주점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-3", "name": "홍익돈까스 충장점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-4", "name": "안교", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-5", "name": "진심왕돈까스 충장점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-6", "name": "긴자료코 광주충장로점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-7", "name": "백소정 충장로점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "chosun-8", "name": "오로라양식 충장점", "neighborhood": "충장로", "district": "충장로", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" }
+      ]
+    },
+    {
+      "id": "kangwon",
+      "name": "강원대",
+      "livingAreaLabel": "강원대 생활권",
+      "candidates": [
+        { "id": "kangwon-1", "name": "온숯카츠", "neighborhood": "강원대 후문", "district": "강원대 후문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-2", "name": "별식당 강원대점", "neighborhood": "강원대 후문", "district": "강원대 후문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-3", "name": "우리돈까스", "neighborhood": "강원대 후문", "district": "강원대 후문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-4", "name": "미미카츠 춘천점", "neighborhood": "효자동", "district": "효자동", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-5", "name": "정성카츠 춘천효자점", "neighborhood": "강원대 후문 · 효자동", "district": "효자동", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-6", "name": "신촌돈까스(간판 별칭 돈까스타운)", "neighborhood": "강원대 후문", "district": "강원대 후문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-7", "name": "문화돈까스", "neighborhood": "강원대 후문 · 효자동", "district": "효자동", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" },
+        { "id": "kangwon-8", "name": "만나돈까스", "neighborhood": "강원대 정문 · 효자동", "district": "강원대 정문", "verifyStatus": "조사 후보 · 출시 전 지도·영업 재확인" }
+      ]
+    }
+  ]
+}
