@@ -1,0 +1,538 @@
+{
+  "schoolId": "ulsan",
+  "schoolName": "울산대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "AI융합전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "E-Mobility전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "IT융합전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "IT융합학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학전공",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건설환경공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건설환경공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학전공",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학부",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학전공",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영계열",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영정보학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영정보학전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학부",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학부(경영학 야간)",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "공동체혁신전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "공학계열",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "과학기술융합계열",
+      "college": "과학기술융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "교양학부",
+      "college": "교양대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학부",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제관계학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌경영학전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계자동차공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "나노반도체공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "나노반도체공학전공",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "나노에너지화학과",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "나노에너지화학전공",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "데이터응용수학과",
+      "college": "과학기술융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "데이터응용수학전공",
+      "college": "과학기술융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "디자인학부",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지털콘텐츠디자인학전공",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "미래모빌리티전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "미술학부",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "법학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회 ・복지학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회과학계열",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회과학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업경영・산업안전공학부",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "산업경영공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업디자인학전공",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업안전공학전공",
+      "college": "공과대학",
+      "status": "신설"
+    },
+    {
+      "name": "생명과학부",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명과학전공",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "생활과학계열",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생활과학부",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생활체육전공",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "섬유디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "섬유디자인학전공",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "성악전공",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트기계설계해석전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트도시・건설전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트제조ICT전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "스페인・중남미학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "스페인・중남미학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠과학부",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각디자인학전공",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학전공",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "실내공간디자인학과",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "실내공간디자인학전공",
+      "college": "디자인·건축융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "아동・가정복지학전공",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "역사・문화학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "역사・문화학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "운동건강관리전공",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "음악학부",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "의공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의류학전공",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "의생명과학전공",
+      "college": "과학기술융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "의예과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학전공",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "인문계열",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "일본어・일본학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "일본어・일본학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "입체조형예술전공",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "재난・건설안전공학전공",
+      "college": "공과대학",
+      "status": "신설"
+    },
+    {
+      "name": "재료공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "저탄소그린에너지전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기전자공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "조선해양공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "조선해양공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "주거환경학전공",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국어・중국학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국어・중국학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "지능로봇전공",
+      "college": "융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "첨단소재공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "프랑스어・프랑스학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "프랑스어・프랑스학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "피아노전공",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "한국어문학전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "항공우주공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계학전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "회화・미디어아트전공",
+      "college": "예술대학",
+      "status": "기존"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schoolId": "baekseok",
+  "schoolName": "백석대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "간호학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "경상학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "경찰학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "관광학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "관광학부 글로벌호텔비즈니스전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "관광학부 항공서비스전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "기독교학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "디자인영상학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "문화예술학부 뮤지컬전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "문화예술학부 실용음악전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "문화예술학부 연기예술전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "물리치료학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠과학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠과학부 태권도전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "안경광학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "어문학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "외식산업학부",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "유아교육과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "유아특수교육과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "응급구조학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "작업치료학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "첨단IT학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "치위생학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "특수교육과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "특수체육교육과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    }
+  ]
+}

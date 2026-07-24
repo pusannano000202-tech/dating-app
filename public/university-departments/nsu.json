@@ -1,0 +1,218 @@
+{
+  "schoolId": "nsu",
+  "schoolName": "남서울대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "가상현실학과",
+      "college": "SW・AI 융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "간호학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과(5)",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "공간조형디자인학과",
+      "college": "창조문화예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광경영학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "광고홍보학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "교양과정부",
+      "college": "교양대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌무역학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌한국어문화학과",
+      "college": "글로벌상경대학",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌한국학과",
+      "college": "글로벌상경대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "드론공간정보공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "멀티미디어학과",
+      "college": "SW・AI 융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "물리치료학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오헬스컨디셔닝학과",
+      "college": "보건의료복지대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "보건행정학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "부동산학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "뷰티보건학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "뷰티향장학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "빅데이터경영공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "세무학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트팜학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "스포츠건강관리학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠비즈니스학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각미디어디자인학과",
+      "college": "창조문화예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "실용음악학과",
+      "college": "창조문화예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "아동복지학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "영상예술디자인학과",
+      "college": "창조문화예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "유통마케팅학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "응급구조학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "일어일문학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "임상병리학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "지능정보통신공학과",
+      "college": "SW・AI 융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "치위생학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터소프트웨어학과",
+      "college": "SW・AI 융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "호텔경영학과",
+      "college": "글로벌상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "휴먼케어학과",
+      "college": "보건의료복지대학",
+      "status": "기존"
+    }
+  ]
+}

@@ -1,0 +1,303 @@
+{
+  "schoolId": "cheongju",
+  "schoolName": "청주대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "간호학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영학과",
+      "college": "비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제통상학과",
+      "college": "비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰행정학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "공예디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광경영학과",
+      "college": "비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "광고홍보학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "교양학부",
+      "college": "교양대학",
+      "status": "기존"
+    },
+    {
+      "name": "교직과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국방안보드론학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "군사학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "데이터사이언스학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "동물보건복지학과",
+      "college": "보건의료과학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "디지털미디어디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지털보안학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "만화애니메이션학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "무역학과",
+      "college": "비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "무인항공기학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "문헌정보학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리치료학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오의약학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "방사선학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "법학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "생활체육학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠재활학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "시스템반도체공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "신문방송학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "아트앤패션디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "에너지융합공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "에너지융합공학과(2~4)",
+      "college": "공과대학",
+      "status": "신설"
+    },
+    {
+      "name": "연극학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "영화영상학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "응용화학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의료경영학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "인공지능소프트웨어학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "임상병리학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "작업치료학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기제어공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "제약공학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "조경도시학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "지적학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "치위생학과",
+      "college": "보건의료과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "토목공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "항공기계공학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "항공서비스학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "항공운항학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "호텔외식경영학과",
+      "college": "비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계학과",
+      "college": "비즈니스대학",
+      "status": "기존"
+    }
+  ]
+}

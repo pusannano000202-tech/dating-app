@@ -1,0 +1,488 @@
+{
+  "schoolId": "cnu",
+  "schoolName": "충남대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "간호학과",
+      "college": "간호대학",
+      "status": "기존"
+    },
+    {
+      "name": "건설공학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과(5)",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학부",
+      "college": "경상대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제학과",
+      "college": "경상대학",
+      "status": "기존"
+    },
+    {
+      "name": "고고학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "공공안전학전공",
+      "college": "자유전공학부",
+      "status": "기존"
+    },
+    {
+      "name": "관현악과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "교육학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국사학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제학부",
+      "college": "국제학부",
+      "status": "기존"
+    },
+    {
+      "name": "국토안보학전공",
+      "college": "국가안보융합학부",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기술교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "농업경제학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "도시・자치융합학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "독어독문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "동물자원과학부",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "디자인창의학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "리더십과조직과학전공",
+      "college": "자유전공학부",
+      "status": "기존"
+    },
+    {
+      "name": "메카트로닉스공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "무역학과",
+      "college": "경상대학",
+      "status": "기존"
+    },
+    {
+      "name": "무용학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "문헌정보학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "미생물・분자생명과학과",
+      "college": "생명시스템과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오시스템기계공학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "반도체융합학과",
+      "college": "자연과학대학",
+      "status": "신설"
+    },
+    {
+      "name": "불어불문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "사학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산림환경자원학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명정보융합학과",
+      "college": "생명시스템과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생물과학과",
+      "college": "생명시스템과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생물환경화학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "소비자학과",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "수의예과",
+      "college": "수의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "수의학과",
+      "college": "수의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트시티건축공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식물자원학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품공학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "심리학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "약학과",
+      "college": "약학대학",
+      "status": "기존"
+    },
+    {
+      "name": "언론정보학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "언어학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "에너지공학과",
+      "college": "공과대학",
+      "status": "신설"
+    },
+    {
+      "name": "영어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "원예학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "유기재료공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "음악과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "응용생물학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "응용화학공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의류학과",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "의예과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "인공지능학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "인문・사회과학전공",
+      "college": "자유전공학부",
+      "status": "기존"
+    },
+    {
+      "name": "일어일문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "자율운항시스템공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기・전자・통신공학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전파정보통신공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정보통계학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "조소과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "중어중문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "지역환경토목학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "지질환경과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "천문우주과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "철학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터융합학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "토목공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "한문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "항공우주공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "해양안보학전공",
+      "college": "국가안보융합학부",
+      "status": "기존"
+    },
+    {
+      "name": "해양환경과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경소재공학과",
+      "college": "농업생명과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "회화과",
+      "college": "예술대학",
+      "status": "기존"
+    }
+  ]
+}

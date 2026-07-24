@@ -1,0 +1,488 @@
+{
+  "schoolId": "dongseo",
+  "schoolName": "동서대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "AI경험디자인전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "AI공학전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "AI콘텐츠전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "Animation학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "Computer Science학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "Cultural Contents Business Management학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "Digital Design학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "ESG디자인전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "Film and Visual Effects학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "Game Development학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "Global Business Administration학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "ICT융합공학과",
+      "college": "미래커리어대학",
+      "status": "기존"
+    },
+    {
+      "name": "Korean Language and Business학과",
+      "college": "International College",
+      "status": "신설"
+    },
+    {
+      "name": "Q College",
+      "college": "Q College",
+      "status": "기존"
+    },
+    {
+      "name": "XR콘텐츠융합연계전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "게임학과",
+      "college": "미디어콘텐츠대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영학부",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학전공",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰학과",
+      "college": "사회과학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "관광경영・컨벤션학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광학부",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "광고홍보학과",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제물류학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제통상물류학부",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제통상학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌 K-컬처 문학/웹소설 전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌 K-컬처 영화/드라마 전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌 K-컬처 웹툰애니메이션 전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌 K-컬처 음악/공연 전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "기계공학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "디자인학부",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지털금융학과",
+      "college": "소프트웨어융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "디지털미디어디자인전공",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지털콘텐츠학부",
+      "college": "미디어콘텐츠대학",
+      "status": "기존"
+    },
+    {
+      "name": "뮤지컬엔터테인먼트과",
+      "college": "임권택영화예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "미디어콘텐츠대학",
+      "college": "미디어콘텐츠대학",
+      "status": "신설"
+    },
+    {
+      "name": "민석교양대학",
+      "college": "민석교양대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오헬스융합대학",
+      "college": "바이오헬스융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "방사선학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "방송영상학과",
+      "college": "미디어콘텐츠대학",
+      "status": "기존"
+    },
+    {
+      "name": "보건행정학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "빅데이터전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "사이버경찰보안전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지상담학과",
+      "college": "미래커리어대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회안전학과",
+      "college": "미래커리어대학",
+      "status": "기존"
+    },
+    {
+      "name": "소프트웨어융합대학",
+      "college": "소프트웨어융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "소프트웨어학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트 국제물류전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "스마트 항만물류전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "스마트 해양모빌리티전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "스포츠레저산업학과",
+      "college": "미래커리어대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각디자인전공",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "시니어운동처방학과",
+      "college": "미래커리어대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "실용콘텐츠창작학과",
+      "college": "미래커리어대학",
+      "status": "기존"
+    },
+    {
+      "name": "연기과",
+      "college": "임권택영화예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "영상애니메이션학과",
+      "college": "미디어콘텐츠대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어SW융합연계전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "영어학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "영화과",
+      "college": "임권택영화예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "외국어학부",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "운동처방학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "웹툰학과",
+      "college": "미디어콘텐츠대학",
+      "status": "기존"
+    },
+    {
+      "name": "이차전지융합연계전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "인공지능로봇전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "일본어SW융합연계전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "일본어학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "임상병리학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "자기설계융합전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "작업치료학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기전자공학과",
+      "college": "소프트웨어융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "정보보안학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "제품인터랙션디자인전공",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국어SW융합연계전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "중국어학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "창의공학부",
+      "college": "소프트웨어융합대학",
+      "status": "통합[신설]"
+    },
+    {
+      "name": "청소년상담심리학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "치위생학과",
+      "college": "바이오헬스융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "캠퍼스아시아학과",
+      "college": "International College",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학부",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "클린에너지전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "토목공학과",
+      "college": "소프트웨어융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "패션디자인학과",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "평생교육컨설팅전공",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "호텔경영학과",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    },
+    {
+      "name": "화장품학과",
+      "college": "바이오헬스융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "환경디자인전공",
+      "college": "디자인대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계세무학전공",
+      "college": "글로벌비즈니스대학",
+      "status": "기존"
+    }
+  ]
+}

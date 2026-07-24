@@ -1,0 +1,423 @@
+{
+  "schoolId": "ks",
+  "schoolName": "경성대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "AI미디어학과",
+      "college": "산학혁신융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "AI수리학과",
+      "college": "산학혁신융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "건강재활전공",
+      "college": "예술종합대학",
+      "status": "신설"
+    },
+    {
+      "name": "건축학과(5년제)",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학과",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제금융물류학부",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제금융학전공",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰행정학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "공예디자인학과",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "광고홍보학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학전공",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제무역통상학과",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌Hospitality경영전공",
+      "college": "글로벌칼리지",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "글로벌IT공학전공",
+      "college": "글로벌칼리지",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌경영전공",
+      "college": "글로벌칼리지",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "글로벌공학부",
+      "college": "글로벌칼리지",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌기계설계공학전공",
+      "college": "글로벌칼리지",
+      "status": "신설"
+    },
+    {
+      "name": "글로벌학부",
+      "college": "글로벌칼리지",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "글로벌한국학전공",
+      "college": "글로벌칼리지",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "글로컬문화학부",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계자동차공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "도시계획학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "동물보건생명과학과",
+      "college": "생명보건대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "디자인학부",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "메카트로닉스공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "문헌정보학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화기획학전공",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화서비스학전공",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화콘텐츠학전공",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "물류학전공",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리치료학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "뮤지컬전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "미디어커뮤니케이션학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "미디어콘텐츠학과",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "법학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "빅데이터응용통계학과",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "사진학과",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업경영공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업디자인학전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "소프트웨어학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트바이오학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠건강학부",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각디자인학전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품생명공학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "실내건축학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "심리학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "애니메이션학전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "약학과",
+      "college": "약학대학",
+      "status": "기존"
+    },
+    {
+      "name": "에너지과학과",
+      "college": "산학혁신융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "역사문화학전공",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "연극영화학부",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "연극전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "영상애니메이션학부",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "영상학전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "영화전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "외식서비스경영학전공",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "유아교육과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "윤리교육과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "음악학부",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "인문문화학부",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "일어일문학전공",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정보통신공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "제약공학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육학전공",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "토목공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "패션디자인학과",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "현대미술학과",
+      "college": "예술종합대학",
+      "status": "기존"
+    },
+    {
+      "name": "호텔관광경영학전공",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "호텔관광외식경영학부",
+      "college": "상경대학",
+      "status": "기존"
+    },
+    {
+      "name": "화장품학과",
+      "college": "생명보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "환경공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계학과",
+      "college": "상경대학",
+      "status": "기존"
+    }
+  ]
+}

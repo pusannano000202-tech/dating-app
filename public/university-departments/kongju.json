@@ -1,0 +1,623 @@
+{
+  "schoolId": "kongju",
+  "schoolName": "국립공주대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "가구리빙디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "간호보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "게임디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영・금융교육과",
+      "college": "사범대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제통상학부",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제학전공",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "고분자공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "공업화학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광&영어통역융복합학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광경영학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "광공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "교양과(자연과학계열)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "교양학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "교양학과(예체능계열)",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "교육학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제금융공학전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "국제통상학전공",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "그린스마트건축공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "금속재료공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "금형공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계설계공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계시스템공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계자동차공학부",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기술・가정교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "나노재료공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "대기과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "데이터정보물리학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "도시・교통공학과",
+      "college": "천안공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "도자문화융합디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "독어독문학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "동물자원학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "디자인컨버전스학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지털융합금형공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "만화애니메이션학부",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "무용학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "문헌정보교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화재보존과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "미래자동차공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "미술교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오산업공학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "반도체기계공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "반도체정보공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "법학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "보건행정학과",
+      "college": "간호보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "부동산학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "불어불문학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산림과학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업경영공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업공학과",
+      "college": "천안공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "산업유통학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "생물교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "생산기계공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "생산기술공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "생활체육지도학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "소프트웨어학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "수산생명의학과",
+      "college": "산업과학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "수학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트인프라공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트정보기술공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트팜공학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식물자원학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식물자원학과(야간)",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품공학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학부",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "애니메이션전공",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "역사교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "영상학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "외식상품학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "원예학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "유아교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "윤리교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "융합경영학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "음악교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "응급구조학과",
+      "college": "간호보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "응용수학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "의료정보학과",
+      "college": "간호보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "의류상품학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "인공지능학부",
+      "college": "단과대구분없음",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "일반사회교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기전자공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기전자응용공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기전자제어공학부",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정보통신공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "제어계측공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "조경학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "주얼리・금속디자인학과",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "중어중문학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "지구과학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "지능형모빌리티공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "지리교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "지리학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "지역건설공학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "지역사회개발학과",
+      "college": "산업과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "지질환경과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "카툰코믹스전공",
+      "college": "예술대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "특수교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "특수동물학과",
+      "college": "산업과학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "한문교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학과",
+      "college": "인문사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학부",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학전공",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경공학과",
+      "college": "천안공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경교육과",
+      "college": "사범대학",
+      "status": "기존"
+    }
+  ]
+}
