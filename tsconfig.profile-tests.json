@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,6 +14,8 @@
     "noEmit": false
   },
   "include": [
+    "components/profile/DepartmentPicker.tsx",
+    "lib/school-theme.ts",
     "lib/pnu-departments.ts",
     "lib/gender.ts",
     "lib/profile/**/*.ts",
