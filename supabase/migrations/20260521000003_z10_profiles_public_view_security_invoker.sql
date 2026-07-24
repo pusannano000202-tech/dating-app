@@ -10,7 +10,7 @@
 --
 -- 배경:
 --   Postgres 15+ 의 view 는 기본적으로 SECURITY INVOKER 동작이지만 명시되지 않음.
---   기존 마이그레이션 20260521_profile_add_preference_vectors.sql 에서 정의된
+--   기존 마이그레이션 20260521000002_profile_add_preference_vectors.sql 에서 정의된
 --   profiles_public view 는 옵션 미지정. RLS 가 view caller 의 권한으로 적용되도록
 --   security_invoker=on 을 명시한다.
 --

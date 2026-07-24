@@ -32,9 +32,13 @@ COMMENT ON COLUMN public.profiles.personality_preference_confidence IS
 COMMENT ON COLUMN public.profiles.personality_preference_completed_at IS
   '상대 성격 선호 설문 완료 시각.';
 
-CREATE OR REPLACE VIEW public.profiles_public AS
+-- CREATE OR REPLACE VIEW는 기존 컬럼의 이름과 순서를 유지해야 한다.
+-- z18에서 추가된 display_name을 보존하고 새 공개 요약 컬럼은 끝에 추가한다.
+CREATE OR REPLACE VIEW public.profiles_public
+WITH (security_invoker = on) AS
 SELECT
   user_id,
+  display_name,
   gender,
   age,
   height,
@@ -46,11 +50,11 @@ SELECT
   appearance_type,
   preferred_bucket_weights,
   worldcup_completed_at,
+  is_profile_complete,
+  updated_at,
   preferred_personality_primary_type,
   preferred_personality_secondary_type,
-  personality_preference_completed_at,
-  is_profile_complete,
-  updated_at
+  personality_preference_completed_at
 FROM public.profiles;
 
 COMMENT ON VIEW public.profiles_public IS

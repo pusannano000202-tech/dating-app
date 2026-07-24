@@ -30,6 +30,10 @@ COMMENT ON COLUMN matches.group_b_confirmed_at IS
   'group_b 리더가 매칭 확정 누른 시각. NULL = 아직 확정 안 함.';
 
 -- confirm_match 재정의: 양방향 추적
+-- PostgreSQL은 OUT 파라미터로 정의된 반환 행 타입 변경을
+-- CREATE OR REPLACE FUNCTION으로 허용하지 않으므로 기존 함수를 먼저 제거한다.
+DROP FUNCTION IF EXISTS public.confirm_match(UUID);
+
 CREATE OR REPLACE FUNCTION public.confirm_match(
   p_match_id UUID
 )
