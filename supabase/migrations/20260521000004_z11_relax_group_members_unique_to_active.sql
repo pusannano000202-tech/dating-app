@@ -8,7 +8,7 @@
 --   본 마이그레이션이 의존하는 group_members 테이블 생성 이후에 적용됨.
 --
 -- 배경:
---   기존 20260521_matching_create_core_tables.sql 에서:
+--   기존 20260521000001_matching_create_core_tables.sql 에서:
 --     CREATE UNIQUE INDEX idx_group_members_one_current_group ON group_members(user_id);
 --   → 한 사용자가 평생 한 그룹에만 속할 수 있게 됨. 매칭이 끝난 뒤 새 그룹 결성 불가.
 --

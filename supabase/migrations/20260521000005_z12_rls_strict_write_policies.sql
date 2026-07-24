@@ -4,8 +4,8 @@
 -- Date: 2026-05-21
 --
 -- This file intentionally uses the `_z...` prefix so it sorts after:
---   - 20260521_matching_create_core_tables.sql
---   - 20260521_profile_add_preference_vectors.sql
+--   - 20260521000001_matching_create_core_tables.sql
+--   - 20260521000002_profile_add_preference_vectors.sql
 --
 -- Goals:
 --   1. Replace broad friend_requests update policy so a sender cannot mark

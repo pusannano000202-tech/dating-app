@@ -140,10 +140,10 @@ BEGIN
 
   v_alias := '익명';
   IF to_regclass('public.match_member_aliases') IS NOT NULL THEN
-    SELECT alias INTO v_alias
-    FROM public.match_member_aliases
-    WHERE match_id = p_match_id
-      AND user_id = v_sender
+    SELECT member_alias.alias INTO v_alias
+    FROM public.match_member_aliases AS member_alias
+    WHERE member_alias.match_id = p_match_id
+      AND member_alias.target_user_id = v_sender
     LIMIT 1;
   END IF;
 
@@ -192,8 +192,7 @@ CREATE POLICY match_chat_messages_delete_admin
   ON public.match_chat_messages
   FOR DELETE
   TO authenticated
-  USING (public.is_admin())
-  WITH CHECK (public.is_admin());
+  USING (public.is_admin());
 
 COMMENT ON TABLE public.match_chat_messages IS
   'Phase 9 secure match chat storage. Access is limited to confirmed/completed approved match participants.';
