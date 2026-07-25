@@ -236,10 +236,10 @@ export interface MatchingProfile {
 export type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 
 // 보증금 상태
-export type DepositStatus = 'pending' | 'paid' | 'refunded' | 'forfeited' | 'compensated'
+export type DepositStatus = 'pending' | 'paid' | 'held' | 'refunded' | 'forfeited' | 'compensated'
 
 // 매칭 상태
-export type MatchStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled'
+export type MatchStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
 ```
 
 ---
