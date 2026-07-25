@@ -1,0 +1,243 @@
+{
+  "schoolId": "ajou",
+  "schoolName": "아주대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "AI모빌리티공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "간호대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과(특별과정)",
+      "college": "간호대학",
+      "status": "기존"
+    },
+    {
+      "name": "건설시스템공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영인텔리전스학과",
+      "college": "경영대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "교통시스템공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "국방디지털융합학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌경영학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌교양학부",
+      "college": "다산학부대학",
+      "status": "기존"
+    },
+    {
+      "name": "금융공학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "디지털미디어학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화콘텐츠학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "불어불문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "사이버보안학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "사학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "소프트웨어학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠레저학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "심리학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "약학과",
+      "college": "약학대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "융합시스템공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "응용화학생명공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과(본과)",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과(예과)",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "인공지능융합학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "자유전공(인문사회계열)",
+      "college": "다산학부대학",
+      "status": "기존"
+    },
+    {
+      "name": "자유전공(자연과학계열)",
+      "college": "다산학부대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학과",
+      "college": "정보통신대학",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "지능형반도체공학과",
+      "college": "정보통신대학",
+      "status": "기존"
+    },
+    {
+      "name": "첨단신소재공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경안전공학과",
+      "college": "공과대학",
+      "status": "기존"
+    }
+  ]
+}
