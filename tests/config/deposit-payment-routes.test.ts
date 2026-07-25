@@ -6,14 +6,66 @@ import { join } from 'node:path'
 import {
   buildDepositPaymentRequestDraft,
   buildDepositCustomerKey,
+  getDepositPaymentReadiness,
   normalizeDepositReturnPath,
+  resolveDepositPaymentProvider,
 } from '../../lib/payments/deposit'
+import {
+  buildTossRefundRequestKey,
+  verifyTossPartialRefundEvidence,
+  verifyTossRefundEvidence,
+  type TossPaymentObject,
+} from '../../lib/payments/toss'
+import { getSupabaseAdminKeyStatus } from '../../lib/supabase-admin'
 
 const ROOT = process.cwd()
 
 function readSource(path: string) {
   return readFileSync(join(ROOT, path), 'utf8')
 }
+
+function restoreEnv(key: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[key]
+    return
+  }
+
+  process.env[key] = value
+}
+
+test('Supabase admin credentials have one server-only resolver', () => {
+  const helperPath = join(ROOT, 'lib/supabase-admin.ts')
+
+  assert.equal(existsSync(helperPath), true, 'lib/supabase-admin.ts is missing')
+})
+
+test('Supabase admin resolver accepts a modern secret key before a legacy service-role JWT', () => {
+  const previousEnv = {
+    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  }
+
+  try {
+    process.env.SUPABASE_SECRET_KEY = 'sb_secret_fake_modern_server_key_123456'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = makeFakeJwt({ role: 'anon' })
+
+    assert.deepEqual(getSupabaseAdminKeyStatus(), {
+      ok: true,
+      key: 'sb_secret_fake_modern_server_key_123456',
+      source: 'secret',
+    })
+
+    delete process.env.SUPABASE_SECRET_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY = makeFakeJwt({ role: 'service_role' })
+    assert.equal(getSupabaseAdminKeyStatus().ok, true)
+
+    process.env.SUPABASE_SERVICE_ROLE_KEY = makeFakeJwt({ role: 'anon' })
+    assert.deepEqual(getSupabaseAdminKeyStatus(), { ok: false, reason: 'invalid' })
+  } finally {
+    restoreEnv('SUPABASE_SECRET_KEY', previousEnv.SUPABASE_SECRET_KEY)
+    restoreEnv('SUPABASE_SERVICE_ROLE_KEY', previousEnv.SUPABASE_SERVICE_ROLE_KEY)
+  }
+})
 
 test('deposit payment API has explicit start, confirm, cancel, and webhook surfaces', () => {
   const routes = [
@@ -43,7 +95,7 @@ test('deposit payment routes use provider readiness and return Toss browser chec
     assert.doesNotMatch(source, /fetch\(['"]https:\/\//)
   }
 
-  assert.match(startRoute, /mock_pay_deposit/)
+  assert.match(startRoute, /payMockDepositForMatch/)
   assert.match(startRoute, /clientKey: process\.env\.NEXT_PUBLIC_TOSS_CLIENT_KEY/)
   assert.match(depositsRoute, /clientKey: process\.env\.NEXT_PUBLIC_TOSS_CLIENT_KEY/)
   assert.match(startRoute, /getPublicAppOrigin\(\) \|\| req\.nextUrl\.origin/)
@@ -60,8 +112,9 @@ test('deposit payment routes use provider readiness and return Toss browser chec
   assert.match(webhookRoute, /payment_provider_not_configured/)
   assert.match(webhookRoute, /getTossPayment/)
   assert.match(webhookRoute, /getTossPaymentByOrderId/)
-  assert.match(webhookRoute, /SUPABASE_SERVICE_ROLE_KEY/)
-  assert.match(webhookRoute, /mapTossPaymentStatusToDepositStatus/)
+  assert.match(webhookRoute, /getSupabaseAdminKey/)
+  assert.doesNotMatch(webhookRoute, /SUPABASE_SERVICE_ROLE_KEY/)
+  assert.match(webhookRoute, /mapTossPaymentStatusToReconcileAction/)
   assert.match(webhookRoute, /toss_order_id/)
   assert.match(tossHelper, /https:\/\/api\.tosspayments\.com\/v1/)
   assert.match(tossHelper, /\/payments\/\$\{encodeURIComponent\(paymentKey\)\}/)
@@ -71,6 +124,44 @@ test('deposit payment routes use provider readiness and return Toss browser chec
   assert.doesNotMatch(tossHelper, /\/payments',/)
   assert.match(tossHelper, /Authorization/)
   assert.match(tossHelper, /Idempotency-Key/)
+})
+
+test('payment provider cannot be downgraded to mock by request input in production', () => {
+  const routes = [
+    readSource('app/api/deposits/route.ts'),
+    readSource('app/api/payments/deposit/route.ts'),
+    readSource('app/api/payments/deposit/confirm/route.ts'),
+    readSource('app/api/payments/deposit/cancel/route.ts'),
+    readSource('app/api/payments/deposit/webhook/route.ts'),
+  ]
+
+  for (const route of routes) {
+    assert.match(route, /resolveDepositPaymentProvider\(\)/)
+    assert.doesNotMatch(route, /resolveDepositPaymentProvider\(\s*(?:body|readString|req\.nextUrl)/)
+  }
+
+  const previousServerProvider = process.env.PAYMENT_PROVIDER
+  const previousPublicProvider = process.env.NEXT_PUBLIC_PAYMENT_PROVIDER
+  const previousNodeEnv = process.env.NODE_ENV
+
+  try {
+    process.env.PAYMENT_PROVIDER = 'toss'
+    process.env.NEXT_PUBLIC_PAYMENT_PROVIDER = 'mock'
+    assert.equal(resolveDepositPaymentProvider(), 'toss')
+
+    ;(process.env as Record<string, string | undefined>).NODE_ENV = 'production'
+    assert.deepEqual(getDepositPaymentReadiness('mock'), {
+      ok: false,
+      provider: 'mock',
+      error: 'payment_provider_not_configured',
+      missing: [],
+      invalid: ['mock_payments_disabled_in_production'],
+    })
+  } finally {
+    restoreEnv('PAYMENT_PROVIDER', previousServerProvider)
+    restoreEnv('NEXT_PUBLIC_PAYMENT_PROVIDER', previousPublicProvider)
+    restoreEnv('NODE_ENV', previousNodeEnv)
+  }
 })
 
 test('deposit payment routes do not expose missing provider environment variable names', () => {
@@ -93,7 +184,39 @@ test('Toss deposit readiness requires checkout, refund, and reconciliation serve
   assert.match(paymentLib, /TOSS_SECRET_KEY/)
   assert.match(paymentLib, /NEXT_PUBLIC_TOSS_CLIENT_KEY/)
   assert.match(paymentLib, /PAYMENT_INTERNAL_SECRET/)
-  assert.match(paymentLib, /SUPABASE_SERVICE_ROLE_KEY/)
+  assert.match(paymentLib, /getSupabaseAdminKeyStatus/)
+})
+
+test('mock deposit readiness requires the same server settlement credential as its route', () => {
+  const previousEnv = {
+    NODE_ENV: process.env.NODE_ENV,
+    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  }
+
+  try {
+    ;(process.env as Record<string, string | undefined>).NODE_ENV = 'development'
+    delete process.env.SUPABASE_SECRET_KEY
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    assert.deepEqual(getDepositPaymentReadiness('mock'), {
+      ok: false,
+      provider: 'mock',
+      error: 'payment_provider_not_configured',
+      missing: ['supabase_admin_key'],
+      invalid: [],
+    })
+
+    process.env.SUPABASE_SECRET_KEY = 'sb_secret_fake_mock_server_key_123456'
+    assert.deepEqual(getDepositPaymentReadiness('mock'), {
+      ok: true,
+      provider: 'mock',
+    })
+  } finally {
+    restoreEnv('NODE_ENV', previousEnv.NODE_ENV)
+    restoreEnv('SUPABASE_SECRET_KEY', previousEnv.SUPABASE_SECRET_KEY)
+    restoreEnv('SUPABASE_SERVICE_ROLE_KEY', previousEnv.SUPABASE_SERVICE_ROLE_KEY)
+  }
 })
 
 test('deposit checkout order name is readable Korean copy for Toss users', () => {
@@ -118,7 +241,9 @@ test('local env example documents mock and Toss sandbox payment settings without
     assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY=/)
     assert.match(envExample, /TOSS_SECRET_KEY=/)
     assert.match(envExample, /PAYMENT_INTERNAL_SECRET=/)
+    assert.match(envExample, /SUPABASE_SECRET_KEY=/)
     assert.match(envExample, /SUPABASE_SERVICE_ROLE_KEY=/)
+    assert.match(envExample, /sb_secret_/)
     assert.match(envExample, /NEXT_PUBLIC_TOSS_CLIENT_KEY is .*browser/)
     assert.match(envExample, /TOSS_SECRET_KEY is server-only/)
     assert.match(envExample, /Never expose these with NEXT_PUBLIC_/)
@@ -141,7 +266,9 @@ test('payment env checker supports mock review and Toss sandbox preflight withou
   assert.match(checker, /NEXT_PUBLIC_TOSS_CLIENT_KEY/)
   assert.match(checker, /TOSS_SECRET_KEY/)
   assert.match(checker, /PAYMENT_INTERNAL_SECRET/)
+  assert.match(checker, /SUPABASE_SECRET_KEY/)
   assert.match(checker, /SUPABASE_SERVICE_ROLE_KEY/)
+  assert.match(checker, /--no-env-file/)
   assert.match(checker, /console\.table\(rows\)/)
   assert.match(checker, /isPlaceholderValue/)
   assert.doesNotMatch(checker, /console\.log\(env/)
@@ -183,6 +310,7 @@ test('deployment readiness checker verifies git, Vercel link, and Toss env witho
   assert.doesNotMatch(checker, /console\.log\(process\.env/)
   assert.doesNotMatch(checker, /TOSS_SECRET_KEY=.*test/)
   assert.doesNotMatch(checker, /SUPABASE_SERVICE_ROLE_KEY=.*eyJ/)
+  assert.doesNotMatch(checker, /SUPABASE_SECRET_KEY=.*sb_secret_[A-Za-z0-9_-]{12,}/)
 })
 
 test('tracked secret scanner blocks real payment and service-role keys without printing values', () => {
@@ -207,6 +335,7 @@ test('tracked secret scanner blocks real payment and service-role keys without p
 test('payment env checker rejects malformed Toss and service role values without printing secrets', () => {
   const baseEnv = {
     ...process.env,
+    SUPABASE_SECRET_KEY: '',
     NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: makeFakeJwt({ role: 'anon' }),
     NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
@@ -216,7 +345,7 @@ test('payment env checker rejects malformed Toss and service role values without
   }
 
   assert.throws(
-    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss'], {
+    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss', '--no-env-file'], {
       cwd: ROOT,
       env: baseEnv,
       encoding: 'utf8',
@@ -236,6 +365,7 @@ test('payment env checker rejects malformed Toss and service role values without
 test('payment env checker rejects Toss keys with trailing prose or unsafe characters', () => {
   const baseEnv = {
     ...process.env,
+    SUPABASE_SECRET_KEY: '',
     NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: makeFakeJwt({ role: 'anon' }),
     NEXT_PUBLIC_PAYMENT_PROVIDER: 'toss',
@@ -247,7 +377,7 @@ test('payment env checker rejects Toss keys with trailing prose or unsafe charac
   }
 
   assert.throws(
-    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss'], {
+    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss', '--no-env-file'], {
       cwd: ROOT,
       env: baseEnv,
       encoding: 'utf8',
@@ -267,6 +397,7 @@ test('payment env checker rejects Toss keys with trailing prose or unsafe charac
 test('payment env checker rejects copied placeholder deployment values', () => {
   const baseEnv = {
     ...process.env,
+    SUPABASE_SECRET_KEY: '',
     NEXT_PUBLIC_SUPABASE_URL: 'https://your-project.supabase.co',
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_your-key',
     NEXT_PUBLIC_PAYMENT_PROVIDER: 'toss',
@@ -278,7 +409,7 @@ test('payment env checker rejects copied placeholder deployment values', () => {
   }
 
   assert.throws(
-    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss'], {
+    () => execFileSync('node', ['scripts/check-payment-env.mjs', '--provider=toss', '--no-env-file'], {
       cwd: ROOT,
       env: baseEnv,
       encoding: 'utf8',
@@ -331,9 +462,16 @@ test('deposit checkout preserves safe return paths for group and match flows', (
   assert.match(depositsRoute, /returnPath: typeof body\.return_path === 'string' \? body\.return_path : undefined/)
   assert.match(depositsRoute, /match_id_required/)
   assert.match(depositsRoute, /validateDepositMatchContext/)
+  assert.match(depositsRoute, /\.eq\('match_id', matchId\)/)
+  assert.match(depositsRoute, /match_id: matchId/)
   assert.match(paymentRoute, /returnPath: typeof body\.return_path === 'string' \? body\.return_path : undefined/)
   assert.match(paymentRoute, /match_id_required/)
   assert.match(paymentRoute, /validateDepositMatchContext/)
+  assert.match(paymentRoute, /\.eq\('match_id', matchId\)/)
+  assert.match(paymentRoute, /match_id: matchId/)
+  assert.match(confirmRoute, /match_id_required/)
+  assert.match(confirmRoute, /validateDepositMatchContext/)
+  assert.match(confirmRoute, /\.eq\('match_id', matchId\)/)
   assert.match(confirmRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
   assert.match(cancelRoute, /normalizeDepositReturnPath\(req\.nextUrl\.searchParams\.get\('return_path'\)\)/)
   assert.match(cancelRoute, /getPublicAppOrigin\(\) \|\| req\.nextUrl\.origin/)
@@ -418,20 +556,86 @@ test('group create does not handle deposit callbacks because deposits happen aft
   assert.match(matchDetailPage, /return_path: `\/match\/\$\{match\.match_id\}`/)
 })
 
-test('match refund route reports external Toss settlement separately from DB refund request', () => {
+test('match refund route prepares, settles with Toss, and finalizes in that order', () => {
   const refundRoute = readSource('app/api/matches/[id]/refund/route.ts')
 
-  assert.match(refundRoute, /submit_refund_request/)
-  assert.match(refundRoute, /external_refund/)
+  assert.match(refundRoute, /prepare_refund_request/)
+  assert.match(refundRoute, /finalize_refund_request/)
   assert.match(refundRoute, /cancelTossPayment/)
-  assert.match(refundRoute, /SUPABASE_SERVICE_ROLE_KEY/)
-  assert.match(refundRoute, /pending_provider_configuration/)
-  assert.match(refundRoute, /server_settlement_not_configured/)
-  assert.match(refundRoute, /refund_amount_zero/)
+  assert.match(refundRoute, /createPaymentServiceClient/)
+  assert.match(refundRoute, /refund_request_id/)
+  assert.match(refundRoute, /refund_settlement_pending/)
+  assert.doesNotMatch(refundRoute, /submit_refund_request/)
+  assert.ok(
+    refundRoute.indexOf(".rpc('prepare_refund_request'") < refundRoute.indexOf('const settlement = await settleRefundWithProvider'),
+    'refund must be prepared before provider settlement',
+  )
+  assert.ok(
+    refundRoute.indexOf('const settlement = await settleRefundWithProvider') < refundRoute.indexOf(".rpc('finalize_refund_request'"),
+    'DB refund must be finalized only after provider settlement succeeds',
+  )
+  assert.match(refundRoute, /const payment = await cancelTossPayment/)
   assert.doesNotMatch(refundRoute, /missing:/)
 })
 
-test('Toss general payment webhook re-queries payment state instead of trusting signatures or body status', () => {
+test('mock payment is server-only and bound to the current match', () => {
+  const routes = [
+    readSource('app/api/deposits/route.ts'),
+    readSource('app/api/payments/deposit/route.ts'),
+    readSource('app/api/payments/deposit/confirm/route.ts'),
+  ]
+  const serverHelper = readSource('lib/payments/deposit-server.ts')
+
+  for (const route of routes) {
+    assert.doesNotMatch(route, /\.rpc\('mock_pay_deposit'/)
+    assert.match(route, /payMockDepositForMatch/)
+  }
+
+  assert.match(serverHelper, /mock_pay_deposit_for_match/)
+  assert.match(serverHelper, /getSupabaseAdminKey/)
+  assert.doesNotMatch(serverHelper, /SUPABASE_SERVICE_ROLE_KEY/)
+  assert.match(serverHelper, /p_match_id: params\.matchId/)
+  assert.match(serverHelper, /p_user_id: params\.userId/)
+})
+
+test('deposit writes use service-only boundaries and Toss confirmation revalidates the match atomically', () => {
+  const startRoutes = [
+    readSource('app/api/deposits/route.ts'),
+    readSource('app/api/payments/deposit/route.ts'),
+  ]
+  const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
+
+  for (const route of startRoutes) {
+    assert.match(route, /createPaymentServiceClient/)
+    assert.match(route, /const paymentService = createPaymentServiceClient\(\)/)
+    assert.match(route, /paymentService[\s\S]*\.from\('deposits'\)[\s\S]*\.insert\(/)
+    assert.doesNotMatch(route, /const created = await supabase[\s\S]*\.insert\(/)
+  }
+
+  assert.match(confirmRoute, /createPaymentServiceClient/)
+  assert.match(confirmRoute, /const paymentService = createPaymentServiceClient\(\)/)
+  assert.match(confirmRoute, /\.rpc\('finalize_toss_deposit_payment'/)
+  assert.doesNotMatch(confirmRoute, /reverseApprovedDepositPayment/)
+  assert.doesNotMatch(confirmRoute, /cancelTossPayment/)
+  assert.match(confirmRoute, /recoverAmbiguousTossConfirmation/)
+  assert.match(confirmRoute, /getTossPayment/)
+  assert.match(confirmRoute, /finalizeApprovedDepositPayment/)
+  assert.match(confirmRoute, /payment_reconciliation_required/)
+  assert.doesNotMatch(confirmRoute, /\.update\(\{\s*status: 'paid'/)
+
+  const migration = readSource(
+    'supabase/migrations/20260715155041_phase12_payment_ownership_refund_and_friend_safety.sql',
+  )
+  const finalizer = migration.match(
+    /CREATE OR REPLACE FUNCTION public\.finalize_toss_deposit_payment[\s\S]*?GRANT EXECUTE ON FUNCTION public\.finalize_toss_deposit_payment[^;]+;/,
+  )?.[0] ?? ''
+  assert.match(finalizer, /FROM public\.matches AS m[\s\S]*FOR UPDATE/)
+  assert.match(finalizer, /v_match\.status NOT IN \('pending', 'confirmed'\)/)
+  assert.match(finalizer, /FROM public\.deposits AS d[\s\S]*FOR UPDATE/)
+  assert.match(finalizer, /TO service_role/)
+})
+
+test('Toss general payment webhook re-queries and finalizes DONE through the ownership RPC', () => {
   const webhookRoute = readSource('app/api/payments/deposit/webhook/route.ts')
   const tossHelper = readSource('lib/payments/toss.ts')
 
@@ -443,9 +647,196 @@ test('Toss general payment webhook re-queries payment state instead of trusting 
   assert.match(webhookRoute, /status === 'DONE'/)
   assert.match(webhookRoute, /status === 'CANCELED'/)
   assert.match(webhookRoute, /status === 'PARTIAL_CANCELED'/)
-  assert.match(webhookRoute, /ignored_already_refunded/)
-  assert.match(webhookRoute, /deposit\.notes/)
+  assert.match(webhookRoute, /\.rpc\('finalize_toss_deposit_payment'/)
+  assert.match(webhookRoute, /p_match_id: deposit\.match_id/)
+  assert.match(webhookRoute, /p_group_id: deposit\.group_id/)
+  assert.match(webhookRoute, /p_user_id: deposit\.user_id/)
+  assert.match(webhookRoute, /partial_cancellation_requires_reconciliation/)
+  assert.match(webhookRoute, /sumSuccessfulCancelAmount/)
+  assert.doesNotMatch(webhookRoute, /if \(status === 'DONE'\) return 'paid'/)
+  assert.doesNotMatch(webhookRoute, /status:\s*nextStatus/)
+  assert.doesNotMatch(webhookRoute, /\.update\(\{\s*status:\s*'paid'/)
   assert.doesNotMatch(webhookRoute, /tosspayments-webhook-signature/)
   assert.match(tossHelper, /method: 'GET'/)
   assert.match(tossHelper, /if \(options\.method === 'POST'\)/)
+})
+
+test('deposit finalization failures never trigger an automatic provider reversal', () => {
+  const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
+
+  assert.match(confirmRoute, /recoverDepositAfterFinalizationFailure/)
+  assert.match(confirmRoute, /payment_reconciliation_required/)
+  assert.doesNotMatch(confirmRoute, /reverseApprovedDepositPayment/)
+  assert.doesNotMatch(confirmRoute, /cancelTossPayment/)
+})
+
+test('partial refund evidence requires the latest DONE cancel, exact amount, balance, and total', () => {
+  const payment: TossPaymentObject = {
+    paymentKey: 'payment-key',
+    orderId: 'deposit-order',
+    status: 'PARTIAL_CANCELED',
+    totalAmount: 10_000,
+    balanceAmount: 3_000,
+    lastTransactionKey: 'cancel-transaction',
+    cancels: [{
+      cancelAmount: 7_000,
+      cancelStatus: 'DONE',
+      transactionKey: 'cancel-transaction',
+      canceledAt: '2026-07-25T10:00:00.000Z',
+      refundableAmount: 3_000,
+    }],
+  }
+
+  assert.deepEqual(
+    verifyTossPartialRefundEvidence(payment, {
+      requestedRefundAmount: 7_000,
+      depositAmount: 10_000,
+    }),
+    {
+      ok: true,
+      transactionKey: 'cancel-transaction',
+      canceledAt: '2026-07-25T10:00:00.000Z',
+    },
+  )
+  assert.equal(
+    buildTossRefundRequestKey({
+      refundRequestId: 'refund-request',
+      settlementVersion: 2,
+      refundAmount: 7_000,
+    }),
+    'refund_refund-request_v2_7000',
+  )
+
+  assert.equal(
+    verifyTossPartialRefundEvidence(
+      { ...payment, lastTransactionKey: 'different-transaction' },
+      { requestedRefundAmount: 7_000, depositAmount: 10_000 },
+    ).ok,
+    false,
+  )
+  assert.equal(
+    verifyTossPartialRefundEvidence(
+      { ...payment, balanceAmount: undefined },
+      { requestedRefundAmount: 7_000, depositAmount: 10_000 },
+    ).ok,
+    false,
+  )
+  assert.equal(
+    verifyTossPartialRefundEvidence(
+      {
+        ...payment,
+        cancels: [
+          ...(payment.cancels ?? []),
+          {
+            cancelAmount: 1_000,
+            cancelStatus: 'DONE',
+            transactionKey: 'older-cancel',
+            refundableAmount: 2_000,
+          },
+        ],
+      },
+      { requestedRefundAmount: 7_000, depositAmount: 10_000 },
+    ).ok,
+    false,
+  )
+
+  assert.equal(
+    verifyTossRefundEvidence(
+      {
+        ...payment,
+        status: 'CANCELED',
+        balanceAmount: 0,
+        cancels: [{
+          cancelAmount: 10_000,
+          cancelStatus: 'DONE',
+          transactionKey: 'full-cancel',
+          refundableAmount: 0,
+        }],
+        lastTransactionKey: 'full-cancel',
+      },
+      { requestedRefundAmount: 10_000, depositAmount: 10_000 },
+    ).ok,
+    true,
+  )
+})
+
+test('deposit confirmation re-reads the exact deposit and leaves uncertain settlement for reconciliation', () => {
+  const confirmRoute = readSource('app/api/payments/deposit/confirm/route.ts')
+
+  assert.match(confirmRoute, /recoverDepositAfterFinalizationFailure/)
+  assert.match(confirmRoute, /\.eq\('id', params\.deposit\.id\)/)
+  assert.match(confirmRoute, /\.eq\('match_id', params\.matchId\)/)
+  assert.match(confirmRoute, /\.eq\('group_id', params\.groupId\)/)
+  assert.match(confirmRoute, /\.eq\('user_id', params\.userId\)/)
+  assert.match(confirmRoute, /\.eq\('toss_order_id', params\.payment\.orderId\)/)
+  assert.match(confirmRoute, /recoveredDeposit\.toss_payment_key === params\.payment\.paymentKey/)
+  assert.match(confirmRoute, /payment_reconciliation_required/)
+  assert.doesNotMatch(confirmRoute, /cancelTossPayment/)
+  assert.doesNotMatch(
+    confirmRoute,
+    /catch\s*\{[\s\S]*?\.update\(\{[\s\S]*?toss_payment_key:[\s\S]*?payment_reconciliation_required/,
+  )
+})
+
+test('partial cancellation webhook recovers the matching pending refund request through its finalizer', () => {
+  const webhookRoute = readSource('app/api/payments/deposit/webhook/route.ts')
+
+  assert.match(webhookRoute, /deposit_refund_requests/)
+  assert.match(webhookRoute, /verifyTossPartialRefundEvidence/)
+  assert.match(webhookRoute, /buildTossRefundRequestKey/)
+  assert.match(webhookRoute, /\.rpc\('finalize_refund_request'/)
+  assert.match(webhookRoute, /p_refund_request_id: refundRequest\.id/)
+  assert.match(webhookRoute, /p_settlement_version: refundRequest\.settlement_version/)
+  assert.match(webhookRoute, /p_settlement_key: evidence\.transactionKey/)
+  assert.match(webhookRoute, /p_provider_request_key: requestKey/)
+  assert.match(webhookRoute, /refundRequest\.status === 'processed'/)
+  assert.match(webhookRoute, /refundRequest\.settlement_key === evidence\.transactionKey/)
+  assert.match(webhookRoute, /refundRequest\.provider_request_key === requestKey/)
+  assert.doesNotMatch(
+    webhookRoute,
+    /if \(reconcileAction === 'partial_cancellation'\) \{\s*throw new WebhookReconcileError/,
+  )
+})
+
+test('refund route verifies current Toss state before issuing a new cancellation', () => {
+  const refundRoute = readSource('app/api/matches/[id]/refund/route.ts')
+
+  assert.match(refundRoute, /const currentPayment = await getTossPayment\(paymentKey\)/)
+  assert.match(refundRoute, /buildVerifiedTossSettlement/)
+  assert.match(refundRoute, /verifyTossRefundEvidence/)
+  assert.match(refundRoute, /currentPayment\.status !== 'DONE'/)
+  assert.match(refundRoute, /provider_settlement_requires_reconciliation/)
+  assert.ok(
+    refundRoute.indexOf('await getTossPayment(paymentKey)')
+      < refundRoute.indexOf('await cancelTossPayment'),
+    'provider state must be inspected before a new cancellation is requested',
+  )
+})
+
+test('internal Toss cancellation resolves the owned deposit before calling the provider', () => {
+  const cancelRoute = readSource('app/api/payments/deposit/cancel/route.ts')
+
+  assert.match(cancelRoute, /deposit_id_required/)
+  assert.match(cancelRoute, /match_id_required/)
+  assert.match(cancelRoute, /group_id_required/)
+  assert.match(cancelRoute, /user_id_required/)
+  assert.match(cancelRoute, /\.from\('deposits'\)/)
+  assert.match(cancelRoute, /\.eq\('id', depositId\)/)
+  assert.match(cancelRoute, /deposit\.toss_payment_key !== paymentKey/)
+  assert.match(cancelRoute, /deposit\.match_id !== matchId/)
+  assert.match(cancelRoute, /deposit\.group_id !== groupId/)
+  assert.match(cancelRoute, /deposit\.user_id !== userId/)
+  assert.match(cancelRoute, /partial_cancellation_not_supported/)
+  assert.match(cancelRoute, /partial_cancellation_requires_reconciliation/)
+  assert.match(cancelRoute, /payment\.status !== 'CANCELED'/)
+  assert.match(cancelRoute, /refunded_amount: deposit\.amount/)
+  assert.match(cancelRoute, /retained_amount: 0/)
+  assert.ok(
+    cancelRoute.indexOf(".from('deposits')") < cancelRoute.indexOf('await cancelTossPayment'),
+    'the owned deposit must be loaded before Toss cancellation',
+  )
+  assert.ok(
+    cancelRoute.indexOf('await cancelTossPayment') < cancelRoute.indexOf(".update({\n        status: 'refunded'"),
+    'the deposit must be marked refunded only after Toss proves a full cancellation',
+  )
 })
