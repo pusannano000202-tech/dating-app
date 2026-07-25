@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, LockKeyhole } from 'lucide-react'
+import SchoolMascot from '@/components/theme/SchoolMascot'
+import SchoolName from '@/components/theme/SchoolName'
 import {
   getDevMatchSetupStatusFromClient,
   getDevPreviewGroupSizeFromClient,
@@ -13,6 +15,8 @@ import {
   setDevPreviewGroupStatus,
 } from '@/lib/dev-match-setup'
 import { normalizeGroupSize } from '@/lib/matching/group-size'
+import { isMatchingGroupsPayload } from '@/lib/matching/frontend-load-state'
+import { isGroupQueueActive } from '@/lib/matching/group-queue-state'
 import {
   EMPTY_MATCH_SETUP_STATUS,
   type MatchSetupStatus,
@@ -22,6 +26,7 @@ import {
   isPreMatchCardDraftCookieDone,
 } from '@/lib/matching/pre-match-card-draft'
 import QueueRadarCard from '@/components/matching/QueueRadarCard'
+import { DepartmentAutoFriendPanel } from '@/components/matching/group-create/DepartmentAutoFriendPanel'
 import {
   DEV_GROUP_STATE,
   DEV_QUEUE_VISUAL,
@@ -33,8 +38,9 @@ import { FreeBetaQueuePanel } from '@/components/matching/group-create/FreeBetaQ
 import { GroupDangerZone } from '@/components/matching/group-create/GroupDangerZone'
 import { GroupHeader } from '@/components/matching/group-create/GroupHeader'
 import { GroupMemberStatusPanel } from '@/components/matching/group-create/GroupMemberStatusPanel'
-import { InviteFriendPanel } from '@/components/matching/group-create/InviteFriendPanel'
+import { InviteFriendPanel, type InviteShareTarget } from '@/components/matching/group-create/InviteFriendPanel'
 import { getGroupCompositionSummary, getQueueStatusText } from '@/components/matching/group-create/status'
+import { shareGroupInviteOnKakao } from '@/lib/kakao-share'
 import type {
   FriendSummary,
   GroupInviteRecord,
@@ -51,6 +57,7 @@ export default function GroupCreatePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [sharePending, setSharePending] = useState<InviteShareTarget | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showTransferPanel, setShowTransferPanel] = useState(false)
@@ -67,7 +74,7 @@ export default function GroupCreatePage() {
   const groupIsFull = members.length >= capacity
   const openSlots = Math.max(0, capacity - members.length)
   const isLeader = Boolean(group && currentUserId && group.leader_user_id === currentUserId)
-  const inQueue = group?.status === 'ready' || group?.status === 'in_pool'
+  const inQueue = isGroupQueueActive(state.match_pool_status)
   const groupId = group?.id
   const canManageMembers = Boolean(isLeader && group && ['forming', 'ready', 'in_pool'].includes(group.status))
   const currentUserMatchSetup = isDevPreview
@@ -195,28 +202,62 @@ export default function GroupCreatePage() {
       }
 
       if (!res.ok) {
-        setError('그룹을 만들 수 없어요. 기본 프로필을 먼저 완료해주세요.')
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        clearGroupStateAfterLoadFailure()
+        setError(translateGroupError(data.error))
         return
       }
 
-      const data = await res.json() as GroupState
+      const payload = await res.json() as unknown
+      if (!isMatchingGroupsPayload(payload)) {
+        clearGroupStateAfterLoadFailure()
+        setError('그룹 응답을 확인하지 못했어요. 잘못된 상태로 진행하지 않도록 멈췄어요.')
+        return
+      }
+      const data = payload as GroupState
       setState(data)
       await refreshPreMatchCardStatus()
     } catch {
+      clearGroupStateAfterLoadFailure()
       setError('그룹 정보를 불러오지 못했어요.')
     } finally {
       setLoading(false)
     }
   }
 
-  async function refreshGroup() {
-    if (isDevPreview) return
+  async function refreshGroup(): Promise<boolean> {
+    if (isDevPreview) return true
 
-    const res = await fetch('/api/groups')
-    if (!res.ok) return
-    const data = await res.json() as GroupState
-    setState(data)
-    await refreshPreMatchCardStatus()
+    try {
+      const res = await fetch('/api/groups')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string }
+        clearGroupStateAfterLoadFailure()
+        setError(translateGroupError(data.error))
+        return false
+      }
+      const payload = await res.json() as unknown
+      if (!isMatchingGroupsPayload(payload)) {
+        clearGroupStateAfterLoadFailure()
+        setError('그룹 응답을 확인하지 못했어요. 잘못된 상태로 진행하지 않도록 멈췄어요.')
+        return false
+      }
+      const data = payload as GroupState
+      setState(data)
+      await refreshPreMatchCardStatus()
+      return true
+    } catch {
+      clearGroupStateAfterLoadFailure()
+      setError('그룹 정보를 다시 확인하지 못했어요. 잠시 후 새로고침해주세요.')
+      return false
+    }
+  }
+
+  function clearGroupStateAfterLoadFailure() {
+    setState(EMPTY_STATE)
+    setPreMatchCardDone(false)
+    setQueueVisualState(QUEUE_VISUAL_DEFAULT)
+    setShowTransferPanel(false)
   }
 
   async function updateGroupSize(size: 2 | 3) {
@@ -252,8 +293,13 @@ export default function GroupCreatePage() {
         return
       }
 
-      const data = await res.json() as GroupState
-      setState(data)
+      const payload = await res.json() as unknown
+      if (!isMatchingGroupsPayload(payload)) {
+        clearGroupStateAfterLoadFailure()
+        setError('그룹 응답을 확인하지 못했어요. 잘못된 상태로 진행되지 않도록 멈췄어요.')
+        return
+      }
+      setState(payload as GroupState)
     } catch {
       setError('그룹 인원을 변경하지 못했어요.')
     } finally {
@@ -302,7 +348,8 @@ export default function GroupCreatePage() {
         return
       }
 
-      await refreshGroup()
+      const refreshed = await refreshGroup()
+      if (!refreshed) return
       setError(`${memberName}님을 그룹에서 내보냈어요. 부족한 친구를 다시 초대해야 매칭 찾기가 켜져요.`)
     } catch {
       setError('친구를 그룹에서 내보내지 못했어요.')
@@ -376,32 +423,127 @@ export default function GroupCreatePage() {
     }
   }
 
-  async function copyInviteLink() {
-    if (!group || saving) return
-
-    if (isDevPreview) {
-      await navigator.clipboard.writeText(`${window.location.origin}/group/invite/dev-preview`)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1400)
-      return
-    }
+  async function shareInviteLink(target: InviteShareTarget) {
+    if (!group || saving || sharePending) return
 
     setSaving(true)
+    setSharePending(target)
     setError(null)
+    setNotice(null)
 
     try {
-      const invite = await createInvite({ kind: 'link' })
-      const link = `${window.location.origin}/group/invite/${invite.token}`
-      await navigator.clipboard.writeText(link)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1400)
-      await refreshGroup()
+      const inviteUrl = await createInviteLink()
+      const shareUrl = target === 'kakao' ? buildKakaoShareUrl(inviteUrl) : inviteUrl
+      const payload = buildInviteSharePayload(shareUrl)
+
+      if (target === 'kakao') {
+        const shared = await shareWithKakaoOrFallback(payload)
+        if (shared === 'kakao') {
+          setNotice('카카오톡 공유창을 열었어요. 보낼 친구나 단톡방을 선택하면 됩니다.')
+        } else if (shared === 'native') {
+          setNotice('카카오톡 공유를 열지 못해서 기본 공유창으로 이어갔어요.')
+        } else {
+          setNotice('카카오톡 공유를 열지 못해서 초대 링크를 복사했어요.')
+        }
+        return
+      }
+
+      if (target === 'native') {
+        const shared = await shareWithNative(payload)
+        if (shared) {
+          setNotice('공유창을 열었어요. 보낼 앱을 선택하면 됩니다.')
+          return
+        }
+      }
+
+      await copyInviteUrl(inviteUrl)
+      setNotice('초대 링크를 복사했어요. 카카오톡 채팅방에 바로 붙여넣을 수 있어요.')
     } catch {
-      setError('초대 링크를 만들지 못했어요.')
+      setError('초대 링크를 만들거나 공유하지 못했어요. 잠시 뒤 다시 시도해 주세요.')
       setCopied(false)
     } finally {
       setSaving(false)
+      setSharePending(null)
     }
+  }
+
+  async function createInviteLink() {
+    if (!group) throw new Error('group_required')
+
+    if (isDevPreview) {
+      return `${window.location.origin}/group/invite/dev-preview`
+    }
+
+    const invite = await createInvite({ kind: 'link' })
+    await refreshGroup()
+    return `${window.location.origin}/group/invite/${invite.token}`
+  }
+
+  function buildInviteSharePayload(inviteUrl: string) {
+    const sizeLabel = `${capacity}:${capacity}`
+
+    return {
+      title: `Quantum ${sizeLabel} 과팅 팀 초대`,
+      description: '친구가 보낸 팀 초대예요. 로그인하고 그룹에 합류하면 이번 주 매칭 준비를 같이 이어갈 수 있어요.',
+      url: inviteUrl,
+      buttonTitle: '초대 수락하기',
+    }
+  }
+
+  function buildKakaoShareUrl(inviteUrl: string) {
+    const shareOrigin = process.env.NEXT_PUBLIC_KAKAO_SHARE_ORIGIN?.trim()
+    if (!shareOrigin) return inviteUrl
+
+    try {
+      const publicOrigin = new URL(shareOrigin)
+      if (publicOrigin.protocol !== 'https:') return inviteUrl
+
+      const url = new URL(inviteUrl)
+      url.protocol = publicOrigin.protocol
+      url.host = publicOrigin.host
+      return url.toString()
+    } catch {
+      return inviteUrl
+    }
+  }
+
+  async function shareWithKakaoOrFallback(payload: ReturnType<typeof buildInviteSharePayload>) {
+    try {
+      await shareGroupInviteOnKakao(payload)
+      return 'kakao' as const
+    } catch {
+      const nativeShared = await shareWithNative(payload)
+      if (nativeShared) return 'native' as const
+
+      await copyInviteUrl(payload.url)
+      return 'copy' as const
+    }
+  }
+
+  async function shareWithNative(payload: ReturnType<typeof buildInviteSharePayload>) {
+    if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
+      return false
+    }
+
+    try {
+      await navigator.share({
+        title: payload.title,
+        text: payload.description,
+        url: payload.url,
+      })
+      return true
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return true
+      }
+      return false
+    }
+  }
+
+  async function copyInviteUrl(inviteUrl: string) {
+    await navigator.clipboard.writeText(inviteUrl)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1400)
   }
 
   async function createInvite(payload: Record<string, string>) {
@@ -433,6 +575,7 @@ export default function GroupCreatePage() {
       setState((current) => ({
         ...current,
         group: current.group ? { ...current.group, status: 'in_pool' } : current.group,
+        match_pool_status: 'waiting',
       }))
       return
     }
@@ -451,7 +594,13 @@ export default function GroupCreatePage() {
         setError(translateQueueError(data.error))
         return
       }
-      await refreshGroup()
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'ready' } : current.group,
+        match_pool_status: 'waiting',
+      }))
+      const refreshed = await refreshGroup()
+      if (!refreshed) return
     } catch {
       setError('큐 진입에 실패했어요.')
     } finally {
@@ -463,11 +612,12 @@ export default function GroupCreatePage() {
     if (!group || saving || !canCancelQueue) return
 
     if (isDevPreview) {
-      setDevPreviewGroupStatus('ready')
+      setDevPreviewGroupStatus('forming')
       setDevPreviewGroupSize(capacity)
       setState((current) => ({
         ...current,
-        group: current.group ? { ...current.group, status: 'ready' } : current.group,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+        match_pool_status: null,
       }))
       return
     }
@@ -486,6 +636,11 @@ export default function GroupCreatePage() {
         setError(translateQueueError(data.error))
         return
       }
+      setState((current) => ({
+        ...current,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+        match_pool_status: null,
+      }))
       await refreshGroup()
     } catch {
       setError('큐 취소에 실패했어요.')
@@ -594,6 +749,13 @@ export default function GroupCreatePage() {
 
   function translateGroupError(code?: string) {
     switch (code) {
+      case 'Unauthorized':        return '로그인이 필요해요.'
+      case 'group_state_read_failed': return '그룹 상태를 확인하지 못했어요. 잘못된 상태로 진행하지 않도록 잠시 멈췄어요.'
+      case 'profile_read_failed': return '프로필을 확인하지 못했어요. 잠시 후 다시 시도해주세요.'
+      case 'profile_gender_required': return '기본 프로필을 먼저 완료해야 그룹을 만들 수 있어요.'
+      case 'group_create_failed': return '그룹을 만들지 못했어요. 잠시 후 다시 시도해주세요.'
+      case 'leader_membership_create_failed': return '그룹 리더 등록에 실패했어요. 다시 시도해주세요.'
+      case 'group_create_compensation_failed': return '그룹 생성 정리에 실패했어요. 중복 생성을 피하려면 고객 지원에 문의해주세요.'
       case 'not_group_leader':   return '리더만 그룹을 해체할 수 있어요.'
       case 'leader_cannot_leave': return '리더는 바로 나갈 수 없어요. 해체하거나 리더 위임을 먼저 해야 해요.'
       case 'cannot_remove_leader': return '리더는 그룹에서 내보낼 수 없어요. 리더 위임이나 그룹 해체를 먼저 선택해주세요.'
@@ -609,9 +771,28 @@ export default function GroupCreatePage() {
   }
 
   return (
-    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
-      <div className="relative mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-7 sm:max-w-md">
+    <main className="min-h-screen booting-paper px-4 pb-24 text-boot-ink sm:px-6">
+      <div className="relative mx-auto w-full max-w-2xl pt-5 sm:pt-7">
         <GroupHeader />
+
+        <section className="mb-5 border-y border-boot-hairline bg-white px-1 py-4">
+          <div className="flex items-center gap-4">
+            <SchoolMascot
+              pose="guide"
+              size="lg"
+              className="h-16 w-16 rounded-md border border-boot-primary/10 bg-boot-soft"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-black text-boot-primary">과팅 팀 이어가기</p>
+              <h2 className="mt-1 text-lg font-black leading-tight text-boot-ink">
+                <SchoolName suffix=" 친구들과 준비 중" />
+              </h2>
+              <p className="mt-2 text-xs font-bold leading-5 text-boot-muted">
+                아직 필요한 한 단계만 먼저 보여드릴게요.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {loading ? (
           <section className="glass-card rounded-3xl p-5">
@@ -744,8 +925,17 @@ export default function GroupCreatePage() {
                 <InviteFriendPanel
                   copied={copied}
                   saving={saving || !group}
+                  sharePending={sharePending}
                   pendingInvites={pendingInvites}
-                  onCopyInviteLink={copyInviteLink}
+                  onShareInviteLink={shareInviteLink}
+                />
+
+                <DepartmentAutoFriendPanel
+                  disabled={saving || !group}
+                  preview={isDevPreview}
+                  onRequestSent={async () => {
+                    await refreshGroup()
+                  }}
                 />
 
                 <FriendListPanel

@@ -49,6 +49,7 @@ export interface FriendSummary {
 
 export interface GroupState {
   group: GroupRecord | null
+  match_pool_status: 'waiting' | 'rolled_over' | null
   members: GroupMemberRecord[]
   invites: GroupInviteRecord[]
   friends: FriendSummary[]
