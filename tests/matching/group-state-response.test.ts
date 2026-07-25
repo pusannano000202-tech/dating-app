@@ -5,7 +5,7 @@ import { join } from 'node:path'
 
 test('group state contract: fail-closed reads, atomic mutation RPCs, and response identity', () => {
   const routePath = join(process.cwd(), 'app/api/groups/route.ts')
-  const route = readFileSync(routePath, 'utf8')
+  const route = readFileSync(routePath, 'utf8').replace(/\r\n/g, '\n')
 
   assert.match(route, /return NextResponse\.json\(\{\s*\.{3}state\.result,\s*current_user_id:\s*user\.id\s*\}\)/)
   assert.match(route, /const stateLoad = await loadGroupState\(supabase, user\.id\)/)

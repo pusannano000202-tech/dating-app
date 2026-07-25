@@ -7,6 +7,19 @@ function readSource(path: string): string {
   return readFileSync(join(process.cwd(), path), 'utf8')
 }
 
+test('development fixture screens disclose that preview data is not saved', () => {
+  const notificationsPage = readSource('app/notifications/page.tsx')
+  const friendsPage = readSource('app/friends/page.tsx')
+  const notice = readSource('components/dev/DevPreviewNotice.tsx')
+
+  assert.match(notificationsPage, /DevPreviewNotice/)
+  assert.match(friendsPage, /DevPreviewNotice/)
+  assert.match(notificationsPage, /previewNoticeReady && isDevPreview/)
+  assert.match(friendsPage, /previewNoticeReady && isDevPreview/)
+  assert.match(notice, /개발 미리보기/)
+  assert.match(notice, /실제 계정에 저장되지 않/)
+})
+
 test('match setup pages continue directly to the next setup step from match start', () => {
   const redirectHelper = readSource('lib/client-redirect.ts')
   const personalityPage = readSource('app/profile/personality-preference/page.tsx')
@@ -37,7 +50,8 @@ test('dev preview queue status persists from group create to the home task card'
   assert.match(devSetup, /function getDevPreviewSoloStatusFromClient/)
 
   assert.match(groupCreatePage, /setDevPreviewGroupStatus\('in_pool'\)/)
-  assert.match(groupCreatePage, /setDevPreviewGroupStatus\('ready'\)/)
+  assert.match(groupCreatePage, /setDevPreviewGroupStatus\('forming'\)/)
+  assert.match(groupCreatePage, /match_pool_status: 'waiting'/)
   assert.match(groupCreatePage, /getDevPreviewGroupStatusFromClient\(\)/)
   assert.match(groupCreatePage, /getDevPreviewGroupSizeFromClient\(requestedSize\)/)
 
@@ -51,9 +65,9 @@ test('dev preview queue status persists from group create to the home task card'
   assert.match(homeTaskCard, /soloStatus === 'matched'/)
   assert.match(homeTaskCard, /href: '\/match\?mode=solo&sampleMatches=1'/)
   assert.match(homeTaskCard, /const isSoloFlow = isSoloQueue \|\| isSoloMatched/)
-  assert.match(homeTaskCard, /groupName=\{teamCardName\}/)
-  assert.match(homeTaskCard, /status=\{teamCardStatus\}/)
-  assert.match(homeTaskCard, /1:1 매칭대기중 - 조건이 맞는 상대를 찾는 중/)
+  assert.match(homeTaskCard, /quantum-campus-group\.webp/)
+  assert.match(homeTaskCard, /\{teamCardStatus\}/)
+  assert.match(homeTaskCard, /준비 \{progressDone\}\/4/)
   assert.match(homeTaskCard, /상대 탐색 중/)
   assert.match(homeTaskCard, /if \(loading\) \{/)
   assert.match(homeTaskCard, /href: '\/match'/)
@@ -64,13 +78,15 @@ test('dev preview queue status persists from group create to the home task card'
   assert.match(homeTaskCard, /pendingMatch/)
   assert.match(homeTaskCard, /\/api\/matches\/\$\{encodeURIComponent\(pendingMatch\.match_id\)\}\/cancel/)
   assert.match(homeTaskCard, /canCancelActiveMatchFromHome/)
-  assert.match(homeTaskCard, /const teamCardAction = canCancelQueueFromHome/)
-  assert.match(homeTaskCard, /action=\{teamCardAction\}/)
+  assert.match(homeTaskCard, /\{canCancelQueueFromHome && \(/)
+  assert.match(homeTaskCard, /onClick=\{handleCancelQueue\}/)
+  assert.match(homeTaskCard, /\{canCancelActiveMatchFromHome && \(/)
+  assert.match(homeTaskCard, /onClick=\{handleCancelActiveMatch\}/)
   assert.match(homeTaskCard, /soloStatus === 'matched'/)
   assert.match(homeTaskCard, /setDevPreviewSoloStatus\('idle'\)/)
   assert.match(homeTaskCard, /1:1 매칭 취소하기/)
   assert.match(homeTaskCard, /매칭 취소하기/)
-  assert.doesNotMatch(homeTaskCard, /setGroupStatus\(null\)/)
+  assert.match(homeTaskCard, /const clearActionableState = useCallback\(\(\) => \{[\s\S]+setGroupStatus\(null\)/)
 
   assert.match(matchPage, /getDevPreviewGroupStatusFromClient\(\)/)
   assert.match(matchPage, /getDevPreviewSoloStatusFromClient\(\)/)
@@ -96,12 +112,13 @@ test('group create shows an app-styled Korean loading shell before client data l
 
 test('match hub renders opponent cards only after match results exist', () => {
   const matchPage = readSource('app/match/page.tsx')
+  const lockedOpponentCard = readSource('components/matching/LockedOpponentCard.tsx')
 
   assert.match(matchPage, /const visibleMatches = isSoloMode/)
   assert.match(matchPage, /match\.match_mode === 'solo'/)
   assert.match(matchPage, /\(match\.match_mode \?\? 'group'\) === 'group'/)
-  assert.match(matchPage, /const currentMatchResult = visibleMatches\[0\]/)
-  assert.match(matchPage, /const hasMatchResults = visibleMatches\.length > 0/)
+  assert.match(matchPage, /const currentMatchResult = visibleMatches\.find\(\(match\) => isActiveMatchStatus\(match\.match_status\)\)/)
+  assert.match(matchPage, /const hasMatchResults = Boolean\(currentMatchResult\)/)
   assert.match(matchPage, /const hasStartedMatching =/)
   assert.match(matchPage, /const effectiveMatchMode: MatchMode = soloBlockedByGroupFlow \? 'group' : matchMode/)
   assert.match(matchPage, /const hasAnyStartedMatching = groupFlowActive \|\| rawSoloFlowActive/)
@@ -110,7 +127,7 @@ test('match hub renders opponent cards only after match results exist', () => {
   assert.match(matchPage, /&& hasAnyStartedMatching/)
   assert.match(matchPage, /<QueueControlStrip/)
   assert.match(matchPage, /\{loading \? \(/)
-  assert.match(matchPage, /: hasMatchResults \? \(/)
+  assert.match(matchPage, /: currentMatchResult \? \(/)
   assert.match(matchPage, /hasStartedMatching && !hasMatchResults/)
   assert.match(matchPage, /<MatchSearchingPrivacyCard[\s\S]+mode=\{effectiveMatchMode\}/)
   assert.match(matchPage, /<MatchSearchingPrivacyCard[\s\S]+canceling=\{cancelingQueue\}/)
@@ -118,6 +135,10 @@ test('match hub renders opponent cards only after match results exist', () => {
   assert.match(matchPage, /<PostMatchFlowCard[\s\S]+match=\{currentMatchResult\}/)
   assert.match(matchPage, /\{shouldShowMatchingPool && \(/)
   assert.doesNotMatch(matchPage, /visibleMatches\.map/)
+  assert.match(matchPage, /getOpponentFactChips\(currentMatchResult\)/)
+  assert.doesNotMatch(matchPage, /chemi=\{isSoloMode \? 88 : 92\}/)
+  assert.match(lockedOpponentCard, /chemi != null/)
+  assert.doesNotMatch(lockedOpponentCard, /chemi = 92/)
   assert.match(matchPage, /지금은 \{targetLabel\}를 찾는 중이에요/)
   assert.match(matchPage, /가매칭이 도착하기 전까지는/)
   assert.match(matchPage, /!loading && !hasAnyStartedMatching && \(/)
@@ -126,10 +147,35 @@ test('match hub renders opponent cards only after match results exist', () => {
   assert.doesNotMatch(matchPage, /chemi=\{70\}/)
 })
 
+test('home and match detail keep stale or terminal matching state non-actionable', () => {
+  const homeTaskCard = readSource('components/matching/HomeTodayTaskCard.tsx')
+  const matchDetail = readSource('app/match/[id]/page.tsx')
+  const groupCreatePage = readSource('app/group/create/page.tsx')
+
+  assert.match(homeTaskCard, /nextMatches\.some\([\s\S]{0,120}\(match\) => match\.match_mode === 'solo' && isActiveMatchStatus\(match\.match_status\)/)
+  assert.match(homeTaskCard, /if \(requiredFailure\) \{[\s\S]{0,500}clearActionableState\(\)[\s\S]{0,200}setLoadFailure\(requiredFailure\)/)
+  assert.match(homeTaskCard, /if \(loadFailure\) \{[\s\S]{0,700}if \(pendingMatch\)/)
+  assert.match(matchDetail, /const dailyCardsAvailable =\s*match\?\.match_status === 'confirmed' \|\| match\?\.match_status === 'completed'/)
+  assert.match(matchDetail, /if \(dailyCardsAvailable && match\?\.scheduled_start\)/)
+  assert.match(matchDetail, /\{dailyCardsAvailable && match\.scheduled_start && \(/)
+  assert.match(groupCreatePage, /function clearGroupStateAfterLoadFailure\(\)/)
+  assert.match(groupCreatePage, /setState\(EMPTY_STATE\)/)
+  assert.match(groupCreatePage, /if \(!res\.ok\) \{[\s\S]{0,250}clearGroupStateAfterLoadFailure\(\)/)
+  assert.match(groupCreatePage, /const refreshed = await refreshGroup\(\)\s+if \(!refreshed\) return/)
+  assert.match(groupCreatePage, /method: 'PATCH'[\s\S]{0,700}isMatchingGroupsPayload\(payload\)/)
+  assert.match(matchDetail, /if \(!isMatchDetailPayload\(data\)\) \{[\s\S]{0,300}failClosed\(/)
+  assert.match(matchDetail, /const failClosed = \(message: string\) => \{[\s\S]{0,350}setMatch\(null\)/)
+  assert.match(matchDetail, /const refreshConnections = useCallback\(async \(\) => \{\s+setConnectionsLoading\(true\)\s+setConnections\(\[\]\)/)
+  assert.match(matchDetail, /const refreshed = await refresh\(\)\s+if \(!refreshed\) return\s+goToPendingStep\(2\)/)
+  assert.match(matchDetail, /const refreshed = await refresh\(\)\s+if \(!refreshed\) return\s+goToPendingStep\(3\)/)
+})
+
 test('home routes the main matching CTA through the matching hub', () => {
   const homePage = readSource('app/page.tsx')
+  const homeTaskCard = readSource('components/matching/HomeTodayTaskCard.tsx')
 
-  assert.match(homePage, /href="\/match"/)
+  assert.match(homePage, /HomeTodayTaskCard/)
+  assert.match(homeTaskCard, /href: '\/match'/)
   assert.doesNotMatch(homePage, /href="\/match\/start"/)
   assert.doesNotMatch(homePage, /HomeLockedOpponentNotice/)
   assert.doesNotMatch(homePage, /상대팀 카드는 아직 잠겨 있어요/)
@@ -232,8 +278,8 @@ test('active group queue state replaces start buttons with cancelable waiting UI
 
   const groupCreatePage = readSource('app/group/create/page.tsx')
   assert.match(groupCreatePage, /async function cancelQueue\(\)/)
-  assert.match(groupCreatePage, /setDevPreviewGroupStatus\('ready'\)/)
-  assert.doesNotMatch(groupCreatePage, /setDevPreviewGroupStatus\('forming'\)[\s\S]{0,160}status: 'forming'/)
+  assert.match(groupCreatePage, /setDevPreviewGroupStatus\('forming'\)/)
+  assert.match(groupCreatePage, /setDevPreviewGroupStatus\('forming'\)[\s\S]{0,220}status: 'forming'[\s\S]{0,80}match_pool_status: null/)
 
   assert.match(matchingPool, /groupQueueActive/)
   assert.match(matchingPool, /hideStartAction/)
@@ -274,6 +320,7 @@ test('solo introduction flow is separate from group creation', () => {
 test('solo queue and mock detail stay in the 1:1 flow', () => {
   const matchPage = readSource('app/match/page.tsx')
   const matchDetailPage = readSource('app/match/[id]/page.tsx')
+  const matchFoundSummary = readSource('components/matching/MatchFoundSummary.tsx')
   const matchingPool = readSource('components/MatchingPool.tsx')
   const notificationsPage = readSource('app/notifications/page.tsx')
 
@@ -307,7 +354,7 @@ test('solo queue and mock detail stay in the 1:1 flow', () => {
   assert.match(matchPage, /내가 써야 상대 힌트가 열려요/)
 
   const homeTaskCard = readSource('components/matching/HomeTodayTaskCard.tsx')
-  assert.match(homeTaskCard, /if \(groupStatus === 'in_pool'\)/)
+  assert.match(homeTaskCard, /if \(isGroupQueueActive\(matchPoolStatus\)\)/)
   assert.match(homeTaskCard, /if \(groupStatus === 'ready'\)/)
   assert.match(homeTaskCard, /이번 주 매칭을 시작할 수 있어요/)
   assert.match(homeTaskCard, /큐 진입 가능/)
@@ -338,6 +385,10 @@ test('solo queue and mock detail stay in the 1:1 flow', () => {
   assert.match(matchDetailPage, /내 소개 카드 작성/)
   assert.match(matchDetailPage, /mode=\{currentMatch\.match_mode === 'solo' \? 'solo' : 'group'\}/)
   assert.match(matchDetailPage, /function PendingUnlockPreview/)
+  assert.doesNotMatch(matchDetailPage, /score=\{70\}|score=\{92\}/)
+  assert.doesNotMatch(matchDetailPage, /department="경영학과"/)
+  assert.match(matchFoundSummary, /typeof score === 'number'/)
+  assert.doesNotMatch(matchFoundSummary, /score = 70/)
   assert.match(matchDetailPage, /확정 후 열리는 것/)
   assert.match(matchDetailPage, /16-20시에 하루 한 장씩 직접 열고/)
   assert.match(matchDetailPage, /function TodayCardSummary/)
@@ -370,27 +421,39 @@ test('home info modal explains the whole app flow with visual cards', () => {
   assert.match(homeInfo, /MessageCircle/)
 })
 
-test('daily card availability can generate in-app notifications', () => {
+test('daily card availability uses a read-only lookup and an idempotent sync path', () => {
   const notificationApi = readSource('app/api/notifications/route.ts')
-  const migration = readSource('supabase/migrations/20260701000000_daily_card_available_notifications.sql')
+  const notificationSyncApi = readSource('app/api/notifications/sync-daily-cards/route.ts')
 
-  assert.match(notificationApi, /notify_available_daily_cards/)
+  assert.doesNotMatch(notificationApi, /notify_available_daily_cards/)
   assert.match(notificationApi, /get_my_notifications/)
-  assert.match(migration, /daily_card_available/)
-  assert.match(migration, /CREATE OR REPLACE FUNCTION public\.notify_available_daily_cards/)
-  assert.match(migration, /SET search_path = ''/)
-  assert.match(migration, /match_daily_card_schedule/)
-  assert.match(migration, /INSERT INTO public\.notifications/)
-  assert.match(migration, /FROM public\.notifications n/)
-  assert.match(migration, /selected_at IS NULL/)
-  assert.match(migration, /forfeited_at IS NULL/)
-  assert.match(migration, /v_user_id UUID := auth\.uid\(\)/)
-  assert.match(migration, /gm\.user_id = v_user_id/)
-  assert.match(
-    migration,
-    /REVOKE ALL ON FUNCTION public\.notify_available_daily_cards\(UUID\) FROM PUBLIC/,
-  )
-  assert.match(migration, /NOT EXISTS/)
+  assert.match(notificationSyncApi, /export async function POST/)
+  assert.match(notificationSyncApi, /notify_available_daily_cards/)
+})
+
+test('home and match hub stop actionable matching UI when required API state is unavailable', () => {
+  const homeTaskCard = readSource('components/matching/HomeTodayTaskCard.tsx')
+  const matchPage = readSource('app/match/page.tsx')
+
+  assert.match(homeTaskCard, /getMatchingFrontendLoadFailure/)
+  assert.match(homeTaskCard, /loadFailure/)
+  assert.match(homeTaskCard, /getMatchingFrontendLoadMessage/)
+  assert.match(homeTaskCard, /다시 불러오기/)
+  assert.doesNotMatch(homeTaskCard, /실패해도 기본 CTA를 보여준다/)
+
+  assert.match(matchPage, /getMatchingFrontendLoadFailure/)
+  assert.match(matchPage, /loadFailure/)
+  assert.match(matchPage, /MatchingLoadFailureScreen/)
+  assert.match(matchPage, /다시 불러오기/)
+})
+
+test('group create surfaces required group refresh failures instead of keeping silent stale state', () => {
+  const groupCreatePage = readSource('app/group/create/page.tsx')
+
+  assert.match(groupCreatePage, /async function refreshGroup\(\): Promise<boolean>/)
+  assert.match(groupCreatePage, /setError\(translateGroupError\(data\.error\)\)/)
+  assert.match(groupCreatePage, /return false/)
+  assert.match(groupCreatePage, /group_state_read_failed/)
 })
 
 test('preference page makes age range selection visually prominent', () => {
