@@ -13,9 +13,12 @@ import {
   MessageSquareText,
   PartyPopper,
   Phone,
+  Sparkles,
   Users,
 } from 'lucide-react'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { syncDailyCardsThenLoadNotifications } from '@/lib/notifications/load-notifications'
+import DevPreviewNotice from '@/components/dev/DevPreviewNotice'
 
 interface NotificationRow {
   id: string
@@ -26,6 +29,20 @@ interface NotificationRow {
 }
 
 const DEV_NOTIFICATIONS: NotificationRow[] = [
+  {
+    id: 'dev-notification-campus-seven',
+    kind: 'campus_seven_guide',
+    payload: {
+      cohort_id: 'dev-campus-seven',
+      day_number: 1,
+      cue_key: 'opening',
+      title: '첫 장면이 시작됐어요',
+      body: '앱을 열고 지금 도착한 안내를 확인해 주세요.',
+      scheduled_at: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
+    },
+    read_at: null,
+    created_at: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
+  },
   {
     id: 'dev-notification-solo-match-created',
     kind: 'match_created',
@@ -87,6 +104,7 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
 
 export default function NotificationsPage() {
   const isDevPreview = isDevPreviewClientSession()
+  const [previewNoticeReady, setPreviewNoticeReady] = useState(false)
   const [items, setItems] = useState<NotificationRow[]>([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -103,7 +121,7 @@ export default function NotificationsPage() {
     }
 
     try {
-      const res = await fetch('/api/notifications?limit=100')
+      const res = await syncDailyCardsThenLoadNotifications(fetch)
       if (res.status === 401) {
         setError('로그인이 필요해요.')
         return
@@ -124,6 +142,10 @@ export default function NotificationsPage() {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  useEffect(() => {
+    setPreviewNoticeReady(true)
+  }, [])
 
   async function markAll() {
     if (busy) return
@@ -185,6 +207,8 @@ export default function NotificationsPage() {
             </button>
           )}
         </header>
+
+        {previewNoticeReady && isDevPreview && <DevPreviewNotice />}
 
         {error && (
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
@@ -260,7 +284,7 @@ function MatchNotificationCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate text-base font-black">{kindLabel(notification.kind, isSolo)}</p>
+            <p className="truncate text-base font-black">{kindLabel(notification.kind, notification.payload, isSolo)}</p>
             {unread && <span className="h-2 w-2 flex-shrink-0 rounded-full bg-boot-primary" />}
           </div>
           <p className="mt-1 text-xs leading-5 text-boot-muted">{kindSummary(notification.kind, notification.payload)}</p>
@@ -314,11 +338,15 @@ function KindIcon({ kind }: { kind: string }) {
     case 'review_request': return <MessageSquareText size={18} />
     case 'friend_request_received': return <Heart size={18} />
     case 'meeting_reminder': return <Bell size={18} />
+    case 'campus_seven_guide': return <Sparkles size={18} />
     default: return <Bell size={18} />
   }
 }
 
-function kindLabel(kind: string, isSolo = false): string {
+function kindLabel(kind: string, payload: Record<string, unknown>, isSolo = false): string {
+  if (kind === 'campus_seven_guide') {
+    return typeof payload.title === 'string' ? payload.title : '새 안내가 도착했어요'
+  }
   if (kind === 'daily_card_available') return '오늘의 데일리카드를 열어보세요!'
   switch (kind) {
     case 'match_created': return isSolo ? '1:1 가매칭이 도착했어요!' : '새 가매칭이 도착했어요!'
@@ -339,6 +367,9 @@ function kindLabel(kind: string, isSolo = false): string {
 }
 
 function kindSummary(kind: string, payload: Record<string, unknown>): string {
+  if (kind === 'campus_seven_guide') {
+    return typeof payload.body === 'string' ? payload.body : 'Campus Seven LIVE 화면에서 확인해 주세요.'
+  }
   if (kind === 'daily_card_available') {
     return '16시부터 20시 사이에 하루 한 장을 직접 열 수 있어요. 내가 열어야 상대 힌트가 보여요.'
   }
@@ -385,6 +416,7 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
 }
 
 function getNotificationHref(kind: string, matchId: string | null) {
+  if (kind === 'campus_seven_guide') return '/match/campus-seven'
   if (!matchId) return '/match'
   if (kind === 'review_request') return `/match/${encodeURIComponent(matchId)}/review`
   if (kind === 'continuation_choice_request') return `/match/${encodeURIComponent(matchId)}/continuation`
