@@ -106,7 +106,7 @@ export default function GroupInvitePage() {
           {state === 'unauthorized' && invite && (
             <div>
               <p className="text-xs font-black text-boot-primary">초대 그룹</p>
-              <p className="mt-1 text-xl font-black">{invite.group_name ?? '부팅 그룹'}</p>
+              <p className="mt-1 text-xl font-black">{invite.group_name ?? 'Quantum 그룹'}</p>
               <p className="mt-1 text-xs font-bold text-boot-muted">{invite.group_size}명 그룹 · 수락 대기</p>
               <div className="mt-4 rounded-2xl border border-boot-hairline bg-boot-soft/55 px-3 py-3">
                 <div className="flex items-start gap-2">
@@ -137,7 +137,7 @@ export default function GroupInvitePage() {
           {state === 'ready' && invite && (
             <div>
               <p className="text-xs font-black text-boot-primary">초대 그룹</p>
-              <p className="mt-1 text-xl font-black">{invite.group_name ?? '부팅 그룹'}</p>
+              <p className="mt-1 text-xl font-black">{invite.group_name ?? 'Quantum 그룹'}</p>
               <p className="mt-1 text-xs font-bold text-boot-muted">{invite.group_size}명 그룹 · 수락 대기</p>
               <button
                 type="button"
