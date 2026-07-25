@@ -21,7 +21,7 @@ import { getSupabaseAdminKeyStatus } from '../../lib/supabase-admin'
 const ROOT = process.cwd()
 
 function readSource(path: string) {
-  return readFileSync(join(ROOT, path), 'utf8')
+  return readFileSync(join(ROOT, path), 'utf8').replace(/\r\n/g, '\n')
 }
 
 function restoreEnv(key: string, value: string | undefined) {

@@ -9,21 +9,32 @@ function readSource(path: string) {
   return readFileSync(join(ROOT, path), 'utf8')
 }
 
-test('root layout uses Booting production metadata and light theme color', () => {
+test('root layout uses Quantum production metadata and Campus Signal theme color', () => {
   const layout = readSource('app/layout.tsx')
 
-  assert.match(layout, /themeColor:\s*'#f8f3ec'/)
+  assert.match(layout, /title:\s*'Quantum/)
+  assert.match(layout, /themeColor:\s*'#F4F6F5'/)
   assert.match(layout, /bg-app min-h-screen text-boot-ink/)
   assert.doesNotMatch(layout, /Destiny/)
 })
 
-test('home page renders the Booting dashboard behind demo auth for school preview', () => {
+test('root layout isolates the search-param theme provider behind Suspense', () => {
+  const layout = readSource('app/layout.tsx')
+
+  assert.match(layout, /import\s+\{\s*Suspense\s*\}\s+from\s+'react'/)
+  assert.match(
+    layout,
+    /<Suspense\s+fallback=\{null\}>[\s\S]*<SchoolThemeProvider\s*\/>[\s\S]*<\/Suspense>/,
+  )
+})
+
+test('home page renders the Quantum next-action dashboard behind demo auth', () => {
   const home = readSource('app/page.tsx')
 
   assert.match(home, /BootingLogo/)
   assert.match(home, /HomeDashboard/)
   assert.match(home, /HomeTodayTaskCard/)
-  assert.match(home, /href="\/match"/)
+  assert.match(home, /QuantumHomeRecommendations/)
   assert.doesNotMatch(home, /href="\/match\/start"/)
   assert.doesNotMatch(home, /href="\/login"/)
   assert.doesNotMatch(home, /LandingFlowRow/)
@@ -33,12 +44,46 @@ test('home page renders the Booting dashboard behind demo auth for school previe
   assert.doesNotMatch(home, /DestinyLogo/)
 })
 
+test('school mascot assets stay available while action screens avoid oversized decoration', () => {
+  const mascot = readSource('components/theme/SchoolMascot.tsx')
+  const home = readSource('app/page.tsx')
+  const basic = readSource('app/profile/basic/page.tsx')
+  const match = readSource('app/match/page.tsx')
+  const groupCreate = readSource('app/group/create/page.tsx')
+  const community = readSource('app/community/page.tsx')
+  const meetups = readSource('app/meetups/page.tsx')
+  const refund = readSource('app/match/[id]/refund/page.tsx')
+  const report = readSource('app/dev/mascot-screen-report/page.tsx')
+
+  assert.match(mascot, /app-assets-v3-normalized-v2/)
+  assert.match(mascot, /overflow-hidden/)
+  assert.doesNotMatch(mascot, /scale-\[1\.06\]/)
+
+  assert.doesNotMatch(home, /SchoolMascot/)
+  assert.doesNotMatch(basic, /SchoolMascot/)
+  assert.match(match, /hasStartedMatching \? 'waiting'/)
+  assert.match(match, /h-16 w-16/)
+  assert.match(groupCreate, /pose="guide"/)
+  assert.match(groupCreate, /h-16 w-16/)
+  assert.doesNotMatch(community, /h-\[114px\] w-\[114px\]/)
+  assert.doesNotMatch(meetups, /h-\[114px\] w-\[114px\]/)
+  assert.match(refund, /pose="refund"/)
+  assert.match(refund, /h-\[118px\] w-\[118px\]/)
+  assert.doesNotMatch(groupCreate, /pose="refund"/)
+  assert.doesNotMatch(community, /pose="refund"/)
+  assert.doesNotMatch(meetups, /pose="refund"/)
+  assert.match(report, /suffix: 'community_guide'/)
+  assert.match(report, /slot: 114/)
+})
+
 test('home page does not show result-like opponent card before matching starts', () => {
   const home = readSource('app/page.tsx')
+  const today = readSource('components/matching/HomeTodayTaskCard.tsx')
 
-  assert.match(home, /매칭 전까지 이름과 사진은 공개되지 않아요/)
+  assert.match(home, /필요한 순간 전까지 이름과 사진은 상대에게 공개되지 않아요/)
   assert.match(home, /HomeTodayTaskCard/)
-  assert.match(home, /href="\/match"/)
+  assert.match(today, /quantum-campus-group\.webp/)
+  assert.doesNotMatch(today, /DarkTeamProgressCard/)
   assert.doesNotMatch(home, /HomeLockedOpponentNotice/)
   assert.doesNotMatch(home, /상대팀 카드는 아직 잠겨 있어요/)
   assert.doesNotMatch(home, /매칭이 잡히기 전에는 케미 점수나 상대팀 정보가 보이지 않아요/)
@@ -122,6 +167,7 @@ test('pending match detail uses page steps instead of one long scroll', () => {
 
 test('auth and completion entry points use Booting branding', () => {
   const login = readSource('app/(auth)/login/page.tsx')
+  const logo = readSource('components/BootingLogo.tsx')
   const complete = readSource('app/profile/complete/page.tsx')
   const edit = readSource('app/profile/edit/page.tsx')
 
@@ -131,6 +177,12 @@ test('auth and completion entry points use Booting branding', () => {
     assert.doesNotMatch(source, /font-destiny/)
     assert.doesNotMatch(source, /shadow-violet-900/)
   }
+
+  assert.match(logo, /subtitle\?: string/)
+  assert.match(login, /subtitle="대학생 과팅"/)
+  assert.match(login, /UNIVERSITY GROUP MATCHING/)
+  assert.doesNotMatch(login, /PNU GROUP MATCHING/)
+  assert.match(login, /bg-white\/82/)
 })
 
 test('login page uses Supabase email OTP while phone provider is disabled', () => {
@@ -164,8 +216,8 @@ test('onboarding and match setup are separate product flows', () => {
   const stepProgress = readSource('components/profile/StepProgress.tsx')
   const matchStart = readSource('app/match/start/page.tsx')
 
-  assert.match(home, /href="\/friends"/)
-  assert.match(home, /href="\/match"/)
+  assert.match(home, /QuantumHomeRecommendations/)
+  assert.match(home, /HomeTodayTaskCard/)
   assert.doesNotMatch(home, /href="\/match\/start"/)
   assert.match(worldcup, /router\.push\('\/profile\/survey'\)/)
   assert.match(survey, /router\.push\('\/profile\/photos'\)/)
@@ -193,8 +245,8 @@ test('matching readiness gates include nickname and pre-match card checks', () =
   const checkNicknameRoute = readSource('app/api/profiles/check-nickname/route.ts')
   const claimNicknameRoute = readSource('app/api/profiles/claim-nickname/route.ts')
   const draftRoute = readSource('app/api/profile/match-card-draft/route.ts')
-  const nicknameMigration = readSource('supabase/migrations/20260622_profile_display_name_claims.sql')
-  const draftMigration = readSource('supabase/migrations/20260622_matching_pre_match_card_drafts.sql')
+  const nicknameMigration = readSource('supabase/migrations/20260622000001_profile_display_name_claims.sql')
+  const draftMigration = readSource('supabase/migrations/20260622000000_matching_pre_match_card_drafts.sql')
 
   assert.match(basicInfoForm, /\/api\/profiles\/check-nickname\?nickname=/)
   assert.match(basicInfoForm, /await checkNicknameAvailability\(trimmedName\)/)
@@ -254,6 +306,16 @@ test('profile onboarding pages allow dev preview without Supabase user redirects
     assert.match(source, /isSupabaseConfigured/)
     assert.match(source, /isDevPreviewClientSession\(\) \|\| !isSupabaseConfigured\(\)/)
   }
+})
+
+test('dev school preview keeps the server and first client render hydration-safe', () => {
+  const switcher = readSource('components/dev/DevSchoolPreviewSwitcher.tsx')
+
+  assert.match(switcher, /useState<DevSchoolPreview>\(DEV_SCHOOL_PREVIEWS\[0\]\)/)
+  assert.match(switcher, /useEffect\(\(\) => \{[\s\S]*setSelected\(readStoredDevSchoolPreview\(\)\)[\s\S]*\}, \[\]\)/)
+  assert.doesNotMatch(switcher, /useState<DevSchoolPreview>\(getInitialSchool\)/)
+  assert.match(switcher, /aria-label="학교 검색"/)
+  assert.match(switcher, /aria-pressed=\{isSelected\}/)
 })
 
 test('middleware issues dev auth cookie when opening dev preview', () => {

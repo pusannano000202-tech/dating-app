@@ -18,6 +18,7 @@ import {
   UsersRound,
 } from 'lucide-react'
 import BootingLogo from '@/components/BootingLogo'
+import DevSchoolPreviewSwitcher from '@/components/dev/DevSchoolPreviewSwitcher'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 
 const previewLinks = [
@@ -84,9 +85,11 @@ export default function DevPreviewPage() {
           </p>
           <h1 className="mt-2 text-3xl font-black leading-tight">현재 화면 점검</h1>
           <p className="mt-2 text-sm leading-6 text-boot-muted">
-            로그인 없이 주요 화면을 열어보고, 성준 작업에서 흡수한 부분과 보류한 부분을 확인합니다.
+            로그인 없이 학교별 색감으로 주요 화면을 열어보고, 기본정보 입력 없이도 홈과 매칭 화면을 확인합니다.
           </p>
         </section>
+
+        <DevSchoolPreviewSwitcher />
 
         <section className="glass-card mb-5 rounded-3xl p-5">
           <div className="mb-4 flex items-center gap-3">
