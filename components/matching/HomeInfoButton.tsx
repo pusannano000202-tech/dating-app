@@ -21,7 +21,7 @@ export default function HomeInfoButton() {
       {open && (
         <section className="absolute right-0 top-12 z-30 max-h-[calc(100vh-7rem)] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto rounded-[28px] border border-boot-primary/15 bg-white p-4 text-left shadow-xl">
           <p className="text-xs font-black uppercase tracking-normal text-boot-primary">How it works</p>
-          <h2 className="mt-1 text-lg font-black text-boot-ink">부팅은 기존 과팅이랑 이렇게 달라요</h2>
+          <h2 className="mt-1 text-lg font-black text-boot-ink">Quantum은 기존 과팅이랑 이렇게 달라요</h2>
           <p className="mt-1 text-xs leading-5 text-boot-muted">
             홈에서는 다음 행동만 보고, 상대 카드와 큐 숫자는 매칭 찾기 이후 매칭 화면에서 확인해요.
           </p>

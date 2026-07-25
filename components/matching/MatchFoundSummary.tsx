@@ -13,9 +13,9 @@ type MatchFoundSummaryProps = {
 }
 
 export default function MatchFoundSummary({
-  score = 70,
-  department = '경영학과',
-  ageRange = '20~23세',
+  score,
+  department,
+  ageRange,
   genderSummary = '여 0명 · 남 0명',
   lockedTitle = '상대팀 이름은 아직 비공개예요',
   lockedMessage = '날짜를 정하고 만남 전까지 하루씩 Q&A로 알아가요.',
@@ -26,13 +26,15 @@ export default function MatchFoundSummary({
   return (
     <section className={['text-center', className].filter(Boolean).join(' ')}>
       <p className="mb-5 text-xs font-black uppercase tracking-[0.35em] text-boot-coral">MATCH FOUND</p>
-      <ChemiRing score={score} size="lg" className="mx-auto mb-8" />
+      {typeof score === 'number' && (
+        <ChemiRing score={score} size="lg" className="mx-auto mb-8" />
+      )}
       <h1 className="text-3xl font-black leading-tight text-boot-ink">{title}</h1>
       <p className="mt-3 text-sm font-bold text-boot-muted">{subtitle}</p>
 
       <div className="mt-9 space-y-4 text-left">
-        <InfoPill label="학과" value={department} />
-        <InfoPill label="나이대" value={ageRange} />
+        {department && <InfoPill label="학과" value={department} />}
+        {ageRange && <InfoPill label="나이대" value={ageRange} />}
         <InfoPill label="성별 구성" value={genderSummary} />
         <div className="rounded-[26px] bg-white px-5 py-5 shadow-[0_14px_34px_rgba(23,20,18,0.08)]">
           <p className="text-base font-black text-boot-ink">{lockedTitle}</p>

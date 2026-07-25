@@ -3,24 +3,25 @@ import { Zap } from 'lucide-react'
 interface BootingLogoProps {
   size?: 'sm' | 'md' | 'lg'
   showSubtitle?: boolean
+  subtitle?: string
   className?: string
 }
 
 const sizes = {
   sm: {
-    mark: 'h-8 w-8 rounded-xl',
+    mark: 'h-8 w-8 rounded-md',
     icon: 16,
     title: 'text-lg',
     subtitle: 'text-[9px]',
   },
   md: {
-    mark: 'h-10 w-10 rounded-2xl',
+    mark: 'h-10 w-10 rounded-md',
     icon: 19,
     title: 'text-2xl',
     subtitle: 'text-[10px]',
   },
   lg: {
-    mark: 'h-12 w-12 rounded-2xl',
+    mark: 'h-12 w-12 rounded-md',
     icon: 23,
     title: 'text-3xl',
     subtitle: 'text-[11px]',
@@ -30,6 +31,7 @@ const sizes = {
 export default function BootingLogo({
   size = 'md',
   showSubtitle = true,
+  subtitle = '대학생 연결',
   className = '',
 }: BootingLogoProps) {
   const s = sizes[size]
@@ -41,11 +43,11 @@ export default function BootingLogo({
       </div>
       <div>
         <p className={`${s.title} font-black leading-none tracking-normal text-boot-ink`}>
-          부팅
+          Quantum
         </p>
         {showSubtitle && (
-          <p className={`${s.subtitle} mt-1 font-bold uppercase tracking-[0.18em] text-boot-muted`}>
-            부산대 과팅
+          <p className={`${s.subtitle} mt-1 font-bold tracking-normal text-boot-muted`}>
+            {subtitle}
           </p>
         )}
       </div>

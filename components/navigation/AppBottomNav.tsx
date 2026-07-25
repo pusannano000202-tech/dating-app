@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, MessageCircle, UserRound, Zap } from 'lucide-react'
+import { Home, MessageCircleMore, UserRound, UsersRound, Zap } from 'lucide-react'
 
 const hiddenExactRoutes = new Set(['/login', '/dev/preview'])
 
 const tabs = [
   { href: '/', label: '홈', Icon: Home },
   { href: '/match', label: '매칭', Icon: Zap },
-  { href: '/chat', label: '채팅', Icon: MessageCircle },
+  { href: '/meetups', label: '모임', Icon: UsersRound },
+  { href: '/community', label: '커뮤니티', Icon: MessageCircleMore },
   { href: '/profile/edit', label: '마이', Icon: UserRound },
 ]
 
@@ -22,7 +23,8 @@ function shouldHide(pathname: string): boolean {
 function isActive(pathname: string, href: string): boolean {
   if (href === '/') return pathname === '/'
   if (href === '/match') return pathname === '/match' || pathname.startsWith('/match/')
-  if (href === '/chat') return pathname === '/chat' || /^\/match\/[^/]+\/chat/.test(pathname)
+  if (href === '/meetups') return pathname === '/meetups' || pathname.startsWith('/meetups/')
+  if (href === '/community') return pathname === '/community' || pathname.startsWith('/community/')
   if (href === '/profile/edit') return pathname === '/profile/edit' || pathname.startsWith('/profile/')
   return pathname === href || pathname.startsWith(`${href}/`)
 }
@@ -33,24 +35,36 @@ export default function AppBottomNav() {
   if (shouldHide(pathname)) return null
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+10px)] pointer-events-none">
-      <div className="booting-bottom-nav mx-auto grid max-w-md grid-cols-4 gap-1 rounded-[30px] p-1.5 backdrop-blur-2xl pointer-events-auto">
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 border-t border-boot-hairline bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
+      <div
+        className="pointer-events-auto mx-auto grid h-16 max-w-md gap-1 px-2"
+        style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
+      >
         {tabs.map(({ href, label, Icon }) => {
           const active = isActive(pathname, href)
+          const className = [
+            'relative flex min-h-16 flex-col items-center justify-center px-1 text-[10px] font-black transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-boot-primary',
+            active
+              ? 'text-boot-primary'
+              : 'text-boot-muted hover:text-boot-body',
+          ].join(' ')
+          const content = (
+            <>
+              {active && <span className="absolute inset-x-4 top-0 h-0.5 bg-boot-primary" />}
+              <Icon size={20} strokeWidth={active ? 2.8 : 2.1} />
+              <span className="mt-1 leading-none">{label}</span>
+            </>
+          )
+
           return (
             <Link
               key={href}
               href={href}
-              className={[
-                'flex min-h-[56px] flex-col items-center justify-center rounded-[24px] px-2 text-[11px] font-black transition',
-                active
-                  ? 'bg-white text-boot-primary shadow-[0_8px_22px_rgba(23,20,18,0.08)]'
-                  : 'text-boot-muted hover:bg-white/60 hover:text-boot-body',
-              ].join(' ')}
+              prefetch
+              className={className}
               aria-current={active ? 'page' : undefined}
             >
-              <Icon size={19} strokeWidth={active ? 2.8 : 2.2} />
-              <span className="mt-1 leading-none">{label}</span>
+              {content}
             </Link>
           )
         })}
