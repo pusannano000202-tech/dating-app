@@ -226,7 +226,9 @@ function LoginContent() {
 
       <section className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-7 pt-7">
         <header className="flex items-center justify-between">
-          <BootingLogo size="md" />
+          <div className="rounded-2xl border border-white/45 bg-white/82 px-3 py-2 shadow-sm backdrop-blur-xl">
+            <BootingLogo size="md" subtitle="대학생 과팅" />
+          </div>
           {showAuth && (
             <button
               type="button"
@@ -246,7 +248,7 @@ function LoginContent() {
           <div className="flex flex-1 flex-col justify-end pb-8">
             <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/45 bg-white/78 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary shadow-sm backdrop-blur-xl">
               <Sparkles size={12} />
-              PNU GROUP MATCHING
+              UNIVERSITY GROUP MATCHING
             </div>
 
             <h1 className="max-w-[20rem] text-[2.75rem] font-black leading-[1.05] tracking-normal text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.42)]">
@@ -289,7 +291,7 @@ function LoginContent() {
             <div className="rounded-[30px] border border-white/60 bg-white/92 p-6 shadow-[0_26px_70px_rgba(23,18,15,0.22)] backdrop-blur-2xl">
               <div className="mb-6">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary">Login</p>
-                <h1 className="mt-2 text-2xl font-black leading-tight">부팅 시작하기</h1>
+                <h1 className="mt-2 text-2xl font-black leading-tight">Quantum 시작하기</h1>
                 <p className="mt-2 text-sm leading-6 text-boot-muted">
                   로그인하면 기본정보 입력부터 매칭 준비까지 이어서 진행돼요.
                 </p>

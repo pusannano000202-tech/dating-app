@@ -1,8 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { CalendarCheck2, ChevronRight, Loader2, Search, Sparkles, UsersRound } from 'lucide-react'
+import { CalendarCheck2, ChevronRight, Loader2, RotateCw, Search, Sparkles, UsersRound } from 'lucide-react'
 import {
   getDevMatchSetupStatusFromClient,
   getDevPreviewGroupSizeFromClient,
@@ -21,13 +22,15 @@ import {
   PRE_MATCH_CARD_DRAFT_COOKIE,
   isPreMatchCardDraftCookieDone,
 } from '@/lib/matching/pre-match-card-draft'
+import { DEV_PREVIEW_GROUP } from '@/lib/matching/dev-preview-group'
 import {
-  DEV_PREVIEW_CURRENT_USER_ID,
-  DEV_PREVIEW_GROUP,
-  DEV_PREVIEW_GROUP_MEMBERS,
-} from '@/lib/matching/dev-preview-group'
-import CurrentGroupPreview, { type CurrentGroupMember } from '@/components/matching/CurrentGroupPreview'
-import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
+  getMatchingFrontendLoadFailure,
+  getMatchingFrontendLoadMessage,
+  getMatchingFrontendPayloadFailure,
+  type MatchingFrontendLoadFailure,
+} from '@/lib/matching/frontend-load-state'
+import { isGroupQueueActive } from '@/lib/matching/group-queue-state'
+import { isActiveMatchStatus } from '@/lib/matching/match-view-state'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 
@@ -41,9 +44,11 @@ interface MatchRow {
 
 interface GroupsResponse {
   group: { id?: string | null; status: GroupStatus; size?: number | null } | null
-  members?: CurrentGroupMember[]
-  current_user_id?: string | null
-  current_user_match_setup?: MatchSetupStatus
+  match_pool_status: 'waiting' | 'rolled_over' | null
+  members: unknown[]
+  invites: unknown[]
+  friends: unknown[]
+  current_user_match_setup: MatchSetupStatus
 }
 
 interface MatchesResponse {
@@ -60,24 +65,35 @@ export default function HomeTodayTaskCard() {
   const [cancelingQueue, setCancelingQueue] = useState(false)
   const [groupStatus, setGroupStatus] = useState<GroupStatus | null>(null)
   const [groupId, setGroupId] = useState<string | null>(null)
+  const [matchPoolStatus, setMatchPoolStatus] = useState<'waiting' | 'rolled_over' | null>(null)
   const [groupSize, setGroupSize] = useState(3)
-  const [groupMembers, setGroupMembers] = useState<CurrentGroupMember[]>([])
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [matchSetupStatus, setMatchSetupStatus] = useState<MatchSetupStatus>(EMPTY_MATCH_SETUP_STATUS)
   const [preMatchCardDone, setPreMatchCardDone] = useState(false)
   const [matches, setMatches] = useState<MatchRow[]>([])
   const [soloStatus, setSoloStatus] = useState<DevPreviewSoloStatus>('idle')
   const [cancelingMatch, setCancelingMatch] = useState(false)
+  const [loadFailure, setLoadFailure] = useState<MatchingFrontendLoadFailure | null>(null)
+
+  const clearActionableState = useCallback(() => {
+    setGroupStatus(null)
+    setGroupId(null)
+    setMatchPoolStatus(null)
+    setGroupSize(3)
+    setMatchSetupStatus(EMPTY_MATCH_SETUP_STATUS)
+    setPreMatchCardDone(false)
+    setMatches([])
+    setSoloStatus('idle')
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
+    setLoadFailure(null)
     if (isDevPreview) {
-      const previewGroupSize = getDevPreviewGroupSizeFromClient(DEV_PREVIEW_GROUP.size)
-      setGroupStatus(getDevPreviewGroupStatusFromClient())
+      setGroupSize(getDevPreviewGroupSizeFromClient(DEV_PREVIEW_GROUP.size))
+      const previewGroupStatus = getDevPreviewGroupStatusFromClient()
+      setGroupStatus(previewGroupStatus)
+      setMatchPoolStatus(previewGroupStatus === 'in_pool' ? 'waiting' : null)
       setGroupId(DEV_PREVIEW_GROUP.id)
-      setGroupSize(previewGroupSize)
-      setGroupMembers(DEV_PREVIEW_GROUP_MEMBERS.slice(0, previewGroupSize))
-      setCurrentUserId(DEV_PREVIEW_CURRENT_USER_ID)
       setMatchSetupStatus(getDevMatchSetupStatusFromClient())
       setPreMatchCardDone(hasPreMatchCardDraftCookie())
       setSoloStatus(getDevPreviewSoloStatusFromClient())
@@ -93,21 +109,48 @@ export default function HomeTodayTaskCard() {
         fetch('/api/profile/match-card-draft'),
       ])
 
-      if (groupRes.ok) {
-        const data = await groupRes.json() as GroupsResponse
-        setGroupStatus(data.group?.status ?? null)
-        setGroupId(data.group?.id ?? null)
-        setGroupSize(data.group?.size ?? 3)
-        setGroupMembers(data.members ?? [])
-        setCurrentUserId(data.current_user_id ?? null)
-        setMatchSetupStatus(data.current_user_match_setup ?? EMPTY_MATCH_SETUP_STATUS)
+      const requiredFailure = getMatchingFrontendLoadFailure({
+        groups: groupRes,
+        matches: matchRes,
+      })
+      if (requiredFailure) {
+        clearActionableState()
+        setLoadFailure(requiredFailure)
+        return
       }
-      if (matchRes.ok) {
-        const data = await matchRes.json() as MatchesResponse
-        const nextMatches = data.matches ?? []
-        setMatches(nextMatches)
-        setSoloStatus(nextMatches.some((match) => match.match_mode === 'solo') ? 'matched' : 'idle')
+
+      const [groupPayload, matchPayload] = await Promise.all([
+        groupRes.json() as Promise<unknown>,
+        matchRes.json() as Promise<unknown>,
+      ])
+      const payloadFailure = getMatchingFrontendPayloadFailure({
+        groups: groupPayload,
+        matches: matchPayload,
+      })
+      if (payloadFailure) {
+        clearActionableState()
+        setLoadFailure(payloadFailure)
+        return
       }
+
+      const groupData = groupPayload as GroupsResponse
+      setGroupStatus(groupData.group?.status ?? null)
+      setMatchPoolStatus(groupData.match_pool_status ?? null)
+      setGroupId(groupData.group?.id ?? null)
+      setGroupSize(groupData.group?.size ?? 3)
+      setMatchSetupStatus(groupData.current_user_match_setup)
+
+      const matchData = matchPayload as MatchesResponse
+      const nextMatches = matchData.matches ?? []
+      setMatches(nextMatches)
+      setSoloStatus(
+        nextMatches.some(
+          (match) => match.match_mode === 'solo' && isActiveMatchStatus(match.match_status),
+        )
+          ? 'matched'
+          : 'idle',
+      )
+
       if (cardDraftRes.ok) {
         const data = await cardDraftRes.json() as PreMatchCardDraftResponse
         setPreMatchCardDone(Number(data.draft?.completed_items ?? 0) >= 4)
@@ -115,11 +158,12 @@ export default function HomeTodayTaskCard() {
         setPreMatchCardDone(hasPreMatchCardDraftCookie())
       }
     } catch {
-      // 홈의 오늘 할 일 카드는 실패해도 기본 CTA를 보여준다.
+      clearActionableState()
+      setLoadFailure('network_unavailable')
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview])
+  }, [clearActionableState, isDevPreview])
 
   useEffect(() => {
     load()
@@ -129,7 +173,7 @@ export default function HomeTodayTaskCard() {
     if (cancelingQueue) return
 
     const isSoloQueue = soloStatus === 'in_pool'
-    const isGroupQueue = groupStatus === 'in_pool'
+    const isGroupQueue = isGroupQueueActive(matchPoolStatus)
     if (!isSoloQueue && !isGroupQueue) return
 
     const message = isSoloQueue
@@ -146,8 +190,9 @@ export default function HomeTodayTaskCard() {
       }
 
       if (isDevPreview) {
-        setDevPreviewGroupStatus('ready')
-        setGroupStatus('ready')
+        setDevPreviewGroupStatus('forming')
+        setGroupStatus('forming')
+        setMatchPoolStatus(null)
         return
       }
 
@@ -163,7 +208,7 @@ export default function HomeTodayTaskCard() {
     } finally {
       setCancelingQueue(false)
     }
-  }, [cancelingQueue, groupId, groupStatus, isDevPreview, load, soloStatus])
+  }, [cancelingQueue, groupId, isDevPreview, load, matchPoolStatus, soloStatus])
 
   const pendingMatch = useMemo(
     () => matches.find((match) => match.match_status === 'pending') ?? null,
@@ -215,9 +260,6 @@ export default function HomeTodayTaskCard() {
         href: '/match',
         cta: '매칭 화면 보기',
         Icon: Search,
-        tone: 'neutral' as const,
-        secondaryHref: null,
-        secondaryCta: null,
       }
     }
 
@@ -228,6 +270,17 @@ export default function HomeTodayTaskCard() {
       preMatchCardDone
     const setupCoreDone = matchSetupStatus.allDone && preMatchCardDone
 
+    if (loadFailure) {
+      return {
+        eyebrow: '연결 확인',
+        title: '현재 진행 상태를 확인하지 못했어요',
+        description: getMatchingFrontendLoadMessage(loadFailure),
+        href: loadFailure === 'unauthorized' ? '/login?next=%2F' : '/match',
+        cta: loadFailure === 'unauthorized' ? '다시 로그인' : '다시 불러오기',
+        Icon: RotateCw,
+      }
+    }
+
     if (pendingMatch) {
       return {
         eyebrow: '오늘 할 일',
@@ -236,9 +289,6 @@ export default function HomeTodayTaskCard() {
         href: `/match/${encodeURIComponent(pendingMatch.match_id)}`,
         cta: '사전 힌트 작성',
         Icon: Sparkles,
-        tone: 'primary' as const,
-        secondaryHref: null,
-        secondaryCta: null,
       }
     }
 
@@ -253,9 +303,6 @@ export default function HomeTodayTaskCard() {
         href: `/match/${encodeURIComponent(confirmed.match_id)}`,
         cta: '매칭 확인',
         Icon: CalendarCheck2,
-        tone: 'success' as const,
-        secondaryHref: null,
-        secondaryCta: null,
       }
     }
 
@@ -267,9 +314,6 @@ export default function HomeTodayTaskCard() {
         href: '/match?mode=solo&soloStatus=in_pool',
         cta: '1:1 대기 현황 보기',
         Icon: Search,
-        tone: 'primary' as const,
-        secondaryHref: '/notifications',
-        secondaryCta: '알림 확인',
       }
     }
 
@@ -281,13 +325,10 @@ export default function HomeTodayTaskCard() {
         href: '/match?mode=solo&sampleMatches=1',
         cta: '가매칭 확인',
         Icon: Sparkles,
-        tone: 'primary' as const,
-        secondaryHref: '/notifications',
-        secondaryCta: '알림 보기',
       }
     }
 
-    if (groupStatus === 'in_pool') {
+    if (isGroupQueueActive(matchPoolStatus)) {
       return {
         eyebrow: '매칭 진행 중',
         title: '매칭 큐에 들어가 있어요',
@@ -295,9 +336,6 @@ export default function HomeTodayTaskCard() {
         href: '/group/create?from=home-queue',
         cta: '큐 상태 보기',
         Icon: Search,
-        tone: 'primary' as const,
-        secondaryHref: null,
-        secondaryCta: null,
       }
     }
 
@@ -309,9 +347,6 @@ export default function HomeTodayTaskCard() {
         href: '/group/create',
         cta: '큐 진입하기',
         Icon: Search,
-        tone: 'primary' as const,
-        secondaryHref: null,
-        secondaryCta: null,
       }
     }
 
@@ -323,9 +358,6 @@ export default function HomeTodayTaskCard() {
         href: '/group/create',
         cta: '그룹 준비 보기',
         Icon: UsersRound,
-        tone: 'neutral' as const,
-        secondaryHref: '/friends',
-        secondaryCta: '친구 초대',
       }
     }
 
@@ -337,9 +369,6 @@ export default function HomeTodayTaskCard() {
         href: '/group/create',
         cta: '그룹 만들기',
         Icon: UsersRound,
-        tone: 'neutral' as const,
-        secondaryHref: '/friends',
-        secondaryCta: '친구 초대',
       }
     }
 
@@ -351,9 +380,6 @@ export default function HomeTodayTaskCard() {
         href: '/match/start',
         cta: '준비 이어가기',
         Icon: Search,
-        tone: 'primary' as const,
-        secondaryHref: '/friends',
-        secondaryCta: '친구 초대',
       }
     }
 
@@ -364,18 +390,14 @@ export default function HomeTodayTaskCard() {
       href: '/match/start',
       cta: '매칭 찾기',
       Icon: Search,
-      tone: 'primary' as const,
-      secondaryHref: '/friends',
-      secondaryCta: '친구 초대',
     }
-  }, [groupStatus, loading, matchSetupStatus, matches, pendingMatch, preMatchCardDone, soloStatus])
+  }, [groupStatus, loadFailure, loading, matchPoolStatus, matchSetupStatus, matches, pendingMatch, preMatchCardDone, soloStatus])
 
   const Icon = task.Icon
   const isSoloQueue = soloStatus === 'in_pool'
   const isSoloMatched = soloStatus === 'matched'
   const isSoloFlow = isSoloQueue || isSoloMatched
-  const showGroupPreview = !isSoloFlow && (task.href === '/match/start' || task.href === '/group/create')
-  const hasGroup = !isSoloFlow && (groupStatus != null || groupMembers.length > 0)
+  const isGroupQueue = isGroupQueueActive(matchPoolStatus)
   const progressValue = matchSetupStatus.allDone && preMatchCardDone
     ? 100
     : [
@@ -385,87 +407,69 @@ export default function HomeTodayTaskCard() {
         preMatchCardDone,
       ].filter(Boolean).length * 25
   const progressDone = Math.round(progressValue / 25)
-  const memberNames = isSoloFlow
-    ? ['나']
-    : groupMembers.length > 0
-    ? groupMembers.map((member) => member.user_id === currentUserId ? '나' : member.display_name || '친구')
-    : ['나']
-  const teamCardName = isSoloFlow
-    ? '1:1 소개팅'
-    : hasGroup
-      ? '내 과팅 팀'
-      : '팀을 만들어주세요'
   const teamCardStatus = loading
     ? '확인 중'
     : isSoloMatched
       ? '가매칭 도착'
       : isSoloQueue
         ? '상대 탐색 중'
-        : groupStatus === 'in_pool'
+        : isGroupQueue
           ? '매칭 탐색 중'
           : groupStatus === 'ready'
             ? '큐 진입 가능'
             : '준비 중'
-  const teamProgressLabel = isSoloMatched
-    ? '1:1 가매칭 도착 - 보증금과 사전 카드를 준비해요'
-    : isSoloQueue
-      ? '1:1 매칭대기중 - 조건이 맞는 상대를 찾는 중'
-      : `팀 성향 분석 ${progressDone}/4 완료${progressDone < 4 ? ' - 한 명만 더!' : ''}`
-  const canCancelQueueFromHome = soloStatus === 'in_pool' || groupStatus === 'in_pool'
+  const canCancelQueueFromHome = soloStatus === 'in_pool' || isGroupQueue
   const cancelQueueLabel = soloStatus === 'in_pool' ? '1:1 매칭 취소하기' : '매칭 취소하기'
   const canCancelActiveMatchFromHome = Boolean(pendingMatch) || soloStatus === 'matched'
   const cancelMatchLabel = soloStatus === 'matched' ? '1:1 매칭 취소하기' : '매칭 취소하기'
-  const teamCardAction = canCancelQueueFromHome
-    ? {
-        label: cancelQueueLabel,
-        onClick: handleCancelQueue,
-        disabled: cancelingQueue,
-      }
-    : canCancelActiveMatchFromHome
-      ? {
-          label: cancelMatchLabel,
-          onClick: handleCancelActiveMatch,
-          disabled: cancelingMatch,
-        }
-      : undefined
-
   return (
     <section className="mb-6">
-      <DarkTeamProgressCard
-        groupName={teamCardName}
-        members={memberNames}
-        progressValue={progressValue}
-        progressLabel={teamProgressLabel}
-        status={teamCardStatus}
-        action={teamCardAction}
-      />
-
-      <div className="mt-4 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
+      <div className="overflow-hidden rounded-lg border border-boot-hairline bg-white shadow-[0_12px_30px_rgba(24,35,31,0.08)]">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-boot-soft">
+          <Image
+            src="/images/quantum-campus-group.webp"
+            alt="캠퍼스 라운지에서 과팅을 준비하며 대화하는 대학생 네 명"
+            fill
+            sizes="(max-width: 480px) calc(100vw - 32px), 448px"
+            className="object-cover"
+            priority
+          />
+          <span className="absolute left-3 top-3 rounded-md bg-white/95 px-2.5 py-1 text-[11px] font-black text-boot-primary shadow-sm">
+            {task.eyebrow}
+          </span>
+        </div>
+        <div className="px-5 py-5">
+        <div className="mb-4 flex items-center justify-between gap-3 border-b border-boot-hairline pb-3 text-xs font-black">
+          <span className="text-boot-primary">{isSoloFlow ? '1:1' : `${groupSize}:${groupSize}`} · {teamCardStatus}</span>
+          <span className="text-boot-muted">준비 {progressDone}/4</span>
+        </div>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.28em] text-boot-primary">{task.eyebrow}</p>
-            <h2 className="mt-3 text-2xl font-black leading-tight text-boot-ink">{task.title}</h2>
+            <h2 className="text-2xl font-black leading-tight text-boot-ink">{task.title}</h2>
             <p className="mt-2 text-sm leading-6 text-boot-muted">{task.description}</p>
           </div>
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[24px] bg-boot-soft text-boot-primary shadow-sm">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md bg-boot-soft text-boot-primary">
             {loading ? <Loader2 size={19} className="animate-spin" /> : <Icon size={22} />}
           </div>
         </div>
 
-        <div className={task.secondaryHref || canCancelQueueFromHome || canCancelActiveMatchFromHome ? 'mt-6 grid grid-cols-1 gap-2' : 'mt-6'}>
-          <Link
-            href={task.href}
-            className="flex h-14 items-center justify-center gap-2 rounded-[24px] bg-boot-ink px-4 text-base font-black text-white shadow-[0_16px_34px_rgba(23,20,18,0.22)] transition hover:opacity-95"
-          >
-            {task.cta}
-            <ChevronRight size={18} />
-          </Link>
-          {task.secondaryHref && task.secondaryCta && (
-            <Link
-              href={task.secondaryHref}
-              className="flex h-14 items-center justify-center rounded-[24px] border border-boot-primary/20 bg-boot-soft px-4 text-sm font-black text-boot-primary"
+        <div className={canCancelQueueFromHome || canCancelActiveMatchFromHome ? 'mt-6 grid grid-cols-1 gap-2' : 'mt-6'}>
+          {loadFailure && loadFailure !== 'unauthorized' ? (
+            <button
+              type="button"
+              onClick={load}
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-md bg-boot-primary px-4 text-base font-black text-white transition-colors hover:bg-[#174d76] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-boot-primary focus-visible:ring-offset-2"
             >
-              {task.secondaryCta}
+              다시 불러오기
+              <RotateCw size={18} />
+            </button>
+          ) : (
+            <Link
+              href={task.href}
+              className="flex h-14 items-center justify-center gap-2 rounded-md bg-boot-primary px-4 text-base font-black text-white transition-colors hover:bg-[#174d76] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-boot-primary focus-visible:ring-offset-2"
+            >
+              {task.cta}
+              <ChevronRight size={18} />
             </Link>
           )}
           {canCancelQueueFromHome && (
@@ -473,7 +477,7 @@ export default function HomeTodayTaskCard() {
               type="button"
               onClick={handleCancelQueue}
               disabled={cancelingQueue}
-              className="flex h-12 items-center justify-center rounded-[22px] border border-boot-primary/25 bg-white px-4 text-sm font-black text-boot-primary shadow-sm transition hover:bg-boot-soft disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-12 items-center justify-center rounded-md border border-boot-primary/25 bg-white px-4 text-sm font-black text-boot-primary transition hover:bg-boot-soft disabled:cursor-not-allowed disabled:opacity-60"
             >
               {cancelingQueue ? '취소하는 중...' : cancelQueueLabel}
             </button>
@@ -483,22 +487,14 @@ export default function HomeTodayTaskCard() {
               type="button"
               onClick={handleCancelActiveMatch}
               disabled={cancelingMatch}
-              className="flex h-12 items-center justify-center rounded-[22px] border border-boot-primary/25 bg-white px-4 text-sm font-black text-boot-primary shadow-sm transition hover:bg-boot-soft disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-12 items-center justify-center rounded-md border border-boot-primary/25 bg-white px-4 text-sm font-black text-boot-primary transition hover:bg-boot-soft disabled:cursor-not-allowed disabled:opacity-60"
             >
               {cancelingMatch ? '취소하는 중...' : cancelMatchLabel}
             </button>
           )}
         </div>
 
-        {showGroupPreview && (
-          <CurrentGroupPreview
-            className="mt-4"
-            members={groupMembers}
-            capacity={groupSize}
-            currentUserId={currentUserId}
-            hasGroup={hasGroup}
-          />
-        )}
+        </div>
       </div>
     </section>
   )

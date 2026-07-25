@@ -6,6 +6,7 @@ type LockedOpponentCardProps = {
   scoreLabel?: string
   chemi?: number
   chips?: string[]
+  participantCount?: number
   description?: string
   revealed?: boolean
   className?: string
@@ -15,8 +16,9 @@ export default function LockedOpponentCard({
   eyebrow = '추천 상대팀',
   title = '간호 트리오',
   scoreLabel = '케미',
-  chemi = 92,
-  chips = ['차분한', '카페파', '수요일'],
+  chemi,
+  chips = [],
+  participantCount = 3,
   description = '프로필은 매칭 확정 후에 공개돼요',
   revealed = false,
   className = '',
@@ -28,11 +30,15 @@ export default function LockedOpponentCard({
           <p className="text-xs font-black text-boot-muted">{eyebrow}</p>
           <h2 className="mt-3 text-2xl font-black leading-tight text-boot-ink">{title}</h2>
         </div>
-        <p className="text-xl font-black text-boot-primary">{scoreLabel} {chemi}%</p>
+        {chemi != null ? (
+          <p className="text-xl font-black text-boot-primary">{scoreLabel} {chemi}%</p>
+        ) : (
+          <p className="text-xs font-black text-boot-primary">조건 확인 완료</p>
+        )}
       </div>
 
       <div className="mb-4 flex items-center">
-        {[0, 1, 2].map((item) => (
+        {Array.from({ length: Math.max(1, Math.min(3, participantCount)) }, (_, item) => (
           <span
             key={item}
             className="-mr-2 flex h-12 w-12 items-center justify-center rounded-full border-2 border-boot-surface bg-boot-soft text-lg font-black text-boot-muted"
