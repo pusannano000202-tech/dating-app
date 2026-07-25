@@ -5,13 +5,101 @@ export interface TossPaymentObject {
   orderId: string
   status: string
   totalAmount: number
+  balanceAmount?: number
+  lastTransactionKey?: string | null
   method?: string
   approvedAt?: string
   cancels?: Array<{
     cancelAmount?: number
     cancelReason?: string
     canceledAt?: string
+    transactionKey?: string
+    cancelStatus?: string
+    cancelRequestId?: string | null
+    refundableAmount?: number
   }>
+}
+
+export function buildTossRefundRequestKey(params: {
+  refundRequestId: string
+  settlementVersion: number
+  refundAmount: number
+}) {
+  return `refund_${params.refundRequestId}_v${params.settlementVersion}_${params.refundAmount}`
+}
+
+export function verifyTossPartialRefundEvidence(
+  payment: TossPaymentObject,
+  params: {
+    requestedRefundAmount: number
+    depositAmount: number
+  },
+):
+  | { ok: true; transactionKey: string; canceledAt: string | null }
+  | { ok: false } {
+  if (
+    payment.status !== 'PARTIAL_CANCELED'
+    || params.requestedRefundAmount >= params.depositAmount
+  ) {
+    return { ok: false }
+  }
+
+  return verifyTossRefundEvidence(payment, params)
+}
+
+export function verifyTossRefundEvidence(
+  payment: TossPaymentObject,
+  params: {
+    requestedRefundAmount: number
+    depositAmount: number
+  },
+):
+  | { ok: true; transactionKey: string; canceledAt: string | null }
+  | { ok: false } {
+  const expectedBalance = params.depositAmount - params.requestedRefundAmount
+  if (
+    !['CANCELED', 'PARTIAL_CANCELED'].includes(payment.status)
+    || payment.totalAmount !== params.depositAmount
+    || !Number.isInteger(payment.balanceAmount)
+    || !payment.lastTransactionKey
+    || !Number.isInteger(params.requestedRefundAmount)
+    || params.requestedRefundAmount <= 0
+    || params.requestedRefundAmount > params.depositAmount
+    || (expectedBalance === 0 && payment.status !== 'CANCELED')
+    || (expectedBalance > 0 && payment.status !== 'PARTIAL_CANCELED')
+  ) {
+    return { ok: false }
+  }
+
+  const doneCancels = (payment.cancels ?? []).filter(
+    (cancel) => cancel.cancelStatus === 'DONE' && Number.isInteger(cancel.cancelAmount),
+  )
+  const latestCancel = doneCancels.find(
+    (cancel) => cancel.transactionKey === payment.lastTransactionKey,
+  )
+  const totalCanceled = doneCancels.reduce(
+    (sum, cancel) => sum + (cancel.cancelAmount ?? 0),
+    0,
+  )
+
+  if (
+    !latestCancel?.transactionKey
+    || latestCancel.cancelAmount !== params.requestedRefundAmount
+    || totalCanceled !== params.requestedRefundAmount
+    || payment.balanceAmount !== expectedBalance
+    || (
+      Number.isInteger(latestCancel.refundableAmount)
+      && latestCancel.refundableAmount !== expectedBalance
+    )
+  ) {
+    return { ok: false }
+  }
+
+  return {
+    ok: true,
+    transactionKey: latestCancel.transactionKey,
+    canceledAt: latestCancel.canceledAt ?? null,
+  }
 }
 
 export interface TossPaymentErrorBody {

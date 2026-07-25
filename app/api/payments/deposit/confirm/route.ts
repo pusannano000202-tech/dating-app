@@ -7,12 +7,19 @@ import {
   normalizeDepositReturnPath,
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
-import { confirmTossPayment, TossPaymentError } from '@/lib/payments/toss'
+import { createPaymentServiceClient, payMockDepositForMatch } from '@/lib/payments/deposit-server'
+import {
+  confirmTossPayment,
+  getTossPayment,
+  TossPaymentError,
+  type TossPaymentObject,
+} from '@/lib/payments/toss'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { getPublicAppOrigin } from '@/lib/utils'
 
 interface DepositPaymentRow {
   id: string
+  match_id: string
   status: string
   toss_order_id: string | null
   toss_payment_key: string | null
@@ -46,8 +53,9 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
   }
 
   const body = req.method === 'POST' ? await readJson(req) : {}
-  const provider = resolveDepositPaymentProvider(readString(body.provider) ?? req.nextUrl.searchParams.get('provider'))
+  const provider = resolveDepositPaymentProvider()
   const groupId = readString(body.group_id) ?? req.nextUrl.searchParams.get('group_id') ?? ''
+  const matchId = readString(body.match_id) ?? req.nextUrl.searchParams.get('match_id') ?? ''
   const amount = readNumber(body.amount) ?? Number(req.nextUrl.searchParams.get('amount') ?? DEPOSIT_AMOUNT)
   const paymentKey = readString(body.paymentKey) ?? readString(body.payment_key) ?? req.nextUrl.searchParams.get('paymentKey') ?? ''
   const orderId = readString(body.orderId) ?? readString(body.order_id) ?? req.nextUrl.searchParams.get('orderId') ?? ''
@@ -58,6 +66,28 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
       provider,
       error: 'group_id_required',
       status: 400,
+    })
+  }
+  if (!matchId) {
+    return respondWithPaymentError(req, options, {
+      groupId,
+      provider,
+      error: 'match_id_required',
+      status: 400,
+    })
+  }
+
+  const matchContext = await validateDepositMatchContext(supabase, {
+    matchId,
+    groupId,
+    userId: user.id,
+  })
+  if (!matchContext.ok) {
+    return respondWithPaymentError(req, options, {
+      groupId,
+      provider,
+      error: matchContext.error,
+      status: matchContext.status,
     })
   }
   if (!isDepositPaymentAmountValid(amount)) {
@@ -75,6 +105,16 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
       groupId,
       provider: readiness.provider,
       error: readiness.error,
+      status: 503,
+    })
+  }
+
+  const paymentService = createPaymentServiceClient()
+  if (!paymentService) {
+    return respondWithPaymentError(req, options, {
+      groupId,
+      provider,
+      error: 'server_settlement_not_configured',
       status: 503,
     })
   }
@@ -97,9 +137,10 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
       })
     }
 
-    const depositLookup = await supabase
+    const depositLookup = await paymentService
       .from('deposits')
-      .select('id,status,toss_order_id,toss_payment_key')
+      .select('id,match_id,status,toss_order_id,toss_payment_key')
+      .eq('match_id', matchId)
       .eq('group_id', groupId)
       .eq('user_id', user.id)
       .eq('toss_order_id', orderId)
@@ -149,30 +190,27 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
         })
       }
 
-      const { data, error } = await supabase
-        .from('deposits')
-        .update({
-          status: 'paid',
-          toss_payment_key: payment.paymentKey,
-          paid_at: payment.approvedAt ?? new Date().toISOString(),
-        })
-        .eq('id', deposit.id)
-        .select('id,status,toss_order_id,toss_payment_key,paid_at')
-        .maybeSingle()
-
-      if (error || !data) {
+      const finalized = await finalizeApprovedDepositPayment({
+        paymentService,
+        deposit,
+        payment,
+        matchId,
+        groupId,
+        userId: user.id,
+      })
+      if (!finalized.ok) {
         return respondWithPaymentError(req, options, {
           groupId,
           provider,
-          error: error?.message || 'deposit_update_failed',
-          status: 400,
+          error: finalized.error,
+          status: finalized.status,
         })
       }
 
       return respondWithPaidDeposit(req, options, groupId, {
         provider,
         status: 'paid',
-        deposit: data,
+        deposit: finalized.deposit,
         payment: {
           paymentKey: payment.paymentKey,
           orderId: payment.orderId,
@@ -181,7 +219,7 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
         },
       }, 201)
     } catch (error) {
-      if (error instanceof TossPaymentError) {
+      if (error instanceof TossPaymentError && error.status < 500) {
         return respondWithPaymentError(req, options, {
           groupId,
           provider,
@@ -191,25 +229,61 @@ async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) 
         })
       }
 
-      return respondWithPaymentError(req, options, {
+      const recovered = await recoverAmbiguousTossConfirmation({ paymentKey, orderId })
+      if (!recovered.ok) {
+        return respondWithPaymentError(req, options, {
+          groupId,
+          provider,
+          error: recovered.error,
+          status: recovered.status,
+        })
+      }
+
+      const finalized = await finalizeApprovedDepositPayment({
+        paymentService,
+        deposit,
+        payment: recovered.payment,
+        matchId,
         groupId,
-        provider,
-        error: 'confirm_failed',
-        status: 502,
+        userId: user.id,
       })
+      if (!finalized.ok) {
+        return respondWithPaymentError(req, options, {
+          groupId,
+          provider,
+          error: finalized.error,
+          status: finalized.status,
+        })
+      }
+
+      return respondWithPaidDeposit(req, options, groupId, {
+        provider,
+        status: 'paid',
+        deposit: finalized.deposit,
+        payment: {
+          paymentKey: recovered.payment.paymentKey,
+          orderId: recovered.payment.orderId,
+          status: recovered.payment.status,
+          method: recovered.payment.method ?? null,
+          recovered: true,
+        },
+      }, 201)
+
     }
   }
 
-  const { data, error } = await supabase
-    .rpc('mock_pay_deposit', { p_group_id: groupId, p_amount: DEPOSIT_AMOUNT })
-    .maybeSingle()
+  const { data, error } = await payMockDepositForMatch({
+    matchId,
+    groupId,
+    userId: user.id,
+  })
 
   if (error) {
     return respondWithPaymentError(req, options, {
       groupId,
       provider,
-      error: error.message || 'pay_failed',
-      status: 400,
+      error,
+      status: error === 'server_mock_payment_not_configured' ? 503 : 400,
     })
   }
 
@@ -285,4 +359,151 @@ function readNumber(value: unknown) {
   if (typeof value === 'number') return value
   if (typeof value === 'string' && value.trim()) return Number(value)
   return null
+}
+
+async function recoverAmbiguousTossConfirmation(params: {
+  paymentKey: string
+  orderId: string
+}): Promise<
+  | { ok: true; payment: TossPaymentObject }
+  | { ok: false; error: string; status: number }
+> {
+  try {
+    const payment = await getTossPayment(params.paymentKey)
+    if (
+      payment.paymentKey === params.paymentKey
+      && payment.orderId === params.orderId
+      && payment.totalAmount === DEPOSIT_AMOUNT
+      && payment.status === 'DONE'
+    ) {
+      return { ok: true, payment }
+    }
+    if (['ABORTED', 'CANCELED', 'EXPIRED'].includes(payment.status)) {
+      return { ok: false, error: 'confirm_failed', status: 400 }
+    }
+    return { ok: false, error: 'payment_reconciliation_required', status: 502 }
+  } catch {
+    return { ok: false, error: 'payment_reconciliation_required', status: 502 }
+  }
+}
+
+async function finalizeApprovedDepositPayment(params: {
+  paymentService: NonNullable<ReturnType<typeof createPaymentServiceClient>>
+  deposit: DepositPaymentRow
+  payment: TossPaymentObject
+  matchId: string
+  groupId: string
+  userId: string
+}): Promise<
+  | { ok: true; deposit: unknown }
+  | { ok: false; error: string; status: number }
+> {
+  const finalized = await params.paymentService
+    .rpc('finalize_toss_deposit_payment', {
+      p_deposit_id: params.deposit.id,
+      p_match_id: params.matchId,
+      p_group_id: params.groupId,
+      p_user_id: params.userId,
+      p_payment_key: params.payment.paymentKey,
+      p_order_id: params.payment.orderId,
+      p_paid_at: params.payment.approvedAt ?? new Date().toISOString(),
+    })
+    .maybeSingle()
+
+  if (!finalized.error && finalized.data) {
+    return { ok: true, deposit: finalized.data }
+  }
+
+  const recovery = await recoverDepositAfterFinalizationFailure(params)
+  if (recovery.status === 'committed') {
+    return { ok: true, deposit: recovery.deposit }
+  }
+  return { ok: false, error: 'payment_reconciliation_required', status: 502 }
+}
+
+async function recoverDepositAfterFinalizationFailure(params: {
+  paymentService: NonNullable<ReturnType<typeof createPaymentServiceClient>>
+  deposit: DepositPaymentRow
+  payment: TossPaymentObject
+  matchId: string
+  groupId: string
+  userId: string
+}): Promise<
+  | { status: 'committed'; deposit: DepositPaymentRow }
+  | { status: 'pending'; deposit: DepositPaymentRow }
+  | { status: 'uncertain' }
+> {
+  const recovered = await params.paymentService
+    .from('deposits')
+    .select('id,match_id,status,toss_order_id,toss_payment_key')
+    .eq('id', params.deposit.id)
+    .eq('match_id', params.matchId)
+    .eq('group_id', params.groupId)
+    .eq('user_id', params.userId)
+    .eq('toss_order_id', params.payment.orderId)
+    .maybeSingle()
+
+  if (recovered.error || !recovered.data) {
+    return { status: 'uncertain' }
+  }
+
+  const recoveredDeposit = recovered.data as DepositPaymentRow
+  if (
+    (recoveredDeposit.status === 'paid' || recoveredDeposit.status === 'held')
+    && recoveredDeposit.toss_payment_key === params.payment.paymentKey
+  ) {
+    return { status: 'committed', deposit: recoveredDeposit }
+  }
+  if (recoveredDeposit.status === 'pending') {
+    return { status: 'pending', deposit: recoveredDeposit }
+  }
+
+  return { status: 'uncertain' }
+}
+
+type DepositMatchValidation =
+  | { ok: true }
+  | { ok: false; error: string; status: number }
+
+interface DepositMatchRow {
+  id: string
+  status: string
+  group_a_id: string
+  group_b_id: string
+}
+
+async function validateDepositMatchContext(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  params: { matchId: string; groupId: string; userId: string },
+): Promise<DepositMatchValidation> {
+  const matchLookup = await supabase
+    .from('matches')
+    .select('id,status,group_a_id,group_b_id')
+    .eq('id', params.matchId)
+    .maybeSingle()
+
+  if (matchLookup.error) return { ok: false, error: 'match_lookup_failed', status: 500 }
+
+  const match = matchLookup.data as DepositMatchRow | null
+  if (!match) return { ok: false, error: 'match_not_found', status: 404 }
+  if (match.status !== 'pending' && match.status !== 'confirmed') {
+    return { ok: false, error: 'match_not_payable', status: 400 }
+  }
+  if (match.group_a_id !== params.groupId && match.group_b_id !== params.groupId) {
+    return { ok: false, error: 'group_not_in_match', status: 403 }
+  }
+
+  const membership = await supabase
+    .from('group_members')
+    .select('group_id')
+    .eq('group_id', params.groupId)
+    .eq('user_id', params.userId)
+    .is('left_at', null)
+    .maybeSingle()
+
+  if (membership.error || !membership.data) {
+    return { ok: false, error: 'not_group_member', status: 403 }
+  }
+
+  return { ok: true }
 }

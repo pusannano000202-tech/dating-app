@@ -1,4 +1,5 @@
 import { DEPOSIT_AMOUNT } from '../constants'
+import { getSupabaseAdminKeyStatus } from '../supabase-admin'
 
 // Sungjun's current payment layer is Toss-only. Keep mock for local review.
 export const DEPOSIT_PAYMENT_PROVIDERS = ['mock', 'toss'] as const
@@ -26,10 +27,8 @@ export interface DepositPaymentRequestDraft {
   failUrl: string
 }
 
-export function resolveDepositPaymentProvider(input?: unknown): DepositPaymentProvider {
-  const raw = typeof input === 'string' && input.trim()
-    ? input
-    : process.env.NEXT_PUBLIC_PAYMENT_PROVIDER || process.env.PAYMENT_PROVIDER || 'mock'
+export function resolveDepositPaymentProvider(): DepositPaymentProvider {
+  const raw = process.env.PAYMENT_PROVIDER || process.env.NEXT_PUBLIC_PAYMENT_PROVIDER || 'mock'
   const normalized = raw.toLowerCase()
 
   return isDepositPaymentProvider(normalized) ? normalized : 'mock'
@@ -37,9 +36,31 @@ export function resolveDepositPaymentProvider(input?: unknown): DepositPaymentPr
 
 export function getDepositPaymentReadiness(provider: DepositPaymentProvider): DepositPaymentReadiness {
   if (provider === 'mock') {
+    if (process.env.NODE_ENV === 'production') {
+      return {
+        ok: false,
+        provider,
+        error: 'payment_provider_not_configured',
+        missing: [],
+        invalid: ['mock_payments_disabled_in_production'],
+      }
+    }
+
+    const supabaseAdminKey = getSupabaseAdminKeyStatus()
+    if (!supabaseAdminKey.ok) {
+      return {
+        ok: false,
+        provider,
+        error: 'payment_provider_not_configured',
+        missing: supabaseAdminKey.reason === 'missing' ? ['supabase_admin_key'] : [],
+        invalid: supabaseAdminKey.reason === 'invalid' ? ['supabase_admin_key'] : [],
+      }
+    }
+
     return { ok: true, provider }
   }
 
+  const supabaseAdminKey = getSupabaseAdminKeyStatus()
   const checks = [
     {
       key: 'NEXT_PUBLIC_TOSS_CLIENT_KEY',
@@ -53,20 +74,21 @@ export function getDepositPaymentReadiness(provider: DepositPaymentProvider): De
       key: 'PAYMENT_INTERNAL_SECRET',
       validate: (value: string) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
     },
-    {
-      key: 'SUPABASE_SERVICE_ROLE_KEY',
-      validate: (value: string) => isSupabaseJwtWithRole(value, 'service_role'),
-    },
   ] as const
-  const missing = checks
+  const missing: string[] = checks
     .filter((check) => !process.env[check.key])
     .map((check) => check.key)
-  const invalid = checks
+  const invalid: string[] = checks
     .filter((check) => {
       const value = process.env[check.key]
       return typeof value === 'string' && !check.validate(value)
     })
     .map((check) => check.key)
+
+  if (!supabaseAdminKey.ok) {
+    const adminKeyIssues = supabaseAdminKey.reason === 'missing' ? missing : invalid
+    adminKeyIssues.push('supabase_admin_key')
+  }
 
   if (missing.length > 0 || invalid.length > 0) {
     return { ok: false, provider, error: 'payment_provider_not_configured', missing, invalid }
@@ -152,19 +174,6 @@ export function isDepositOrderIdForContext(orderId: string, groupId: string, use
 function isTossKey(value: string, kind: 'ck' | 'sk') {
   if (hasUnsafeEnvValueCharacters(value)) return false
   return new RegExp(`^(?:test|live)_(?:g)?${kind}_[A-Za-z0-9_-]{12,}$`).test(value)
-}
-
-function isSupabaseJwtWithRole(value: string, role: string) {
-  if (hasUnsafeEnvValueCharacters(value)) return false
-  const parts = value.split('.')
-  if (parts.length !== 3 || parts.some((part) => !part)) return false
-
-  try {
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8')) as { role?: unknown }
-    return payload.role === role
-  } catch {
-    return false
-  }
 }
 
 function hasUnsafeEnvValueCharacters(value: string) {
