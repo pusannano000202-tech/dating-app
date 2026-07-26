@@ -3,7 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Check, Loader2, Mail, ShieldCheck } from 'lucide-react'
-import { isPnuEmail, normalizeSchoolEmail } from '@/lib/auth/school-email'
+import {
+  isPnuEmail,
+  isSafeLocalRedirect,
+  normalizeSchoolEmail,
+} from '@/lib/auth/school-email'
 import { createClient } from '@/lib/supabase'
 
 type Phase = 'loading' | 'ready' | 'sent' | 'verified'
@@ -17,7 +21,10 @@ interface RequestResponse {
 export default function SchoolEmailPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('redirect') ?? '/profile/basic'
+  const requestedRedirect = searchParams.get('redirect')
+  const next = isSafeLocalRedirect(requestedRedirect)
+    ? requestedRedirect
+    : '/profile/basic'
   const [phase, setPhase] = useState<Phase>('loading')
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')

@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js'
+import { getSupabaseUrl } from './utils'
+
 export type SupabaseAdminKeyStatus =
   | { ok: true; key: string; source: 'secret' | 'legacy' }
   | { ok: false; reason: 'missing' | 'invalid' }
@@ -21,6 +24,19 @@ export function getSupabaseAdminKeyStatus(): SupabaseAdminKeyStatus {
 export function getSupabaseAdminKey() {
   const status = getSupabaseAdminKeyStatus()
   return status.ok ? status.key : null
+}
+
+export function createSupabaseAdminClient() {
+  const url = getSupabaseUrl()
+  const key = getSupabaseAdminKey()
+  if (!url || !key) return null
+
+  return createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
 }
 
 function isSupabaseSecretKey(value: string) {
