@@ -153,11 +153,12 @@ function hashColor(input: string) {
   }
 }
 
-export default function MascotScreenReportPage({
-  searchParams,
-}: {
-  searchParams?: { school?: string; screen?: string }
-}) {
+export default async function MascotScreenReportPage(
+  props: {
+    searchParams?: Promise<{ school?: string; screen?: string }>
+  }
+) {
+  const searchParams = await props.searchParams;
   const schoolId = searchParams?.school || 'pnu'
   const screenKey = pickScreen(searchParams?.screen)
   const spec = SCREENS[screenKey]

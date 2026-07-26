@@ -19,7 +19,7 @@ type SearchParams = {
 }
 
 type MeetupsPageProps = {
-  searchParams?: SearchParams
+  searchParams?: Promise<SearchParams>
 }
 
 type QuickAction = {
@@ -76,7 +76,8 @@ const trustPoints = [
   },
 ]
 
-export default function MeetupsPage({ searchParams }: MeetupsPageProps) {
+export default async function MeetupsPage(props: MeetupsPageProps) {
+  const searchParams = await props.searchParams;
   const communityEnabled = isCommunityFeatureEnabled()
   const focus = searchParams?.focus
   const focusFeatured =

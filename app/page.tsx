@@ -10,7 +10,7 @@ import HomeInfoButton from '@/components/matching/HomeInfoButton'
 import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
 import QuantumHomeRecommendations from '@/components/home/QuantumHomeRecommendations'
 
-type ServerSupabaseClient = ReturnType<typeof createSupabaseServerClient>
+type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>
 
 type ProfileGate = {
   gender: string | null
@@ -80,14 +80,15 @@ function HomeDashboard() {
 }
 
 export default async function Home() {
+  const cookieStore = await cookies()
   const devAuthed =
     isDevAuthBypassEnabled() &&
-    cookies().get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
+    cookieStore.get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
 
   if (devAuthed) return <HomeDashboard />
   if (!isSupabaseConfigured()) redirect('/login')
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')

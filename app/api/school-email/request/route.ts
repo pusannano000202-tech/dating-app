@@ -10,7 +10,7 @@ interface RequestBody {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {

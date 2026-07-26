@@ -87,7 +87,9 @@ function getMatchStartMode(searchParams?: { mode?: string | string[] }): MatchSt
   return searchParams?.mode === 'solo' ? 'solo' : 'group'
 }
 
-function buildDevMatchSetupProfile(cookieStore: ReturnType<typeof cookies>): MatchSetupProfile {
+function buildDevMatchSetupProfile(
+  cookieStore: Awaited<Awaited<ReturnType<typeof cookies>>>,
+): MatchSetupProfile {
   const isDone = (key: keyof typeof DEV_MATCH_SETUP_COOKIES) =>
     cookieStore.get(DEV_MATCH_SETUP_COOKIES[key])?.value === getDevMatchSetupCookieValue()
 
@@ -110,7 +112,9 @@ function getCurrentSetupState(steps: SetupStep[]) {
   }
 }
 
-function getDevPreviewGroupStatusFromServer(cookieStore: ReturnType<typeof cookies>): ActiveGroupStatus {
+function getDevPreviewGroupStatusFromServer(
+  cookieStore: Awaited<Awaited<ReturnType<typeof cookies>>>,
+): ActiveGroupStatus {
   const value = cookieStore.get(DEV_PREVIEW_GROUP_STATUS_COOKIE)?.value
   if (value === 'in_pool') return 'in_pool'
   if (value === 'ready') return 'ready'
@@ -122,7 +126,7 @@ function isActiveGroupFlowStatus(status: string | null | undefined): boolean {
 }
 
 async function hasActiveGroupFlow(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
   userId: string,
 ): Promise<boolean> {
   const { data: membership } = await supabase
@@ -386,14 +390,15 @@ function MatchStartView({
   )
 }
 
-export default async function MatchStartPage({
-  searchParams,
-}: {
-  searchParams?: { mode?: string | string[] }
-}) {
+export default async function MatchStartPage(
+  props: {
+    searchParams?: Promise<{ mode?: string | string[] }>
+  }
+) {
+  const searchParams = await props.searchParams;
   const mode = getMatchStartMode(searchParams)
   const redirectTo = mode === 'solo' ? SOLO_REDIRECT_TO : GROUP_REDIRECT_TO
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const devAuthed =
     isDevAuthBypassEnabled() &&
     cookieStore.get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
@@ -409,11 +414,11 @@ export default async function MatchStartPage({
     return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} allowSoloMockActions={devAuthed} />
   }
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login?redirect=${encodeURIComponent(redirectTo)}`)
 
-  const soloBlockedByGroupFlow = mode === 'solo' && await hasActiveGroupFlow(supabase, user.id)
+  const soloBlockedByGroupFlow = mode === 'solo' && (await hasActiveGroupFlow(supabase, user.id))
   if (soloBlockedByGroupFlow) return <SoloBlockedByGroupFlowView />
 
   const { data: profile } = await supabase

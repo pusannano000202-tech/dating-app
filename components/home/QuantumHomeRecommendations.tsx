@@ -23,7 +23,7 @@ const recommendations = [
     imageAlt: '캠퍼스 라운지에서 대화하는 대학생 네 명',
     Icon: UsersRound,
     action: '추천 모임 보기',
-    priority: false,
+    priority: true,
   },
 ] as const
 

@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 }
 
 async function confirmDeposit(req: NextRequest, options: ConfirmDepositOptions) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     if (options.redirectBrowser) {
@@ -473,7 +473,7 @@ interface DepositMatchRow {
 }
 
 async function validateDepositMatchContext(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   params: { matchId: string; groupId: string; userId: string },
 ): Promise<DepositMatchValidation> {
   const matchLookup = await supabase

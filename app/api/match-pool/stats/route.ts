@@ -7,7 +7,7 @@ import {
 } from '@/lib/match-pool-stats'
 
 export async function GET() {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase.rpc('get_match_pool_stats')
 
   if (error) {

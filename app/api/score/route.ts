@@ -19,7 +19,7 @@ interface ScorePersistenceMetadata {
 
 export async function POST(req: NextRequest) {
   // Verify the caller is authenticated
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

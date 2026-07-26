@@ -12,7 +12,7 @@ interface CreateInviteBody {
 export async function GET(req: NextRequest) {
   // RPC 는 SECURITY DEFINER 이고 pending + not expired 만 안전 필드를 반환하므로
   // 미로그인 사용자에게도 허용한다. 가입자/회원만의 미리보기로 막으면 초대 링크 UX 가 어색.
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const token = req.nextUrl.searchParams.get('token')
   if (!token) {
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const user = await getUser(supabase)
   if (!user) {
     return jsonError('Unauthorized', 401)
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ invite: data }, { status: 201 })
 }
 
-async function getUser(supabase: ReturnType<typeof createSupabaseServerClient>) {
+async function getUser(supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
   return user
 }

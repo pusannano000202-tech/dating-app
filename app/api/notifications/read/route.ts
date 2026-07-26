@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 // body: { notification_id: string } → 개별 읽음
 // body: {} (or { all: true }) → 전체 읽음
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

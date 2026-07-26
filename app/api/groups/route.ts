@@ -116,7 +116,7 @@ type LoadGroupStateResult = {
 }
 
 export async function GET() {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const user = await getUser(supabase)
   if (!user) {
     return jsonError('Unauthorized', 401)
@@ -130,7 +130,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const user = await getUser(supabase)
   if (!user) {
     return jsonError('Unauthorized', 401)
@@ -191,7 +191,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const user = await getUser(supabase)
   if (!user) {
     return jsonError('Unauthorized', 401)
@@ -239,7 +239,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 async function loadGroupState(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   userId: string
 ): Promise<LoadGroupStateResult> {
   const { data: membership, error: membershipError } = await supabase
@@ -320,7 +320,7 @@ async function loadGroupState(
 }
 
 async function loadGroup(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   groupId: string
 ): Promise<GroupLoadResult> {
   const { data, error } = await supabase
@@ -337,7 +337,7 @@ async function loadGroup(
 }
 
 async function loadMembers(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   groupId: string
 ): Promise<GroupMembersLoadResult> {
   const { data, error } = await supabase.rpc('get_group_member_summaries', { p_group_id: groupId })
@@ -404,7 +404,7 @@ async function loadMembers(
 }
 
 async function loadCurrentUserMatchSetup(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   userId: string,
 ): Promise<MatchSetupLoadResult> {
   const { data, error } = await supabase
@@ -418,7 +418,7 @@ async function loadCurrentUserMatchSetup(
 }
 
 async function loadInvites(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   groupId: string
 ): Promise<GroupInvitesLoadResult> {
   const { data, error } = await supabase
@@ -434,7 +434,7 @@ async function loadInvites(
 }
 
 async function loadFriends(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   members: GroupMemberRecord[],
   invites: GroupInviteRecord[]
 ): Promise<FriendsLoadResult> {
@@ -466,7 +466,7 @@ async function loadFriends(
   }
 }
 
-async function getUser(supabase: ReturnType<typeof createSupabaseServerClient>) {
+async function getUser(supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
   return user
 }

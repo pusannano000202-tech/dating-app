@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     })
   }
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: authData } = await supabase.auth.getUser()
   const currentUserId = authData.user?.id ?? null
   if (!currentUserId) {

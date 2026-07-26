@@ -44,6 +44,8 @@ export default function CommunityComingSoon({ kind }: CommunityComingSoonProps) 
               </p>
             </div>
 
+            {/* A full document navigation keeps the disabled community boundary out of client prefetch. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/match"
               className="mt-4 flex h-12 items-center justify-center gap-2 rounded-2xl bg-boot-ink px-4 text-sm font-black text-white"

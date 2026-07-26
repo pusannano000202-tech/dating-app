@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const feature = getCampusSevenFeatureState()
   if (!feature.visible) return NextResponse.json({ error: 'not_found' }, { status: 404 })
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
