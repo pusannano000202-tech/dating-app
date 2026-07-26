@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { CalendarClock, ChevronLeft, ChevronRight, Heart, Loader2, LockKeyhole, Search, Sparkles, UserPlus, Users } from 'lucide-react'
+import { CalendarClock, ChevronLeft, ChevronRight, Heart, Loader2, LockKeyhole, RotateCw, Search, Sparkles, UserPlus, Users } from 'lucide-react'
 import {
   getDevPreviewGroupSizeFromClient,
   getDevPreviewGroupStatusFromClient,
@@ -17,10 +17,21 @@ import {
   DEV_PREVIEW_GROUP_MEMBERS,
 } from '@/lib/matching/dev-preview-group'
 import MatchingPool, { type PoolStats } from '@/components/MatchingPool'
+import SchoolMascot from '@/components/theme/SchoolMascot'
+import SchoolName from '@/components/theme/SchoolName'
 import CurrentGroupPreview, { type CurrentGroupMember } from '@/components/matching/CurrentGroupPreview'
 import NotificationBell from '@/components/NotificationBell'
 import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
+import CampusSevenMatchEntry from '@/components/matching/campus-seven/CampusSevenMatchEntry'
+import {
+  getMatchingFrontendLoadFailure,
+  getMatchingFrontendLoadMessage,
+  getMatchingFrontendPayloadFailure,
+  type MatchingFrontendLoadFailure,
+} from '@/lib/matching/frontend-load-state'
+import { isGroupQueueActive as hasActiveGroupQueue } from '@/lib/matching/group-queue-state'
+import { isActiveMatchStatus } from '@/lib/matching/match-view-state'
 
 type MatchMode = 'group' | 'solo'
 
@@ -40,6 +51,7 @@ interface MatchRow {
 
 interface GroupSummary {
   group: { id?: string | null; size?: number | null; status?: string | null } | null
+  match_pool_status: 'waiting' | 'rolled_over' | null
   members: CurrentGroupMember[]
   current_user_id: string | null
 }
@@ -117,12 +129,14 @@ const DEV_POOL: PoolStats = {
 
 const EMPTY_GROUP_SUMMARY: GroupSummary = {
   group: null,
+  match_pool_status: null,
   members: [],
   current_user_id: null,
 }
 
 const DEV_GROUP_SUMMARY: GroupSummary = {
   group: DEV_PREVIEW_GROUP,
+  match_pool_status: null,
   members: DEV_PREVIEW_GROUP_MEMBERS,
   current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
 }
@@ -133,15 +147,19 @@ export default function MatchesPage() {
   const [groupSummary, setGroupSummary] = useState<GroupSummary>(EMPTY_GROUP_SUMMARY)
   const [matchMode, setMatchMode] = useState<MatchMode>('group')
   const [soloQueueActive, setSoloQueueActive] = useState(false)
+  const [devPreviewActive, setDevPreviewActive] = useState(false)
   const [cancelingQueue, setCancelingQueue] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [loadFailure, setLoadFailure] = useState<MatchingFrontendLoadFailure | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
     setError(null)
+    setLoadFailure(null)
 
     const isDevPreview = isDevPreviewClientSession()
+    setDevPreviewActive(isDevPreview)
 
     if (isDevPreview) {
       const params = new URLSearchParams(window.location.search)
@@ -177,6 +195,7 @@ export default function MatchesPage() {
           size: previewGroupSize,
           status: previewGroupStatus,
         },
+        match_pool_status: previewGroupStatus === 'in_pool' ? 'waiting' : null,
         members: DEV_PREVIEW_GROUP_MEMBERS.slice(0, previewGroupSize),
         current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
       })
@@ -187,19 +206,8 @@ export default function MatchesPage() {
     try {
       const params = new URLSearchParams(window.location.search)
       const requestedMode: MatchMode = params.get('mode') === 'solo' ? 'solo' : 'group'
-      const explicitSoloPreview =
-        requestedMode === 'solo'
-        && (params.get('soloStatus') === 'in_pool' || params.get('sampleMatches') === '1')
       setMatchMode(requestedMode)
-      setSoloQueueActive(requestedMode === 'solo' && params.get('soloStatus') === 'in_pool')
-
-      if (explicitSoloPreview) {
-        setMatches(params.get('sampleMatches') === '1' ? DEV_SOLO_MATCHES : [])
-        setPoolStats(DEV_POOL)
-        setGroupSummary(EMPTY_GROUP_SUMMARY)
-        setLoading(false)
-        return
-      }
+      setSoloQueueActive(false)
 
       const [matchRes, poolRes, groupRes] = await Promise.all([
         fetch('/api/matches'),
@@ -207,31 +215,54 @@ export default function MatchesPage() {
         fetch('/api/groups'),
       ])
 
+      const requiredFailure = getMatchingFrontendLoadFailure({
+        groups: groupRes,
+        matches: matchRes,
+      })
+      if (requiredFailure) {
+        setMatches([])
+        setGroupSummary(EMPTY_GROUP_SUMMARY)
+        setSoloQueueActive(false)
+        setLoadFailure(requiredFailure)
+        return
+      }
+
+      const [groupPayload, matchPayload] = await Promise.all([
+        groupRes.json() as Promise<unknown>,
+        matchRes.json() as Promise<unknown>,
+      ])
+      const payloadFailure = getMatchingFrontendPayloadFailure({
+        groups: groupPayload,
+        matches: matchPayload,
+      })
+      if (payloadFailure) {
+        setMatches([])
+        setGroupSummary(EMPTY_GROUP_SUMMARY)
+        setSoloQueueActive(false)
+        setLoadFailure(payloadFailure)
+        return
+      }
+
       if (poolRes.ok) {
         const stats = await poolRes.json() as PoolStats
         setPoolStats(stats)
       }
-      if (groupRes.ok) {
-        const groupData = await groupRes.json() as GroupSummary
-        setGroupSummary({
-          group: groupData.group ?? null,
-          members: groupData.members ?? [],
-          current_user_id: groupData.current_user_id ?? null,
-        })
-      }
 
-      if (matchRes.status === 401) {
-        setError('로그인이 필요해요.')
-        return
-      }
-      if (!matchRes.ok) {
-        setError('매칭 정보를 불러오지 못했어요.')
-        return
-      }
-      const data = await matchRes.json() as { matches: MatchRow[] }
+      const groupData = groupPayload as GroupSummary
+      setGroupSummary({
+        group: groupData.group ?? null,
+        match_pool_status: groupData.match_pool_status ?? null,
+        members: groupData.members ?? [],
+        current_user_id: groupData.current_user_id ?? null,
+      })
+
+      const data = matchPayload as { matches: MatchRow[] }
       setMatches(data.matches ?? [])
     } catch {
-      setError('매칭 정보를 불러오지 못했어요.')
+      setMatches([])
+      setGroupSummary(EMPTY_GROUP_SUMMARY)
+      setSoloQueueActive(false)
+      setLoadFailure('network_unavailable')
     } finally {
       setLoading(false)
     }
@@ -251,10 +282,11 @@ export default function MatchesPage() {
     setError(null)
 
     if (isDevPreviewClientSession()) {
-      setDevPreviewGroupStatus('ready')
+      setDevPreviewGroupStatus('forming')
       setGroupSummary((current) => ({
         ...current,
-        group: current.group ? { ...current.group, status: 'ready' } : current.group,
+        group: current.group ? { ...current.group, status: 'forming' } : current.group,
+        match_pool_status: null,
       }))
       setCancelingQueue(false)
       return
@@ -328,6 +360,7 @@ export default function MatchesPage() {
         setGroupSummary((current) => ({
           ...current,
           group: current.group ? { ...current.group, status: 'ready' } : current.group,
+          match_pool_status: 'waiting',
         }))
         setMatchMode('group')
         window.history.replaceState(null, '', '/match')
@@ -355,10 +388,23 @@ export default function MatchesPage() {
     }
   }, [cancelingQueue, refresh])
 
-  const groupMatchResults = matches.some((match) => (match.match_mode ?? 'group') === 'group')
-  const soloMatchResults = matches.some((match) => match.match_mode === 'solo')
+  if (loadFailure && !loading) {
+    return (
+      <MatchingLoadFailureScreen
+        failure={loadFailure}
+        onRetry={refresh}
+      />
+    )
+  }
+
+  const groupMatchResults = matches.some(
+    (match) => (match.match_mode ?? 'group') === 'group' && isActiveMatchStatus(match.match_status),
+  )
+  const soloMatchResults = matches.some(
+    (match) => match.match_mode === 'solo' && isActiveMatchStatus(match.match_status),
+  )
   const rawSoloFlowActive = soloQueueActive || soloMatchResults
-  const groupFlowActive = groupSummary.group?.status === 'in_pool' || groupMatchResults
+  const groupFlowActive = hasActiveGroupQueue(groupSummary.match_pool_status) || groupMatchResults
   const soloBlockedByGroupFlow = groupFlowActive && !rawSoloFlowActive
   const effectiveMatchMode: MatchMode = soloBlockedByGroupFlow ? 'group' : matchMode
   const isSoloMode = effectiveMatchMode === 'solo'
@@ -377,11 +423,11 @@ export default function MatchesPage() {
   const visibleMatches = isSoloMode
     ? matches.filter((match) => match.match_mode === 'solo')
     : matches.filter((match) => (match.match_mode ?? 'group') === 'group')
-  const currentMatchResult = visibleMatches[0]
-  const pendingGroupQueue = groupSummary.group?.status === 'in_pool' && !groupMatchResults
+  const currentMatchResult = visibleMatches.find((match) => isActiveMatchStatus(match.match_status))
+  const pendingGroupQueue = hasActiveGroupQueue(groupSummary.match_pool_status) && !groupMatchResults
   const isGroupQueueActive = !isSoloMode && pendingGroupQueue
   const soloFlowActive = isSoloMode && rawSoloFlowActive
-  const hasMatchResults = visibleMatches.length > 0
+  const hasMatchResults = Boolean(currentMatchResult)
   const hasStartedMatching = isSoloMode
     ? rawSoloFlowActive
     : groupFlowActive
@@ -426,18 +472,39 @@ export default function MatchesPage() {
   const activeGroupSize = groupCapacity === 2 ? 2 : 3
 
   return (
-    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink">
-      <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] pt-6 sm:max-w-md">
+    <main className="min-h-screen booting-paper px-4 pb-24 text-boot-ink sm:px-6">
+      <div className="mx-auto w-full max-w-2xl pt-5 sm:pt-7">
         <header className="mb-5 flex items-center gap-3">
-          <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary" aria-label="홈으로 돌아가기">
+          <Link href="/" className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body hover:border-boot-primary hover:text-boot-primary" aria-label="홈으로 돌아가기">
             <ChevronLeft size={18} />
           </Link>
           <div className="flex-1">
-            <p className="text-sm font-bold text-boot-muted">매칭 허브</p>
-            <h1 className="text-3xl font-black leading-tight">오늘의 매칭</h1>
+            <p className="text-sm font-bold text-boot-muted">Quantum이 다음 단계를 정리했어요</p>
+            <h1 className="text-[28px] font-black leading-tight">매칭</h1>
           </div>
           <NotificationBell />
         </header>
+
+        <section className="mb-4 border-y border-boot-hairline bg-white px-1 py-4">
+          <div className="flex items-center gap-4">
+            <SchoolMascot
+              pose={hasMatchResults ? 'confirm' : hasStartedMatching ? 'waiting' : 'guide'}
+              size="lg"
+              className="h-16 w-16 rounded-md border border-boot-primary/10 bg-boot-soft"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-black text-boot-primary">현재 매칭 상태</p>
+              <h2 className="mt-1 text-lg font-black leading-tight text-boot-ink">
+                <SchoolName suffix="에서 이어갈 과팅" />
+              </h2>
+              <p className="mt-2 text-xs font-bold leading-5 text-boot-muted">
+                준비가 덜 된 항목부터 한 번에 하나씩 보여드릴게요.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <CampusSevenMatchEntry href="/match/campus-seven" />
 
         <DarkTeamProgressCard
           className="mb-4"
@@ -490,14 +557,14 @@ export default function MatchesPage() {
               </div>
             </div>
           </section>
-        ) : hasMatchResults ? (
+        ) : currentMatchResult ? (
           <>
             <LockedOpponentCard
               className="mb-5"
               eyebrow={isSoloMode ? '추천 상대' : '추천 상대팀'}
               title={isSoloMode ? '소개팅 상대 후보' : '가매칭 후보'}
-              chemi={isSoloMode ? 88 : 92}
-              chips={isSoloMode ? ['1:1', '조용한 대화', '저녁 가능'] : ['차분한', '카페파', '수요일']}
+              participantCount={currentMatchResult?.opp_group_size ?? 1}
+              chips={getOpponentFactChips(currentMatchResult)}
               description={isSoloMode
                 ? '보증금과 사전 카드가 끝나면 상대의 카드와 약속 정보가 단계적으로 열려요'
                 : '보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요'}
@@ -544,11 +611,13 @@ export default function MatchesPage() {
               mode={matchMode}
               setMatchMode={setMatchMode}
               soloBlockedByGroupFlow={soloBlockedByGroupFlow}
+              devPreviewActive={devPreviewActive}
             />
             <MatchModeBody
               mode={matchMode}
               groupSummary={groupSummary}
               soloBlockedByGroupFlow={soloBlockedByGroupFlow}
+              devPreviewActive={devPreviewActive}
             />
           </section>
         )}
@@ -558,7 +627,7 @@ export default function MatchesPage() {
           <MatchingPool
             stats={poolStats}
             mode={matchMode}
-            soloDisabled={soloBlockedByGroupFlow}
+            soloDisabled={!devPreviewActive || soloBlockedByGroupFlow}
             soloQueueActive={soloFlowActive}
             soloCanceling={cancelingQueue}
             onCancelSoloQueue={handleCancelSoloQueue}
@@ -793,10 +862,12 @@ function MatchModeSelector({
   mode,
   setMatchMode,
   soloBlockedByGroupFlow,
+  devPreviewActive,
 }: {
   mode: MatchMode
   setMatchMode: (mode: MatchMode) => void
   soloBlockedByGroupFlow: boolean
+  devPreviewActive: boolean
 }) {
   return (
     <div className="mb-4 grid grid-cols-2 gap-2 rounded-[26px] bg-boot-soft p-1.5">
@@ -826,7 +897,7 @@ function MatchModeSelector({
       <button
         type="button"
         aria-pressed={mode === 'solo'}
-        disabled={soloBlockedByGroupFlow}
+        disabled={!devPreviewActive || soloBlockedByGroupFlow}
         onClick={() => setMatchMode('solo')}
         className={[
           'min-h-[96px] rounded-[22px] px-4 py-4 text-left transition disabled:cursor-not-allowed disabled:opacity-50',
@@ -854,15 +925,70 @@ function MatchModeBody({
   mode,
   groupSummary,
   soloBlockedByGroupFlow,
+  devPreviewActive,
 }: {
   mode: MatchMode
   groupSummary: GroupSummary
   soloBlockedByGroupFlow: boolean
+  devPreviewActive: boolean
 }) {
   return mode === 'group' ? (
     <GroupMatchStartPanel groupSummary={groupSummary} />
   ) : (
-    <SoloMatchStartPanel soloBlockedByGroupFlow={soloBlockedByGroupFlow} />
+    <SoloMatchStartPanel soloBlockedByGroupFlow={soloBlockedByGroupFlow} devPreviewActive={devPreviewActive} />
+  )
+}
+
+function MatchingLoadFailureScreen({
+  failure,
+  onRetry,
+}: {
+  failure: MatchingFrontendLoadFailure
+  onRetry: () => Promise<void>
+}) {
+  const isUnauthorized = failure === 'unauthorized'
+
+  return (
+    <main className="min-h-screen booting-paper px-4 pb-24 text-boot-ink sm:px-6">
+      <div className="mx-auto w-full max-w-2xl pt-5 sm:pt-7">
+        <header className="mb-5 flex items-center gap-3">
+          <Link href="/" className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body hover:border-boot-primary hover:text-boot-primary" aria-label="홈으로 돌아가기">
+            <ChevronLeft size={18} />
+          </Link>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-boot-muted">Quantum이 안전하게 멈췄어요</p>
+            <h1 className="text-[28px] font-black leading-tight">매칭</h1>
+          </div>
+        </header>
+
+        <section className="rounded-lg border border-boot-primary/15 bg-white px-5 py-6 shadow-[0_14px_34px_rgba(24,35,31,0.08)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-boot-soft text-boot-primary">
+            <RotateCw size={21} />
+          </div>
+          <h2 className="mt-4 text-xl font-black text-boot-ink">현재 상태를 다시 확인해야 해요</h2>
+          <p className="mt-2 text-sm leading-6 text-boot-muted">
+            {getMatchingFrontendLoadMessage(failure)}
+          </p>
+          {isUnauthorized ? (
+            <Link
+              href="/login?next=%2Fmatch"
+              className="mt-6 flex h-14 items-center justify-center rounded-md bg-boot-primary px-4 text-base font-black text-white"
+            >
+              다시 로그인
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void onRetry()}
+              className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-md bg-boot-primary px-4 text-base font-black text-white"
+            >
+              <RotateCw size={18} />
+              다시 불러오기
+            </button>
+          )}
+        </section>
+      </div>
+    </main>
   )
 }
 
@@ -910,7 +1036,25 @@ function GroupMatchStartPanel({ groupSummary }: { groupSummary: GroupSummary }) 
   )
 }
 
-function SoloMatchStartPanel({ soloBlockedByGroupFlow }: { soloBlockedByGroupFlow: boolean }) {
+function SoloMatchStartPanel({
+  soloBlockedByGroupFlow,
+  devPreviewActive,
+}: {
+  soloBlockedByGroupFlow: boolean
+  devPreviewActive: boolean
+}) {
+  if (!devPreviewActive) {
+    return (
+      <div className="rounded-[26px] border border-boot-primary/20 bg-boot-soft px-4 py-4">
+        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-boot-primary">Solo Match</p>
+        <h2 className="mt-1 text-xl font-black leading-tight text-boot-ink">소개팅은 준비 중이에요</h2>
+        <p className="mt-2 text-sm leading-6 text-boot-muted">
+          지금 production 화면에서는 1:1 큐를 실제로 열지 않아요. 먼저 과팅 흐름을 이용해 주세요.
+        </p>
+      </div>
+    )
+  }
+
   if (soloBlockedByGroupFlow) {
     return (
       <div className="rounded-[26px] border border-boot-primary/20 bg-boot-soft px-4 py-4">
@@ -1194,6 +1338,14 @@ function getMatchCardTitle(match: MatchRow): string {
   }
 
   return `상대 그룹 ${match.opp_group_size}명 · ${formatGroupGender(match.opp_group_gender)}`
+}
+
+function getOpponentFactChips(match: MatchRow | undefined): string[] {
+  if (!match) return []
+  if (match.match_mode === 'solo') {
+    return ['1:1', formatGroupGender(match.opp_group_gender)]
+  }
+  return [`상대 ${match.opp_group_size}명`, formatGroupGender(match.opp_group_gender)]
 }
 
 function formatGroupGender(gender: MatchRow['opp_group_gender']): string {

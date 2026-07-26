@@ -1,0 +1,393 @@
+{
+  "schoolId": "hanyang",
+  "schoolName": "한양대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "간호학과",
+      "college": "간호대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과(야간)",
+      "college": "간호대학",
+      "status": "기존"
+    },
+    {
+      "name": "건설환경공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영공학전공",
+      "college": "단과대구분없음",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영학부",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제금융학부",
+      "college": "경제금융대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "관현악과",
+      "college": "음악대학",
+      "status": "기존"
+    },
+    {
+      "name": "교육공학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "교육학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국악과",
+      "college": "음악대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학과",
+      "college": "인문과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "국제학전공",
+      "college": "국제학부",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌한국학전공",
+      "college": "국제학부",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "데이터사이언스전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "데이터사이언스학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "도시공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "독어독문학과",
+      "college": "인문과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "무용학과",
+      "college": "예술·체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "미디어커뮤니케이션학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "미래자동차공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오메디컬공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "반도체공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "사학과",
+      "college": "인문과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업융합학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "생명공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "성악과",
+      "college": "음악대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠매니지먼트전공",
+      "college": "예술·체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠사이언스전공",
+      "college": "예술·체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠산업과학부",
+      "college": "예술·체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "실내건축디자인학과",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "심리뇌과학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "에너지공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "연극영화학과",
+      "college": "예술·체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "원자력공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "유기나노공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "융합전자공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "응용미술교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "의류학과",
+      "college": "생활과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "의예과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "자원환경공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "작곡과",
+      "college": "음악대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기·생체공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정보공학전공",
+      "college": "단과대구분없음",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "정보시스템학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정책학과",
+      "college": "정책과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "중어중문학과",
+      "college": "인문과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "창의융합교육원(공학)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "창의융합교육원(예체능)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "창의융합교육원(인문사회)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "창의융합교육원(자연과학)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "철학과",
+      "college": "인문과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터소프트웨어학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "파이낸스경영학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "피아노과",
+      "college": "음악대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학과",
+      "college": "정책과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    }
+  ]
+}

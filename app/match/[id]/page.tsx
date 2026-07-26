@@ -24,36 +24,11 @@ import {
   type DailyCardFieldId,
 } from '@/lib/matching/daily-card-authoring'
 import { getDevMatchPreviewStatus } from '@/lib/matching/dev-match-preview'
-
-interface MatchDetail {
-  match_id: string
-  match_mode?: 'group' | 'solo'
-  my_group_id: string
-  opp_group_id: string
-  opp_group_size: number
-  opp_group_gender: 'male' | 'female' | 'mixed'
-  match_status: string
-  matched_at: string
-  confirmed_at: string | null
-  completed_at: string | null
-  my_confirmed_at: string | null
-  opp_confirmed_at: string | null
-  scheduled_start: string | null
-  scheduled_end: string | null
-  venue_name: string | null
-  venue_address: string | null
-  venue_map_url: string | null
-  my_card_submitted_at: string | null
-  my_card_content_text: string | null
-  my_group_active_count: number
-  my_group_card_submitted_count: number
-  my_group_deposit_paid_count: number
-  my_group_ready: boolean
-  opp_group_active_count: number
-  opp_group_card_submitted_count: number
-  opp_group_deposit_paid_count: number
-  opp_group_ready: boolean
-}
+import {
+  isMatchDetailPayload,
+  type MatchDetail,
+} from '@/lib/matching/match-detail-state'
+import { getMatchViewState } from '@/lib/matching/match-view-state'
 
 interface ConnectionRow {
   target_user_id: string
@@ -304,7 +279,7 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
   const matchId = params.id
-  const isDevPreview = isDevPreviewClientSession() || matchId.startsWith('dev-match') || matchId.startsWith('dev-solo-')
+  const isDevPreview = isDevPreviewClientSession()
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -321,38 +296,56 @@ export default function MatchDetailPage() {
   const [dailyCardsLoading, setDailyCardsLoading] = useState(false)
   const [dailyCardPicking, setDailyCardPicking] = useState<number | null>(null)
   const [pendingStepIndex, setPendingStepIndex] = useState(0)
+  const dailyCardsAvailable =
+    match?.match_status === 'confirmed' || match?.match_status === 'completed'
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (): Promise<boolean> => {
     setLoading(true)
     setError(null)
+
+    const failClosed = (message: string) => {
+      setMatch(null)
+      setConnections([])
+      setAttendance(null)
+      setDailyCards([])
+      setCardDraft(createEmptyDailyCardDraft())
+      setPendingStepIndex(0)
+      setError(message)
+    }
 
     if (isDevPreview) {
       const devMatch = createDevMatchDetail(matchId)
       setMatch(devMatch)
       setCardDraft(createDailyCardDraftFromSubmissionText(devMatch.my_card_content_text))
       setLoading(false)
-      return
+      return true
     }
 
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}`)
       if (res.status === 401) {
-        setError('로그인이 필요해요.')
-        return
+        failClosed('로그인이 필요해요.')
+        return false
       }
       if (res.status === 404) {
-        setError('매칭을 찾을 수 없어요.')
-        return
+        failClosed('매칭을 찾을 수 없어요.')
+        return false
       }
       if (!res.ok) {
-        setError('매칭 정보를 불러오지 못했어요.')
-        return
+        failClosed('매칭 정보를 불러오지 못했어요.')
+        return false
       }
-      const data = await res.json() as { match: MatchDetail }
+      const data: unknown = await res.json().catch(() => null)
+      if (!isMatchDetailPayload(data)) {
+        failClosed('매칭 응답을 확인하지 못했어요. 잘못된 상태로 진행하지 않도록 멈췄어요.')
+        return false
+      }
       setMatch(data.match)
       setCardDraft(createDailyCardDraftFromSubmissionText(data.match.my_card_content_text))
+      return true
     } catch {
-      setError('매칭 정보를 불러오지 못했어요.')
+      failClosed('매칭 정보를 불러오지 못했어요.')
+      return false
     } finally {
       setLoading(false)
     }
@@ -370,6 +363,7 @@ export default function MatchDetailPage() {
 
   const refreshConnections = useCallback(async () => {
     setConnectionsLoading(true)
+    setConnections([])
     if (isDevPreview) {
       setConnections(createDevConnections(matchId))
       setConnectionsLoading(false)
@@ -419,12 +413,12 @@ export default function MatchDetailPage() {
   }, [isDevPreview, matchId])
 
   useEffect(() => {
-    if (match?.scheduled_start) {
+    if (dailyCardsAvailable && match?.scheduled_start) {
       refreshDailyCards()
     } else {
       setDailyCards([])
     }
-  }, [match?.scheduled_start, refreshDailyCards])
+  }, [dailyCardsAvailable, match?.scheduled_start, refreshDailyCards])
 
   const refreshAttendance = useCallback(async () => {
     if (isDevPreview) {
@@ -647,7 +641,8 @@ export default function MatchDetailPage() {
         setError(translateMatchError(data.error))
         return
       }
-      await refresh()
+      const refreshed = await refresh()
+      if (!refreshed) return
       goToPendingStep(2)
     } catch {
       setError('카드 저장에 실패했어요.')
@@ -657,7 +652,7 @@ export default function MatchDetailPage() {
   }
 
   async function pickDailyCard(selectedSlot: number) {
-    if (dailyCardPicking) return
+    if (!dailyCardsAvailable || dailyCardPicking) return
     setDailyCardPicking(selectedSlot)
     setError(null)
 
@@ -744,7 +739,8 @@ export default function MatchDetailPage() {
         setError(translateMatchError(data.error))
         return
       }
-      await refresh()
+      const refreshed = await refresh()
+      if (!refreshed) return
       goToPendingStep(3)
     } catch {
       setError('보증금 결제 확인에 실패했어요. 잠시 뒤 다시 시도해 주세요.')
@@ -864,6 +860,7 @@ export default function MatchDetailPage() {
   const pendingStepCopy = getPendingStepCopy(pendingStep, match)
   const isFirstPendingStep = pendingStepIndex === 0
   const isLastPendingStep = pendingStepIndex === PENDING_MATCH_STEPS.length - 1
+  const matchViewState = getMatchViewState(match?.match_status)
 
   function renderPendingStep(currentMatch: MatchDetail, stepKey: PendingMatchStepKey) {
     switch (stepKey) {
@@ -871,9 +868,8 @@ export default function MatchDetailPage() {
         return (
           <div className="space-y-4">
             <MatchFoundSummary
-              score={70}
               department="확정 후 공개"
-              ageRange="20~23세"
+              ageRange="확정 후 공개"
               genderSummary={getOpponentSummary(currentMatch)}
               title={currentMatch.match_mode === 'solo' ? '1:1 가매칭이 도착했어요!' : '가매칭됐어요!'}
               subtitle={currentMatch.match_mode === 'solo' ? '보증금과 내 사전 카드를 끝내면 확정돼요' : '보증금과 사전 카드를 끝내면 확정돼요'}
@@ -1106,7 +1102,34 @@ export default function MatchDetailPage() {
           </section>
         ) : match ? (
           <>
-            {match.match_status === 'pending' ? (
+            {matchViewState === 'inactive' || matchViewState === 'unknown' ? (
+              <section className="mb-4 rounded-3xl border border-boot-hairline bg-white p-5 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={20} className="mt-0.5 shrink-0 text-boot-muted" />
+                  <div>
+                    <p className="text-xs font-black text-boot-muted">
+                      {match.match_status === 'no_show' ? '노쇼 처리' : '종료된 매칭'}
+                    </p>
+                    <h2 className="mt-1 text-xl font-black text-boot-ink">
+                      이 매칭은 더 진행할 수 없어요
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-boot-muted">
+                      {match.match_status === 'cancelled'
+                        ? '취소된 매칭입니다. 매칭 화면에서 새 상대를 찾아보세요.'
+                        : match.match_status === 'no_show'
+                          ? '노쇼 처리된 매칭입니다. 정산과 후속 안내는 알림에서 확인할 수 있어요.'
+                          : '현재 상태를 안전하게 표시할 수 없어 진행 행동을 잠갔어요.'}
+                    </p>
+                    <Link
+                      href="/match"
+                      className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-boot-primary px-4 text-sm font-black text-white"
+                    >
+                      매칭 화면으로 돌아가기
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            ) : matchViewState === 'pending' ? (
               <section className="glass-card rounded-3xl p-5 mb-4">
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
@@ -1181,14 +1204,11 @@ export default function MatchDetailPage() {
               <>
                 <MatchFoundSummary
                   className="mb-6"
-                  score={92}
-                  department="경영학과"
-                  ageRange="20~23세"
                   genderSummary={getOpponentSummary(match)}
                   title="매칭됐어요!"
                   subtitle={match.match_mode === 'solo' ? '딱 맞는 상대를 찾았어요' : '딱 맞는 팀을 찾았어요'}
-                  lockedTitle={match.match_mode === 'solo' ? '상대 이름은 아직 비공개예요' : '상대팀 이름은 아직 비공개예요'}
-                  lockedMessage="날짜를 정하고 만남 전까지 하루씩 Q&A로 알아가요."
+                  lockedTitle="상대 상세 정보를 준비 중이에요"
+                  lockedMessage="확정된 상대 정보는 실제 프로필 계약이 연결된 뒤 안전하게 보여드려요."
                 />
 
                 {match.scheduled_start && (
@@ -1329,7 +1349,7 @@ export default function MatchDetailPage() {
               </div>
             ) : null}
 
-            {match.scheduled_start && (
+            {dailyCardsAvailable && match.scheduled_start && (
               <section className="glass-card rounded-3xl border border-boot-hairline p-5 mb-4">
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div className="min-w-0">

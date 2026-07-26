@@ -12,6 +12,16 @@ export type MatchSetupProfile = {
   preference_weights: unknown | null
 }
 
+const WEEKDAYS = new Set([
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+])
+
 export const DEFAULT_MATCH_PREFERENCE_WEIGHTS: PreferenceWeights = {
   appearance: 0.35,
   personality: 0.35,
@@ -32,18 +42,31 @@ const REQUIRED_WEIGHT_KEY_SET = new Set<string>(REQUIRED_WEIGHT_KEYS)
 export function hasAvailableTimeslots(payload: MatchSetupProfile['available_timeslots']): boolean {
   if (!payload || typeof payload !== 'object' || !Array.isArray(payload.slots)) return false
 
-  return payload.slots.some((slot) => {
-    if (!slot || typeof slot !== 'object') return false
-    const row = slot as Record<string, unknown>
-    return (
-      typeof row.day === 'string' &&
-      typeof row.start === 'string' &&
-      typeof row.end === 'string' &&
-      row.day.length > 0 &&
-      row.start.length > 0 &&
-      row.end.length > 0
-    )
-  })
+  return payload.slots.length > 0 && payload.slots.every(isValidAvailabilitySlot)
+}
+
+export function isValidAvailabilitySlot(slot: unknown): boolean {
+  if (!slot || typeof slot !== 'object' || Array.isArray(slot)) return false
+
+  const row = slot as Record<string, unknown>
+  if (
+    typeof row.day !== 'string' ||
+    !WEEKDAYS.has(row.day) ||
+    typeof row.start !== 'string' ||
+    typeof row.end !== 'string'
+  ) {
+    return false
+  }
+
+  const start = parseTime(row.start)
+  const end = parseTime(row.end)
+  return start !== null && end !== null && start < end
+}
+
+function parseTime(value: string): number | null {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value)
+  if (!match) return null
+  return Number(match[1]) * 60 + Number(match[2])
 }
 
 export function hasPreferenceWeights(payload: unknown): payload is PreferenceWeights {

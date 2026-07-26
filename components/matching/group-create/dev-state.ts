@@ -11,6 +11,7 @@ const nowIso = new Date().toISOString()
 
 export const EMPTY_STATE: GroupState = {
   group: null,
+  match_pool_status: null,
   members: [],
   invites: [],
   friends: [],
@@ -20,11 +21,12 @@ export const DEV_GROUP_STATE: GroupState = {
   group: {
     id: DEV_PREVIEW_GROUP_ID,
     leader_user_id: DEV_PREVIEW_CURRENT_USER_ID,
-    name: 'Booting preview group',
+    name: 'Quantum preview group',
     size: 3,
     gender: 'male',
     status: 'forming',
   },
+  match_pool_status: null,
   members: DEV_PREVIEW_GROUP_MEMBERS.map((member) => ({
     group_id: DEV_PREVIEW_GROUP_ID,
     user_id: member.user_id,

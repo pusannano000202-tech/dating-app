@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     !isSupabaseConfigured()
 
   if (!devBypass) {
-    const supabase = createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login?redirect=/admin')
     const { data: isAdmin, error } = await supabase.rpc('is_admin')

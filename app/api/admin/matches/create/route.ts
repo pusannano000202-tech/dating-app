@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 // 운영자가 수동으로 리뷰 대기 매칭을 생성 (배치 러너 없이 콘솔 테스트/긴급 매칭용).
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

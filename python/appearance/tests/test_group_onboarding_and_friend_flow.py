@@ -1,7 +1,6 @@
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -14,23 +13,28 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         home = read("app/page.tsx")
         basic = read("app/profile/basic/page.tsx")
         worldcup = read("app/profile/worldcup/page.tsx")
+        survey = read("app/profile/survey/page.tsx")
         progress = read("components/profile/StepProgress.tsx")
         login = read("app/(auth)/login/page.tsx")
 
-        self.assertIn("if (!profile?.gender)             redirect('/profile/basic')", home)
-        self.assertIn("if (!profile?.appearance_type)    redirect('/profile/worldcup')", home)
-        self.assertLess(home.index("redirect('/profile/basic')"), home.index("redirect('/profile/worldcup')"))
+        self.assertIn("if (!profile?.gender) return '/profile/basic'", home)
+        self.assertIn("if (!profile.appearance_type) return '/profile/worldcup'", home)
+        self.assertIn("if (profile.big5_openness == null) return '/profile/survey'", home)
+        self.assertLess(home.index("return '/profile/basic'"), home.index("return '/profile/worldcup'"))
+        self.assertLess(home.index("return '/profile/worldcup'"), home.index("return '/profile/survey'"))
 
         self.assertIn("router.push('/profile/worldcup')", basic)
-        self.assertIn("router.push('/profile/photos')", worldcup)
+        self.assertIn("router.push('/profile/survey')", worldcup)
+        self.assertIn("router.push('/profile/photos')", survey)
 
         self.assertLess(progress.index("path: '/profile/basic'"), progress.index("path: '/profile/worldcup'"))
-        self.assertLess(progress.index("path: '/profile/worldcup'"), progress.index("path: '/profile/photos'"))
+        self.assertLess(progress.index("path: '/profile/worldcup'"), progress.index("path: '/profile/survey'"))
+        self.assertLess(progress.index("path: '/profile/survey'"), progress.index("path: '/profile/photos'"))
         self.assertIn("?? '/profile/basic'", login)
         self.assertNotIn("?? '/profile/worldcup'", login)
 
     def test_friend_relationship_tables_exist_before_group_invites(self):
-        migration = read("supabase/migrations/20260521_matching_create_core_tables.sql")
+        migration = read("supabase/migrations/20260521000001_matching_create_core_tables.sql")
 
         self.assertIn("CREATE TABLE friend_requests", migration)
         self.assertIn("CREATE TABLE friendships", migration)
@@ -42,28 +46,30 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
 
     def test_group_create_screen_is_friend_invite_based(self):
         page = read("app/group/create/page.tsx")
+        invite_panel = read("components/matching/group-create/InviteFriendPanel.tsx")
+        member_panel = read("components/matching/group-create/GroupMemberStatusPanel.tsx")
+        queue_panel = read("components/matching/group-create/FreeBetaQueuePanel.tsx")
 
-        self.assertIn("친구 추가", page)
-        self.assertIn("친구 목록", page)
-        self.assertIn("그룹 멤버", page)
-        self.assertIn("우리 그룹", page)
-        # 2026-05-22: 보증금 결제 카드가 큐 진입 버튼과 분리됨. 큐 버튼은 단순화됨.
-        # 결제 카드 + 큐 버튼이 각각 존재해야 함.
-        self.assertIn("이번 주 매칭 큐에 들어가기", page)
-        self.assertIn("내 보증금", page)
-        self.assertNotIn("개발 중", page)
+        self.assertIn("InviteFriendPanel", page)
+        self.assertIn("GroupMemberStatusPanel", page)
+        self.assertIn("FreeBetaQueuePanel", page)
+        self.assertIn("친구 초대하기", invite_panel)
+        self.assertIn("그룹 멤버", member_panel)
+        self.assertIn("이번 주 매칭 큐에 들어가기", queue_panel)
+        self.assertIn("가매칭이 잡힌 뒤", queue_panel)
+        self.assertNotIn("개발 중", page + invite_panel + member_panel + queue_panel)
 
     def test_matching_pool_uses_weekly_queue_not_orbs_or_dots(self):
         component = read("components/MatchingPool.tsx")
         landing = read("app/page.tsx")
 
-        self.assertIn("주간 매칭 큐", component)
-        self.assertIn("대기 그룹", component)
+        self.assertIn("이번 주 과팅 대기", component)
+        self.assertIn("남자 그룹", component)
         self.assertIn("토요일 14:00", component)
         self.assertNotIn("SoulOrb", component)
         self.assertNotIn("ORBS", component)
         self.assertNotIn("rounded-full bg-emerald", component)
-        self.assertIn("MatchingPool", landing)
+        self.assertNotIn("MatchingPool", landing)
 
 
 if __name__ == "__main__":

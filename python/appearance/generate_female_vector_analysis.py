@@ -6,7 +6,6 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "public" / "appearance-ideal"
 AUDIT_PATH = OUT_DIR / "FEMALE_FILE_AUDIT.json"

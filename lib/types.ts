@@ -36,7 +36,7 @@ export interface PreferenceWeights {
 }
 
 // 이상형 월드컵 결과 (사용자 노출 금지: raw vector)
-// 마이그레이션: supabase/migrations/20260521_profile_add_preference_vectors.sql
+// 마이그레이션: supabase/migrations/20260521000002_profile_add_preference_vectors.sql
 export interface PreferredAppearance {
   preferred_appearance_vector: Record<string, number> | null
   preferred_appearance_delta_vector: Record<string, number> | null
@@ -105,6 +105,6 @@ export interface FriendSummary {
   group_status?: 'available' | 'invited' | 'in_group'
 }
 
-export type DepositStatus = 'pending' | 'paid' | 'refunded' | 'forfeited' | 'compensated'
+export type DepositStatus = 'pending' | 'paid' | 'held' | 'refunded' | 'forfeited' | 'compensated'
 
-export type MatchStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled'
+export type MatchStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'

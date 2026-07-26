@@ -12,7 +12,7 @@ import {
 } from '@/lib/refund/fee-flow'
 import { createClient } from '@/lib/supabase'
 import { isSupabaseConfigured } from '@/lib/utils'
-import SanjiCharacter, { type SanjiMood } from '@/components/SanjiCharacter'
+import SchoolMascot from '@/components/theme/SchoolMascot'
 
 type Stage = 'select' | 'ask_support' | 'notify_zero' | 'done'
 type UserGender = 'male' | 'female' | null
@@ -103,7 +103,7 @@ export default function RefundPage() {
   const nextBegAmount = APP_FEE_BEG_STEPS[begStepIndex + 1]
 
   return (
-    <main className="min-h-screen booting-paper px-5 pb-10 text-boot-ink">
+    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink md:pb-10">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
           <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
@@ -116,13 +116,31 @@ export default function RefundPage() {
         </header>
 
         {error && (
-          <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
         {stage === 'select' && (
           <section className="glass-card rounded-3xl border border-boot-hairline p-5">
+            <div className="mb-5 grid grid-cols-[minmax(0,1fr)_118px] items-center gap-3 rounded-2xl border border-boot-hairline bg-white/75 p-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-black text-boot-primary">환불 안내</p>
+                <h2 className="mt-1 text-base font-black leading-snug text-boot-ink">
+                  약속을 지켜줘서 고마워요
+                </h2>
+                <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
+                  보증금은 전액 환불이 기본이고, 앱 기여금은 자유롭게 정할 수 있어요.
+                </p>
+              </div>
+              <SchoolMascot
+                pose="refund"
+                size="lg"
+                className="h-[118px] w-[118px] rounded-[24px] bg-white/90"
+                label="학교별 보증금 환불 안내 마스코트"
+              />
+            </div>
+
             <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
             <p className="gradient-fate-text mb-6 text-3xl font-black tabular-nums">{total.toLocaleString()} 원</p>
 
@@ -182,7 +200,6 @@ export default function RefundPage() {
 
         {stage === 'ask_support' && (
           <SanjiCard
-            mood="pleading"
             speech={`${currentBegAmount.toLocaleString()}원만 남겨주실래요?`}
             sub={`보증금 ${totalLabel} 중 ${currentBegAmount.toLocaleString()}원만 앱 운영비로 남기고 나머지는 환불돼요.`}
             acceptLabel={`${currentBegAmount.toLocaleString()}원 남기기`}
@@ -210,11 +227,11 @@ export default function RefundPage() {
 
         {stage === 'done' && result && (
           <section className="glass-card rounded-3xl p-6 text-center">
-            <p className="text-sm text-gray-400 mb-1">정산 완료</p>
+            <p className="mb-1 text-sm text-boot-muted">정산 완료</p>
             <p className="text-3xl font-black gradient-fate-text mb-1">
               {result.refund.toLocaleString()} 원 환불
             </p>
-            <p className="text-[11px] text-violet-300 mb-5">
+            <p className="mb-5 text-[11px] font-bold text-boot-primary">
               앱 기여금 {result.appRevenue.toLocaleString()}원
             </p>
             <Link
@@ -226,7 +243,7 @@ export default function RefundPage() {
             <button
               type="button"
               onClick={() => router.push('/notifications')}
-              className="w-full mt-2 py-3 rounded-2xl text-sm border border-white/10 text-gray-300"
+              className="mt-2 w-full rounded-2xl border border-boot-hairline bg-white/80 py-3 text-sm text-boot-body"
             >
               알림 확인
             </button>
@@ -238,7 +255,6 @@ export default function RefundPage() {
 }
 
 function SanjiCard({
-  mood,
   speech,
   sub,
   acceptLabel,
@@ -247,7 +263,6 @@ function SanjiCard({
   onReject,
   busy,
 }: {
-  mood: SanjiMood
   speech: string
   sub: string
   acceptLabel: string
@@ -260,15 +275,15 @@ function SanjiCard({
     <div className="flex flex-col items-center">
       <div className="relative mx-auto w-full max-w-[300px] z-10">
         <div className="glass-card rounded-3xl px-5 py-4 text-center shadow-lg">
-          <p className="text-base font-black text-violet-100 leading-snug">{speech}</p>
-          <p className="mt-2 text-xs text-gray-400 leading-relaxed">{sub}</p>
+          <p className="text-base font-black leading-snug text-boot-ink">{speech}</p>
+          <p className="mt-2 text-xs leading-relaxed text-boot-body">{sub}</p>
         </div>
         <div className="flex justify-center mt-[-1px]">
           <svg width="28" height="14" viewBox="0 0 28 14" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon
               points="0,0 28,0 14,14"
-              fill="rgba(255,255,255,0.055)"
-              stroke="rgba(255,255,255,0.09)"
+              fill="rgba(255,255,255,0.92)"
+              stroke="rgba(25,35,45,0.12)"
               strokeWidth="1"
               strokeLinejoin="round"
             />
@@ -277,7 +292,12 @@ function SanjiCard({
       </div>
 
       <div className="mt-[-8px]">
-        <SanjiCharacter mood={mood} />
+        <SchoolMascot
+          pose="refund"
+          size="lg"
+          className="h-[118px] w-[118px] rounded-[24px] bg-white/90"
+          label="학교별 앱 기여금 안내 마스코트"
+        />
       </div>
 
       <div className="flex gap-2 mt-3 w-full max-w-[320px]">
@@ -285,7 +305,7 @@ function SanjiCard({
           type="button"
           onClick={onReject}
           disabled={busy}
-          className="flex-1 py-3 rounded-2xl text-sm border border-white/15 text-gray-300 disabled:opacity-40"
+          className="flex-1 rounded-2xl border border-boot-hairline bg-white/80 py-3 text-sm text-boot-body disabled:opacity-40"
         >
           {rejectLabel}
         </button>
@@ -293,7 +313,7 @@ function SanjiCard({
           type="button"
           onClick={onAccept}
           disabled={busy}
-          className="flex-1 py-3 rounded-2xl text-sm bg-violet-500/20 border border-violet-400/30 text-violet-100 font-bold disabled:opacity-40"
+          className="flex-1 rounded-2xl border border-boot-primary/30 bg-boot-primary/10 py-3 text-sm font-bold text-boot-primary disabled:opacity-40"
         >
           {busy ? <Loader2 size={14} className="animate-spin inline" /> : acceptLabel}
         </button>
@@ -325,15 +345,15 @@ function ConfirmCard({
 }) {
   return (
     <section className="glass-card rounded-3xl p-5">
-      <h2 className="text-lg font-black text-white">{title}</h2>
-      <p className="mt-2 text-sm text-gray-400 leading-relaxed">{body}</p>
+      <h2 className="text-lg font-black text-boot-ink">{title}</h2>
+      <p className="mt-2 text-sm leading-relaxed text-boot-body">{body}</p>
       {children}
       <div className="flex gap-2 mt-5">
         <button
           type="button"
           onClick={onSecondary}
           disabled={busy}
-          className="flex-1 py-3 rounded-2xl text-sm border border-white/15 text-gray-300 disabled:opacity-40"
+          className="flex-1 rounded-2xl border border-boot-hairline bg-white/80 py-3 text-sm text-boot-body disabled:opacity-40"
         >
           {secondaryLabel}
         </button>
@@ -343,8 +363,8 @@ function ConfirmCard({
           disabled={busy}
           className={`flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40 ${
             danger
-              ? 'bg-rose-500/20 border border-rose-400/30 text-rose-100'
-              : 'bg-violet-500/20 border border-violet-400/30 text-violet-100'
+              ? 'border border-rose-200 bg-rose-50 text-rose-700'
+              : 'border border-boot-primary/30 bg-boot-primary/10 text-boot-primary'
           }`}
         >
           {busy ? <Loader2 size={14} className="animate-spin inline" /> : primaryLabel}
@@ -358,7 +378,7 @@ function ReactionComic({ userGender }: { userGender: UserGender }) {
   const counterpart = userGender === 'female' ? '남자' : userGender === 'male' ? '여자' : '상대'
   const face = userGender === 'female' ? '😤' : userGender === 'male' ? '😒' : '😶'
   return (
-    <div className="mt-4 rounded-3xl border border-white/10 bg-black/20 p-4">
+    <div className="mt-4 rounded-3xl border border-boot-hairline bg-white/65 p-4">
       <div className="rounded-2xl bg-white text-slate-950 px-4 py-3 shadow-lg">
         <div className="flex items-center gap-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-4xl">
@@ -367,7 +387,7 @@ function ReactionComic({ userGender }: { userGender: UserGender }) {
           <div className="min-w-0">
             <p className="text-xs font-black text-slate-500">상대방 반응 미리보기</p>
             <p className="mt-1 text-sm font-black">{counterpart}가 살짝 삐진 장면</p>
-            <p className="mt-1 text-xs text-slate-500">아... 매칭비 0원...?</p>
+            <p className="mt-1 text-xs text-slate-500">아... 앱 기여금 0원...?</p>
           </div>
         </div>
       </div>

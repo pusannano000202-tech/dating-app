@@ -1,0 +1,443 @@
+{
+  "schoolId": "inha",
+  "schoolName": "인하대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "IBT학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "ISE학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "KLC학과",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "간호대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "건축공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학과(IUT)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "경제학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "고분자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "공간정보공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "교육학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제통상학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "국제학부",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌금융학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "금융투자학과",
+      "college": "미래융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "데이터사이언스학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "디자인융합학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "디자인테크놀로지학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "메카트로닉스공학과",
+      "college": "미래융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화콘텐츠문화경영학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "물류・경영학과(IUT)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "물류학과(IUT)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "물리학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "미디어커뮤니케이션학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오제약공학과",
+      "college": "바이오시스템융합학부",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "반도체산업융합학과",
+      "college": "미래융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "반도체시스템공학과",
+      "college": "공과대학",
+      "status": "신설"
+    },
+    {
+      "name": "사학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회인프라공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회인프라공학과(BEU)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "산업경영공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업경영학과",
+      "college": "미래융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명공학과",
+      "college": "바이오시스템융합학부",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "생명과학과",
+      "college": "바이오시스템융합학부",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "소비자학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "소프트웨어융합공학과",
+      "college": "미래융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트모빌리티공학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠과학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "아동심리학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "아태물류학부",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "에너지자원공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "연극영화학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "예술체육대학",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "의류디자인학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "의예과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "인공지능공학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "일본언어문화학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "자유전공학부",
+      "college": "프런티어학부대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학과(BEU)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "전자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학과(BEU)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "정보통신공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정보통신공학과(BEU)",
+      "college": "단과대구분없음",
+      "status": "신설"
+    },
+    {
+      "name": "정보통신공학과(IUT)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "조선해양공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "조형예술학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "철학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학과",
+      "college": "소프트웨어융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학과(IUT)",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "통계학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "프랑스언어문화학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "프런티어학부대학",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "한국어문학과",
+      "college": "문과대학",
+      "status": "기존"
+    },
+    {
+      "name": "항공우주공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "해양과학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경공학과",
+      "college": "공과대학",
+      "status": "기존"
+    }
+  ]
+}

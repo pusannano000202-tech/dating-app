@@ -5,7 +5,6 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-
 ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = ROOT / "public" / "appearance-ideal" / "female-64"
 OUT_DIR = ROOT / "public" / "appearance-ideal"

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import BasicInfoForm, { type BasicInfoData } from '@/components/profile/BasicInfoForm'
+import BasicInfoConversation from '@/components/profile/BasicInfoConversation'
+import type { BasicInfoData } from '@/components/profile/BasicInfoForm'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { DEV_BASIC_PROFILE_STORAGE_KEY } from '@/lib/profile/dev-basic-profile'
 import { createClient } from '@/lib/supabase'
@@ -17,7 +18,18 @@ export default function BasicInfoPage() {
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { setLoaded(true); return }
+      if (!user) {
+        if (isDevPreviewClientSession()) {
+          try {
+            const stored = sessionStorage.getItem(DEV_BASIC_PROFILE_STORAGE_KEY)
+            if (stored) {
+              setInitialData(JSON.parse(stored) as Partial<BasicInfoData>)
+            }
+          } catch {}
+        }
+        setLoaded(true)
+        return
+      }
       Promise.all([
         supabase
           .from('profiles')
@@ -86,32 +98,15 @@ export default function BasicInfoPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col px-5 pb-28">
-      <div className="mb-6">
-        <p className="mb-2 text-xs font-black text-boot-primary">1단계 / 내 정보</p>
-        <h1 className="text-2xl font-black gradient-fate-text">내 정보 등록</h1>
-        <p className="mt-1 text-sm leading-relaxed text-gray-500">
-          매칭 전에 필요한 기본정보만 먼저 채워요. 여기서 입력한 내용은 그룹 매칭과 다음 이상형 월드컵에 이어집니다.
-        </p>
-      </div>
-
-      {loaded && (
-        <section className="mb-4 rounded-2xl border border-boot-primary/25 bg-white/90 px-4 py-3">
-          <p className="text-[11px] font-black text-boot-primary">오늘 할 일</p>
-          <div className="mt-2 flex items-center gap-2 overflow-x-auto text-[11px]">
-            <span className="whitespace-nowrap rounded-full bg-boot-soft px-3 py-1 text-boot-ink">기본정보 입력</span>
-            <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">이상형 월드컵</span>
-            <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">성향 질문</span>
-            <span className="whitespace-nowrap rounded-full border border-boot-hairline px-3 py-1 text-boot-muted">사진 업로드</span>
-          </div>
-          <p className="mt-2 text-xs text-boot-muted">
-            필수 항목을 채우면 아래 버튼으로 바로 다음 화면을 확인할 수 있어요.
-          </p>
-        </section>
-      )}
+    <div className="mx-auto flex min-h-screen w-full max-w-xl flex-col px-5 pb-28 pt-8">
+      <header className="mb-7">
+        <p className="text-xs font-black text-boot-primary">QUANTUM · 프로필 시작</p>
+        <h1 className="mt-2 text-2xl font-black text-boot-ink">내 정보를 차례로 알려주세요</h1>
+        <p className="mt-2 text-sm leading-6 text-boot-muted">매칭에 필요한 정보부터 짧게 묻고, 마지막에 한 번에 확인해요.</p>
+      </header>
 
       {loaded ? (
-        <BasicInfoForm
+        <BasicInfoConversation
           key={initialData ? 'loaded' : 'empty'}
           initialValue={initialData}
           onSubmit={handleSubmit}
@@ -119,9 +114,9 @@ export default function BasicInfoPage() {
           serverError={serverError}
         />
       ) : (
-        <div className="flex flex-col gap-5 animate-pulse">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-14 rounded-2xl bg-white/5" />
+        <div className="flex flex-col gap-4 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-14 rounded-lg bg-boot-soft" />
           ))}
         </div>
       )}

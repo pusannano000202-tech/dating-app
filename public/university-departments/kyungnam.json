@@ -1,0 +1,433 @@
+{
+  "schoolId": "kyungnam",
+  "schoolName": "경남대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "E-mobility전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "MSC교육부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "SW응용학전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "USG융합학부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "가정교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학전공(5년)",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "게임학과",
+      "college": "AI・SW융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "경영학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학부",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰학부",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰학전공",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "경호보안학과",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "고전강독학전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "공동체혁신전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "관광학부",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광항공서비스학 전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "교양영어교육부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "교육학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "군사학과",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학부",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계로봇모빌리티공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계시스템디자인공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계융합공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계융합공학과(중소기업계약학과)",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "디자인학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지털마케팅학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "로컬크리에이터학과",
+      "college": "미래라이프대학",
+      "status": "신설"
+    },
+    {
+      "name": "무역물류학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화콘텐츠학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "물리치료학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "미디어영상학과",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "미래자동차학과",
+      "college": "AI・SW융합대학",
+      "status": "신설"
+    },
+    {
+      "name": "미래형자동차기술융합학",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "미술교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "법학과",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "보건의료정보학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "부동산경제금융학과",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "비즈니스컨설팅학과",
+      "college": "미래라이프대학",
+      "status": "신설"
+    },
+    {
+      "name": "빅데이터융합학전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "소방방재공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "소프트웨어전공",
+      "college": "AI・SW융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트기계설계해석전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "스마트기계융합공학전공",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트도시건설전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "스마트제조ICT전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "스타트업학전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "스포츠과학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "심리학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "아레테교육부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "액티브시니어학과",
+      "college": "미래라이프대학",
+      "status": "신설"
+    },
+    {
+      "name": "여가라이프비즈니스학과",
+      "college": "미래라이프대학",
+      "status": "신설"
+    },
+    {
+      "name": "역사학과",
+      "college": "인문사회대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "외식조리학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "유아교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "음악교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "의사소통교육부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "인공지능학과",
+      "college": "AI・SW융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "일어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "자유전공학부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "작업치료학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "재난안전건설학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "전기공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학전공",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "제약공학과",
+      "college": "건강보건대학",
+      "status": "기존"
+    },
+    {
+      "name": "지능로봇전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "체육교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학부",
+      "college": "AI・SW융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학전공",
+      "college": "AI・SW융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터보안전공",
+      "college": "AI・SW융합대학",
+      "status": "기존"
+    },
+    {
+      "name": "탐정학전공",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "토털뷰티디자인학과",
+      "college": "미래라이프대학",
+      "status": "신설"
+    },
+    {
+      "name": "평생교육상담보육학과",
+      "college": "미래라이프대학",
+      "status": "신설"
+    },
+    {
+      "name": "프로네시스융합학부",
+      "college": "창의융합대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "행정학과",
+      "college": "공공인재대학",
+      "status": "기존"
+    },
+    {
+      "name": "호텔컨벤션경영학전공",
+      "college": "경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계학전공",
+      "college": "경영대학",
+      "status": "기존"
+    }
+  ]
+}

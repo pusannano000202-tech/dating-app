@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
-type SupabaseServerClient = ReturnType<typeof createSupabaseServerClient>
+type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>
 type AdminReviewRow = Record<string, unknown>
 
 interface MeetingEvidenceRow {
@@ -22,8 +22,9 @@ interface VenueEvidenceRow {
   checkin_radius_m: number | null
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createSupabaseServerClient()
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

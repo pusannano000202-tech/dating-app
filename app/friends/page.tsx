@@ -15,6 +15,8 @@ import {
   UserX,
   UsersRound,
 } from 'lucide-react'
+import { DepartmentAutoFriendPanel } from '@/components/matching/group-create/DepartmentAutoFriendPanel'
+import DevPreviewNotice from '@/components/dev/DevPreviewNotice'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
   DEV_PREVIEW_CURRENT_USER_ID,
@@ -65,6 +67,7 @@ const DEV_FRIENDS_STATE: FriendsState = {
 
 export default function FriendsPage() {
   const isDevPreview = isDevPreviewClientSession()
+  const [previewNoticeReady, setPreviewNoticeReady] = useState(false)
   const [state, setState] = useState<FriendsState>(EMPTY)
   const [nickname, setNickname] = useState('')
   const [loading, setLoading] = useState(true)
@@ -104,6 +107,10 @@ export default function FriendsPage() {
   useEffect(() => {
     refresh()
   }, [refresh])
+
+  useEffect(() => {
+    setPreviewNoticeReady(true)
+  }, [])
 
   async function sendRequest() {
     const trimmed = nickname.trim()
@@ -231,6 +238,8 @@ export default function FriendsPage() {
           </div>
         </header>
 
+        {previewNoticeReady && isDevPreview && <DevPreviewNotice />}
+
         {error && (
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
             {error}
@@ -272,6 +281,12 @@ export default function FriendsPage() {
             그룹 화면에서 `초대 링크 복사`를 누르면 카카오톡이나 메시지로 바로 보낼 수 있어요.
           </p>
         </section>
+
+        <DepartmentAutoFriendPanel
+          disabled={saving}
+          preview={isDevPreview}
+          onRequestSent={refresh}
+        />
 
         <section className="mb-5 rounded-3xl border border-boot-hairline bg-white/90 p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">

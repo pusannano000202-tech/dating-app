@@ -1,7 +1,6 @@
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[3]
 IDEAL_WORLDCUP = ROOT / "components" / "profile" / "IdealWorldcup.tsx"
 

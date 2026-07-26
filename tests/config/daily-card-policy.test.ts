@@ -10,7 +10,7 @@ function readSource(path: string) {
 }
 
 test('daily card DB policy stays on user-picked 16-20 KST draw windows', () => {
-  const migration = readSource('supabase/migrations/20260602_z54_daily_card_draw_policy.sql')
+  const migration = readSource('supabase/migrations/20260602000004_z54_daily_card_draw_policy.sql')
 
   assert.match(migration, /reveal_window_start/)
   assert.match(migration, /reveal_window_end/)

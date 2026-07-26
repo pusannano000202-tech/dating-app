@@ -12,7 +12,7 @@ type PreMatchCardReadinessRow = {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -26,21 +26,24 @@ export async function POST(req: NextRequest) {
 
   const { data: memberRows, error: memberError } = await supabase
     .from('group_members')
-    .select('user_id, role')
+    .select('user_id')
     .eq('group_id', groupId)
     .is('left_at', null)
 
   if (memberError) {
-    return NextResponse.json({ error: 'member_lookup_failed' }, { status: 400 })
+    return NextResponse.json({ error: 'member_lookup_failed' }, { status: 500 })
   }
 
   const { data: group, error: groupError } = await supabase
     .from('groups')
-    .select('id, size, status')
+    .select('id, size, status, leader_user_id')
     .eq('id', groupId)
     .maybeSingle()
 
-  if (groupError || !group) {
+  if (groupError) {
+    return NextResponse.json({ error: 'group_lookup_failed' }, { status: 500 })
+  }
+  if (!group) {
     return NextResponse.json({ error: 'group_not_found' }, { status: 404 })
   }
   if (group.status !== 'forming') {
@@ -48,17 +51,17 @@ export async function POST(req: NextRequest) {
   }
 
   const activeMembers = memberRows ?? []
-  const isLeader = activeMembers.some((row: { user_id: string; role: string }) => row.user_id === user.id && row.role === 'leader')
+  const isLeader = group.leader_user_id === user.id
   if (!activeMembers.some((row: { user_id: string }) => row.user_id === user.id)) {
-    return NextResponse.json({ error: 'not_group_member' }, { status: 400 })
+    return NextResponse.json({ error: 'not_group_member' }, { status: 404 })
   }
   if (!isLeader) {
-    return NextResponse.json({ error: 'not_group_leader' }, { status: 400 })
+    return NextResponse.json({ error: 'not_group_leader' }, { status: 409 })
   }
   if (activeMembers.length < 2) {
-    return NextResponse.json({ error: 'not_enough_members' }, { status: 400 })
+    return NextResponse.json({ error: 'not_enough_members' }, { status: 409 })
   }
-  if (activeMembers.length < group.size) {
+  if (activeMembers.length !== group.size) {
     return NextResponse.json({ error: 'group_not_full' }, { status: 409 })
   }
 
@@ -68,8 +71,11 @@ export async function POST(req: NextRequest) {
     .select('user_id, personality_preference_completed_at, available_timeslots, preference_weights')
     .in('user_id', userIds)
 
-  if (profileError || (profiles?.length ?? 0) !== activeMembers.length) {
-    return NextResponse.json({ error: 'member_profile_lookup_failed' }, { status: 400 })
+  if (profileError) {
+    return NextResponse.json({ error: 'member_profile_lookup_failed' }, { status: 500 })
+  }
+  if ((profiles?.length ?? 0) !== activeMembers.length) {
+    return NextResponse.json({ error: 'member_profile_not_found' }, { status: 404 })
   }
 
   const allReady = (profiles as MatchSetupProfileRow[]).every((profile) => getMatchSetupStatus(profile).allDone)
@@ -81,7 +87,7 @@ export async function POST(req: NextRequest) {
     .rpc('get_group_pre_match_card_readiness', { p_group_id: groupId })
 
   if (cardReadinessError) {
-    return NextResponse.json({ error: 'member_card_lookup_failed' }, { status: 400 })
+    return NextResponse.json({ error: 'member_card_lookup_failed' }, { status: 500 })
   }
 
   const cardReadySet = new Set(
@@ -103,10 +109,32 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'enter_failed' }, { status: 400 })
+    const failure = getEnterMatchPoolRpcFailure(error.message)
+    return NextResponse.json({ error: failure.error }, { status: failure.status })
   }
 
   return NextResponse.json({ entry: data })
+}
+
+function getEnterMatchPoolRpcFailure(message: string | undefined): { error: string; status: 404 | 409 | 500 } {
+  if (message === 'group_not_found') {
+    return { error: 'group_not_found', status: 404 }
+  }
+
+  if (
+    message === 'not_group_leader' ||
+    message === 'group_membership_invalid' ||
+    message === 'already_in_queue' ||
+    message === 'group_not_open' ||
+    message === 'not_enough_members' ||
+    message === 'group_not_full' ||
+    message === 'member_match_setup_incomplete' ||
+    message === 'member_pre_match_card_incomplete'
+  ) {
+    return { error: message, status: 409 }
+  }
+
+  return { error: 'enter_match_pool_failed', status: 500 }
 }
 
 async function readJson(req: NextRequest): Promise<Record<string, unknown>> {

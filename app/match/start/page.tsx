@@ -87,7 +87,9 @@ function getMatchStartMode(searchParams?: { mode?: string | string[] }): MatchSt
   return searchParams?.mode === 'solo' ? 'solo' : 'group'
 }
 
-function buildDevMatchSetupProfile(cookieStore: ReturnType<typeof cookies>): MatchSetupProfile {
+function buildDevMatchSetupProfile(
+  cookieStore: Awaited<Awaited<ReturnType<typeof cookies>>>,
+): MatchSetupProfile {
   const isDone = (key: keyof typeof DEV_MATCH_SETUP_COOKIES) =>
     cookieStore.get(DEV_MATCH_SETUP_COOKIES[key])?.value === getDevMatchSetupCookieValue()
 
@@ -110,7 +112,9 @@ function getCurrentSetupState(steps: SetupStep[]) {
   }
 }
 
-function getDevPreviewGroupStatusFromServer(cookieStore: ReturnType<typeof cookies>): ActiveGroupStatus {
+function getDevPreviewGroupStatusFromServer(
+  cookieStore: Awaited<Awaited<ReturnType<typeof cookies>>>,
+): ActiveGroupStatus {
   const value = cookieStore.get(DEV_PREVIEW_GROUP_STATUS_COOKIE)?.value
   if (value === 'in_pool') return 'in_pool'
   if (value === 'ready') return 'ready'
@@ -122,7 +126,7 @@ function isActiveGroupFlowStatus(status: string | null | undefined): boolean {
 }
 
 async function hasActiveGroupFlow(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
   userId: string,
 ): Promise<boolean> {
   const { data: membership } = await supabase
@@ -179,7 +183,15 @@ function SoloBlockedByGroupFlowView() {
   )
 }
 
-function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupStep[] }) {
+function MatchStartView({
+  mode,
+  steps,
+  allowSoloMockActions = false,
+}: {
+  mode: MatchStartMode
+  steps: SetupStep[]
+  allowSoloMockActions?: boolean
+}) {
   const current = getCurrentSetupState(steps)
   const currentStep = current.currentStep
   const isSoloMode = mode === 'solo'
@@ -217,22 +229,37 @@ function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupSte
           </section>
 
           {isSoloMode ? (
-            <div className="space-y-3">
-              <Link
-                href="/match?mode=solo&soloStatus=in_pool"
-                className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
-              >
-                1:1 매칭 큐 들어가기
-                <ArrowRight size={18} />
-              </Link>
-              <Link
-                href="/match?mode=solo&sampleMatches=1"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
-              >
-                mock 가매칭 화면 보기
-                <ArrowRight size={16} />
-              </Link>
-            </div>
+            allowSoloMockActions ? (
+              <div className="space-y-3">
+                <Link
+                  href="/match?mode=solo&soloStatus=in_pool"
+                  className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-center text-base font-black"
+                >
+                  1:1 매칭 큐 들어가기
+                  <ArrowRight size={18} />
+                </Link>
+                <Link
+                  href="/match?mode=solo&sampleMatches=1"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/20 bg-white py-4 text-center text-sm font-black text-boot-primary"
+                >
+                  mock 가매칭 화면 보기
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            ) : (
+              <section className="rounded-3xl border border-boot-primary/20 bg-boot-soft px-5 py-5 text-center">
+                <h3 className="text-lg font-black text-boot-ink">1:1 소개팅은 준비 중이에요</h3>
+                <p className="mt-2 text-sm leading-6 text-boot-muted">
+                  production 화면에서는 아직 실제 1:1 큐에 들어가지 않아요. 친구와 함께하는 과팅부터 이용해 주세요.
+                </p>
+                <Link
+                  href="/match"
+                  className="mt-4 inline-flex h-11 items-center justify-center rounded-2xl bg-boot-ink px-5 text-sm font-black text-white"
+                >
+                  매칭 화면으로 돌아가기
+                </Link>
+              </section>
+            )
           ) : (
           <div className="grid grid-cols-2 gap-3">
             <Link
@@ -363,14 +390,15 @@ function MatchStartView({ mode, steps }: { mode: MatchStartMode; steps: SetupSte
   )
 }
 
-export default async function MatchStartPage({
-  searchParams,
-}: {
-  searchParams?: { mode?: string | string[] }
-}) {
+export default async function MatchStartPage(
+  props: {
+    searchParams?: Promise<{ mode?: string | string[] }>
+  }
+) {
+  const searchParams = await props.searchParams;
   const mode = getMatchStartMode(searchParams)
   const redirectTo = mode === 'solo' ? SOLO_REDIRECT_TO : GROUP_REDIRECT_TO
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const devAuthed =
     isDevAuthBypassEnabled() &&
     cookieStore.get(DEV_AUTH_COOKIE)?.value === getDevAuthCookieValue()
@@ -383,14 +411,14 @@ export default async function MatchStartPage({
     const cardDraftDone = isPreMatchCardDraftCookieDone(
       cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
     )
-    return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} />
+    return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} allowSoloMockActions={devAuthed} />
   }
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect(`/login?redirect=${encodeURIComponent(redirectTo)}`)
 
-  const soloBlockedByGroupFlow = mode === 'solo' && await hasActiveGroupFlow(supabase, user.id)
+  const soloBlockedByGroupFlow = mode === 'solo' && (await hasActiveGroupFlow(supabase, user.id))
   if (soloBlockedByGroupFlow) return <SoloBlockedByGroupFlowView />
 
   const { data: profile } = await supabase

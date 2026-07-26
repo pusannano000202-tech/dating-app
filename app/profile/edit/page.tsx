@@ -178,7 +178,7 @@ export default function ProfileEditPage() {
           <ChevronRight className="w-5 h-5 rotate-180" />
         </button>
         <div>
-          <h1 className="text-xl font-black">부팅 프로필 수정</h1>
+          <h1 className="text-xl font-black">Quantum 프로필 수정</h1>
           <p className="text-xs text-boot-muted mt-0.5">수정할 항목을 골라줘</p>
         </div>
       </div>

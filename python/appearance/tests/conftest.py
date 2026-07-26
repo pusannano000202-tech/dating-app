@@ -1,5 +1,4 @@
 """pytest 공용 설정 — 환경변수 초기화"""
-import os
 import pytest
 
 

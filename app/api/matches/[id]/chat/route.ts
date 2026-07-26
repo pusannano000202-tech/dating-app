@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
-type RouteParams = { params: { id: string } }
+type RouteParams = { params: Promise<{ id: string }> }
 
 function toStatus(errorMessage: string) {
   const message = (errorMessage || 'chat_error').toLowerCase()
@@ -18,8 +18,9 @@ function toStatus(errorMessage: string) {
   return { status: 400, code: message }
 }
 
-export async function GET(_req: NextRequest, { params }: RouteParams) {
-  const supabase = createSupabaseServerClient()
+export async function GET(_req: NextRequest, props: RouteParams) {
+  const params = await props.params;
+  const supabase = await createSupabaseServerClient()
   const {
     data: { user },
     error: authError,
@@ -45,8 +46,9 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
   })
 }
 
-export async function POST(req: NextRequest, { params }: RouteParams) {
-  const supabase = createSupabaseServerClient()
+export async function POST(req: NextRequest, props: RouteParams) {
+  const params = await props.params;
+  const supabase = await createSupabaseServerClient()
   const {
     data: { user },
     error: authError,

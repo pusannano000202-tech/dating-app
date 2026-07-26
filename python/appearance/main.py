@@ -3,18 +3,17 @@
 POST /api/score-photos  →  사진 URL 목록 받아 외모 점수 산출 후 Supabase 저장
 점수 결과는 응답에 포함하지 않는다. (INTERFACE_CONTRACT.md 참고)
 """
-import os
 import logging
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
-from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request, Header
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-from pydantic import BaseModel, field_validator, HttpUrl
+from pydantic import BaseModel, field_validator
 
 from model import build_model, score_photos
 from supabase_client import save_appearance_score
@@ -134,7 +133,7 @@ async def score_photos_endpoint(
         logger.error("이미지 다운로드 실패: req_id=%s user_id=%s error=%s", req_id, req.user_id, e)
         return ScoreResponse(status="error", message="사진을 불러올 수 없습니다")
 
-    except Exception as e:
+    except Exception:
         logger.exception("점수 산출 실패: req_id=%s user_id=%s", req_id, req.user_id)
         return ScoreResponse(status="error", message="점수 산출 중 오류가 발생했습니다")
 

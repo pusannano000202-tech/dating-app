@@ -5,8 +5,9 @@ import { join } from 'node:path'
 
 const ROOT = process.cwd()
 const ENV_FILE = join(ROOT, '.env.local')
+const useEnvFile = !process.argv.includes('--no-env-file')
 
-const fileEnv = existsSync(ENV_FILE) ? readEnvFile(ENV_FILE) : {}
+const fileEnv = useEnvFile && existsSync(ENV_FILE) ? readEnvFile(ENV_FILE) : {}
 const env = { ...fileEnv, ...process.env }
 const provider = resolveProvider(process.argv, env)
 
@@ -59,10 +60,11 @@ if (provider === 'toss') {
       validate: (value) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
     },
     {
-      key: 'SUPABASE_SERVICE_ROLE_KEY',
+      key: 'SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY',
       required: true,
       purpose: 'server-only payment reconciliation',
-      validate: (value) => isSupabaseJwtWithRole(value, 'service_role'),
+      value: resolveSupabaseAdminKey(env),
+      validate: (value) => value.status === 'SET',
     },
   )
 }
@@ -75,7 +77,7 @@ const rows = checks.map((check) => ({
 }))
 
 console.log('Payment environment check')
-console.log(`env file: ${existsSync(ENV_FILE) ? '.env.local found' : '.env.local missing'}`)
+console.log(`env file: ${useEnvFile ? (existsSync(ENV_FILE) ? '.env.local found' : '.env.local missing') : '.env.local skipped'}`)
 console.log(`provider: ${provider}`)
 console.table(rows)
 
@@ -101,7 +103,7 @@ console.log('Payment env check passed.')
 function checkStatus(check, values) {
   const value = check.value ?? values[check.key]
   if (!value) return 'MISSING'
-  if (check.validate && !check.validate(String(value))) return 'INVALID'
+  if (check.validate && !check.validate(value)) return 'INVALID'
   return 'SET'
 }
 
@@ -156,6 +158,22 @@ function isSupabasePublicKey(value) {
   if (isPlaceholderValue(value)) return false
   if (value.startsWith('sb_publishable_')) return !hasUnsafeEnvValueCharacters(value)
   return isSupabaseJwtWithRole(value, 'anon')
+}
+
+function resolveSupabaseAdminKey(values) {
+  if (values.SUPABASE_SECRET_KEY) {
+    return { status: isSupabaseSecretKey(values.SUPABASE_SECRET_KEY) ? 'SET' : 'INVALID' }
+  }
+  if (!values.SUPABASE_SERVICE_ROLE_KEY) return null
+  return {
+    status: isSupabaseJwtWithRole(values.SUPABASE_SERVICE_ROLE_KEY, 'service_role') ? 'SET' : 'INVALID',
+  }
+}
+
+function isSupabaseSecretKey(value) {
+  if (typeof value !== 'string') return false
+  if (isPlaceholderValue(value)) return false
+  return /^sb_secret_[A-Za-z0-9_-]{12,}$/.test(value)
 }
 
 function isTossKey(value, kind) {

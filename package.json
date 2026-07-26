@@ -7,33 +7,40 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:auth": "tsc -p tsconfig.auth-tests.json && node --test .tmp/auth-tests/tests/auth/*.test.js",
-    "test:config": "tsc -p tsconfig.config-tests.json && node --test .tmp/config-tests/tests/config/*.test.js",
+    "test": "npm run test:auth && npm run test:config && npm run test:matching && npm run test:profile",
+    "test:auth": "node -e \"require('fs').rmSync('.tmp/auth-tests',{recursive:true,force:true})\" && tsc -p tsconfig.auth-tests.json && node --test .tmp/auth-tests/tests/auth/*.test.js",
+    "test:config": "node -e \"require('fs').rmSync('.tmp/config-tests',{recursive:true,force:true})\" && tsc -p tsconfig.config-tests.json && node --test .tmp/config-tests/tests/config/*.test.js",
     "test:matching": "node -e \"require('fs').rmSync('.tmp/matching-tests',{recursive:true,force:true})\" && tsc -p tsconfig.matching-tests.json && node --test .tmp/matching-tests/tests/matching/*.test.js",
-    "test:profile": "tsc -p tsconfig.profile-tests.json && node --test .tmp/profile-tests/tests/profile/*.test.js",
+    "test:profile": "node -e \"require('fs').rmSync('.tmp/profile-tests',{recursive:true,force:true})\" && tsc -p tsconfig.profile-tests.json && node --test .tmp/profile-tests/tests/profile/*.test.js",
     "check:payment-env": "node scripts/check-payment-env.mjs",
     "check:secrets": "node scripts/check-secret-leaks.mjs",
     "check:deploy-readiness": "node scripts/check-deploy-readiness.mjs",
     "check:routes": "node scripts/check-local-routes.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.4",
     "lucide-react": "^1.16.0",
-    "next": "14.2.35",
-    "react": "^18",
-    "react-dom": "^18"
+    "next": "15.5.21",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.0.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.35",
-    "postcss": "^8",
+    "eslint": "9.39.5",
+    "eslint-config-next": "15.5.21",
+    "postcss": "8.5.18",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "$postcss",
+    "sharp": "0.35.0"
   }
 }

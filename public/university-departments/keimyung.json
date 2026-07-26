@@ -1,0 +1,483 @@
+{
+  "schoolId": "keimyung",
+  "schoolName": "계명대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "Department of International Business",
+      "college": "Keimyung Adams College",
+      "status": "기존"
+    },
+    {
+      "name": "Department of International Relations",
+      "college": "Keimyung Adams College",
+      "status": "기존"
+    },
+    {
+      "name": "간호학과",
+      "college": "간호대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "건축학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "게임소프트웨어학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영빅데이터학과",
+      "college": "경영대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "경영정보학과",
+      "college": "경영대학",
+      "status": "변경[기존]"
+    },
+    {
+      "name": "경영학과",
+      "college": "경영대학",
+      "status": "변경[기존]"
+    },
+    {
+      "name": "경제금융학과",
+      "college": "사회과학대학",
+      "status": "변경[기존]"
+    },
+    {
+      "name": "경찰행정학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "공예디자인과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "공중보건학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광경영학과",
+      "college": "경영대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "관현악과",
+      "college": "음악공연예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "광고홍보학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "교육학과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "교통공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "국어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학과",
+      "college": "인문국제학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "국제통상학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "기독교학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "도시계획학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "독일유럽학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "디지펜게임공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "러시아중앙아시아학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "로봇공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "무용학과",
+      "college": "음악공연예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "문예창작학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "문헌정보학과",
+      "college": "사회과학대학",
+      "status": "변경[기존]"
+    },
+    {
+      "name": "법학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사진미디어과",
+      "college": "미술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "사학과",
+      "college": "인문국제학대학",
+      "status": "변경[기존]"
+    },
+    {
+      "name": "사회복지학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회체육학과",
+      "college": "체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업디자인과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명과학과",
+      "college": "자연과학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "생태조경학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "성악과",
+      "college": "음악공연예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "세무학과",
+      "college": "경영대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "수학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트제조공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "스페인어중남미학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠마케팅학과",
+      "college": "체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각디자인과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품가공학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품영양학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "실버스포츠복지학과",
+      "college": "체육대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "실용음악음향과",
+      "college": "음악공연예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "심리학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "약학과",
+      "college": "약학대학",
+      "status": "기존"
+    },
+    {
+      "name": "약학부",
+      "college": "약학대학",
+      "status": "신설"
+    },
+    {
+      "name": "언론영상학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "연극뮤지컬과",
+      "college": "음악공연예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "영상애니메이션과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "웹툰과",
+      "college": "미술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "유아교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "의예과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의용공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "의학과",
+      "college": "의과대학",
+      "status": "기존"
+    },
+    {
+      "name": "인문사회계열",
+      "college": "Tabula Rasa College",
+      "status": "기존"
+    },
+    {
+      "name": "일본어일본학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "자동차공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "자연공학계열",
+      "college": "Tabula Rasa College",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "전기에너지공학과",
+      "college": "공과대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "전자공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "제약학과",
+      "college": "약학대학",
+      "status": "기존"
+    },
+    {
+      "name": "중국어중국학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "철학과",
+      "college": "인문국제학대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육학과",
+      "college": "체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "태권도학과",
+      "college": "체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "텍스타일디자인과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "토목공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "통계학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "패션디자인과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "패션마케팅학과",
+      "college": "미술대학",
+      "status": "기존"
+    },
+    {
+      "name": "피아노과",
+      "college": "음악공연예술대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "한국어교육과",
+      "college": "인문국제학대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "한문교육과",
+      "college": "사범대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "혁신신약학과",
+      "college": "약학대학",
+      "status": "신설"
+    },
+    {
+      "name": "화학공학과",
+      "college": "공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "자연과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "환경공학과",
+      "college": "공과대학",
+      "status": "통합[신설]"
+    },
+    {
+      "name": "회계학과",
+      "college": "경영대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "회화과",
+      "college": "미술대학",
+      "status": "기존"
+    }
+  ]
+}

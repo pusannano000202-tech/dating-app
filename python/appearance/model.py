@@ -2,15 +2,15 @@
 ResNet50-based facial beauty scorer trained on SCUT-FBP5500.
 Outputs a raw score in [0, 100].
 """
-import os
 import logging
+import os
 from io import BytesIO
 
+import requests
 import torch
 import torch.nn as nn
-from torchvision import models, transforms
 from PIL import Image
-import requests
+from torchvision import models, transforms
 
 logger = logging.getLogger(__name__)
 

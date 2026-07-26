@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createSupabaseServerClient()
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -18,8 +19,9 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json({ cards: data ?? [] })
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createSupabaseServerClient()
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

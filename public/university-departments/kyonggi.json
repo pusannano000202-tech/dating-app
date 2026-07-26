@@ -1,0 +1,453 @@
+{
+  "schoolId": "kyonggi",
+  "schoolName": "경기대학교",
+  "sourceType": "대학알리미",
+  "sourceDate": "2024-10-07",
+  "departments": [
+    {
+      "name": "AI경영융합전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "AI컴퓨터공학부",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "FineArts학부",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "SW안전보안전공",
+      "college": "소프트웨어경영대학",
+      "status": "변경[신설]"
+    },
+    {
+      "name": "건축공학전공",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축안전공학과",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "건축학과",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학부",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경영학전공",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "경제학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "경찰행정학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "공공안전학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "공공인재학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광개발경영학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "관광문화콘텐츠학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "교양학부",
+      "college": "진성애교양대학",
+      "status": "기존"
+    },
+    {
+      "name": "교직학부",
+      "college": "진성애교양대학",
+      "status": "기존"
+    },
+    {
+      "name": "국어국문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "글로벌어문학부",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "기계시스템공학과",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "기타모집단위",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "나노・반도체전공",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "도시・교통공학전공",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "독어독문전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "디자인비즈학부",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "러시아어문전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "무역학과",
+      "college": "사회과학대학",
+      "status": "신설"
+    },
+    {
+      "name": "문헌정보학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "문화재관리학",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "미디어영상학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "미디어융합콘텐츠전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "미술경영전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "바이오융합학부",
+      "college": "융합과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "반도체장비SW전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "범죄교정심리학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "범죄학전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "법학과",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회복지학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "사회에너지시스템공학과",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업경영정보공학과",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "산업디자인전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "생명과학전공",
+      "college": "융합과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "서양화전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "서예전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "수학과",
+      "college": "융합과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "스마트AI융합전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "스마트시티공학부",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠건강과학전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠과학부",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "스포츠레저산업전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "시각정보디자인전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "시큐리티매니지먼트학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "식품생물공학전공",
+      "college": "융합과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재공학전공",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "신소재화학공학부",
+      "college": "창의공과대학",
+      "status": "신설"
+    },
+    {
+      "name": "실용음악학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "심리상담융합전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "애니메이션학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "연기학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "영어영문학과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "외식조리・관광서비스학과",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "외식조리전공",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "유아교육과",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "융합데이터공학전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "응용통계학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "인공지능전공",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "일어일문전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "입체조형학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "장신구・금속디자인전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "전자공학부",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정보통신시스템전공",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "정치외교학전공",
+      "college": "사회과학대학",
+      "status": "신설"
+    },
+    {
+      "name": "중어중문전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "지식재산학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "창업융합전공",
+      "college": "단과대구분없음",
+      "status": "기존"
+    },
+    {
+      "name": "청소년학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "체육학과",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "컴퓨터공학전공",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "프랑스어문전공",
+      "college": "인문대학",
+      "status": "기존"
+    },
+    {
+      "name": "한국화전공",
+      "college": "예술체육대학",
+      "status": "기존"
+    },
+    {
+      "name": "행정학전공",
+      "college": "사회과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "호텔경영전공",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "호텔외식경영학부",
+      "college": "관광문화대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학공학전공",
+      "college": "창의공과대학",
+      "status": "기존"
+    },
+    {
+      "name": "화학과",
+      "college": "융합과학대학",
+      "status": "기존"
+    },
+    {
+      "name": "회계세무학전공",
+      "college": "소프트웨어경영대학",
+      "status": "기존"
+    },
+    {
+      "name": "휴먼서비스학부",
+      "college": "사회과학대학",
+      "status": "기존"
+    }
+  ]
+}

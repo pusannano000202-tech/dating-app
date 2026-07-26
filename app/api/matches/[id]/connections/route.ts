@@ -4,8 +4,9 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 // 핸드폰 자동공개 정책 (z36 / 결정 8-18):
 // 매칭 status='confirmed' 이후 약속 시간(match_meetings.scheduled_start) 도달 시
 // 양쪽 그룹 멤버의 phone 이 자동 공개된다. 사용자 측 동의/취소 UI 없음.
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createSupabaseServerClient()
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

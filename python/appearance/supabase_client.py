@@ -2,10 +2,11 @@
 Supabase 저장 로직.
 appearance_scores (raw) + profiles.appearance_score_normalized 업데이트.
 """
-import os
 import logging
+import os
 from datetime import datetime, timezone
-from supabase import create_client, Client
+
+from supabase import Client, create_client
 
 logger = logging.getLogger(__name__)
 MODEL_VERSION = "resnet50-scut-v1"

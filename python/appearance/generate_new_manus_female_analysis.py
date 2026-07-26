@@ -5,8 +5,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from generate_female_vector_analysis import AXES, TYPES, blend_vector, bucket_scores
-
+from generate_female_vector_analysis import TYPES, blend_vector, bucket_scores
 
 ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = ROOT / "public" / "appearance-ideal" / "female-64"

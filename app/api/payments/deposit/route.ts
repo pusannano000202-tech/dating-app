@@ -6,17 +6,19 @@ import {
   getDepositPaymentReadiness,
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
+import { createPaymentServiceClient, payMockDepositForMatch } from '@/lib/payments/deposit-server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { getPublicAppOrigin } from '@/lib/utils'
 
 interface DepositPaymentRow {
   id: string
+  match_id: string
   status: string
   toss_order_id: string | null
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
     return matchContext.response
   }
 
-  const provider = resolveDepositPaymentProvider(body.provider)
+  const provider = resolveDepositPaymentProvider()
   const readiness = getDepositPaymentReadiness(provider)
   if (!readiness.ok) {
     return NextResponse.json({
@@ -50,21 +52,30 @@ export async function POST(req: NextRequest) {
     }, { status: 503 })
   }
 
+  const paymentService = createPaymentServiceClient()
+  if (!paymentService) {
+    return NextResponse.json({ error: 'server_settlement_not_configured' }, { status: 503 })
+  }
+
   if (provider === 'mock') {
-    const { data, error } = await supabase
-      .rpc('mock_pay_deposit', { p_group_id: groupId, p_amount: DEPOSIT_AMOUNT })
-      .maybeSingle()
+    const { data, error } = await payMockDepositForMatch({
+      matchId,
+      groupId,
+      userId: user.id,
+    })
 
     if (error) {
-      return NextResponse.json({ error: error.message || 'pay_failed' }, { status: 400 })
+      const status = error === 'server_mock_payment_not_configured' ? 503 : 400
+      return NextResponse.json({ error }, { status })
     }
 
     return NextResponse.json({ provider, status: 'paid', deposit: data }, { status: 201 })
   }
 
-  const activeDeposit = await supabase
+  const activeDeposit = await paymentService
     .from('deposits')
-    .select('id,status,toss_order_id')
+    .select('id,match_id,status,toss_order_id')
+    .eq('match_id', matchId)
     .eq('group_id', groupId)
     .eq('user_id', user.id)
     .in('status', ['pending', 'paid', 'held'])
@@ -85,7 +96,7 @@ export async function POST(req: NextRequest) {
   }
 
   const pendingOrderId = (activeDeposit.data as DepositPaymentRow | null)?.toss_order_id ?? undefined
-  const payment = buildDepositPaymentRequestDraft({
+  let payment = buildDepositPaymentRequestDraft({
     provider,
     groupId,
     matchId,
@@ -97,29 +108,58 @@ export async function POST(req: NextRequest) {
 
   let deposit = activeDeposit.data as DepositPaymentRow | null
   if (!deposit) {
-    const created = await supabase
+    const created = await paymentService
       .from('deposits')
       .insert({
+        match_id: matchId,
         user_id: user.id,
         group_id: groupId,
         amount: DEPOSIT_AMOUNT,
         status: 'pending',
         toss_order_id: payment.orderId,
       })
-      .select('id,status,toss_order_id')
+      .select('id,match_id,status,toss_order_id')
       .maybeSingle()
 
     if (created.error || !created.data) {
-      return NextResponse.json({ error: created.error?.message || 'deposit_create_failed' }, { status: 400 })
-    }
+      if (created.error?.code !== '23505') {
+        return NextResponse.json({ error: created.error?.message || 'deposit_create_failed' }, { status: 400 })
+      }
 
-    deposit = created.data as DepositPaymentRow
+      const concurrent = await paymentService
+        .from('deposits')
+        .select('id,match_id,status,toss_order_id')
+        .eq('match_id', matchId)
+        .eq('user_id', user.id)
+        .in('status', ['pending', 'paid', 'held'])
+        .maybeSingle()
+
+      if (concurrent.error || !concurrent.data?.toss_order_id) {
+        return NextResponse.json({ error: 'deposit_create_conflict' }, { status: 409 })
+      }
+
+      deposit = concurrent.data as DepositPaymentRow
+      if (deposit.status === 'paid' || deposit.status === 'held') {
+        return NextResponse.json({ provider, status: deposit.status, deposit }, { status: 200 })
+      }
+      payment = buildDepositPaymentRequestDraft({
+        provider,
+        groupId,
+        matchId,
+        userId: user.id,
+        origin: getPublicAppOrigin() || req.nextUrl.origin,
+        orderId: deposit.toss_order_id ?? undefined,
+        returnPath: typeof body.return_path === 'string' ? body.return_path : undefined,
+      })
+    } else {
+      deposit = created.data as DepositPaymentRow
+    }
   } else if (!deposit.toss_order_id) {
-    const updated = await supabase
+    const updated = await paymentService
       .from('deposits')
       .update({ toss_order_id: payment.orderId })
       .eq('id', deposit.id)
-      .select('id,status,toss_order_id')
+      .select('id,match_id,status,toss_order_id')
       .maybeSingle()
 
     if (updated.error || !updated.data) {
@@ -163,7 +203,7 @@ interface DepositMatchRow {
 }
 
 async function validateDepositMatchContext(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   params: { matchId: string; groupId: string; userId: string },
 ): Promise<DepositMatchValidation> {
   const matchLookup = await supabase

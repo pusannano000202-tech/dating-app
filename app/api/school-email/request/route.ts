@@ -2,6 +2,7 @@ import { createHash, randomInt } from 'crypto'
 import { createClient as createSupabaseServiceClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { isPnuEmail, normalizeSchoolEmail } from '@/lib/auth/school-email'
+import { getSupabaseAdminKey } from '@/lib/supabase-admin'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 
@@ -10,7 +11,7 @@ interface RequestBody {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
@@ -28,7 +29,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'email_delivery_not_configured' }, { status: 501 })
   }
 
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  const adminKey = getSupabaseAdminKey()
+  if (!adminKey) {
     return NextResponse.json({ error: 'service_role_not_configured' }, { status: 500 })
   }
 
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   const service = createSupabaseServiceClient(
     getSupabaseUrl(),
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+    adminKey
   )
 
   await service
