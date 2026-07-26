@@ -34,7 +34,7 @@ const quickMeetupActions: QuickAction[] = [
   {
     icon: UsersRound,
     title: '3인 모임 바로 시작',
-    detail: '학교 인증 기반 3인 모임으로 바로 이동합니다.',
+    detail: '친구와 함께 3인 모임을 바로 시작합니다.',
     href: '/group/create?size=3',
     isFeatured: true,
   },
@@ -64,7 +64,7 @@ const quickMeetupActions: QuickAction[] = [
 const trustPoints = [
   {
     icon: ShieldCheck,
-    text: '학교 인증 및 신고 기준으로만 운영 룰을 적용합니다.',
+    text: '성인 확인과 신고 기준을 바탕으로 운영 룰을 적용합니다.',
   },
   {
     icon: Globe,

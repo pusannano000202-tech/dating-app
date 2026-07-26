@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { isSafeLocalRedirect } from '@/lib/auth/school-email'
+import { isSafeLocalRedirect } from '@/lib/auth/redirect'
 import { getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {

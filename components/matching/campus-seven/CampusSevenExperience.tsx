@@ -186,7 +186,7 @@ const EMPTY_DASHBOARD: CampusSevenDashboard = {
 }
 
 const CONSENTS = [
-  ['adult_and_school', '성인이며 학교 인증 정보로 자격을 확인합니다.'],
+  ['adult_eligibility', '만 19세 이상이며 참가 자격 확인에 동의합니다.'],
   ['seven_day_schedule', '7일 연속 19:00 일정에 참여합니다.'],
   ['activity_budget', '활동비는 각자 현장에서 결제하며 1인 총 상한은 10만 원입니다.'],
   ['public_venues_no_alcohol', '공개된 장소만 이용하고 음주하지 않습니다.'],
@@ -309,7 +309,7 @@ export default function CampusSevenExperience({
             <p className="mt-3 text-sm font-black leading-6 text-boot-body sm:text-base">오늘 밤, 다음 장면이 열린다</p>
           </div>
           <div className="absolute inset-x-4 bottom-4 flex flex-wrap gap-2 sm:inset-x-8 sm:bottom-7">
-            <span className="rounded-full bg-white/95 px-3 py-2 text-[11px] font-black text-boot-primary shadow-sm">학교 인증 성인</span>
+            <span className="rounded-full bg-white/95 px-3 py-2 text-[11px] font-black text-boot-primary shadow-sm">성인 참가자</span>
             <span className="rounded-full bg-white/95 px-3 py-2 text-[11px] font-black text-boot-coral shadow-sm">8명의 실제 만남</span>
             <span className="rounded-full bg-white/95 px-3 py-2 text-[11px] font-black text-boot-body shadow-sm">앱 실시간 안내</span>
           </div>
@@ -1187,7 +1187,6 @@ function choiceStatus(status: string): string {
 }
 
 function applicationError(code?: string): string {
-  if (code === 'school_verification_required') return '학교 인증을 먼저 완료해주세요.'
   if (code === 'complete_profile_required') return '성별·학교·학과 프로필을 먼저 완료해주세요.'
   if (code === 'profile_photo_required') return '대표 프로필 사진을 먼저 등록해주세요.'
   if (code === 'adult_only') return '만 19세 이상만 신청할 수 있어요.'

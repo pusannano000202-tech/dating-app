@@ -187,7 +187,6 @@ test('auth and completion entry points use Booting branding', () => {
 
 test('login page uses Supabase email OTP while phone provider is disabled', () => {
   const login = readSource('app/(auth)/login/page.tsx')
-  const schoolVerification = readSource('app/profile/school/page.tsx')
 
   assert.match(login, /signInWithOtp\(\{\s*email/)
   assert.match(login, /verifyOtp\(\{\s*email/)
@@ -202,11 +201,7 @@ test('login page uses Supabase email OTP while phone provider is disabled', () =
   assert.match(login, /searchParams\.get\('redirect'\)\s*\?\?\s*searchParams\.get\('next'\)/)
   assert.match(login, /getPostLoginDestination\(\{/)
   assert.match(login, /requestedRedirect/)
-  assert.match(schoolVerification, /isSafeLocalRedirect\(requestedRedirect\)/)
-  assert.doesNotMatch(
-    schoolVerification,
-    /const next = searchParams\.get\('redirect'\)\s*\?\?\s*'\/profile\/basic'/,
-  )
+  assert.doesNotMatch(login, /학교 인증/)
   assert.doesNotMatch(login, /너무 자주/)
   assert.match(login, /type="email"/)
   assert.doesNotMatch(login, /type="tel"/)

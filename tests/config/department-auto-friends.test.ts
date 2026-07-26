@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 const ROOT = process.cwd()
@@ -32,11 +32,27 @@ test('Phase 12 migration disables auto-active friendships and hardens the sugges
   assert.match(migration, /SET search_path = ''/)
   assert.match(migration, /public\.profiles/)
   assert.match(migration, /department_friend_discovery_enabled/)
-  assert.match(migration, /school_email_verified_at/)
   assert.match(migration, /department_discovery_consent_required/)
   assert.match(migration, /public\.friendships/)
   assert.match(migration, /GRANT EXECUTE ON FUNCTION public\.get_department_friend_suggestions\(INT\) TO authenticated/)
   assert.doesNotMatch(migration, /INSERT INTO public\.friendships[\s\S]*status[\s\S]*active/)
+})
+
+test('latest school-email retirement migration keeps explicit consent without email verification', () => {
+  const migrationName = readdirSync(join(ROOT, 'supabase/migrations'))
+    .find((name) => name.endsWith('_retire_school_email_gate.sql'))
+  assert.ok(migrationName)
+  const migration = readSource(
+    `supabase/migrations/${migrationName}`,
+  )
+  const suggestionFunction = migration.match(
+    /CREATE OR REPLACE FUNCTION public\.get_department_friend_suggestions[\s\S]*?REVOKE ALL ON FUNCTION public\.get_department_friend_suggestions/,
+  )?.[0] ?? ''
+
+  assert.match(suggestionFunction, /CREATE OR REPLACE FUNCTION public\.get_department_friend_suggestions/)
+  assert.match(suggestionFunction, /department_friend_discovery_enabled/)
+  assert.match(suggestionFunction, /department_discovery_consent_required/)
+  assert.doesNotMatch(suggestionFunction, /school_email_verified_at|school_verification_required/)
 })
 
 test('group and friends surfaces expose same-department suggestions and explicit requests', () => {

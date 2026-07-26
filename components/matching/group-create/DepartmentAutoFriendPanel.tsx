@@ -155,7 +155,7 @@ export function DepartmentAutoFriendPanel({
             같은 학과 친구 추천
           </h2>
           <p className="mt-1 text-xs font-bold leading-5 text-boot-muted">
-            학교 인증을 마치고 추천 노출에 동의한 같은 학과 학생끼리만 보여요. 친구는 상대가 수락한 뒤에 추가됩니다.
+            추천 노출에 동의한 같은 학교·학과 학생끼리만 보여요. 친구는 상대가 수락한 뒤에 추가됩니다.
           </p>
         </div>
       </div>
@@ -221,7 +221,6 @@ function translateSuggestionError(code?: string) {
   if (code === 'profile_school_required') return '기본정보에서 학교를 먼저 입력해 주세요.'
   if (code === 'profile_department_required') return '기본정보에서 학과를 먼저 입력해 주세요.'
   if (code === 'department_discovery_consent_required') return '추천 사용 동의가 필요해요.'
-  if (code === 'school_verification_required') return '학교 이메일 인증을 먼저 완료해 주세요.'
   if (code === 'department_suggestions_unavailable') return '추천 기능을 준비 중이에요.'
   return '같은 학과 친구 추천을 불러오지 못했어요.'
 }

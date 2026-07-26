@@ -77,7 +77,6 @@ function translateSuggestionError(message = ''): string {
   if (message.includes('profile_school_required')) return 'profile_school_required'
   if (message.includes('profile_department_required')) return 'profile_department_required'
   if (message.includes('department_discovery_consent_required')) return 'department_discovery_consent_required'
-  if (message.includes('school_verification_required')) return 'school_verification_required'
   if (message.includes('not_authenticated')) return 'Unauthorized'
   if (message.includes('get_department_friend_suggestions')) return 'department_suggestions_unavailable'
   return 'department_suggestions_failed'
@@ -88,7 +87,6 @@ function translateSuggestionStatus(message = ''): number {
     return 400
   }
   if (message.includes('department_discovery_consent_required')) return 403
-  if (message.includes('school_verification_required')) return 403
   if (message.includes('not_authenticated')) return 401
   if (message.includes('get_department_friend_suggestions')) return 501
   return 500
