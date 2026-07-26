@@ -157,6 +157,16 @@ test('campus eats map flow connects category tabs, a collapsible ranking rail, a
   assert.doesNotMatch(component, /setView\(restored\.view\)/)
 })
 
+test('campus eats keeps the URL aligned with the visible category and view', () => {
+  const component = readSource('components/campus-eats/CampusEatsPilot.tsx')
+
+  assert.match(component, /new URLSearchParams\(window\.location\.search\)/)
+  assert.match(component, /params\.set\('category', selectedCategory\.id\)/)
+  assert.match(component, /params\.set\('mode', view === 'battle' \? 'battle' : 'map'\)/)
+  assert.match(component, /window\.history\.replaceState\(null, '', nextUrl\)/)
+  assert.match(component, /\[hydrated, selectedCategory\.id, view\]/)
+})
+
 test('campus eats separates personal device ratings from collecting school results', () => {
   const component = readSource('components/campus-eats/CampusEatsPilot.tsx')
 

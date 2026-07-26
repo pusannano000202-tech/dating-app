@@ -267,6 +267,15 @@ export default function CampusEatsPilot() {
     )
   }, [hydrated, personalRating, selectedCategory.id, selectedSchool.id])
 
+  useEffect(() => {
+    if (!hydrated) return
+    const params = new URLSearchParams(window.location.search)
+    params.set('category', selectedCategory.id)
+    params.set('mode', view === 'battle' ? 'battle' : 'map')
+    const nextUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState(null, '', nextUrl)
+  }, [hydrated, selectedCategory.id, view])
+
   useEffect(() => () => {
     if (feedbackTimeoutRef.current !== null) window.clearTimeout(feedbackTimeoutRef.current)
   }, [])
