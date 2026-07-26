@@ -13,17 +13,31 @@ export async function GET() {
 
 async function checkSupabase(): Promise<boolean | null> {
   if (!isSupabaseConfigured()) return null
+  let timeout: ReturnType<typeof setTimeout> | undefined
+
   try {
     const url = `${getSupabaseUrl()}/auth/v1/health`
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000)
+    timeout = setTimeout(() => controller.abort(), 3000)
     const res = await fetch(url, {
       headers: { apikey: getSupabasePublicKey() },
       signal: controller.signal,
     })
-    clearTimeout(timeout)
-    return res.ok || res.status === 200
-  } catch {
+
+    if (!res.ok) {
+      console.error('[health] Supabase health check failed', {
+        status: res.status,
+      })
+    }
+
+    return res.ok
+  } catch (error) {
+    console.error('[health] Supabase health check failed', {
+      errorType: error instanceof Error ? error.name : 'UnknownError',
+      message: error instanceof Error ? error.message : 'Unknown failure',
+    })
     return false
+  } finally {
+    if (timeout) clearTimeout(timeout)
   }
 }

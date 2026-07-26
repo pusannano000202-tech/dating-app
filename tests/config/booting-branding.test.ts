@@ -358,4 +358,17 @@ test('health check validates Supabase Auth with the public key', () => {
   assert.match(healthRoute, /\/auth\/v1\/health/)
   assert.match(healthRoute, /getSupabasePublicKey\(\)/)
   assert.doesNotMatch(healthRoute, /\/rest\/v1\//)
+  assert.match(healthRoute, /\[health\] Supabase health check failed/)
+  assert.match(healthRoute, /status: res\.status/)
+  assert.doesNotMatch(healthRoute, /console\.error\([^)]*getSupabasePublicKey/)
+})
+
+test('match-pool stats records safe RPC diagnostics before falling back', () => {
+  const statsRoute = readSource('app/api/match-pool/stats/route.ts')
+
+  assert.match(statsRoute, /\[match-pool\/stats\] Supabase RPC failed/)
+  assert.match(statsRoute, /code: error\.code/)
+  assert.match(statsRoute, /message: error\.message/)
+  assert.match(statsRoute, /x-stats-fallback/)
+  assert.doesNotMatch(statsRoute, /console\.error\([^)]*SUPABASE/)
 })
