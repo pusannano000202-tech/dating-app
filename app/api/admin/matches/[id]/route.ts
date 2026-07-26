@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createSupabaseAdminClient } from '@/lib/supabase-admin'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>
@@ -34,7 +35,12 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
   if (error) return NextResponse.json({ error: error.message || 'lookup_failed' }, { status: 400 })
 
   const review = data && typeof data === 'object' ? data as AdminReviewRow : null
-  const evidence = await loadAdminMatchEvidence(supabase, params.id, review)
+  const adminClient = createSupabaseAdminClient()
+  if (!adminClient) {
+    return NextResponse.json({ error: 'admin_service_unavailable' }, { status: 503 })
+  }
+
+  const evidence = await loadAdminMatchEvidence(adminClient, params.id, review)
   return NextResponse.json({ review: review ? { ...review, evidence } : data })
 }
 

@@ -4,6 +4,7 @@ import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ChevronLeft, LogIn, MailCheck, Send, Sparkles } from 'lucide-react'
+import { getPostLoginDestination } from '@/lib/auth/school-email'
 import { createClient } from '@/lib/supabase'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { getSupabaseConfigIssue } from '@/lib/utils'
@@ -27,7 +28,11 @@ function isEmailOtpRateLimitError(error: unknown): boolean {
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') ?? searchParams.get('next') ?? '/profile/basic'
+  const requestedRedirect = searchParams.get('redirect') ?? searchParams.get('next')
+  const redirectTo = getPostLoginDestination({
+    schoolEmailVerifiedAt: null,
+    requestedRedirect,
+  })
   const authError = searchParams.get('auth_error')
   const supabaseConfigIssue = getSupabaseConfigIssue()
   const showDevPreviewEntry = isDevAuthBypassEnabled()

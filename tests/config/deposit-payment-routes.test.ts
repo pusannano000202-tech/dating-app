@@ -598,6 +598,16 @@ test('mock payment is server-only and bound to the current match', () => {
   assert.match(serverHelper, /p_user_id: params\.userId/)
 })
 
+test('shared Supabase admin client is server-only and never persists sessions', () => {
+  const helper = readSource('lib/supabase-admin.ts')
+
+  assert.match(helper, /export function createSupabaseAdminClient\(\)/)
+  assert.match(helper, /const key = getSupabaseAdminKey\(\)/)
+  assert.match(helper, /persistSession:\s*false/)
+  assert.match(helper, /autoRefreshToken:\s*false/)
+  assert.doesNotMatch(helper, /NEXT_PUBLIC_SUPABASE_(?:SECRET|SERVICE_ROLE)/)
+})
+
 test('deposit writes use service-only boundaries and Toss confirmation revalidates the match atomically', () => {
   const startRoutes = [
     readSource('app/api/deposits/route.ts'),

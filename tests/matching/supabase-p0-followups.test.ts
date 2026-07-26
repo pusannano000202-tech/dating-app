@@ -143,3 +143,82 @@ test('match utility definer functions are internal-only and chat access is self-
     /REVOKE (?:ALL|EXECUTE) ON FUNCTION public\.can_access_match_chat\(UUID, UUID\)\s+FROM PUBLIC, anon[\s\S]*?GRANT EXECUTE ON FUNCTION public\.can_access_match_chat\(UUID, UUID\)\s+TO authenticated/i,
   )
 })
+
+test('no-show automation RPCs are service-only', () => {
+  const migration = readMigration('_repair_server_data_acl.sql')
+
+  for (const signature of [
+    'batch_finalize_no_shows\\(\\)',
+    'finalize_no_show_admin\\(UUID\\)',
+  ]) {
+    assert.match(
+      migration,
+      new RegExp(
+        `REVOKE ALL ON FUNCTION public\\.${signature}\\s+FROM PUBLIC, anon, authenticated`,
+        'i',
+      ),
+    )
+    assert.match(
+      migration,
+      new RegExp(
+        `GRANT EXECUTE ON FUNCTION public\\.${signature}\\s+TO service_role`,
+        'i',
+      ),
+    )
+  }
+
+  assert.doesNotMatch(
+    migration,
+    /GRANT EXECUTE ON FUNCTION public\.(?:batch_finalize_no_shows\(\)|finalize_no_show_admin\(UUID\))\s+TO authenticated/i,
+  )
+})
+
+test('server-only routes receive only the table privileges they actually use', () => {
+  const migration = readMigration('_repair_server_data_acl.sql')
+
+  assert.match(
+    migration,
+    /GRANT SELECT, INSERT, UPDATE ON TABLE public\.deposits\s+TO service_role/i,
+  )
+  assert.match(
+    migration,
+    /GRANT SELECT, INSERT, UPDATE ON TABLE public\.users\s+TO service_role/i,
+  )
+  assert.match(
+    migration,
+    /GRANT INSERT ON TABLE public\.school_email_verification_codes\s+TO service_role/i,
+  )
+
+  for (const table of [
+    'attendances',
+    'deposit_refund_requests',
+    'match_meetings',
+    'venues',
+  ]) {
+    assert.match(
+      migration,
+      new RegExp(`GRANT SELECT ON TABLE public\\.${table}\\s+TO service_role`, 'i'),
+    )
+  }
+
+  assert.doesNotMatch(
+    migration,
+    /GRANT (?:ALL|SELECT|INSERT|UPDATE|DELETE)[\s\S]*TO (?:anon|authenticated)/i,
+  )
+})
+
+test('admin match evidence switches to the server client only after admin authorization', () => {
+  const route = readFileSync(
+    join(process.cwd(), 'app', 'api', 'admin', 'matches', '[id]', 'route.ts'),
+    'utf8',
+  )
+
+  assert.match(route, /createSupabaseAdminClient/)
+  assert.match(route, /const adminClient = createSupabaseAdminClient\(\)/)
+  assert.ok(
+    route.indexOf(".rpc('admin_get_match_review'") < route.indexOf('createSupabaseAdminClient()'),
+    'the user-scoped admin RPC must authorize before a service client is created',
+  )
+  assert.match(route, /loadAdminMatchEvidence\(adminClient,/)
+  assert.doesNotMatch(route, /loadAdminMatchEvidence\(supabase,/)
+})
