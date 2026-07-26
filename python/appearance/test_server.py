@@ -3,6 +3,7 @@
 서버가 실행 중일 때 실행: python test_server.py
 """
 import sys
+
 import requests
 
 BASE_URL = "http://localhost:8001"

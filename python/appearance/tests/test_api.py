@@ -1,6 +1,6 @@
 """Integration tests for the FastAPI endpoints using httpx TestClient."""
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import torch.nn as nn
 from fastapi.testclient import TestClient

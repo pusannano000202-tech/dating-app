@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from PIL import Image
 
-from model import build_model, score_image, score_photos, load_image_from_url, SCORE_MIN, SCORE_MAX
+from model import SCORE_MAX, SCORE_MIN, build_model, load_image_from_url, score_image, score_photos
 
 
 def _make_dummy_model(output: float = 3.0) -> nn.Module:
