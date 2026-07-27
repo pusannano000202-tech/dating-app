@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  getRequestedRoute,
   getPostLoginDestination,
   isSafeLocalRedirect,
 } from '../../lib/auth/redirect'
@@ -36,4 +37,9 @@ test('isSafeLocalRedirect rejects protocol-relative and external redirects', () 
   assert.equal(isSafeLocalRedirect('//evil.example'), false)
   assert.equal(isSafeLocalRedirect('https://evil.example'), false)
   assert.equal(isSafeLocalRedirect(null), false)
+})
+
+test('getRequestedRoute preserves protected-route query parameters', () => {
+  assert.equal(getRequestedRoute('/group/create', '?size=3'), '/group/create?size=3')
+  assert.equal(getRequestedRoute('/match', ''), '/match')
 })

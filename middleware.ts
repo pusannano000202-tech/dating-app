@@ -7,6 +7,7 @@ import {
   isDevAuthBypassEnabled,
   shouldIssueDevAuthCookie,
 } from './lib/dev-auth'
+import { getRequestedRoute } from './lib/auth/redirect'
 import { getSupabasePublicKey, getSupabaseUrl, isSupabaseConfigured } from './lib/utils'
 
 const PROTECTED_PREFIXES = ['/profile', '/group', '/match', '/friends', '/notifications', '/admin']
@@ -21,7 +22,7 @@ function setDevAuthCookie(response: NextResponse): void {
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, search } = request.nextUrl
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
   const canBypassAuth = isDevAuthBypassEnabled()
   const shouldIssueDevAuth = shouldIssueDevAuthCookie({ pathname })
@@ -45,7 +46,7 @@ export async function middleware(request: NextRequest) {
 
     if (isProtected && !isDevAuthed && !shouldIssueDevAuth) {
       const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
+      loginUrl.searchParams.set('redirect', getRequestedRoute(pathname, search))
       return NextResponse.redirect(loginUrl)
     }
 
@@ -85,7 +86,7 @@ export async function middleware(request: NextRequest) {
 
   if (isProtected && !user) {
     const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', pathname)
+    loginUrl.searchParams.set('redirect', getRequestedRoute(pathname, search))
     return NextResponse.redirect(loginUrl)
   }
 
