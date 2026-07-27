@@ -131,14 +131,14 @@ export default async function MeetupsPage(props: MeetupsPageProps) {
             <h1 className="text-2xl font-black leading-tight"><SchoolName suffix=" 모임을 이어가요" /></h1>
             <p className="mt-2 text-sm leading-6 text-boot-muted">{focusedCopy}</p>
             {featuredAction ? (
-              <Link
+              <a
                 href={featuredAction.href}
                 className="mt-4 flex min-h-12 items-center justify-between rounded-lg bg-boot-primary px-4 py-3 text-sm font-black text-white"
                 aria-label={`${featuredAction.title} 시작`}
               >
                 <span>{featuredAction.title}</span>
                 <ArrowRight size={18} />
-              </Link>
+              </a>
             ) : null}
           </div>
         </section>
@@ -149,7 +149,7 @@ export default async function MeetupsPage(props: MeetupsPageProps) {
             {quickMeetupActions
               .filter((action) => !action.isFeatured)
               .map((action) => (
-              <Link
+              <a
                 key={action.title}
                 href={action.href}
                 className={`flex min-h-11 items-center rounded-lg border bg-white px-4 py-3 transition ${
@@ -169,7 +169,7 @@ export default async function MeetupsPage(props: MeetupsPageProps) {
                   <span className="mt-0.5 block text-xs text-boot-muted">{action.detail}</span>
                 </span>
                 <ArrowRight size={16} className="text-boot-muted" />
-              </Link>
+              </a>
               ))}
           </div>
         </section>

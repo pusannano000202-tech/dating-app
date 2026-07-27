@@ -11,6 +11,13 @@ function readSource(path: string): string {
   return readFileSync(join(ROOT, path), 'utf8')
 }
 
+test('public meetup actions use document navigation so auth redirects keep query parameters', () => {
+  const meetups = readSource('app/meetups/page.tsx')
+
+  assert.match(meetups, /<a[\s\S]*href=\{featuredAction\.href\}/)
+  assert.match(meetups, /<a[\s\S]*key=\{action\.title\}[\s\S]*href=\{action\.href\}/)
+})
+
 test('community preview is development-only unless production explicitly enables it', () => {
   assert.equal(isCommunityFeatureEnabled({
     nodeEnv: 'development',
