@@ -4,10 +4,15 @@ import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ChevronLeft, LogIn, MailCheck, Send, Sparkles } from 'lucide-react'
+import { isGoogleOAuthProviderEnabled } from '@/lib/auth/provider-availability'
 import { getPostLoginDestination } from '@/lib/auth/redirect'
 import { createClient } from '@/lib/supabase'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
-import { getSupabaseConfigIssue } from '@/lib/utils'
+import {
+  getSupabaseConfigIssue,
+  getSupabasePublicKey,
+  getSupabaseUrl,
+} from '@/lib/utils'
 import BootingLogo from '@/components/BootingLogo'
 
 type LoginStep = 'email' | 'code'
@@ -40,6 +45,7 @@ function LoginContent() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(authError)
   const [resendCooldown, setResendCooldown] = useState(0)
   const [showAuth, setShowAuth] = useState(Boolean(authError))
@@ -160,8 +166,18 @@ function LoginContent() {
       return
     }
 
-    setLoading(true)
+    setGoogleLoading(true)
     try {
+      const googleEnabled = await isGoogleOAuthProviderEnabled({
+        supabaseUrl: getSupabaseUrl(),
+        publicKey: getSupabasePublicKey(),
+        fetcher: window.fetch.bind(window),
+      })
+      if (!googleEnabled) {
+        setError('Google 로그인은 현재 준비 중입니다. 아래 이메일 로그인으로 계속해주세요.')
+        return
+      }
+
       const supabase = createClient()
       const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`
       const { error: err } = await supabase.auth.signInWithOAuth({
@@ -174,7 +190,8 @@ function LoginContent() {
       if (err) throw err
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Google 로그인으로 이동하지 못했어요. 다시 시도해줘.')
-      setLoading(false)
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -206,7 +223,7 @@ function LoginContent() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#17120f] text-boot-ink">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#17120f] text-boot-ink">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,142,95,0.30),transparent_34%),linear-gradient(135deg,#271b16_0%,#17120f_42%,#fff3ec_100%)]" />
       <video
         className={[
@@ -306,11 +323,11 @@ function LoginContent() {
                   <button
                     type="button"
                     onClick={() => void signInWithGoogle()}
-                    disabled={loading}
+                    disabled={loading || googleLoading}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-boot-hairline bg-white px-4 py-3.5 text-sm font-black text-boot-ink shadow-sm transition-all hover:border-boot-primary/30 hover:bg-boot-soft disabled:opacity-70"
                   >
                     <LogIn size={15} strokeWidth={2.6} />
-                    Google 계정으로 계속하기
+                    {googleLoading ? 'Google 로그인 확인 중...' : 'Google 계정으로 계속하기'}
                   </button>
 
                   <div className="my-5 flex items-center gap-3 text-[11px] font-black text-boot-muted">
@@ -340,11 +357,15 @@ function LoginContent() {
                       />
                     </label>
 
-                    {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+                    {error && (
+                      <p role="alert" className="mb-3 text-xs font-bold text-red-500">
+                        {error}
+                      </p>
+                    )}
 
                     <button
                       type="submit"
-                      disabled={loading}
+                      disabled={loading || googleLoading}
                       className="btn-gradient-animated flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-black text-white disabled:opacity-70"
                     >
                       <Send size={15} strokeWidth={2.6} />
