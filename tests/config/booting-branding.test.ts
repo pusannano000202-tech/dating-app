@@ -167,6 +167,8 @@ test('pending match detail uses page steps instead of one long scroll', () => {
 
 test('auth and completion entry points use Booting branding', () => {
   const login = readSource('app/(auth)/login/page.tsx')
+  const authLayout = readSource('app/(auth)/layout.tsx')
+  const groupLayout = readSource('app/group/layout.tsx')
   const logo = readSource('components/BootingLogo.tsx')
   const complete = readSource('app/profile/complete/page.tsx')
   const edit = readSource('app/profile/edit/page.tsx')
@@ -183,6 +185,10 @@ test('auth and completion entry points use Booting branding', () => {
   assert.match(login, /UNIVERSITY GROUP MATCHING/)
   assert.doesNotMatch(login, /PNU GROUP MATCHING/)
   assert.match(login, /bg-white\/82/)
+  assert.match(authLayout, /로그인 \| Quantum/)
+  assert.match(groupLayout, /그룹 과팅 \| Quantum/)
+  assert.doesNotMatch(authLayout, /부산대 과팅/)
+  assert.doesNotMatch(groupLayout, /부산대 과팅/)
 })
 
 test('login page uses Supabase email OTP while phone provider is disabled', () => {
