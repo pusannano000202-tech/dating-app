@@ -6,7 +6,7 @@ import AppBottomNav from '@/components/navigation/AppBottomNav'
 
 export const metadata: Metadata = {
   title: 'Quantum — 대학생 연결',
-  description: '학교 인증을 바탕으로 과팅, 모임, 캠퍼스 생활을 자연스럽게 이어주는 대학생 연결 서비스입니다.',
+  description: '과팅, 모임, 캠퍼스 생활을 자연스럽게 이어주는 대학생 연결 서비스입니다.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

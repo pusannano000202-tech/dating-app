@@ -16,7 +16,7 @@ type ApplyBody = {
 }
 
 const REQUIRED_CONSENTS = [
-  'adult_and_school',
+  'adult_eligibility',
   'seven_day_schedule',
   'activity_budget',
   'public_venues_no_alcohol',
@@ -63,13 +63,12 @@ export async function POST(req: NextRequest) {
     p_preference_answers: preferenceAnswers,
     p_required_consents: requiredConsents,
     p_card_sale_preference: body.cardSalePreference === true,
-    p_consent_version: 'campus-seven-v2',
+    p_consent_version: 'campus-seven-v3',
   })
 
   if (error) {
     const code = translateApplicationError(error.message)
-    const status = code === 'school_verification_required' ? 403
-      : code === 'application_locked' ? 409
+    const status = code === 'application_locked' ? 409
         : code === 'program_setup_required' ? 503
           : 400
     return NextResponse.json({ error: code }, { status })
@@ -110,7 +109,6 @@ async function readJson(req: NextRequest): Promise<Record<string, unknown>> {
 
 function translateApplicationError(message = ''): string {
   const codes = [
-    'school_verification_required',
     'complete_profile_required',
     'profile_photo_required',
     'adult_only',

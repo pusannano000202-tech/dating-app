@@ -37,7 +37,7 @@ export default function CampusSevenMatchEntry({ href = '/match/campus-seven' }: 
           </span>
         </div>
         <div className="mt-4 flex items-center gap-2 border-t border-boot-hairline pt-3 text-[11px] font-black text-boot-body">
-          <ShieldCheck size={15} className="text-boot-primary" /> 학교 인증 성인 · 공개 장소 · 비공개 선택
+          <ShieldCheck size={15} className="text-boot-primary" /> 성인 확인 · 공개 장소 · 비공개 선택
         </div>
       </div>
     </Link>

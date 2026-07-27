@@ -4,7 +4,7 @@ import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ChevronLeft, LogIn, MailCheck, Send, Sparkles } from 'lucide-react'
-import { getPostLoginDestination } from '@/lib/auth/school-email'
+import { getPostLoginDestination } from '@/lib/auth/redirect'
 import { createClient } from '@/lib/supabase'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { getSupabaseConfigIssue } from '@/lib/utils'
@@ -30,7 +30,6 @@ function LoginContent() {
   const searchParams = useSearchParams()
   const requestedRedirect = searchParams.get('redirect') ?? searchParams.get('next')
   const redirectTo = getPostLoginDestination({
-    schoolEmailVerifiedAt: null,
     requestedRedirect,
   })
   const authError = searchParams.get('auth_error')
@@ -422,7 +421,7 @@ function LoginContent() {
             </div>
 
             <p className="mt-5 text-center text-[11px] leading-relaxed text-boot-muted">
-              이메일은 로그인과 학교 인증 진행을 위해서만 사용돼요.
+              이메일은 로그인과 계정 보호를 위해서만 사용돼요.
             </p>
           </div>
         )}

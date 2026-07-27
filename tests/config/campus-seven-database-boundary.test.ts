@@ -13,6 +13,14 @@ function readCampusSevenMigration(): string {
   return readFileSync(join(ROOT, 'supabase', 'migrations', migrationName), 'utf8')
 }
 
+function readSchoolEmailRetirementMigration(): string {
+  const migrationName = readdirSync(join(ROOT, 'supabase', 'migrations'))
+    .find((name) => name.endsWith('_retire_school_email_gate.sql'))
+
+  assert.ok(migrationName, 'school email retirement migration must exist')
+  return readFileSync(join(ROOT, 'supabase', 'migrations', migrationName), 'utf8')
+}
+
 test('campus seven database keeps identity and cohort participation in separate tables', () => {
   const migration = readCampusSevenMigration()
   const enrollmentTable = migration.match(
@@ -112,8 +120,10 @@ test('campus seven uses the existing primary profile photo only for active visib
 })
 
 test('application consent explicitly covers representative photo display inside the cohort', () => {
-  const migration = readCampusSevenMigration()
+  const migration = readSchoolEmailRetirementMigration()
 
   assert.match(migration, /"cohort_photo_display": true/i)
-  assert.match(migration, /p_consent_version TEXT DEFAULT 'campus-seven-v2'/i)
+  assert.match(migration, /"adult_eligibility": true/i)
+  assert.match(migration, /p_consent_version TEXT DEFAULT 'campus-seven-v3'/i)
+  assert.doesNotMatch(migration, /school_verification_required/i)
 })
