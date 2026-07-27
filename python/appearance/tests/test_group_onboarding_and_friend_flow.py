@@ -16,6 +16,7 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         survey = read("app/profile/survey/page.tsx")
         progress = read("components/profile/StepProgress.tsx")
         login = read("app/(auth)/login/page.tsx")
+        redirect = read("lib/auth/redirect.ts")
 
         self.assertIn("if (!profile?.gender) return '/profile/basic'", home)
         self.assertIn("if (!profile.appearance_type) return '/profile/worldcup'", home)
@@ -30,8 +31,10 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         self.assertLess(progress.index("path: '/profile/basic'"), progress.index("path: '/profile/worldcup'"))
         self.assertLess(progress.index("path: '/profile/worldcup'"), progress.index("path: '/profile/survey'"))
         self.assertLess(progress.index("path: '/profile/survey'"), progress.index("path: '/profile/photos'"))
-        self.assertIn("?? '/profile/basic'", login)
-        self.assertNotIn("?? '/profile/worldcup'", login)
+        self.assertIn("getPostLoginDestination", login)
+        self.assertIn("requestedRedirect", login)
+        self.assertIn("return '/profile/basic'", redirect)
+        self.assertNotIn("return '/profile/worldcup'", redirect)
 
     def test_friend_relationship_tables_exist_before_group_invites(self):
         migration = read("supabase/migrations/20260521000001_matching_create_core_tables.sql")
