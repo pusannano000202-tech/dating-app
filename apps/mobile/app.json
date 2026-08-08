@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Quantum",
+    "slug": "quantum-campus",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "quantum",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.quantum.campus"
+    },
+    "android": {
+      "package": "com.quantum.campus",
+      "adaptiveIcon": {
+        "backgroundColor": "#123249",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9ac0b05b-a234-461c-96e7-20617ff33f1e"
+      }
+    },
+    "owner": "quantum-pusan"
+  }
+}

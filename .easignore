@@ -1,0 +1,6 @@
+# The Expo app is standalone. EAS only needs this directory from the repository.
+*
+!apps/
+apps/*
+!apps/mobile/
+!apps/mobile/**
