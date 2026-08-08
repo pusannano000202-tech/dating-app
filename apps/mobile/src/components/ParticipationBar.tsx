@@ -7,11 +7,12 @@ import { colors, layout, radii, spacing } from '../theme/tokens';
 type ParticipationBarProps = {
   event: TonightEvent | null;
   activeEvent: TonightEvent;
+  disabled?: boolean;
   onJoin: () => void;
   onCancel: () => void;
 };
 
-export function ParticipationBar({ event, activeEvent, onJoin, onCancel }: ParticipationBarProps) {
+export function ParticipationBar({ event, activeEvent, disabled = false, onJoin, onCancel }: ParticipationBarProps) {
   if (event) {
     return (
       <View style={styles.joined} accessibilityLiveRegion="polite">
@@ -21,7 +22,7 @@ export function ParticipationBar({ event, activeEvent, onJoin, onCancel }: Parti
           <Text numberOfLines={1} style={styles.joinedTitle}>{event.title}</Text>
           <Text style={styles.joinedMeta}>{event.meetingTime} · {event.venue}</Text>
         </View>
-        <Pressable accessibilityLabel="참여 취소" onPress={onCancel} style={styles.cancelButton}>
+        <Pressable accessibilityLabel="참여 취소" disabled={disabled} onPress={onCancel} style={[styles.cancelButton, disabled && styles.disabled]}>
           <X size={19} color={colors.ink} />
         </Pressable>
       </View>
@@ -29,9 +30,9 @@ export function ParticipationBar({ event, activeEvent, onJoin, onCancel }: Parti
   }
 
   return (
-    <Pressable onPress={onJoin} style={({ pressed }) => [styles.joinButton, pressed && styles.pressed]}>
-      <Text style={styles.joinButtonTitle}>{activeEvent.title} 참여하기</Text>
-      <Text style={styles.joinButtonMeta}>지금은 미리보기 상태이며 결제는 진행되지 않아요</Text>
+    <Pressable disabled={disabled} onPress={onJoin} style={({ pressed }) => [styles.joinButton, pressed && styles.pressed, disabled && styles.disabled]}>
+      <Text style={styles.joinButtonTitle}>{disabled ? '저장 중' : `${activeEvent.title} 참여하기`}</Text>
+      <Text style={styles.joinButtonMeta}>참여는 계정에 저장되며 결제는 아직 진행되지 않아요</Text>
     </Pressable>
   );
 }
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
+  disabled: { opacity: 0.5 },
   joinButtonTitle: { color: colors.surface, fontSize: 16, fontWeight: '900', textAlign: 'center' },
   joinButtonMeta: { marginTop: 4, color: 'rgba(255,255,255,0.76)', fontSize: 10, fontWeight: '700', textAlign: 'center' },
 });

@@ -1,6 +1,8 @@
-import { Camera, ChevronRight, LockKeyhole, LogIn, Settings, ShieldCheck, UserRound } from 'lucide-react-native';
+import { Camera, ChevronRight, LockKeyhole, LogOut, Settings, ShieldCheck, UserRound } from 'lucide-react-native';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useAuth } from '../../src/auth/context';
 import { PageHeader } from '../../src/components/PageHeader';
 import { Screen } from '../../src/components/Screen';
 import { colors, radii, spacing } from '../../src/theme/tokens';
@@ -13,26 +15,41 @@ const profileRows = [
 ] as const;
 
 export default function ProfileScreen() {
+  const { session, signOut } = useAuth();
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function handleSignOut() {
+    setMessage(null);
+    try {
+      await signOut();
+    } catch {
+      setMessage('로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    }
+  }
+
+  if (!session) return null;
+
   return (
     <Screen contentStyle={styles.content}>
       <PageHeader
         eyebrow="MY QUANTUM"
         title="내 정보와 안전 설정"
-        description="모바일 로그인 연결 전 미리보기입니다. 기존 웹 계정과 데이터는 다음 단계에서 그대로 이어집니다."
+        description="웹과 모바일에서 같은 Quantum 계정과 참여 정보를 사용합니다."
       />
 
       <View style={styles.accountBand}>
         <View style={styles.avatar}><LockKeyhole size={24} color={colors.school} /></View>
         <View style={styles.accountCopy}>
-          <Text style={styles.accountTitle}>아직 앱 계정이 연결되지 않았어요</Text>
-          <Text style={styles.accountDescription}>Google 또는 Kakao 로그인으로 기존 Quantum 계정을 이어갈 수 있게 만들 예정입니다.</Text>
+          <Text style={styles.accountTitle}>Quantum 계정 연결됨</Text>
+          <Text style={styles.accountDescription}>{session.user.email ?? '소셜 로그인 계정'}</Text>
         </View>
       </View>
 
-      <Pressable style={styles.loginButton}>
-        <LogIn size={19} color={colors.surface} />
-        <Text style={styles.loginButtonText}>계정 연결 준비 중</Text>
+      <Pressable onPress={() => void handleSignOut()} style={styles.loginButton}>
+        <LogOut size={19} color={colors.surface} />
+        <Text style={styles.loginButtonText}>로그아웃</Text>
       </Pressable>
+      {message && <Text style={styles.errorText} role="alert">{message}</Text>}
 
       <View style={styles.rows}>
         {profileRows.map((item) => {
@@ -83,6 +100,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.school,
   },
   loginButtonText: { color: colors.surface, fontSize: 15, fontWeight: '900' },
+  errorText: { marginHorizontal: spacing.lg, marginTop: spacing.sm, color: colors.action, fontSize: 12, lineHeight: 18, fontWeight: '800', textAlign: 'center' },
   rows: { marginTop: spacing.xl, paddingHorizontal: spacing.lg },
   row: {
     minHeight: 76,

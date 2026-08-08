@@ -105,7 +105,7 @@ export function TonightEventCarousel({
                     <Text style={styles.eyebrow}>{item.eyebrow}</Text>
                     <View style={styles.remainingPill}>
                       <UsersRound size={13} color={colors.nightText} />
-                      <Text style={styles.remainingText}>{item.remaining}자리</Text>
+                      <Text style={styles.remainingText}>{item.remaining === null ? '모집 중' : `${item.remaining}자리`}</Text>
                     </View>
                   </View>
                 </View>
