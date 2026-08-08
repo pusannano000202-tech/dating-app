@@ -49,7 +49,8 @@
 - [ ] Supabase 모바일 딥링크와 Google·Kakao 로그인 공급자에 앱 주소를 등록한다.
 - [x] 로그인 세션을 SecureStore에 보관하고 기존 Quantum 계정과 연결하는 앱 코드를 구현한다.
 - [x] 현재 로컬 일정 데이터를 Quantum 모임 API 응답으로 교체한다.
-- [ ] 참여 중복 방지를 서버·DB에서도 강제하는 migration을 원격 Supabase에 적용하고 실제 계정으로 확인한다. 로컬 코드와 테스트는 완료했다.
+- [x] 참여 중복 방지를 서버·DB에서도 강제하는 migration을 원격 Supabase에 적용하고 표·RLS·RPC 권한을 확인한다.
+- [x] EAS preview·production 환경에 Vercel API 주소와 Supabase 공개 설정을 등록한다.
 - [ ] 사진 업로드, 외모 분석, 보증금, 친구 관계를 모바일 API와 연결한다.
 - [ ] 결제는 Toss 모바일 리다이렉트 계약과 환불 정책 승인 후 별도 Gate에서 연결한다.
 
@@ -65,6 +66,6 @@
 
 ## 현재 판정
 
-- **완료:** 모바일 UI 골격, 원기둥형 일정 탐색, Supabase 세션 코드, 모임 목록·참여 API 코드, Android 번들 export, 자동 검사, 로그인 브라우저 QA.
-- **미완료:** 실제 Android 로그인 QA, Supabase 딥링크 등록 확인, 원격 참여 migration, 사진·결제 연결, 최신 APK/AAB 재빌드, Play Console 등록과 심사.
-- **출시 상태:** 빌드 가능한 코드까지 왔지만 원격 DB·실기기·최신 설치 파일 검증 전이므로 실제 서비스 출시는 차단 상태다.
+- **완료:** 모바일 UI 골격, 원기둥형 일정 탐색, Supabase 세션 코드, 모임 목록·참여 API와 원격 DB, EAS 공개 환경설정, Android 번들 export, 자동 검사, 로그인 브라우저 QA.
+- **미완료:** 실제 Android 로그인 QA, Supabase 딥링크 등록 확인, 사진·결제 연결, 최신 APK/AAB 재빌드, Play Console 등록과 심사.
+- **출시 상태:** 코드와 참여 DB 계약까지 연결됐지만 실기기 OAuth·최신 설치 파일 검증 전이므로 실제 서비스 출시는 차단 상태다.
