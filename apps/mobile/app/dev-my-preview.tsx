@@ -1,5 +1,6 @@
-import { Redirect } from 'expo-router';
-import { Alert, StyleSheet, Text } from 'react-native';
+import { Redirect, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { MyFinanceSafetySection } from '../src/components/my/MyFinanceSafetySection';
 import { MyPeopleSection } from '../src/components/my/MyPeopleSection';
@@ -22,53 +23,64 @@ const previewFriends = [
   { userId: 'fixture-jisoo', displayName: 'Jisoo' },
 ];
 
-function showPreviewAction(label: string) {
-  Alert.alert('Development preview', `${label} is a local preview action.`);
+function getPreviewState(value: string | string[] | undefined) {
+  const state = Array.isArray(value) ? value[0] : value;
+  return state === 'loading' || state === 'error' ? state : 'ready';
 }
 
 export default function DevMyPreview() {
   if (!__DEV__) return <Redirect href="/login" />;
 
+  const { state } = useLocalSearchParams<{ state?: string | string[] }>();
+  const [lastAction, setLastAction] = useState('None');
+  const previewState = getPreviewState(state);
+  const isReady = previewState === 'ready';
+
   return (
     <Screen contentStyle={styles.content}>
       <Text style={styles.notice}>DEV ONLY - local My fixture</Text>
-      <MyProfileHeader
-        actionLabel={previewProfile.actionLabel}
-        displayName={previewProfile.displayName}
-        onAction={() => showPreviewAction('Profile action')}
-        primaryPhotoUrl={null}
-        profileState="ready"
-        progress={previewProfile.progress}
-        school={previewProfile.school}
-      />
-      <MyPeopleSection
-        friends={previewFriends}
-        notificationsState="ready"
-        onFriends={() => showPreviewAction('Friends')}
-        onNotifications={() => showPreviewAction('Notifications')}
-        receivedRequestCount={1}
-        state="ready"
-        unreadNotificationCount={2}
-      />
-      <MyProfileSection
-        appearanceStatusLabel="Preview status: not connected"
-        onBasic={() => showPreviewAction('Basic profile')}
-        onPhotos={() => showPreviewAction('Profile photos')}
-        onWorldcup={() => showPreviewAction('Worldcup')}
-        photoCount={0}
-        photoState="ready"
-      />
-      <MyFinanceSafetySection
-        message={null}
-        onDeposit={() => showPreviewAction('Deposit contract')}
-        onSignOut={() => showPreviewAction('Sign out')}
-        signingOut={false}
-      />
+      <View style={styles.sections}>
+        <MyProfileHeader
+          actionLabel={previewProfile.actionLabel}
+          displayName={isReady ? previewProfile.displayName : null}
+          onAction={() => setLastAction('Profile action')}
+          primaryPhotoUrl={null}
+          profileState={previewState}
+          progress={isReady ? previewProfile.progress : null}
+          school={isReady ? previewProfile.school : null}
+        />
+        <MyPeopleSection
+          friends={isReady ? previewFriends : []}
+          notificationsState={previewState}
+          onFriends={() => setLastAction('Friends')}
+          onNotifications={() => setLastAction('Notifications')}
+          receivedRequestCount={isReady ? 1 : null}
+          state={previewState}
+          unreadNotificationCount={isReady ? 2 : null}
+        />
+        <MyProfileSection
+          appearanceStatusLabel={isReady ? 'Preview status: not connected' : null}
+          onBasic={() => setLastAction('Basic profile')}
+          onPhotos={() => setLastAction('Profile photos')}
+          onWorldcup={() => setLastAction('Worldcup')}
+          photoCount={isReady ? 0 : null}
+          photoState={previewState}
+        />
+        <MyFinanceSafetySection
+          message={null}
+          onDeposit={() => setLastAction('Deposit contract')}
+          onSignOut={() => setLastAction('Sign out')}
+          signingOut={false}
+        />
+        <Text accessibilityLiveRegion="polite" style={styles.actionStatus} testID="my-preview-last-action">Last preview action: {lastAction}</Text>
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
+  content: { paddingTop: spacing.lg },
+  sections: { gap: spacing.xl, paddingHorizontal: spacing.lg },
   notice: { color: '#65716D', fontSize: 12, fontWeight: '800', letterSpacing: 0 },
+  actionStatus: { color: '#65716D', fontSize: 12, fontWeight: '700', letterSpacing: 0 },
 });
