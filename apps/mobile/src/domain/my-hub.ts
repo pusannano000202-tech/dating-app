@@ -17,6 +17,10 @@ export function selectActiveFriends<T extends { status: string }>(items: readonl
   return items.filter((item) => item.status === 'active');
 }
 
+export function runMyHubFactory<T>(factory: () => T): Promise<T> {
+  return new Promise<T>((resolve) => resolve(factory()));
+}
+
 function assertNever(value: never): never {
   throw new Error(`Unexpected value: ${String(value)}`);
 }

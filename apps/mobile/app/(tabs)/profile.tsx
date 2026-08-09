@@ -12,7 +12,7 @@ import { MyPeopleSection } from '../../src/components/my/MyPeopleSection';
 import { MyProfileHeader } from '../../src/components/my/MyProfileHeader';
 import { MyProfileSection } from '../../src/components/my/MyProfileSection';
 import { Screen } from '../../src/components/Screen';
-import { buildMyProfileProgress, getAppearanceStatusLabel, getMyPrimaryAction, selectActiveFriends } from '../../src/domain/my-hub';
+import { buildMyProfileProgress, getAppearanceStatusLabel, getMyPrimaryAction, runMyHubFactory, selectActiveFriends } from '../../src/domain/my-hub';
 import { spacing } from '../../src/theme/tokens';
 
 type RequestState<T> = {
@@ -52,13 +52,13 @@ export default function ProfileScreen() {
     setNotificationsState(loadingState);
     if (isRefresh) setRefreshing(true);
 
-    void getQuantumApiClient().getProfileOnboarding().then((summary) => {
+    void runMyHubFactory(() => getQuantumApiClient()).then((client) => client.getProfileOnboarding()).then((summary) => {
       if (canUpdate()) setProfileState({ status: 'ready', data: summary });
     }).catch(() => {
       if (canUpdate()) setProfileState({ status: 'error', data: null });
     }).finally(finish);
 
-    void getProfilePhotosApi().listPhotos().then((photos) => {
+    void runMyHubFactory(() => getProfilePhotosApi()).then((client) => client.listPhotos()).then((photos) => {
       if (canUpdate()) setPhotosState({ status: 'ready', data: photos });
     }).catch(() => {
       if (canUpdate()) setPhotosState({ status: 'error', data: null });
@@ -112,6 +112,7 @@ export default function ProfileScreen() {
   const summary = profileState.status === 'ready' ? profileState.data : null;
   const nextStep = summary?.nextStep ?? 'basic';
   const primaryAction = getMyPrimaryAction(nextStep);
+  const profileProgress = profileState.status === 'ready' ? buildMyProfileProgress(nextStep) : null;
   const primaryPhotoUrl = photosState.status === 'ready' ? photosState.data?.items[0]?.signedUrl ?? null : null;
   const photoCount = photosState.status === 'ready' ? photosState.data?.items.length ?? null : null;
   const activeFriends = friendsState.status === 'ready'
@@ -131,43 +132,45 @@ export default function ProfileScreen() {
         refreshControl: <RefreshControl refreshing={refreshing} onRefresh={() => reload(true)} />,
       }}
     >
-      <MyProfileHeader
-        actionLabel={primaryAction.label}
-        displayName={summary?.profile?.displayName ?? 'Quantum 사용자'}
-        error={profileState.status === 'error'}
-        loading={profileState.status === 'loading'}
-        onAction={() => profileState.status === 'error' ? reload(true) : router.push(primaryAction.route)}
-        primaryPhotoUrl={primaryPhotoUrl}
-        progress={buildMyProfileProgress(nextStep)}
-        school={summary?.profile?.school ?? null}
-      />
-      <MyPeopleSection
-        friends={activeFriends}
-        onFriends={() => router.push('/friends')}
-        onNotifications={() => router.push('/notifications')}
-        receivedRequestCount={receivedRequestCount}
-        state={friendsState.status}
-        notificationsState={notificationsState.status}
-        unreadNotificationCount={unreadNotificationCount}
-      />
-      <MyProfileSection
-        appearanceStatusLabel={summary ? getAppearanceStatusLabel(summary.appearanceStatus) : null}
-        onBasic={() => router.push('/profile/basic')}
-        onPhotos={() => router.push('/profile/photos')}
-        onWorldcup={() => router.push('/profile/worldcup')}
-        photoCount={photoCount}
-        photoState={photosState.status}
-      />
-      <MyFinanceSafetySection
-        message={message}
-        onDeposit={() => router.push('/deposit')}
-        onSignOut={confirmSignOut}
-        signingOut={signingOut}
-      />
+      <View style={styles.sections}>
+        <MyProfileHeader
+          actionLabel={primaryAction.label}
+          displayName={summary?.profile?.displayName ?? null}
+          onAction={() => profileState.status === 'error' ? reload(true) : router.push(primaryAction.route)}
+          primaryPhotoUrl={primaryPhotoUrl}
+          profileState={profileState.status}
+          progress={profileProgress}
+          school={summary?.profile?.school ?? null}
+        />
+        <MyPeopleSection
+          friends={activeFriends}
+          onFriends={() => router.push('/friends')}
+          onNotifications={() => router.push('/notifications')}
+          receivedRequestCount={receivedRequestCount}
+          state={friendsState.status}
+          notificationsState={notificationsState.status}
+          unreadNotificationCount={unreadNotificationCount}
+        />
+        <MyProfileSection
+          appearanceStatusLabel={summary ? getAppearanceStatusLabel(summary.appearanceStatus) : null}
+          onBasic={() => router.push('/profile/basic')}
+          onPhotos={() => router.push('/profile/photos')}
+          onWorldcup={() => router.push('/profile/worldcup')}
+          photoCount={photoCount}
+          photoState={photosState.status}
+        />
+        <MyFinanceSafetySection
+          message={message}
+          onDeposit={() => router.push('/deposit')}
+          onSignOut={confirmSignOut}
+          signingOut={signingOut}
+        />
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
+  content: { paddingTop: spacing.lg },
+  sections: { gap: spacing.xl, paddingHorizontal: spacing.lg },
 });

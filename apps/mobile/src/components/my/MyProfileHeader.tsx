@@ -5,19 +5,29 @@ import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'rea
 import type { MyProfileProgress } from '../../domain/my-hub';
 import { colors, layout, radii, spacing, typography } from '../../theme/tokens';
 
+type MyProfileHeaderLoadState =
+  | {
+    profileState: 'loading' | 'ready' | 'error';
+    loading?: never;
+    error?: never;
+  }
+  | {
+    profileState?: never;
+    loading: boolean;
+    error: boolean;
+  };
+
 export type MyProfileHeaderProps = {
-  displayName: string;
+  displayName: string | null;
   school: string | null;
   primaryPhotoUrl: string | null;
-  progress: MyProfileProgress;
+  progress: MyProfileProgress | null;
   actionLabel: string;
   onAction: () => void;
-  loading: boolean;
-  error: boolean;
-};
+} & MyProfileHeaderLoadState;
 
-function initials(displayName: string) {
-  return displayName.trim().slice(0, 2) || '?';
+function initials(displayName: string | null) {
+  return displayName?.trim().slice(0, 2) || '?';
 }
 
 export function MyProfileHeader({
@@ -27,10 +37,14 @@ export function MyProfileHeader({
   progress,
   actionLabel,
   onAction,
-  loading,
-  error,
+  profileState,
+  loading: legacyLoading,
+  error: legacyError,
 }: MyProfileHeaderProps) {
   const [imageFailed, setImageFailed] = useState(false);
+  const resolvedProfileState = profileState ?? (legacyLoading ? 'loading' : legacyError ? 'error' : 'ready');
+  const loading = resolvedProfileState === 'loading';
+  const error = resolvedProfileState === 'error';
 
   useEffect(() => {
     setImageFailed(false);
@@ -41,24 +55,31 @@ export function MyProfileHeader({
       <Text style={styles.eyebrow}>마이</Text>
       <Text style={styles.title}>내 정보와 만남을 한곳에서 관리해요.</Text>
       <View style={styles.profileRow}>
-        {primaryPhotoUrl && !imageFailed ? (
-          <Image accessibilityLabel={`${displayName} 프로필 사진`} onError={() => setImageFailed(true)} source={{ uri: primaryPhotoUrl }} style={styles.avatar} resizeMode="cover" />
-        ) : (
-          <View accessibilityLabel={`${displayName} 이니셜`} style={styles.avatarFallback}>
-            <Text style={styles.avatarInitial}>{initials(displayName)}</Text>
-          </View>
-        )}
-        <View style={styles.profileCopy}>
-          <Text numberOfLines={1} style={styles.name}>{displayName}</Text>
-          <Text numberOfLines={1} style={styles.school}>{school ?? '학교 정보 미등록'}</Text>
-          {error ? <Text accessibilityRole="alert" style={styles.error}>프로필을 불러오지 못했어요</Text> : null}
-        </View>
+        {loading ? <Text style={styles.status}>프로필 정보를 불러오는 중</Text>
+          : error ? <Text accessibilityRole="alert" style={styles.error}>프로필 정보를 확인하지 못했어요</Text>
+          : <>
+            {primaryPhotoUrl && !imageFailed ? (
+              <Image accessibilityLabel={`${displayName ?? '내'} 프로필 사진`} onError={() => setImageFailed(true)} source={{ uri: primaryPhotoUrl }} style={styles.avatar} resizeMode="cover" />
+            ) : (
+              <View accessibilityLabel={`${displayName ?? '내'} 이니셜`} style={styles.avatarFallback}>
+                <Text style={styles.avatarInitial}>{initials(displayName)}</Text>
+              </View>
+            )}
+            <View style={styles.profileCopy}>
+              <Text numberOfLines={1} style={styles.name}>{displayName ?? '프로필을 시작해 주세요'}</Text>
+              <Text numberOfLines={1} style={styles.school}>{school ?? '등록된 학교 정보가 없어요'}</Text>
+            </View>
+          </>}
       </View>
       <View style={styles.progressBlock}>
-        <Text style={styles.progressLabel}>{progress.completed}/{progress.total} 완료</Text>
-        <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: progress.percent }} style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress.percent}%` }]} />
-        </View>
+        {progress ? (
+          <>
+            <Text style={styles.progressLabel}>{progress.completed}/{progress.total} 완료</Text>
+            <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: progress.percent }} style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progress.percent}%` }]} />
+            </View>
+          </>
+        ) : <Text style={styles.progressLabel}>{loading ? '프로필 진행 상태를 불러오는 중' : '프로필 진행 상태를 확인하지 못했어요'}</Text>}
       </View>
       <Pressable
         accessibilityLabel={loading ? '프로필 불러오는 중' : error ? '프로필 다시 확인' : actionLabel}
@@ -83,6 +104,7 @@ const styles = StyleSheet.create({
   avatarFallback: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: radii.round, backgroundColor: colors.surfaceMuted },
   avatarInitial: { color: colors.body, fontSize: 22, fontWeight: '800' },
   profileCopy: { flex: 1, minWidth: 0, gap: spacing.xs },
+  status: { flex: 1, color: colors.muted, fontSize: 14, lineHeight: 20, fontWeight: '700' },
   name: { color: colors.ink, fontSize: 17, fontWeight: '800' },
   school: { color: colors.muted, fontSize: 13, lineHeight: 18, fontWeight: '600' },
   error: { color: colors.body, fontSize: 13, lineHeight: 18, fontWeight: '700' },

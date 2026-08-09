@@ -5,6 +5,7 @@ import {
   buildMyProfileProgress,
   getAppearanceStatusLabel,
   getMyPrimaryAction,
+  runMyHubFactory,
   selectActiveFriends,
 } from '../src/domain/my-hub';
 
@@ -62,4 +63,11 @@ test('selects only active friends from a generic status list', () => {
   ];
 
   assert.deepEqual(selectActiveFriends(friends), [friends[0]]);
+});
+
+test('converts synchronous my hub factory failures into promise rejections', async () => {
+  await assert.rejects(
+    () => runMyHubFactory(() => { throw new Error('factory failed'); }),
+    /factory failed/,
+  );
 });
