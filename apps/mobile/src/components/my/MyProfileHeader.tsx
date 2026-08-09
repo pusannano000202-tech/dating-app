@@ -1,4 +1,4 @@
-import { ChevronRight, UserRound } from 'lucide-react-native';
+import { ChevronRight } from 'lucide-react-native';
 import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { MyProfileProgress } from '../../domain/my-hub';
@@ -14,6 +14,10 @@ export type MyProfileHeaderProps = {
   loading: boolean;
   error: boolean;
 };
+
+function initials(displayName: string) {
+  return displayName.trim().slice(0, 2) || '?';
+}
 
 export function MyProfileHeader({
   displayName,
@@ -34,7 +38,7 @@ export function MyProfileHeader({
           <Image accessibilityLabel={`${displayName} 프로필 사진`} source={{ uri: primaryPhotoUrl }} style={styles.avatar} resizeMode="cover" />
         ) : (
           <View accessibilityLabel={`${displayName} 이니셜`} style={styles.avatarFallback}>
-            <UserRound color={colors.muted} size={28} strokeWidth={2} />
+            <Text style={styles.avatarInitial}>{initials(displayName)}</Text>
           </View>
         )}
         <View style={styles.profileCopy}>
@@ -68,6 +72,7 @@ const styles = StyleSheet.create({
   profileRow: { marginTop: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   avatar: { width: 72, height: 72, borderRadius: radii.round, backgroundColor: colors.surfaceMuted },
   avatarFallback: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: radii.round, backgroundColor: colors.surfaceMuted },
+  avatarInitial: { color: colors.body, fontSize: 22, fontWeight: '800' },
   profileCopy: { flex: 1, minWidth: 0, gap: spacing.xs },
   name: { color: colors.ink, fontSize: 17, fontWeight: '800' },
   school: { color: colors.muted, fontSize: 13, lineHeight: 18, fontWeight: '600' },
