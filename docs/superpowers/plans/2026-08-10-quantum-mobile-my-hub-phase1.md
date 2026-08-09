@@ -17,6 +17,7 @@
 - Create `apps/mobile/src/components/my/MyPeopleSection.tsx`: real friend/request/notification counts with initials and failure states.
 - Create `apps/mobile/src/components/my/MyProfileSection.tsx`: native basic/photo/worldcup entry tiles.
 - Create `apps/mobile/src/components/my/MyFinanceSafetySection.tsx`: truthful 10,000 won contract entry, privacy note, and account actions.
+- Create `apps/mobile/tests/mobile-my-components.test.ts`: focused source-contract tests for the four view components.
 - Modify `apps/mobile/app/(tabs)/profile.tsx`: independent loading, refresh, and composition.
 - Modify `apps/mobile/tests/mobile-profile.test.ts`: lock native routing, hidden survey row, and real-data boundaries.
 - Create `apps/mobile/tests/mobile-my-hub.test.ts`: unit tests for the pure presentation mapper.
@@ -78,15 +79,15 @@ Expected: all focused tests PASS and TypeScript exits 0.
 - Create: `apps/mobile/src/components/my/MyPeopleSection.tsx`
 - Create: `apps/mobile/src/components/my/MyProfileSection.tsx`
 - Create: `apps/mobile/src/components/my/MyFinanceSafetySection.tsx`
-- Modify: `apps/mobile/tests/mobile-profile.test.ts`
+- Create: `apps/mobile/tests/mobile-my-components.test.ts`
 
-- [ ] **Step 1: Update the source-contract test before components exist**
+- [ ] **Step 1: Write focused source-contract tests before components exist**
 
-Assert the final screen imports all four components, does not contain a visible `성향 설문` menu row, retains `/profile/survey` in the protected navigator, and contains no generated friend-photo asset or hard-coded friend/notification count.
+Assert the four component files expose the specified props, contain the approved section labels, use `Image` with `resizeMode="cover"` for the current user's photo, render friend initials rather than friend image URLs, and contain no hard-coded friend/notification count or paid deposit claim.
 
 - [ ] **Step 2: Run the test and verify failure**
 
-Run: `cd apps/mobile; npx tsx --test tests/mobile-profile.test.ts`
+Run: `cd apps/mobile; npx tsx --test tests/mobile-my-components.test.ts`
 
 Expected: FAIL on missing component imports and the old survey row.
 
@@ -121,7 +122,7 @@ Use existing `colors`, `spacing`, `radii`, `layout`, and Lucide icons. Cards use
 
 - [ ] **Step 4: Re-run the profile test**
 
-Run: `cd apps/mobile; npx tsx --test tests/mobile-profile.test.ts`
+Run: `cd apps/mobile; npx tsx --test tests/mobile-my-components.test.ts`
 
 Expected: PASS.
 
@@ -143,6 +144,7 @@ getSocialApiClient().listNotifications({ unreadOnly: true, limit: 200 })
 ```
 
 The test must reject `Promise.all(...)` for these four calls and require independent settlement or independent error handling.
+It must also require imports of all four My components, no visible `성향 설문` menu row, and preservation of `/profile/survey` in the protected navigator.
 
 - [ ] **Step 2: Run and confirm failure**
 
