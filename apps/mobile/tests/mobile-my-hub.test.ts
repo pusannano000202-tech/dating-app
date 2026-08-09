@@ -5,6 +5,7 @@ import {
   buildMyProfileProgress,
   getAppearanceStatusLabel,
   getMyPrimaryAction,
+  selectActiveFriends,
 } from '../src/domain/my-hub';
 
 test('builds four-step profile progress from the server next step', () => {
@@ -50,4 +51,15 @@ test('keeps appearance status labels nonempty and free of numeric scores', () =>
     assert.notEqual(label.trim(), '');
     assert.doesNotMatch(label, /\d/);
   }
+});
+
+test('selects only active friends from a generic status list', () => {
+  const friends = [
+    { id: 'active', status: 'active', label: 'kept' },
+    { id: 'accepted', status: 'accepted', label: 'excluded' },
+    { id: 'blocked', status: 'blocked', label: 'excluded' },
+    { id: 'pending', status: 'pending', label: 'excluded' },
+  ];
+
+  assert.deepEqual(selectActiveFriends(friends), [friends[0]]);
 });

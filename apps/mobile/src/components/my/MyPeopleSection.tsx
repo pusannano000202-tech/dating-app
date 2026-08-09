@@ -5,6 +5,7 @@ import { colors, layout, radii, spacing } from '../../theme/tokens';
 
 export type MyPeopleSectionProps = {
   state: 'loading' | 'ready' | 'error';
+  notificationsState: 'loading' | 'ready' | 'error';
   friends: Array<{ userId: string; displayName: string | null }>;
   receivedRequestCount: number | null;
   unreadNotificationCount: number | null;
@@ -19,6 +20,7 @@ function initials(displayName: string | null) {
 
 export function MyPeopleSection({
   state,
+  notificationsState,
   friends,
   receivedRequestCount,
   unreadNotificationCount,
@@ -51,13 +53,26 @@ export function MyPeopleSection({
           <Pressable accessibilityRole="button" onPress={onNotifications} style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
             <Bell color={colors.school} size={19} />
             <Text style={styles.actionText}>알림</Text>
-            {unreadNotificationCount === null ? <Text style={styles.unavailable}>확인 필요</Text> : unreadNotificationCount > 0 ? <Text style={styles.badge}>{unreadNotificationCount}</Text> : null}
+            <NotificationStatus notificationsState={notificationsState} unreadNotificationCount={unreadNotificationCount} />
             <ChevronRight color={colors.muted} size={17} />
           </Pressable>
         </View>
       </View>
     </View>
   );
+}
+
+function NotificationStatus({
+  notificationsState,
+  unreadNotificationCount,
+}: Pick<MyPeopleSectionProps, 'notificationsState' | 'unreadNotificationCount'>) {
+  if (notificationsState === 'loading' && unreadNotificationCount === null) {
+    return <Text style={styles.unavailable}>불러오는 중</Text>;
+  }
+  if (notificationsState === 'error' || unreadNotificationCount === null) {
+    return <Text style={styles.unavailable}>확인 필요</Text>;
+  }
+  return unreadNotificationCount > 0 ? <Text style={styles.badge}>{unreadNotificationCount}</Text> : null;
 }
 
 const styles = StyleSheet.create({

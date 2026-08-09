@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, layout, radii, spacing } from '../../theme/tokens';
 
 export type MyProfileSectionProps = {
+  photoState: 'loading' | 'ready' | 'error';
   photoCount: number | null;
   appearanceStatusLabel: string | null;
   onBasic: () => void;
@@ -11,8 +12,14 @@ export type MyProfileSectionProps = {
   onWorldcup: () => void;
 };
 
-export function MyProfileSection({ photoCount, appearanceStatusLabel, onBasic, onPhotos, onWorldcup }: MyProfileSectionProps) {
-  const photoDescription = photoCount !== null ? `현재 ${photoCount}장 등록됨` : '사진 등록 상태를 확인해요';
+export function MyProfileSection({ photoState, photoCount, appearanceStatusLabel, onBasic, onPhotos, onWorldcup }: MyProfileSectionProps) {
+  const photoDescription = photoState === 'loading'
+    ? '사진 정보를 불러오는 중'
+    : photoState === 'error'
+      ? '사진 정보를 확인하지 못했어요'
+      : photoCount !== null
+        ? `현재 ${photoCount}장 등록됨`
+        : '사진 등록 상태를 확인해요';
 
   return (
     <View style={styles.section}>

@@ -105,6 +105,10 @@ test('my hub composes the approved sections and routes its profile actions', asy
   assert.match(profileSource, /<MyPeopleSection/);
   assert.match(profileSource, /<MyProfileSection/);
   assert.match(profileSource, /<MyFinanceSafetySection/);
+  assert.match(profileSource, /selectActiveFriends/);
+  assert.match(profileSource, /selectActiveFriends\(friendsState\.data\?\.friends \?\? \[\]\)/);
+  assert.match(profileSource, /notificationsState=\{notificationsState\.status\}/);
+  assert.match(profileSource, /photoState=\{photosState\.status\}/);
   assert.match(profileSource, /useFocusEffect\(useCallback\(\(\) =>/);
   assert.match(profileSource, /router\.push\('\/friends'\)/);
   assert.match(profileSource, /router\.push\('\/notifications'\)/);
@@ -122,6 +126,8 @@ test('my hub independently loads account data and confirms sign out', async () =
   assert.match(profileSource, /getSocialApiClient\(\)\.then\(\(client\) => client\.listFriends\(\)\)/);
   assert.match(profileSource, /getSocialApiClient\(\)\.then\(\(client\) => client\.listNotifications\(\{ unreadOnly: true, limit: 200 \}\)\)/);
   assert.doesNotMatch(profileSource, /Promise\.all\(/);
+  assert.match(profileSource, /requestIdRef/);
+  assert.match(profileSource, /focusedRef/);
   assert.match(profileSource, /Alert\.alert\(\s*['"]로그아웃['"]/);
 })
 
