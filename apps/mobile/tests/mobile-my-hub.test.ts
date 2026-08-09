@@ -34,10 +34,19 @@ test('returns the primary action for each profile step', () => {
 
 test('keeps appearance status labels nonempty and free of numeric scores', () => {
   const statuses = ['not_requested', 'pending', 'ready', 'failed', 'stale', 'unavailable'] as const;
+  const expectedLabels: Record<(typeof statuses)[number], string> = {
+    not_requested: '매칭을 찾을 때 분석해요',
+    pending: '분석을 준비하고 있어요',
+    ready: '매칭 준비가 되었어요',
+    failed: '매칭 찾기에서 다시 시도해요',
+    stale: '사진 변경으로 다시 분석이 필요해요',
+    unavailable: '분석 상태를 확인하지 못했어요',
+  };
 
   for (const status of statuses) {
     const label = getAppearanceStatusLabel(status);
 
+    assert.equal(label, expectedLabels[status]);
     assert.notEqual(label.trim(), '');
     assert.doesNotMatch(label, /\d/);
   }
