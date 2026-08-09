@@ -29,7 +29,9 @@ export function MyFinanceSafetySection({ onDeposit, onSignOut, signingOut, messa
         </View>
         {message ? <Text accessibilityRole="alert" style={styles.message}>{message}</Text> : null}
         <Pressable
+          accessibilityLabel={signingOut ? '로그아웃 처리 중' : '로그아웃'}
           accessibilityRole="button"
+          accessibilityState={{ busy: signingOut, disabled: signingOut }}
           disabled={signingOut}
           onPress={onSignOut}
           style={({ pressed }) => [styles.signOut, pressed && styles.pressed, signingOut && styles.disabled]}
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
   depositDescription: { color: colors.muted, fontSize: 12, lineHeight: 17, fontWeight: '600' },
   safetyNote: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, padding: spacing.md, borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: colors.surfaceMuted },
   safetyText: { flex: 1, color: colors.safety, fontSize: 13, lineHeight: 19, fontWeight: '700' },
-  message: { marginHorizontal: spacing.md, marginTop: spacing.sm, color: colors.action, fontSize: 13, lineHeight: 18, fontWeight: '700' },
+  message: { marginHorizontal: spacing.md, marginTop: spacing.sm, color: colors.body, fontSize: 13, lineHeight: 18, fontWeight: '700' },
   signOut: { minHeight: layout.minimumTouchTarget, marginTop: spacing.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, borderTopWidth: 1, borderTopColor: colors.line },
   signOutText: { color: colors.muted, fontSize: 14, fontWeight: '700' },
   pressed: { backgroundColor: colors.surfaceMuted },

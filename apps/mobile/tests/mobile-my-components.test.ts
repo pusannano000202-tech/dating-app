@@ -22,6 +22,9 @@ test('my profile header exposes the compact profile and retry contract', async (
   assert.match(source, /내 정보와 만남을 한곳에서 관리해요\./);
   assert.match(source, /<Image/);
   assert.match(source, /resizeMode="cover"/);
+  assert.match(source, /useEffect\(\(\) => \{\s*setImageFailed\(false\);\s*\}, \[primaryPhotoUrl\]\)/);
+  assert.match(source, /primaryPhotoUrl && !imageFailed/);
+  assert.match(source, /onError=\{\(\) => setImageFailed\(true\)\}/);
   assert.match(source, /function initials\(displayName: string\)/);
   assert.match(source, /displayName\.trim\(\)\.slice\(0, 2\)/);
   assert.match(source, /<Text style=\{styles\.avatarInitial\}>\{initials\(displayName\)\}<\/Text>/);
@@ -30,10 +33,14 @@ test('my profile header exposes the compact profile and retry contract', async (
   assert.match(source, /progress\.completed.*progress\.total.*완료/);
   assert.match(source, /width: `\$\{progress\.percent\}%`/);
   assert.match(source, /<ActivityIndicator/);
+  assert.match(source, /accessibilityLabel=\{loading \? '프로필 불러오는 중'/);
+  assert.match(source, /accessibilityState=\{\{ busy: loading, disabled: loading \}\}/);
   assert.match(source, /프로필을 불러오지 못했어요/);
   assert.match(source, /다시 확인/);
   assert.match(source, /minHeight: layout\.minimumTouchTarget/);
   assert.match(source, /radii\.card/);
+  assert.match(source, /error: \{ color: colors\.body/);
+  assert.doesNotMatch(source, /error: \{ color: colors\.action/);
   assert.doesNotMatch(source, /<UserRound/);
 });
 
@@ -52,10 +59,15 @@ test('my people section keeps friend identities safe and counts truthful', async
   assert.match(source, /아직 연결된 친구가 없어요\./);
   assert.match(source, /친구와 초대/);
   assert.match(source, /알림/);
-  assert.match(source, /receivedRequestCount !== null/);
-  assert.match(source, /unreadNotificationCount !== null/);
+  assert.match(source, /receivedRequestCount === null/);
+  assert.match(source, /unreadNotificationCount === null/);
+  assert.match(source, /확인 필요/);
+  assert.match(source, /receivedRequestCount > 0/);
+  assert.match(source, /unreadNotificationCount > 0/);
   assert.match(source, /minHeight: layout\.minimumTouchTarget/);
   assert.match(source, /radii\.card/);
+  assert.match(source, /badge: \{[^}]*backgroundColor: colors\.ink/);
+  assert.doesNotMatch(source, /badge: \{[^}]*backgroundColor: colors\.action/);
   assert.doesNotMatch(source, /photoUrl|imageUrl|image_url/i);
   assert.doesNotMatch(source, /친구\s*\d+명|납부 완료|환불 완료/);
 });
@@ -95,8 +107,12 @@ test('my finance and safety section keeps settlement state scoped to confirmed m
   assert.match(source, /외모 점수와 내부 매칭 정보는 다른 사용자에게 공개하지 않아요\./);
   assert.match(source, /accessibilityRole="alert"/);
   assert.match(source, /<ActivityIndicator/);
+  assert.match(source, /accessibilityLabel=\{signingOut \? '로그아웃 처리 중' : '로그아웃'\}/);
+  assert.match(source, /accessibilityState=\{\{ busy: signingOut, disabled: signingOut \}\}/);
   assert.match(source, /minHeight: layout\.minimumTouchTarget/);
   assert.match(source, /radii\.card/);
+  assert.match(source, /message: \{[^}]*color: colors\.body/);
+  assert.doesNotMatch(source, /message: \{[^}]*color: colors\.action/);
   assert.doesNotMatch(source, /신고|차단|환불|이월|기부|납부 완료|환불 완료/);
 });
 
