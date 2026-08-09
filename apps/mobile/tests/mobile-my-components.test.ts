@@ -22,6 +22,9 @@ test('my profile header exposes the compact profile and retry contract', async (
   assert.match(source, /내 정보와 만남을 한곳에서 관리해요\./);
   assert.match(source, /<Image/);
   assert.match(source, /resizeMode="cover"/);
+  assert.match(source, /function initials\(displayName: string\)/);
+  assert.match(source, /displayName\.trim\(\)\.slice\(0, 2\)/);
+  assert.match(source, /<Text style=\{styles\.avatarInitial\}>\{initials\(displayName\)\}<\/Text>/);
   assert.match(source, /width: 72/);
   assert.match(source, /height: 72/);
   assert.match(source, /progress\.completed.*progress\.total.*완료/);
@@ -31,6 +34,7 @@ test('my profile header exposes the compact profile and retry contract', async (
   assert.match(source, /다시 확인/);
   assert.match(source, /minHeight: layout\.minimumTouchTarget/);
   assert.match(source, /radii\.card/);
+  assert.doesNotMatch(source, /<UserRound/);
 });
 
 test('my people section keeps friend identities safe and counts truthful', async () => {
