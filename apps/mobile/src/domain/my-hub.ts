@@ -1,4 +1,5 @@
-import type { MobileAppearanceStatus, MobileProfileStep } from '../api/client';
+type MobileProfileStep = 'basic' | 'worldcup' | 'survey' | 'photos' | 'complete';
+type MobileAppearanceStatus = 'not_requested' | 'pending' | 'ready' | 'failed' | 'stale' | 'unavailable';
 
 export type MyProfileProgress = {
   completed: number;
