@@ -1,118 +1,171 @@
-import { Camera, ChevronRight, LockKeyhole, LogOut, Settings, ShieldCheck, UserRound } from 'lucide-react-native';
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
+import { Alert, RefreshControl, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '../../src/auth/context';
-import { PageHeader } from '../../src/components/PageHeader';
+import { type MobileProfileSummary } from '../../src/api/client';
+import { getProfilePhotosApi, type ProfilePhotos } from '../../src/api/profile-photos';
+import { getQuantumApiClient } from '../../src/api/quantum';
+import { getSocialApiClient, type MobileFriendsSnapshot, type MobileNotification } from '../../src/api/social';
+import { MyFinanceSafetySection } from '../../src/components/my/MyFinanceSafetySection';
+import { MyPeopleSection } from '../../src/components/my/MyPeopleSection';
+import { MyProfileHeader } from '../../src/components/my/MyProfileHeader';
+import { MyProfileSection } from '../../src/components/my/MyProfileSection';
 import { Screen } from '../../src/components/Screen';
-import { colors, radii, spacing } from '../../src/theme/tokens';
+import { buildMyProfileProgress, getAppearanceStatusLabel, getMyPrimaryAction } from '../../src/domain/my-hub';
+import { spacing } from '../../src/theme/tokens';
 
-const profileRows = [
-  { title: '기본정보', description: '닉네임, 학교, 참여 방식', icon: UserRound },
-  { title: '프로필 사진', description: '최대 3장 · 분석은 매칭 찾기 때만', icon: Camera },
-  { title: '안전과 공개 범위', description: '가명, 차단, 친구 삭제 관리', icon: ShieldCheck },
-  { title: '앱 설정', description: '알림과 접근 권한', icon: Settings },
-] as const;
+type RequestState<T> = {
+  status: 'loading' | 'ready' | 'error';
+  data: T | null;
+};
+
+function loadingState<T>(): RequestState<T> {
+  return { status: 'loading', data: null };
+}
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { session, signOut } = useAuth();
+  const [profileState, setProfileState] = useState<RequestState<MobileProfileSummary>>(loadingState);
+  const [photosState, setPhotosState] = useState<RequestState<ProfilePhotos>>(loadingState);
+  const [friendsState, setFriendsState] = useState<RequestState<MobileFriendsSnapshot>>(loadingState);
+  const [notificationsState, setNotificationsState] = useState<RequestState<MobileNotification[]>>(loadingState);
+  const [refreshing, setRefreshing] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const requestIdRef = useRef(0);
+  const focusedRef = useRef(false);
+
+  const reload = useCallback((isRefresh = false) => {
+    const requestId = ++requestIdRef.current;
+    let remaining = 4;
+    const canUpdate = () => focusedRef.current && requestId === requestIdRef.current;
+    const finish = () => {
+      remaining -= 1;
+      if (remaining === 0 && canUpdate()) setRefreshing(false);
+    };
+
+    setProfileState(loadingState);
+    setPhotosState(loadingState);
+    setFriendsState(loadingState);
+    setNotificationsState(loadingState);
+    if (isRefresh) setRefreshing(true);
+
+    void getQuantumApiClient().getProfileOnboarding().then((summary) => {
+      if (canUpdate()) setProfileState({ status: 'ready', data: summary });
+    }).catch(() => {
+      if (canUpdate()) setProfileState({ status: 'error', data: null });
+    }).finally(finish);
+
+    void getProfilePhotosApi().listPhotos().then((photos) => {
+      if (canUpdate()) setPhotosState({ status: 'ready', data: photos });
+    }).catch(() => {
+      if (canUpdate()) setPhotosState({ status: 'error', data: null });
+    }).finally(finish);
+
+    void getSocialApiClient().then((client) => client.listFriends()).then((friends) => {
+      if (canUpdate()) setFriendsState({ status: 'ready', data: friends });
+    }).catch(() => {
+      if (canUpdate()) setFriendsState({ status: 'error', data: null });
+    }).finally(finish);
+
+    void getSocialApiClient().then((client) => client.listNotifications({ unreadOnly: true, limit: 200 })).then((notifications) => {
+      if (canUpdate()) setNotificationsState({ status: 'ready', data: notifications });
+    }).catch(() => {
+      if (canUpdate()) setNotificationsState({ status: 'error', data: null });
+    }).finally(finish);
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    if (!session) return;
+    focusedRef.current = true;
+    reload();
+    return () => {
+      focusedRef.current = false;
+      requestIdRef.current += 1;
+    };
+  }, [reload, session]));
 
   async function handleSignOut() {
+    if (signingOut) return;
+    setSigningOut(true);
     setMessage(null);
     try {
       await signOut();
     } catch {
       setMessage('로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSigningOut(false);
     }
+  }
+
+  function confirmSignOut() {
+    Alert.alert('로그아웃', '이 기기에서 Quantum 로그인을 종료할까요?', [
+      { text: '취소', style: 'cancel' },
+      { text: '로그아웃', style: 'destructive', onPress: () => void handleSignOut() },
+    ]);
   }
 
   if (!session) return null;
 
+  const summary = profileState.status === 'ready' ? profileState.data : null;
+  const nextStep = summary?.nextStep ?? 'basic';
+  const primaryAction = getMyPrimaryAction(nextStep);
+  const primaryPhotoUrl = photosState.status === 'ready' ? photosState.data?.items[0]?.signedUrl ?? null : null;
+  const photoCount = photosState.status === 'ready' ? photosState.data?.items.length ?? null : null;
+  const acceptedFriends = friendsState.status === 'ready'
+    ? friendsState.data?.friends.filter((friend) => friend.status === 'accepted') ?? []
+    : [];
+  const receivedRequestCount = friendsState.status === 'ready'
+    ? friendsState.data?.received.filter((request) => request.status === 'pending').length ?? 0
+    : null;
+  const unreadNotificationCount = notificationsState.status === 'ready'
+    ? notificationsState.data?.length ?? 0
+    : null;
+
   return (
-    <Screen contentStyle={styles.content}>
-      <PageHeader
-        eyebrow="MY QUANTUM"
-        title="내 정보와 안전 설정"
-        description="웹과 모바일에서 같은 Quantum 계정과 참여 정보를 사용합니다."
+    <Screen
+      contentStyle={styles.content}
+      scrollProps={{
+        refreshControl: <RefreshControl refreshing={refreshing} onRefresh={() => reload(true)} />,
+      }}
+    >
+      <MyProfileHeader
+        actionLabel={primaryAction.label}
+        displayName={summary?.profile?.displayName ?? 'Quantum 사용자'}
+        error={profileState.status === 'error'}
+        loading={profileState.status === 'loading'}
+        onAction={() => profileState.status === 'error' ? reload(true) : router.push(primaryAction.route)}
+        primaryPhotoUrl={primaryPhotoUrl}
+        progress={buildMyProfileProgress(nextStep)}
+        school={summary?.profile?.school ?? null}
       />
-
-      <View style={styles.accountBand}>
-        <View style={styles.avatar}><LockKeyhole size={24} color={colors.school} /></View>
-        <View style={styles.accountCopy}>
-          <Text style={styles.accountTitle}>Quantum 계정 연결됨</Text>
-          <Text style={styles.accountDescription}>{session.user.email ?? '소셜 로그인 계정'}</Text>
-        </View>
-      </View>
-
-      <Pressable onPress={() => void handleSignOut()} style={styles.loginButton}>
-        <LogOut size={19} color={colors.surface} />
-        <Text style={styles.loginButtonText}>로그아웃</Text>
-      </Pressable>
-      {message && <Text style={styles.errorText} role="alert">{message}</Text>}
-
-      <View style={styles.rows}>
-        {profileRows.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Pressable key={item.title} style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
-              <Icon size={20} color={colors.body} />
-              <View style={styles.rowCopy}>
-                <Text style={styles.rowTitle}>{item.title}</Text>
-                <Text style={styles.rowDescription}>{item.description}</Text>
-              </View>
-              <ChevronRight size={19} color={colors.muted} />
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <Text style={styles.privacyNote}>외모 점수와 내부 매칭 정보는 다른 사용자에게 공개하지 않습니다.</Text>
+      <MyPeopleSection
+        friends={acceptedFriends}
+        onFriends={() => router.push('/friends')}
+        onNotifications={() => router.push('/notifications')}
+        receivedRequestCount={receivedRequestCount}
+        state={friendsState.status}
+        unreadNotificationCount={unreadNotificationCount}
+      />
+      <MyProfileSection
+        appearanceStatusLabel={summary ? getAppearanceStatusLabel(summary.appearanceStatus) : null}
+        onBasic={() => router.push('/profile/basic')}
+        onPhotos={() => router.push('/profile/photos')}
+        onWorldcup={() => router.push('/profile/worldcup')}
+        photoCount={photoCount}
+      />
+      <MyFinanceSafetySection
+        message={message}
+        onDeposit={() => router.push('/deposit')}
+        onSignOut={confirmSignOut}
+        signingOut={signingOut}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { paddingTop: spacing.lg },
-  accountBand: {
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    borderRadius: radii.card,
-    backgroundColor: colors.surfaceMuted,
-    padding: spacing.lg,
-  },
-  avatar: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: colors.surface },
-  accountCopy: { flex: 1 },
-  accountTitle: { color: colors.ink, fontSize: 14, lineHeight: 20, fontWeight: '900' },
-  accountDescription: { marginTop: 4, color: colors.muted, fontSize: 11, lineHeight: 17, fontWeight: '600' },
-  loginButton: {
-    minHeight: 52,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: radii.card,
-    backgroundColor: colors.school,
-  },
-  loginButtonText: { color: colors.surface, fontSize: 15, fontWeight: '900' },
-  errorText: { marginHorizontal: spacing.lg, marginTop: spacing.sm, color: colors.action, fontSize: 12, lineHeight: 18, fontWeight: '800', textAlign: 'center' },
-  rows: { marginTop: spacing.xl, paddingHorizontal: spacing.lg },
-  row: {
-    minHeight: 76,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
-  },
-  pressed: { opacity: 0.7 },
-  rowCopy: { flex: 1 },
-  rowTitle: { color: colors.ink, fontSize: 14, fontWeight: '900' },
-  rowDescription: { marginTop: 3, color: colors.muted, fontSize: 11, fontWeight: '600' },
-  privacyNote: { margin: spacing.lg, color: colors.muted, fontSize: 11, lineHeight: 17, fontWeight: '600', textAlign: 'center' },
+  content: { gap: spacing.xl, paddingHorizontal: spacing.lg, paddingTop: spacing.lg },
 });

@@ -48,6 +48,7 @@ test('my people section keeps friend identities safe and counts truthful', async
   const source = await readComponent('MyPeopleSection');
 
   assert.match(source, /export type MyPeopleSectionProps = \{/);
+  assert.match(source, /state: 'loading' \| 'ready' \| 'error';/);
   assert.match(source, /friends: Array<\{ userId: string; displayName: string \| null \}>;/);
   assert.match(source, /receivedRequestCount: number \| null;/);
   assert.match(source, /unreadNotificationCount: number \| null;/);
@@ -61,6 +62,8 @@ test('my people section keeps friend identities safe and counts truthful', async
   assert.match(source, /알림/);
   assert.match(source, /receivedRequestCount === null/);
   assert.match(source, /unreadNotificationCount === null/);
+  assert.match(source, /친구 정보를 불러오는 중/);
+  assert.match(source, /친구 정보를 확인하지 못했어요/);
   assert.match(source, /확인 필요/);
   assert.match(source, /receivedRequestCount > 0/);
   assert.match(source, /unreadNotificationCount > 0/);

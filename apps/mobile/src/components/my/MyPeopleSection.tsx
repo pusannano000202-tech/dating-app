@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, layout, radii, spacing } from '../../theme/tokens';
 
 export type MyPeopleSectionProps = {
+  state: 'loading' | 'ready' | 'error';
   friends: Array<{ userId: string; displayName: string | null }>;
   receivedRequestCount: number | null;
   unreadNotificationCount: number | null;
@@ -17,6 +18,7 @@ function initials(displayName: string | null) {
 }
 
 export function MyPeopleSection({
+  state,
   friends,
   receivedRequestCount,
   unreadNotificationCount,
@@ -29,14 +31,16 @@ export function MyPeopleSection({
     <View style={styles.section}>
       <Text style={styles.heading}>사람</Text>
       <View style={styles.card}>
-        {visibleFriends.length ? (
+        {state === 'loading' ? <Text style={styles.empty}>친구 정보를 불러오는 중</Text>
+          : state === 'error' ? <Text accessibilityRole="alert" style={styles.empty}>친구 정보를 확인하지 못했어요</Text>
+          : visibleFriends.length ? (
           <View accessibilityLabel="연결된 친구" style={styles.friendRow}>
             <View style={styles.initialsRow}>
               {visibleFriends.map((friend) => <View key={friend.userId} style={styles.initial}><Text style={styles.initialText}>{initials(friend.displayName)}</Text></View>)}
             </View>
             <Text numberOfLines={1} style={styles.friendSummary}>연결된 친구를 확인해요</Text>
           </View>
-        ) : <Text style={styles.empty}>아직 연결된 친구가 없어요.</Text>}
+          ) : <Text style={styles.empty}>아직 연결된 친구가 없어요.</Text>}
         <View style={styles.actions}>
           <Pressable accessibilityRole="button" onPress={onFriends} style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
             <UsersRound color={colors.school} size={19} />
