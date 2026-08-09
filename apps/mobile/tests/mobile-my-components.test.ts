@@ -49,6 +49,7 @@ test('my people section keeps friend identities safe and counts truthful', async
 
   assert.match(source, /export type MyPeopleSectionProps = \{/);
   assert.match(source, /state: 'loading' \| 'ready' \| 'error';/);
+  assert.match(source, /notificationsState: 'loading' \| 'ready' \| 'error';/);
   assert.match(source, /friends: Array<\{ userId: string; displayName: string \| null \}>;/);
   assert.match(source, /receivedRequestCount: number \| null;/);
   assert.match(source, /unreadNotificationCount: number \| null;/);
@@ -64,6 +65,9 @@ test('my people section keeps friend identities safe and counts truthful', async
   assert.match(source, /unreadNotificationCount === null/);
   assert.match(source, /친구 정보를 불러오는 중/);
   assert.match(source, /친구 정보를 확인하지 못했어요/);
+  assert.match(source, /notificationsState === 'loading' && unreadNotificationCount === null/);
+  assert.match(source, /불러오는 중/);
+  assert.match(source, /notificationsState === 'error'/);
   assert.match(source, /확인 필요/);
   assert.match(source, /receivedRequestCount > 0/);
   assert.match(source, /unreadNotificationCount > 0/);
@@ -79,6 +83,7 @@ test('my profile section exposes only profile actions without a numeric appearan
   const source = await readComponent('MyProfileSection');
 
   assert.match(source, /export type MyProfileSectionProps = \{/);
+  assert.match(source, /photoState: 'loading' \| 'ready' \| 'error';/);
   assert.match(source, /photoCount: number \| null;/);
   assert.match(source, /appearanceStatusLabel: string \| null;/);
   assert.match(source, /onBasic: \(\) => void;/);
@@ -89,6 +94,10 @@ test('my profile section exposes only profile actions without a numeric appearan
   assert.match(source, /프로필 사진/);
   assert.match(source, /이상형 월드컵/);
   assert.match(source, /photoCount !== null/);
+  assert.match(source, /photoState === 'loading'/);
+  assert.match(source, /사진 정보를 불러오는 중/);
+  assert.match(source, /photoState === 'error'/);
+  assert.match(source, /사진 정보를 확인하지 못했어요/);
   assert.match(source, /appearanceStatusLabel/);
   assert.match(source, /minHeight: layout\.minimumTouchTarget/);
   assert.match(source, /radii\.card/);

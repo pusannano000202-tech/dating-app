@@ -13,6 +13,10 @@ export type MyPrimaryRoute =
   | '/profile/survey'
   | '/profile/photos';
 
+export function selectActiveFriends<T extends { status: string }>(items: readonly T[]): T[] {
+  return items.filter((item) => item.status === 'active');
+}
+
 function assertNever(value: never): never {
   throw new Error(`Unexpected value: ${String(value)}`);
 }

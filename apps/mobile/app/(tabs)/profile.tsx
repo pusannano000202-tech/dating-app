@@ -12,7 +12,7 @@ import { MyPeopleSection } from '../../src/components/my/MyPeopleSection';
 import { MyProfileHeader } from '../../src/components/my/MyProfileHeader';
 import { MyProfileSection } from '../../src/components/my/MyProfileSection';
 import { Screen } from '../../src/components/Screen';
-import { buildMyProfileProgress, getAppearanceStatusLabel, getMyPrimaryAction } from '../../src/domain/my-hub';
+import { buildMyProfileProgress, getAppearanceStatusLabel, getMyPrimaryAction, selectActiveFriends } from '../../src/domain/my-hub';
 import { spacing } from '../../src/theme/tokens';
 
 type RequestState<T> = {
@@ -114,8 +114,8 @@ export default function ProfileScreen() {
   const primaryAction = getMyPrimaryAction(nextStep);
   const primaryPhotoUrl = photosState.status === 'ready' ? photosState.data?.items[0]?.signedUrl ?? null : null;
   const photoCount = photosState.status === 'ready' ? photosState.data?.items.length ?? null : null;
-  const acceptedFriends = friendsState.status === 'ready'
-    ? friendsState.data?.friends.filter((friend) => friend.status === 'accepted') ?? []
+  const activeFriends = friendsState.status === 'ready'
+    ? selectActiveFriends(friendsState.data?.friends ?? [])
     : [];
   const receivedRequestCount = friendsState.status === 'ready'
     ? friendsState.data?.received.filter((request) => request.status === 'pending').length ?? 0
@@ -142,11 +142,12 @@ export default function ProfileScreen() {
         school={summary?.profile?.school ?? null}
       />
       <MyPeopleSection
-        friends={acceptedFriends}
+        friends={activeFriends}
         onFriends={() => router.push('/friends')}
         onNotifications={() => router.push('/notifications')}
         receivedRequestCount={receivedRequestCount}
         state={friendsState.status}
+        notificationsState={notificationsState.status}
         unreadNotificationCount={unreadNotificationCount}
       />
       <MyProfileSection
@@ -155,6 +156,7 @@ export default function ProfileScreen() {
         onPhotos={() => router.push('/profile/photos')}
         onWorldcup={() => router.push('/profile/worldcup')}
         photoCount={photoCount}
+        photoState={photosState.status}
       />
       <MyFinanceSafetySection
         message={message}
