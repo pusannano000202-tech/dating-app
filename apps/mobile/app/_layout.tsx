@@ -41,6 +41,7 @@ function RootNavigator() {
       </Stack.Protected>
       <Stack.Protected guard={!session}>
         <Stack.Screen name="login" />
+        {__DEV__ ? <Stack.Screen name="dev-my-preview" /> : null}
       </Stack.Protected>
     </Stack>
   );
