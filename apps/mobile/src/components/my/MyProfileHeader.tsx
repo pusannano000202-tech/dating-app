@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { ChevronRight } from 'lucide-react-native';
 import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -29,13 +30,19 @@ export function MyProfileHeader({
   loading,
   error,
 }: MyProfileHeaderProps) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [primaryPhotoUrl]);
+
   return (
     <View style={styles.card}>
       <Text style={styles.eyebrow}>마이</Text>
       <Text style={styles.title}>내 정보와 만남을 한곳에서 관리해요.</Text>
       <View style={styles.profileRow}>
-        {primaryPhotoUrl ? (
-          <Image accessibilityLabel={`${displayName} 프로필 사진`} source={{ uri: primaryPhotoUrl }} style={styles.avatar} resizeMode="cover" />
+        {primaryPhotoUrl && !imageFailed ? (
+          <Image accessibilityLabel={`${displayName} 프로필 사진`} onError={() => setImageFailed(true)} source={{ uri: primaryPhotoUrl }} style={styles.avatar} resizeMode="cover" />
         ) : (
           <View accessibilityLabel={`${displayName} 이니셜`} style={styles.avatarFallback}>
             <Text style={styles.avatarInitial}>{initials(displayName)}</Text>
@@ -54,7 +61,9 @@ export function MyProfileHeader({
         </View>
       </View>
       <Pressable
+        accessibilityLabel={loading ? '프로필 불러오는 중' : error ? '프로필 다시 확인' : actionLabel}
         accessibilityRole="button"
+        accessibilityState={{ busy: loading, disabled: loading }}
         disabled={loading}
         onPress={onAction}
         style={({ pressed }) => [styles.primaryAction, pressed && styles.pressed, loading && styles.disabled]}
@@ -76,7 +85,7 @@ const styles = StyleSheet.create({
   profileCopy: { flex: 1, minWidth: 0, gap: spacing.xs },
   name: { color: colors.ink, fontSize: 17, fontWeight: '800' },
   school: { color: colors.muted, fontSize: 13, lineHeight: 18, fontWeight: '600' },
-  error: { color: colors.action, fontSize: 13, lineHeight: 18, fontWeight: '700' },
+  error: { color: colors.body, fontSize: 13, lineHeight: 18, fontWeight: '700' },
   progressBlock: { marginTop: spacing.lg, gap: spacing.sm },
   progressLabel: { color: colors.body, fontSize: 13, fontWeight: '700' },
   progressTrack: { height: 8, overflow: 'hidden', borderRadius: radii.round, backgroundColor: colors.surfaceMuted },

@@ -41,13 +41,13 @@ export function MyPeopleSection({
           <Pressable accessibilityRole="button" onPress={onFriends} style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
             <UsersRound color={colors.school} size={19} />
             <Text style={styles.actionText}>친구와 초대</Text>
-            {receivedRequestCount !== null && receivedRequestCount > 0 ? <Text style={styles.badge}>{receivedRequestCount}</Text> : null}
+            {receivedRequestCount === null ? <Text style={styles.unavailable}>확인 필요</Text> : receivedRequestCount > 0 ? <Text style={styles.badge}>{receivedRequestCount}</Text> : null}
             <ChevronRight color={colors.muted} size={17} />
           </Pressable>
           <Pressable accessibilityRole="button" onPress={onNotifications} style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
             <Bell color={colors.school} size={19} />
             <Text style={styles.actionText}>알림</Text>
-            {unreadNotificationCount !== null && unreadNotificationCount > 0 ? <Text style={styles.badge}>{unreadNotificationCount}</Text> : null}
+            {unreadNotificationCount === null ? <Text style={styles.unavailable}>확인 필요</Text> : unreadNotificationCount > 0 ? <Text style={styles.badge}>{unreadNotificationCount}</Text> : null}
             <ChevronRight color={colors.muted} size={17} />
           </Pressable>
         </View>
@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
   actions: { borderTopWidth: 1, borderTopColor: colors.line },
   action: { minHeight: layout.minimumTouchTarget, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md },
   actionText: { flex: 1, color: colors.ink, fontSize: 15, fontWeight: '700' },
-  badge: { minWidth: 20, paddingHorizontal: 6, color: colors.surface, fontSize: 12, lineHeight: 20, fontWeight: '800', textAlign: 'center', borderRadius: radii.round, backgroundColor: colors.action },
+  unavailable: { color: colors.muted, fontSize: 12, fontWeight: '700' },
+  badge: { minWidth: 20, paddingHorizontal: 6, color: colors.surface, fontSize: 12, lineHeight: 20, fontWeight: '800', textAlign: 'center', borderRadius: radii.round, backgroundColor: colors.ink },
   pressed: { backgroundColor: colors.surfaceMuted },
 });
