@@ -31,8 +31,11 @@ test('profile screen exposes the authenticated account and a real sign-out actio
   const profile = fs.readFileSync(path.join(process.cwd(), 'app/(tabs)/profile.tsx'), 'utf8');
 
   assert.match(profile, /useAuth/);
-  assert.match(profile, /session\.user/);
+  assert.match(profile, /if \(!session\) return null/);
   assert.match(profile, /signOut/);
+  assert.match(profile, /await signOut\(\)/);
+  assert.match(profile, /Alert\.alert\(/);
+  assert.doesNotMatch(profile, /session\.user/);
   assert.doesNotMatch(profile, /계정 연결 준비 중/);
 });
 

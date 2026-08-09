@@ -105,10 +105,16 @@ test('my hub composes the approved sections and routes its profile actions', asy
   assert.match(profileSource, /<MyPeopleSection/);
   assert.match(profileSource, /<MyProfileSection/);
   assert.match(profileSource, /<MyFinanceSafetySection/);
+  assert.match(profileSource, /runMyHubFactory/);
+  assert.match(profileSource, /runMyHubFactory\(\(\) => getQuantumApiClient\(\)\)/);
+  assert.match(profileSource, /runMyHubFactory\(\(\) => getProfilePhotosApi\(\)\)/);
   assert.match(profileSource, /selectActiveFriends/);
   assert.match(profileSource, /selectActiveFriends\(friendsState\.data\?\.friends \?\? \[\]\)/);
   assert.match(profileSource, /notificationsState=\{notificationsState\.status\}/);
   assert.match(profileSource, /photoState=\{photosState\.status\}/);
+  assert.match(profileSource, /profileState=\{profileState\.status\}/);
+  assert.match(profileSource, /style=\{styles\.sections\}/);
+  assert.match(profileSource, /sections: \{ gap: spacing\.xl/);
   assert.match(profileSource, /useFocusEffect\(useCallback\(\(\) =>/);
   assert.match(profileSource, /router\.push\('\/friends'\)/);
   assert.match(profileSource, /router\.push\('\/notifications'\)/);
@@ -121,13 +127,14 @@ test('my hub composes the approved sections and routes its profile actions', asy
 test('my hub independently loads account data and confirms sign out', async () => {
   const profileSource = await readFile(new URL('../app/(tabs)/profile.tsx', import.meta.url), 'utf8');
 
-  assert.match(profileSource, /getQuantumApiClient\(\)\.getProfileOnboarding\(\)/);
-  assert.match(profileSource, /getProfilePhotosApi\(\)\.listPhotos\(\)/);
+  assert.match(profileSource, /runMyHubFactory\(\(\) => getQuantumApiClient\(\)\)\.then\(\(client\) => client\.getProfileOnboarding\(\)\)/);
+  assert.match(profileSource, /runMyHubFactory\(\(\) => getProfilePhotosApi\(\)\)\.then\(\(client\) => client\.listPhotos\(\)\)/);
   assert.match(profileSource, /getSocialApiClient\(\)\.then\(\(client\) => client\.listFriends\(\)\)/);
   assert.match(profileSource, /getSocialApiClient\(\)\.then\(\(client\) => client\.listNotifications\(\{ unreadOnly: true, limit: 200 \}\)\)/);
   assert.doesNotMatch(profileSource, /Promise\.all\(/);
   assert.match(profileSource, /requestIdRef/);
   assert.match(profileSource, /focusedRef/);
+  assert.doesNotMatch(profileSource, /Quantum 사용자/);
   assert.match(profileSource, /Alert\.alert\(\s*['"]로그아웃['"]/);
 })
 
