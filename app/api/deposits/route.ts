@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import {
   buildDepositPaymentRequestDraft,
@@ -29,7 +29,7 @@ interface DepositRow {
 }
 
 export async function GET(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
 
     if (created.error || !created.data) {
       if (created.error?.code !== '23505') {
-        return NextResponse.json({ error: created.error?.message || 'deposit_create_failed' }, { status: 400 })
+        return NextResponse.json({ error: 'deposit_create_failed' }, { status: 500 })
       }
 
       const concurrent = await paymentService
@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (updated.error || !updated.data) {
-      return NextResponse.json({ error: updated.error?.message || 'deposit_order_attach_failed' }, { status: 400 })
+      return NextResponse.json({ error: 'deposit_order_attach_failed' }, { status: 500 })
     }
 
     deposit = updated.data as DepositPaymentRow
@@ -253,7 +253,7 @@ interface DepositMatchRow {
 }
 
 async function validateDepositMatchContext(
-  supabase: ReturnType<typeof createSupabaseServerClient>,
+  supabase: ReturnType<typeof createSupabaseRequestClient>,
   params: { matchId: string; groupId: string; userId: string },
 ): Promise<DepositMatchValidation> {
   const matchLookup = await supabase
