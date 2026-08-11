@@ -23,18 +23,18 @@
 | EVD-01 | 만남 인증 | 참가자 5명 앨범 공유·비참가자 차단 | PASS | 2026-08-11 원격 참가자 5명+외부인 1명: 업로드, 재전송 중복 방지, 5/5 앨범, 외부인 403, 증거·계정 6/6 정리 | Storage·앨범 계약 변경 시 재검증 |
 | MTP-01 | 모임 | 원기둥 카드 화살표 이동·카테고리 목록 연결 | PASS | 390x844·1440x900에서 화살표 클릭 후 러닝→배드민턴 전환, `배드민턴 모임을 모아봤어요`와 실제 모임 목록 확인, `artifacts/qa/quantum-event-lifecycle/10-meetup-carousel-actions-mobile.png` | 모임 카드·제스처 변경 시 재검증 |
 | AI-01 | 외모분석 | 실제 사진 1장 분석과 비공개 저장 | PASS | 2026-08-11 실제 허용 사진, 분석 1회·재사용·사진 변경 무효화·정리 PASS | 모델·프롬프트 변경 시 재검증 |
-| PAY-00 | 결제 환경 | 토스·Supabase·내부 보호키 형식·환경 일치 | PASS | 2026-08-12 로컬 원본의 공개/비밀키 형식과 test 환경 일치 확인, 혼합 환경 차단과 환불 worker·노쇼 권한 테스트 포함 `test:config` 220/220. Vercel Production은 민감값을 다시 등록했으며 pull 시 값이 마스킹되는 보안 동작 확인 | 배포 뒤 운영 readiness 검사 재실행 |
+| PAY-00 | 결제 환경 | 토스·Supabase·내부 보호키·Cron 보호키 형식·환경 일치 | PASS | 2026-08-12 로컬 원본의 공개/비밀키 형식과 test 환경 일치 확인. `CRON_SECRET` 누락도 배포 전 차단하도록 보강했고 `test:config` 223/223 통과. 로컬 비밀값은 화면에 출력하지 않고 생성 | Vercel Production에 같은 종류의 키가 있는지 배포 직전 readiness 재실행 |
 | PAY-01 | 결제 | 토스 샌드박스 결제 | BLOCKED | 2026-08-12 결제창 진입 뒤 원격 match 기록 확인: `pending`, 10,000원, 주문번호 있음, 승인키·`paid_at` 없음. 은행 점검 단계에서 멈췄고 결제 완료로 잘못 저장되지는 않음 | 점검 종료 후 같은 QA 결제 1회 승인 |
 | PAY-02 | 환불 | 전액 환불·중복 방지 | BLOCKED | API·웹훅·정산 증거 단위 계약 통과. 실제 결제 원본이 없어 실환불 미실행 | PAY-01 결제 직후 전액 환불·중복 클릭 검증 |
 | PAY-03 | 이월 | 10,000원 이월·재사용 | PASS | 원격 `deposit_carryover`·`deposit_carryover_hardening` 적용. 롤백 QA에서 이월 선택→전액 환불 전환→재선택→다음 match 이동, Toss 주문번호 보존, 14일 만료 환불 큐 생성 모두 true, 잔여 fixture 0 | 실제 Toss 승인 원본으로 사용자 화면 E2E는 PAY-01 뒤 1회 확인 |
-| PAY-04 | 자동 환불 | 종료 선택 후 대기 요청 자동 처리 | PARTIAL | worker가 만료 대상을 먼저 큐에 넣고 최대 3묶음·30건을 lease 처리하도록 보강. Vercel Production `CRON_SECRET`·`PAYMENT_INTERNAL_SECRET` 등록, 매일 04:00 KST 설정 | 최신 코드 배포 뒤 Vercel Cron 첫 실행 기록과 실제 pending 결제 건 검증 |
+| PAY-04 | 자동 환불 | 종료 선택 후 대기 요청 자동 처리 | PARTIAL | worker는 한 번에 최대 5건만 lease 처리하고 Toss 요청은 최대 10초 안에 종료한다. 원격 대기열 0건을 확인한 뒤 로컬 인증 요청이 200, queued/claimed/processed 모두 0으로 끝남 | 최신 코드 배포 뒤 Vercel Cron 첫 실행 기록과 실제 승인된 테스트 결제 환불 1건 검증 |
 | PAY-05 | 노쇼 정산 | 참가자 한 명의 직접 몰수 차단 | PASS | 사용자 API는 `no_show_review_required` 409로 금전 처리 없음. 원격 `finalize_no_show(UUID)`는 anon/authenticated 실행 불가, service_role만 실행 가능 | 신고·증거 검토 계약이 동결될 때 서버 정산 경로를 별도 구현 |
 | PAY-06 | 보증금 UX | 전액 환불·다음 매칭 이월 화면과 완료 전 차단 | PASS | 로그인 세션으로 실제 match의 환불 화면을 열어 두 선택 버튼을 클릭했다. 미완료 match는 `만남이 완료된 뒤 선택할 수 있어요`로 안전하게 거절. 390x844 가로 넘침 0, `artifacts/qa/2026-08-12-deposit-carryover/refund-mobile-390x844.jpg`·`refund-browser-viewport.jpg` | 완료된 실제 Toss 결제 match는 PAY-01 뒤 1회 확인 |
-| WEB-01 | 웹 빌드 | Next 운영 빌드 | PASS | 2026-08-12 환불 화면 문구 보완 뒤 격리 운영 빌드 성공, 정적 생성 94/94·타입 검사·내부 환불 경로 포함 확인. 웹·모바일 자동 테스트 합계 768개 통과 | 배포 직전 같은 커밋으로 재실행 |
+| WEB-01 | 웹 빌드 | Next 운영 빌드 | PASS | 2026-08-12 격리 운영 빌드 성공, 정적 생성 94개·타입 검사·내부 환불 경로 포함 확인. 루트 623개와 모바일 151개, 합계 774개 자동 테스트 통과 | 배포 직전 같은 커밋으로 재실행 |
 | AND-00 | 모바일 환경 | Expo 프로젝트 건강 검사 | PASS | 2026-08-12 Expo Doctor 20/20, 모바일 테스트 150/150·타입 검사 통과 | 네이티브 의존성 변경 시 재검증 |
 | AND-01 | 안드로이드 | 최신 AAB·APK 생성과 실기기 설치 | PARTIAL | 기존 AAB `311ad034-f861-48bf-9679-1583d46f730a`·APK `15b759e6-1670-4576-ab5c-9f310bf4d6c7`는 앱 `package.json` 누락으로 `ERRORED`. EAS 업로드 경계를 고쳐 새 preview APK `96b30fcf-ef7c-49f5-9691-ab9de7f73914`(versionCode 3), production AAB `0734affa-7c5e-4641-bedd-6c5f8aa3bd47`(versionCode 4)을 접수했고 현재 `IN_QUEUE` | 빌드 완료 후 APK 실기기 설치, AAB 보관, Google·Kakao 로그인 확인 |
 | AND-02 | 모바일 인증 | Google·Kakao 공급자와 앱 로그인 | PARTIAL | Supabase `/auth/v1/settings` 공개 설정 응답 200, Google·Kakao 모두 enabled 확인 | 완성된 preview APK에서 리디렉션·복귀·세션 유지 실기기 검증 |
-| PROD-01 | Vercel | 현재 HEAD와 배포 commit 일치 | BLOCKED | Vercel 프로젝트·로그인 확인, 토스·환불·Cron·`AI_SERVER_SECRET` 운영 환경 등록. 외모분석 Docker 이미지는 로컬 실제 구동과 `/health`까지 통과했지만 운영 AI HTTPS 주소는 없고 작업 폴더에 추적 변경 165개가 섞여 있어 무검토 배포 금지 | 배포 범위를 별도 commit으로 고정하고 AI Docker 서버 주소를 확보한 뒤 `AI_SERVER_URL`을 등록해 같은 commit으로 build·deploy |
+| PROD-01 | Vercel | 현재 HEAD와 배포 commit 일치 | BLOCKED | 외모분석 Docker 이미지는 로컬 실제 구동과 `/health`까지 통과했지만 운영 AI HTTPS 주소가 없다. 작업 폴더도 다수 기능 변경이 섞여 있어 최신 웹 전체를 아직 배포하지 않음 | 검증된 변경을 기능별 commit으로 고정하고 AI Docker 서버 주소를 확보한 뒤 `AI_SERVER_URL`을 등록해 같은 commit으로 build·deploy |
 | DB-01 | 원격 DB | 이벤트·채팅·앨범·환불 worker·노쇼 권한 migration | PASS | 대상 `jyfwcanjqwboyvicoafm`에 적용, 원격 6계정 E2E·잔여 fixture 0, 환불 lease 컬럼·RPC와 노쇼 service-only 권한 재조회 | 새 migration 추가 시 재검증 |
 | DB-02 | DB 성능 | 채팅 RLS initplan·신규 외래키 인덱스 | PASS | 원격 적용 후 performance advisor WARN 0, unindexed FK 0 | 데이터 증가 후 쿼리 통계 재검토 |
 | DB-03 | migration 이력 | 로컬 파일과 MCP 적용 버전 일치 | PARTIAL | 원격 보정 migration이 여러 단계로 적용돼 로컬 단일 최종 파일과 버전 이력이 다름 | 배포 전 기준 migration 이력 정합화 |
@@ -105,3 +105,12 @@
 - 새 preview APK와 production AAB는 정상 접수됐고 현재 Expo 무료 대기열에 있다. 빌드 산출물이 생기기 전에는 실기기 설치 완료로 표시하지 않는다.
 - 외모분석 서버는 운영 전용 경량 의존성으로 분리하고 승인 기준사진 manifest를 Docker 이미지에 포함했다. 시작 계약 테스트 7/7, 이미지 빌드, 실제 컨테이너 `/health`의 `analyzer_ready=true`, manifest 존재를 확인했다.
 - Vercel에는 외모분석 서버와 동일한 비밀값을 등록했지만 `AI_SERVER_URL`은 아직 없다. Render·Railway·Fly.io 같은 Docker HTTPS 호스트 하나를 연결하기 전까지 실제 OpenAI 운영 분석과 최신 Vercel 배포는 차단한다.
+
+## 2026-08-12 코드리뷰·모바일 보증금 보완 기록
+
+- 결제사 요청에 8초 기본 timeout을 추가하고, timeout과 네트워크 장애를 서로 다른 안전한 오류로 분류했다.
+- 결제 시작 API 두 경로 모두 데이터베이스 원문 오류와 결제 식별자를 공개 응답에서 제거했다.
+- Toss 웹훅은 수신 식별자를 그대로 반환하지 않고 provider·수신 여부·처리 상태만 반환한다.
+- 모바일 보증금 화면의 잘못된 `계약 연결 전` 안내와 비활성 버튼을 제거했다. 로그인 토큰으로 실제 `다음 매칭 이월`과 `전액 환불` API를 호출하며, 금융 선택 전에 확인창을 거친다.
+- 원격 deposits 재조회 결과는 `pending` 1건, 승인 키 0건, 결제 완료 시각 없음이다. 결제창 진입은 확인됐지만 승인·환불 E2E는 아직 완료가 아니다.
+- 새 Android AAB와 APK는 2026-08-12 재조회에서도 `IN_QUEUE`, 산출물 없음이다. APK 생성 전에는 실기기 Google·Kakao 복귀를 검증할 수 없다.
