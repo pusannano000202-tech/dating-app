@@ -13,6 +13,13 @@
     },
     "android": {
       "package": "com.quantum.campus",
+      "blockedPermissions": [
+        "android.permission.DUMP",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#123249",
         "foregroundImage": "./assets/android-icon-foreground.png"
@@ -29,7 +36,22 @@
       "expo-status-bar",
       "expo-secure-store",
       "expo-web-browser",
-      "expo-splash-screen"
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "프로필에 사용할 사진을 선택하려면 사진 접근이 필요해요.",
+          "cameraPermission": false
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#082438",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain"
+        }
+      ]
     ],
     "extra": {
       "router": {},

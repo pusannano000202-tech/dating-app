@@ -59,6 +59,11 @@ export default function LoginScreen() {
         {(configError || message) && (
           <Text style={styles.error} role="alert">{configError ?? message}</Text>
         )}
+        {__DEV__ ? (
+          <Pressable onPress={() => router.push('/dev-profile-preview')} style={styles.previewLink}>
+            <Text style={styles.previewLinkText}>기본정보 화면 미리보기</Text>
+          </Pressable>
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -121,4 +126,6 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.5 },
   providerText: { color: colors.ink, fontSize: 15, fontWeight: '900' },
   error: { marginTop: spacing.md, color: colors.action, fontSize: 12, lineHeight: 18, fontWeight: '800', textAlign: 'center' },
+  previewLink: { minHeight: 44, marginTop: spacing.md, alignItems: 'center', justifyContent: 'center' },
+  previewLinkText: { color: colors.school, fontSize: 12, fontWeight: '800' },
 });

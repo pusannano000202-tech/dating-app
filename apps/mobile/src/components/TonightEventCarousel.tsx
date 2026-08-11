@@ -15,6 +15,7 @@ import {
 import { ChevronLeft, ChevronRight, Clock3, MapPin, UsersRound } from 'lucide-react-native';
 
 import { type TonightEvent, type TonightEventKind } from '../domain/events';
+import { formatEventMeetingTime } from '../domain/event-display';
 import { colors, layout, radii, spacing } from '../theme/tokens';
 
 const eventImages: Record<TonightEventKind, ImageSourcePropType> = {
@@ -114,7 +115,7 @@ export function TonightEventCarousel({
                   <Text style={styles.description}>{item.description}</Text>
                   <View style={styles.metaRow}>
                     <Clock3 size={14} color="#F3B95F" />
-                    <Text style={styles.metaText}>{item.meetingTime}</Text>
+                    <Text style={styles.metaText}>{formatEventMeetingTime(item.meetingTime)}</Text>
                   </View>
                   <View style={styles.metaRow}>
                     <MapPin size={14} color="#F3B95F" />

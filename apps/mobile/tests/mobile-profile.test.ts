@@ -162,6 +162,23 @@ test('basic profile onboarding asks one chat question at a time and uses wheels 
   assert.doesNotMatch(source, /<Field label="키 \(선택\)"/);
 })
 
+test('mobile basic profile chooses a department from a searchable scrolling list', async () => {
+  const source = await readFile(new URL('../app/profile/basic.tsx', import.meta.url), 'utf8');
+  const picker = await readFile(new URL('../src/components/DepartmentSelect.tsx', import.meta.url), 'utf8');
+  const api = await readFile(new URL('../src/api/departments.ts', import.meta.url), 'utf8');
+
+  assert.match(source, /<DepartmentSelect/);
+  assert.match(source, /schoolId="pnu"/);
+  assert.doesNotMatch(source, /label="학과 \(선택\)"/);
+  assert.match(picker, /accessibilityRole="combobox"/);
+  assert.match(picker, /<Modal/);
+  assert.match(picker, /<FlatList/);
+  assert.match(picker, /학과 검색/);
+  assert.match(api, /university-departments\/\$\{encodeURIComponent\(schoolId\)\}\.json/);
+  assert.match(api, /pnu-departments\.json/);
+  assert.match(api, /schoolId === 'pnu'/);
+})
+
 test('mobile survey uses the authenticated server contract and stores raw answers only', async () => {
   const calls: Array<{ url: string; init?: RequestInit }> = [];
   const client = createQuantumApiClient({

@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
   },
-  copy: { flex: 1 },
+  copy: { flex: 1, minWidth: 0 },
   eyebrow: { color: colors.school, fontSize: 12, fontWeight: '800' },
   eyebrowDark: { color: '#F3B95F' },
   title: {
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
   titleDark: { color: colors.nightText },
   description: {
     marginTop: 8,
+    flexShrink: 1,
     color: colors.muted,
     fontSize: 14,
     lineHeight: 21,
