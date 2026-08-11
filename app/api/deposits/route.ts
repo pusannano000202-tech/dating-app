@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import {
   buildDepositPaymentRequestDraft,
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
 
     if (created.error || !created.data) {
       if (created.error?.code !== '23505') {
-        return NextResponse.json({ error: created.error?.message || 'deposit_create_failed' }, { status: 400 })
+        return NextResponse.json({ error: 'deposit_create_failed' }, { status: 500 })
       }
 
       const concurrent = await paymentService
@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (updated.error || !updated.data) {
-      return NextResponse.json({ error: updated.error?.message || 'deposit_order_attach_failed' }, { status: 400 })
+      return NextResponse.json({ error: 'deposit_order_attach_failed' }, { status: 500 })
     }
 
     deposit = updated.data as DepositPaymentRow

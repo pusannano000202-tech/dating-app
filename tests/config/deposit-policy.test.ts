@@ -33,32 +33,28 @@ test('refund page is not blocked by the old free beta gate', () => {
   assert.match(refundPage, /보증금/)
 })
 
-test('refund page starts from full refund and separates voluntary contribution copy', () => {
+test('refund page keeps the full deposit separate from future optional support', () => {
   const refundPage = readSource('app/match/[id]/refund/page.tsx')
 
-  assert.match(refundPage, /useState<number>\(0\)/)
-  assert.match(refundPage, /보증금 정산/)
-  assert.match(refundPage, /앱 기여금/)
-  assert.match(refundPage, /환불 예정 금액/)
+  assert.match(refundPage, /보증금은 어떻게 할까요/)
+  assert.match(refundPage, /다음 매칭에 그대로 사용/)
   assert.match(refundPage, /전액 환불/)
-  assert.match(refundPage, /3,000/)
-  assert.match(refundPage, /2,000/)
-  assert.match(refundPage, /1,000/)
+  assert.match(refundPage, /앱 후원금은 보증금에서 차감하지 않아요/)
+  assert.doesNotMatch(refundPage, /app_fee_amount/)
+  assert.doesNotMatch(refundPage, /앱 기여금/)
   assert.doesNotMatch(refundPage, /매칭비 정산/)
   assert.doesNotMatch(refundPage, /앱에게 줄 매칭비/)
   assert.doesNotMatch(refundPage, /매칭비/)
 })
 
-test('refund page keeps contribution and refund amounts readable on the light settlement card', () => {
+test('refund page keeps the carryover and full refund choices readable on light surfaces', () => {
   const refundPage = readSource('app/match/[id]/refund/page.tsx')
 
-  assert.doesNotMatch(refundPage, /text-white">\{appFee\.toLocaleString\(\)\}/)
-  assert.doesNotMatch(refundPage, /text-white">\{refundAmount\.toLocaleString\(\)\}/)
-  assert.match(refundPage, /data-testid="refund-app-fee-current"/)
-  assert.match(refundPage, /data-testid="refund-amount-preview"/)
+  assert.match(refundPage, /bg-white/)
+  assert.match(refundPage, /WalletCards/)
+  assert.match(refundPage, /RotateCcw/)
   assert.doesNotMatch(refundPage, /text-violet-100/)
   assert.doesNotMatch(refundPage, /text-violet-300/)
-  assert.doesNotMatch(refundPage, /text-white/)
   assert.doesNotMatch(refundPage, /border-white\/15/)
   assert.doesNotMatch(refundPage, /bg-black\/20/)
 })
@@ -164,11 +160,31 @@ test('Phase 12 migration binds active deposits to matches and removes public moc
   assert.doesNotMatch(noShowPenalty, /AND group_id IN/)
 })
 
+test('the final migration state keeps sensitive payment and attendance writes server-only', () => {
+  const migration = readSource(
+    'supabase/migrations/20260809193000_revoke_sensitive_client_table_writes.sql',
+  )
+
+  assert.match(
+    migration,
+    /REVOKE INSERT, UPDATE, DELETE ON TABLE[\s\S]*public\.attendances[\s\S]*public\.connections[\s\S]*public\.deposit_refund_requests[\s\S]*public\.deposits[\s\S]*FROM authenticated/,
+  )
+  assert.match(migration, /DROP POLICY IF EXISTS attendances_self_write ON public\.attendances/)
+  assert.match(migration, /DROP POLICY IF EXISTS attendances_self_update ON public\.attendances/)
+  assert.match(migration, /DROP POLICY IF EXISTS connections_self ON public\.connections/)
+  assert.match(migration, /CREATE POLICY connections_select_participant[\s\S]*FOR SELECT/)
+  assert.match(migration, /DROP POLICY IF EXISTS drr_self ON public\.deposit_refund_requests/)
+  assert.match(migration, /CREATE POLICY deposit_refund_requests_select_self[\s\S]*FOR SELECT/)
+  assert.match(migration, /DROP POLICY IF EXISTS deposits_self ON public\.deposits/)
+  assert.match(migration, /CREATE POLICY deposits_select_self[\s\S]*FOR SELECT/)
+})
+
 test('refund settlement records immutable attempt and provider evidence', () => {
   const migration = readSource(
     'supabase/migrations/20260715155041_phase12_payment_ownership_refund_and_friend_safety.sql',
   )
   const refundRoute = readSource('app/api/matches/[id]/refund/route.ts')
+  const settlement = readSource('lib/payments/refund-settlement.ts')
 
   assert.match(migration, /settlement_version INT NOT NULL DEFAULT 1/)
   assert.match(migration, /provider_payment_key TEXT/)
@@ -188,13 +204,13 @@ test('refund settlement records immutable attempt and provider evidence', () => 
   assert.match(migration, /p_provider_status IS DISTINCT FROM 'MOCK'/)
   assert.match(migration, /p_provider_status IS DISTINCT FROM 'NOT_REQUIRED'/)
   assert.match(refundRoute, /settlement_version/)
-  assert.match(refundRoute, /params\.payment\.paymentKey !== params\.deposit\.toss_payment_key/)
-  assert.match(refundRoute, /params\.payment\.orderId !== params\.deposit\.toss_order_id/)
-  assert.match(refundRoute, /verifyTossRefundEvidence/)
-  assert.match(refundRoute, /const currentPayment = await getTossPayment\(paymentKey\)/)
-  assert.match(refundRoute, /reference: evidence\.transactionKey/)
-  assert.doesNotMatch(refundRoute, /\.reduce\(/)
-  assert.match(refundRoute, /buildTossRefundRequestKey/)
+  assert.match(settlement, /params\.payment\.paymentKey !== params\.deposit\.toss_payment_key/)
+  assert.match(settlement, /params\.payment\.orderId !== params\.deposit\.toss_order_id/)
+  assert.match(settlement, /verifyTossRefundEvidence/)
+  assert.match(settlement, /const currentPayment = await getTossPayment\(paymentKey\)/)
+  assert.match(settlement, /reference: evidence\.transactionKey/)
+  assert.doesNotMatch(settlement, /\.reduce\(/)
+  assert.match(settlement, /buildTossRefundRequestKey/)
 })
 
 test('legacy no-consent department friendships are removed before consent-only suggestions launch', () => {
@@ -226,28 +242,91 @@ test('match confirmation and detail count deposits for the exact match only', ()
 })
 
 test('automatic refund paths queue provider settlement without claiming completion', () => {
-  const migration = readSource(
+  const legacyMigration = readSource(
     'supabase/migrations/20260715155041_phase12_payment_ownership_refund_and_friend_safety.sql',
   )
-  const continuationTrigger = migration.match(
-    /CREATE OR REPLACE FUNCTION public\.trg_continuation_both_continue_check[\s\S]*?REVOKE ALL ON FUNCTION public\.trg_continuation_both_continue_check/,
+  const carryoverMigration = readSource(
+    'supabase/migrations/20260812003000_deposit_carryover.sql',
+  )
+  const continuationTrigger = carryoverMigration.match(
+    /CREATE OR REPLACE FUNCTION public\.trg_continuation_both_continue_check[\s\S]*?\$\$;/,
   )?.[0] ?? ''
-  const expiryWorker = migration.match(
-    /CREATE OR REPLACE FUNCTION public\.expire_refund_requests[\s\S]*?REVOKE ALL ON FUNCTION public\.expire_refund_requests/,
+  const expiryWorker = carryoverMigration.match(
+    /CREATE OR REPLACE FUNCTION public\.expire_refund_requests[\s\S]*?\$\$;/,
   )?.[0] ?? ''
-  const prepareRefund = migration.match(
+  const prepareRefund = legacyMigration.match(
     /CREATE OR REPLACE FUNCTION public\.prepare_refund_request[\s\S]*?REVOKE ALL ON FUNCTION public\.prepare_refund_request/,
   )?.[0] ?? ''
 
-  for (const source of [continuationTrigger, expiryWorker]) {
-    assert.match(source, /public\.deposit_refund_requests/)
-    assert.match(source, /'pending'/)
-    assert.doesNotMatch(source, /UPDATE public\.deposits/)
-    assert.doesNotMatch(source, /'refund_processed'/)
-  }
+  assert.doesNotMatch(continuationTrigger, /public\.deposit_refund_requests/)
+  assert.doesNotMatch(continuationTrigger, /'refund_processed'/)
+  assert.match(expiryWorker, /public\.deposit_refund_requests/)
+  assert.match(expiryWorker, /'pending'/)
+  assert.doesNotMatch(expiryWorker, /UPDATE public\.deposits/)
+  assert.doesNotMatch(expiryWorker, /'refund_processed'/)
 
   assert.match(prepareRefund, /deposit_match_mismatch/)
   assert.doesNotMatch(prepareRefund, /UPDATE public\.deposits/)
+
+  const continuationPage = readSource('app/match/[id]/continuation/page.tsx')
+  assert.match(continuationPage, /14일 동안 고르지 않으면 전액 환불 요청이 자동 접수/)
+  assert.match(continuationPage, /보증금은 각자 전액 환불받거나 다음 매칭에 이어 쓸 수/)
+  assert.doesNotMatch(continuationPage, /보증금은 전액 환불 처리돼요/)
+  assert.doesNotMatch(continuationPage, /자동 전액 환불 처리됨/)
+})
+
+test('legacy automatic refund SQL is superseded by the carryover-aware migration', () => {
+  const migration = readSource(
+    'supabase/migrations/20260715155041_phase12_payment_ownership_refund_and_friend_safety.sql',
+  )
+  const legacyTrigger = migration.match(
+    /CREATE OR REPLACE FUNCTION public\.trg_continuation_both_continue_check[\s\S]*?REVOKE ALL ON FUNCTION public\.trg_continuation_both_continue_check/,
+  )?.[0] ?? ''
+  const carryoverMigration = readSource(
+    'supabase/migrations/20260812003000_deposit_carryover.sql',
+  )
+
+  assert.match(legacyTrigger, /public\.deposit_refund_requests/)
+  assert.match(carryoverMigration, /Relationship choices no longer make a financial choice/)
+})
+
+test('automatic refund worker claims each pending request once and bounds retries', () => {
+  const migration = readSource(
+    'supabase/migrations/20260811234500_refund_settlement_worker.sql',
+  )
+
+  assert.match(migration, /settlement_lease_id UUID/)
+  assert.match(migration, /settlement_lease_expires_at TIMESTAMPTZ/)
+  assert.match(migration, /settlement_attempt_count INT NOT NULL DEFAULT 0/)
+  assert.match(migration, /settlement_last_error TEXT/)
+  assert.match(migration, /settlement_next_retry_at TIMESTAMPTZ/)
+  assert.match(migration, /CREATE OR REPLACE FUNCTION public\.claim_pending_refund_requests/)
+  assert.match(migration, /FOR UPDATE[\s\S]*SKIP LOCKED/)
+  assert.match(migration, /settlement_attempt_count < 5/)
+  assert.match(migration, /LEAST\(GREATEST\(p_limit, 1\), 10\)/)
+  assert.match(migration, /CREATE OR REPLACE FUNCTION public\.release_refund_request_lease/)
+  assert.match(migration, /GRANT EXECUTE ON FUNCTION public\.claim_pending_refund_requests[\s\S]*TO service_role/)
+  assert.match(migration, /GRANT EXECUTE ON FUNCTION public\.release_refund_request_lease[\s\S]*TO service_role/)
+  assert.doesNotMatch(migration, /TO authenticated/)
+})
+
+test('no-show forfeiture cannot be finalized directly by an authenticated participant', () => {
+  const migration = readSource(
+    'supabase/migrations/20260812000500_no_show_settlement_service_only.sql',
+  )
+  const route = readSource('app/api/matches/[id]/finalize-no-show/route.ts')
+
+  assert.match(
+    migration,
+    /REVOKE ALL ON FUNCTION public\.finalize_no_show\(UUID\)[\s\S]*FROM PUBLIC, anon, authenticated/,
+  )
+  assert.match(
+    migration,
+    /GRANT EXECUTE ON FUNCTION public\.finalize_no_show\(UUID\)[\s\S]*TO service_role/,
+  )
+  assert.match(route, /no_show_review_required/)
+  assert.match(route, /status: 409/)
+  assert.doesNotMatch(route, /\.rpc\(['"]finalize_no_show['"]/)
 })
 
 function makeFakeJwt(payload: Record<string, unknown>) {
