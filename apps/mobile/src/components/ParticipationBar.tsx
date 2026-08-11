@@ -1,24 +1,35 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 
+import type { QuantumPartyType } from '../api/client';
 import { type TonightEvent } from '../domain/events';
 import { colors, layout, radii, spacing } from '../theme/tokens';
 
 type ParticipationBarProps = {
   event: TonightEvent | null;
   activeEvent: TonightEvent;
+  participationPartyType: QuantumPartyType | null;
   disabled?: boolean;
+  joinUnavailableReason?: string | null;
   onJoin: () => void;
   onCancel: () => void;
 };
 
-export function ParticipationBar({ event, activeEvent, disabled = false, onJoin, onCancel }: ParticipationBarProps) {
+export function ParticipationBar({
+  event,
+  activeEvent,
+  participationPartyType,
+  disabled = false,
+  joinUnavailableReason = null,
+  onJoin,
+  onCancel,
+}: ParticipationBarProps) {
   if (event) {
     return (
       <View style={styles.joined} accessibilityLiveRegion="polite">
         <View style={styles.joinedIcon}><Check size={18} color={colors.surface} strokeWidth={3} /></View>
         <View style={styles.copy}>
-          <Text style={styles.joinedEyebrow}>참여 중</Text>
+          <Text style={styles.joinedEyebrow}>{participationPartyType === 'friends' ? '친구팀 참여 중' : '혼자 참여 중'}</Text>
           <Text numberOfLines={1} style={styles.joinedTitle}>{event.title}</Text>
           <Text style={styles.joinedMeta}>{event.meetingTime} · {event.venue}</Text>
         </View>
@@ -29,8 +40,22 @@ export function ParticipationBar({ event, activeEvent, disabled = false, onJoin,
     );
   }
 
+  if (joinUnavailableReason) {
+    return (
+      <View style={styles.unavailable} accessibilityLiveRegion="polite">
+        <Text style={styles.unavailableTitle}>친구팀 연결 준비 중</Text>
+        <Text style={styles.unavailableMeta}>친구 식별자와 팀 만들기가 연결되면 열려요. 혼자 참여는 지금 가능해요.</Text>
+      </View>
+    );
+  }
+
   return (
-    <Pressable disabled={disabled} onPress={onJoin} style={({ pressed }) => [styles.joinButton, pressed && styles.pressed, disabled && styles.disabled]}>
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onJoin}
+      style={({ pressed }) => [styles.joinButton, pressed && styles.pressed, disabled && styles.disabled]}
+    >
       <Text style={styles.joinButtonTitle}>{disabled ? '저장 중' : `${activeEvent.title} 참여하기`}</Text>
       <Text style={styles.joinButtonMeta}>참여는 계정에 저장되며 결제는 아직 진행되지 않아요</Text>
     </Pressable>
@@ -78,6 +103,32 @@ const styles = StyleSheet.create({
     borderRadius: radii.card,
     backgroundColor: colors.action,
     paddingHorizontal: spacing.lg,
+  },
+  unavailable: {
+    minHeight: 68,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    justifyContent: 'center',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.18)',
+    paddingVertical: spacing.md,
+  },
+  unavailableTitle: {
+    color: '#F3B95F',
+    fontSize: 15,
+    fontWeight: '900',
+    textAlign: 'center',
+    letterSpacing: 0,
+  },
+  unavailableMeta: {
+    marginTop: 4,
+    color: 'rgba(255,255,255,0.72)',
+    fontSize: 11,
+    lineHeight: 17,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 0,
   },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
   disabled: { opacity: 0.5 },

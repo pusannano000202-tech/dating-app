@@ -1,226 +1,223 @@
 import { useRouter } from 'expo-router';
-import { Bell, ChevronRight, MoonStar, Plus, Sparkles, UsersRound } from 'lucide-react-native';
 import {
-  ImageBackground,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+  ChevronRight,
+  MessageCircleMore,
+  MoonStar,
+  UtensilsCrossed,
+  UsersRound,
+} from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { getQuantumApiClient } from '../../src/api/quantum';
 import { Screen } from '../../src/components/Screen';
+import {
+  buildHomeRecommendationWave,
+  type HomeRecommendationId,
+} from '../../src/domain/home-recommendations';
 import { colors, layout, radii, spacing } from '../../src/theme/tokens';
 
-const hero = require('../../assets/tonight-five.webp');
+const iconByRecommendation = {
+  tonight: MoonStar,
+  meetup: UsersRound,
+  'campus-eats': UtensilsCrossed,
+  feedback: MessageCircleMore,
+} as const;
 
-const recommendations = [
-  {
-    id: 'match',
-    icon: Sparkles,
-    eyebrow: '오늘 밤',
-    title: '다섯 명이 만나는 활동 고르기',
-    description: '저녁, 조깅, 보드게임 중 하나만 고르면 장소와 인원은 Quantum이 맞춰요.',
-    action: '활동 돌려보기',
-    href: '/match' as const,
-    color: colors.action,
-  },
-  {
-    id: 'meetups',
-    icon: UsersRound,
-    eyebrow: '내가 여는 모임',
-    title: '같이 할 사람을 직접 모으기',
-    description: '성별 조건 없이 운동, 관람, 공부처럼 하고 싶은 활동으로 방을 만들어요.',
-    action: '모임 둘러보기',
-    href: '/meetups' as const,
-    color: colors.safety,
-  },
-] as const;
+const colorByRecommendation: Record<HomeRecommendationId, string> = {
+  tonight: colors.action,
+  meetup: colors.safety,
+  'campus-eats': colors.warning,
+  feedback: colors.school,
+};
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [wave, setWave] = useState(() => buildHomeRecommendationWave(null));
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadRecommendation() {
+      try {
+        const catalog = await getQuantumApiClient().listEvents();
+        if (isActive) setWave(buildHomeRecommendationWave(catalog));
+      } catch {
+        if (isActive) setWave(buildHomeRecommendationWave(null));
+      }
+    }
+
+    void loadRecommendation();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const PrimaryIcon = iconByRecommendation[wave.primary.id];
 
   return (
     <Screen
       contentStyle={styles.content}
       before={(
         <View style={styles.topbar}>
-          <View>
-            <Text style={styles.brand}>Quantum</Text>
-            <Text style={styles.school}>부산대학교 · 오늘의 캠퍼스</Text>
-          </View>
-          <Pressable accessibilityLabel="알림" style={styles.iconButton}>
-            <Bell size={21} color={colors.ink} />
-            <View style={styles.notificationDot} />
-          </Pressable>
+          <Text style={styles.brand}>Quantum</Text>
+          <Text style={styles.school}>부산대학교 · 오늘</Text>
         </View>
       )}
     >
-      <ImageBackground source={hero} style={styles.hero} resizeMode="cover">
-        <LinearGradient colors={['rgba(8,14,18,0.05)', 'rgba(8,14,18,0.9)']} style={StyleSheet.absoluteFill} />
-        <View style={styles.heroContent}>
-          <View style={styles.heroSignal}>
-            <MoonStar size={15} color="#F3B95F" />
-            <Text style={styles.heroSignalText}>오늘 밤 3개 활동이 열렸어요</Text>
+      <View style={styles.primaryBand}>
+        <View style={styles.primarySignal}>
+          <View style={styles.primaryIcon}>
+            <PrimaryIcon size={22} color="#F3B95F" />
           </View>
-          <Text style={styles.heroTitle}>뭐 하지 고민하기 전에,{`\n`}Quantum이 다음 행동을 골라드려요.</Text>
-          <Text style={styles.heroDescription}>한 번 누르면 활동 선택부터 만날 장소까지 이어집니다.</Text>
-          <Pressable
-            onPress={() => router.push('/match')}
-            style={({ pressed }) => [styles.heroButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.heroButtonText}>오늘 밤 약속 보기</Text>
-            <ChevronRight size={20} color={colors.surface} />
-          </Pressable>
-        </View>
-      </ImageBackground>
-
-      <View style={styles.body}>
-        <View style={styles.sectionHeader}>
-          <View>
-            <Text style={styles.sectionEyebrow}>QUANTUM PICK</Text>
-            <Text style={styles.sectionTitle}>지금 해볼 것</Text>
-          </View>
-          <Text style={styles.sectionHint}>두 가지만 골랐어요</Text>
+          <Text style={styles.primaryEyebrow}>{wave.primary.eyebrow}</Text>
         </View>
 
-        <View style={styles.recommendationList}>
-          {recommendations.map((item) => {
-            const Icon = item.icon;
+        <View style={styles.primaryCopy}>
+          <Text style={styles.primaryTitle}>{wave.primary.title}</Text>
+          <Text style={styles.primaryDescription}>{wave.primary.description}</Text>
+        </View>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`추천: ${wave.primary.title}`}
+          onPress={() => router.push(wave.primary.href)}
+          style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.primaryButtonText}>{wave.primary.action}</Text>
+          <ChevronRight size={20} color={colors.surface} />
+        </Pressable>
+      </View>
+
+      <View style={styles.nextSection}>
+        <Text style={styles.nextTitle}>다음 선택</Text>
+        <View style={styles.nextList}>
+          {wave.secondary.map((item) => {
+            const Icon = iconByRecommendation[item.id];
+            const color = colorByRecommendation[item.id];
+
             return (
               <Pressable
                 key={item.id}
+                accessibilityRole="button"
+                accessibilityLabel={`${item.title}, ${item.action}`}
                 onPress={() => router.push(item.href)}
-                style={({ pressed }) => [styles.recommendation, pressed && styles.pressed]}
+                style={({ pressed }) => [styles.nextRow, pressed && styles.rowPressed]}
               >
-                <View style={[styles.recommendationIcon, { backgroundColor: `${item.color}14` }]}>
-                  <Icon size={22} color={item.color} />
+                <View style={[styles.nextIcon, { backgroundColor: `${color}12` }]}>
+                  <Icon size={20} color={color} />
                 </View>
-                <View style={styles.recommendationCopy}>
-                  <Text style={[styles.recommendationEyebrow, { color: item.color }]}>{item.eyebrow}</Text>
-                  <Text style={styles.recommendationTitle}>{item.title}</Text>
-                  <Text style={styles.recommendationDescription}>{item.description}</Text>
-                  <Text style={[styles.recommendationAction, { color: item.color }]}>{item.action}  →</Text>
+                <View style={styles.nextCopy}>
+                  <Text style={[styles.nextEyebrow, { color }]}>{item.eyebrow}</Text>
+                  <Text style={styles.nextItemTitle}>{item.title}</Text>
+                  <Text style={styles.nextDescription}>{item.description}</Text>
                 </View>
+                <ChevronRight size={20} color={colors.muted} />
               </Pressable>
             );
           })}
         </View>
-
-        <Pressable onPress={() => router.push('/meetups')} style={styles.createRow}>
-          <View style={styles.createIcon}><Plus size={20} color={colors.school} /></View>
-          <View style={styles.createCopy}>
-            <Text style={styles.createTitle}>원하는 활동이 없나요?</Text>
-            <Text style={styles.createDescription}>내가 직접 모임을 열고 사람을 모을 수 있어요.</Text>
-          </View>
-          <ChevronRight size={20} color={colors.muted} />
-        </Pressable>
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { paddingBottom: 36 },
+  content: { paddingBottom: spacing.xxl },
   topbar: {
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
     minHeight: 72,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.canvas,
   },
-  brand: { color: colors.ink, fontSize: 21, fontWeight: '900' },
-  school: { marginTop: 2, color: colors.muted, fontSize: 11, fontWeight: '700' },
-  iconButton: {
-    width: layout.minimumTouchTarget,
-    height: layout.minimumTouchTarget,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.round,
-    backgroundColor: colors.surface,
-  },
-  notificationDot: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.action,
-  },
-  hero: { height: 390, justifyContent: 'flex-end', overflow: 'hidden' },
-  heroContent: { padding: spacing.lg, paddingTop: 100 },
-  heroSignal: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  heroSignalText: { color: '#F3B95F', fontSize: 12, fontWeight: '900' },
-  heroTitle: { marginTop: 10, color: colors.surface, fontSize: 27, lineHeight: 34, fontWeight: '900' },
-  heroDescription: { marginTop: 9, color: 'rgba(255,255,255,0.76)', fontSize: 13, lineHeight: 20, fontWeight: '600' },
-  heroButton: {
-    minHeight: 52,
-    marginTop: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    borderRadius: radii.card,
-    backgroundColor: colors.action,
-  },
-  heroButtonText: { color: colors.surface, fontSize: 16, fontWeight: '900' },
-  pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
-  body: { backgroundColor: colors.canvas, paddingBottom: spacing.sm },
-  sectionHeader: {
-    marginTop: spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
+  brand: { color: colors.ink, fontSize: 22, fontWeight: '900' },
+  school: { marginTop: 3, color: colors.muted, fontSize: 11, fontWeight: '700' },
+  primaryBand: {
+    minHeight: 318,
+    justifyContent: 'flex-end',
+    backgroundColor: colors.night,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
-  sectionEyebrow: { color: colors.school, fontSize: 11, fontWeight: '900' },
-  sectionTitle: { marginTop: 4, color: colors.ink, fontSize: 21, fontWeight: '900' },
-  sectionHint: { color: colors.muted, fontSize: 11, fontWeight: '700' },
-  recommendationList: { marginTop: spacing.md, paddingHorizontal: spacing.lg, gap: spacing.sm },
-  recommendation: {
-    minHeight: 154,
-    flexDirection: 'row',
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radii.card,
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
-  },
-  recommendationIcon: {
-    width: 42,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.card,
-  },
-  recommendationCopy: { flex: 1 },
-  recommendationEyebrow: { fontSize: 11, fontWeight: '900' },
-  recommendationTitle: { marginTop: 4, color: colors.ink, fontSize: 17, lineHeight: 22, fontWeight: '900' },
-  recommendationDescription: { marginTop: 6, color: colors.muted, fontSize: 12, lineHeight: 18, fontWeight: '600' },
-  recommendationAction: { marginTop: 10, fontSize: 12, fontWeight: '900' },
-  createRow: {
-    minHeight: 76,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-    paddingTop: spacing.lg,
-  },
-  createIcon: {
+  primarySignal: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  primaryIcon: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radii.round,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.nightSurface,
   },
-  createCopy: { flex: 1 },
-  createTitle: { color: colors.ink, fontSize: 14, fontWeight: '900' },
-  createDescription: { marginTop: 3, color: colors.muted, fontSize: 11, fontWeight: '600' },
+  primaryEyebrow: { color: '#F3B95F', fontSize: 12, fontWeight: '900' },
+  primaryCopy: { minWidth: 0, marginTop: spacing.lg },
+  primaryTitle: {
+    color: colors.nightText,
+    fontSize: 27,
+    lineHeight: 34,
+    fontWeight: '900',
+    flexShrink: 1,
+  },
+  primaryDescription: {
+    marginTop: spacing.sm,
+    color: 'rgba(249,251,250,0.72)',
+    fontSize: 14,
+    lineHeight: 21,
+    fontWeight: '600',
+    flexShrink: 1,
+  },
+  primaryButton: {
+    minHeight: 52,
+    marginTop: spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderRadius: radii.control,
+    backgroundColor: colors.action,
+    paddingHorizontal: spacing.lg,
+  },
+  primaryButtonText: { color: colors.surface, fontSize: 15, fontWeight: '900' },
+  pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
+  nextSection: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl },
+  nextTitle: { color: colors.ink, fontSize: 19, fontWeight: '900' },
+  nextList: { marginTop: spacing.sm },
+  nextRow: {
+    minHeight: 96,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    paddingVertical: spacing.md,
+  },
+  rowPressed: { backgroundColor: colors.surfaceMuted },
+  nextIcon: {
+    width: layout.minimumTouchTarget,
+    height: layout.minimumTouchTarget,
+    flexShrink: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.control,
+  },
+  nextCopy: { flex: 1, minWidth: 0 },
+  nextEyebrow: { fontSize: 10, fontWeight: '900' },
+  nextItemTitle: {
+    marginTop: 3,
+    color: colors.ink,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '900',
+    flexShrink: 1,
+  },
+  nextDescription: {
+    marginTop: 4,
+    color: colors.muted,
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: '600',
+    flexShrink: 1,
+  },
 });

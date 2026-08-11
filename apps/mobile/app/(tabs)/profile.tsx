@@ -5,10 +5,12 @@ import { Alert, RefreshControl, StyleSheet, View } from 'react-native';
 import { useAuth } from '../../src/auth/context';
 import { type MobileProfileSummary } from '../../src/api/client';
 import { getProfilePhotosApi, type ProfilePhotos } from '../../src/api/profile-photos';
+import { getMeetingAlbumApi, type MobileAlbumMatch } from '../../src/api/meeting-album';
 import { getQuantumApiClient } from '../../src/api/quantum';
 import { getSocialApiClient, type MobileFriendsSnapshot, type MobileNotification } from '../../src/api/social';
 import { MyFinanceSafetySection } from '../../src/components/my/MyFinanceSafetySection';
 import { MyPeopleSection } from '../../src/components/my/MyPeopleSection';
+import { MyMeetingAlbumSection } from '../../src/components/my/MyMeetingAlbumSection';
 import { MyProfileHeader } from '../../src/components/my/MyProfileHeader';
 import { MyProfileSection } from '../../src/components/my/MyProfileSection';
 import { Screen } from '../../src/components/Screen';
@@ -31,6 +33,7 @@ export default function ProfileScreen() {
   const [photosState, setPhotosState] = useState<RequestState<ProfilePhotos>>(loadingState);
   const [friendsState, setFriendsState] = useState<RequestState<MobileFriendsSnapshot>>(loadingState);
   const [notificationsState, setNotificationsState] = useState<RequestState<MobileNotification[]>>(loadingState);
+  const [matchesState, setMatchesState] = useState<RequestState<MobileAlbumMatch[]>>(loadingState);
   const [refreshing, setRefreshing] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,7 +42,7 @@ export default function ProfileScreen() {
 
   const reload = useCallback((isRefresh = false) => {
     const requestId = ++requestIdRef.current;
-    let remaining = 4;
+    let remaining = 5;
     const canUpdate = () => focusedRef.current && requestId === requestIdRef.current;
     const finish = () => {
       remaining -= 1;
@@ -50,6 +53,7 @@ export default function ProfileScreen() {
     setPhotosState(loadingState);
     setFriendsState(loadingState);
     setNotificationsState(loadingState);
+    setMatchesState(loadingState);
     if (isRefresh) setRefreshing(true);
 
     void runMyHubFactory(() => getQuantumApiClient()).then((client) => client.getProfileOnboarding()).then((summary) => {
@@ -74,6 +78,12 @@ export default function ProfileScreen() {
       if (canUpdate()) setNotificationsState({ status: 'ready', data: notifications });
     }).catch(() => {
       if (canUpdate()) setNotificationsState({ status: 'error', data: null });
+    }).finally(finish);
+
+    void Promise.resolve(getMeetingAlbumApi()).then((client) => client.listMatches()).then((matches) => {
+      if (canUpdate()) setMatchesState({ status: 'ready', data: matches });
+    }).catch(() => {
+      if (canUpdate()) setMatchesState({ status: 'error', data: null });
     }).finally(finish);
   }, []);
 
@@ -124,6 +134,9 @@ export default function ProfileScreen() {
   const unreadNotificationCount = notificationsState.status === 'ready'
     ? notificationsState.data?.length ?? 0
     : null;
+  const latestMatch = matchesState.status === 'ready'
+    ? matchesState.data?.find((match) => match.matchStatus === 'confirmed' || match.matchStatus === 'completed') ?? null
+    : null;
 
   return (
     <Screen
@@ -158,6 +171,13 @@ export default function ProfileScreen() {
           onWorldcup={() => router.push('/profile/worldcup')}
           photoCount={photoCount}
           photoState={photosState.status}
+        />
+        <MyMeetingAlbumSection
+          latestMatch={latestMatch}
+          state={matchesState.status}
+          onOpen={() => {
+            if (latestMatch) router.push(`/matches/${latestMatch.matchId}/album`);
+          }}
         />
         <MyFinanceSafetySection
           message={message}
