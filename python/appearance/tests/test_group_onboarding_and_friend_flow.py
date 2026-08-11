@@ -17,20 +17,23 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         progress = read("components/profile/StepProgress.tsx")
         login = read("app/(auth)/login/page.tsx")
 
-        self.assertIn("if (!profile?.gender)             redirect('/profile/basic')", home)
-        self.assertIn("if (!profile?.appearance_type)    redirect('/profile/worldcup')", home)
-        self.assertLess(home.index("redirect('/profile/basic')"), home.index("redirect('/profile/worldcup')"))
+        self.assertIn("if (!profile?.gender) return '/profile/basic'", home)
+        self.assertIn("if (!profile.appearance_type) return '/profile/worldcup'", home)
+        self.assertLess(
+            home.index("return '/profile/basic'"),
+            home.index("return '/profile/worldcup'"),
+        )
 
         self.assertIn("router.push('/profile/worldcup')", basic)
         self.assertIn("router.push('/profile/photos')", worldcup)
 
         self.assertLess(progress.index("path: '/profile/basic'"), progress.index("path: '/profile/worldcup'"))
         self.assertLess(progress.index("path: '/profile/worldcup'"), progress.index("path: '/profile/photos'"))
-        self.assertIn("?? '/profile/basic'", login)
-        self.assertNotIn("?? '/profile/worldcup'", login)
+        self.assertIn("?? '/'", login)
+        self.assertNotIn("?? '/profile/basic'", login)
 
     def test_friend_relationship_tables_exist_before_group_invites(self):
-        migration = read("supabase/migrations/20260521_matching_create_core_tables.sql")
+        migration = read("supabase/migrations/20260521000001_matching_create_core_tables.sql")
 
         self.assertIn("CREATE TABLE friend_requests", migration)
         self.assertIn("CREATE TABLE friendships", migration)
@@ -43,27 +46,21 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
     def test_group_create_screen_is_friend_invite_based(self):
         page = read("app/group/create/page.tsx")
 
-        self.assertIn("친구 추가", page)
-        self.assertIn("친구 목록", page)
-        self.assertIn("그룹 멤버", page)
-        self.assertIn("우리 그룹", page)
-        # 2026-05-22: 보증금 결제 카드가 큐 진입 버튼과 분리됨. 큐 버튼은 단순화됨.
-        # 결제 카드 + 큐 버튼이 각각 존재해야 함.
-        self.assertIn("이번 주 매칭 큐에 들어가기", page)
-        self.assertIn("내 보증금", page)
+        self.assertIn("친구 초대", page)
+        self.assertIn("현재 함께하는 친구", page)
+        self.assertIn("GroupMemberStatusPanel", page)
+        self.assertIn("QueueRadarCard", page)
         self.assertNotIn("개발 중", page)
 
-    def test_matching_pool_uses_weekly_queue_not_orbs_or_dots(self):
-        component = read("components/MatchingPool.tsx")
+    def test_matching_landing_uses_event_first_discovery(self):
+        component = read("components/matching/QuantumMatchDiscovery.tsx")
         landing = read("app/page.tsx")
 
-        self.assertIn("주간 매칭 큐", component)
-        self.assertIn("대기 그룹", component)
-        self.assertIn("토요일 14:00", component)
-        self.assertNotIn("SoulOrb", component)
-        self.assertNotIn("ORBS", component)
-        self.assertNotIn("rounded-full bg-emerald", component)
-        self.assertIn("MatchingPool", landing)
+        self.assertIn("오늘 바로", component)
+        self.assertIn("날짜 골라 만나기", component)
+        self.assertIn("QuantumHomeParticipation", landing)
+        self.assertIn("QuantumHomeRecommendations", landing)
+        self.assertNotIn("MatchingPool", landing)
 
 
 if __name__ == "__main__":

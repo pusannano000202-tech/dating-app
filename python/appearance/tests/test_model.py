@@ -1,13 +1,22 @@
-"""unit tests for model.py — no HTTP, no GPU required"""
+"""Legacy PyTorch evaluator tests, skipped in the OpenAI-only runtime image."""
+from __future__ import annotations
+
 import io
 import unittest
 from unittest.mock import MagicMock, patch
 
-import torch
-import torch.nn as nn
-from PIL import Image
+LEGACY_MODEL_IMPORT_ERROR = None
+try:
+    import torch
+    import torch.nn as nn
+    from PIL import Image
 
-from model import build_model, score_image, score_photos, load_image_from_url, SCORE_MIN, SCORE_MAX
+    from model import build_model, score_image, score_photos, load_image_from_url, SCORE_MIN, SCORE_MAX
+except (ImportError, OSError, RuntimeError) as exc:
+    LEGACY_MODEL_IMPORT_ERROR = exc
+
+
+LEGACY_SKIP_REASON = "legacy PyTorch evaluator dependencies are not installed in the OpenAI runtime"
 
 
 def _make_dummy_model(output: float = 3.0) -> nn.Module:
@@ -22,6 +31,7 @@ def _rgb_image(w: int = 64, h: int = 64) -> Image.Image:
     return Image.new("RGB", (w, h), color=(128, 100, 80))
 
 
+@unittest.skipIf(LEGACY_MODEL_IMPORT_ERROR is not None, LEGACY_SKIP_REASON)
 class TestBuildModel(unittest.TestCase):
     def test_build_model_returns_module(self):
         model = build_model(weights_path=None)
@@ -39,6 +49,7 @@ class TestBuildModel(unittest.TestCase):
         self.assertEqual(out.shape, (1, 1))
 
 
+@unittest.skipIf(LEGACY_MODEL_IMPORT_ERROR is not None, LEGACY_SKIP_REASON)
 class TestScoreImage(unittest.TestCase):
     def test_score_in_range(self):
         model = build_model(weights_path=None)
@@ -69,6 +80,7 @@ class TestScoreImage(unittest.TestCase):
         self.assertAlmostEqual(score, 50.0, places=3)
 
 
+@unittest.skipIf(LEGACY_MODEL_IMPORT_ERROR is not None, LEGACY_SKIP_REASON)
 class TestScorePhotos(unittest.TestCase):
     def _mock_load(self, img: Image.Image):
         return patch("model.load_image_from_url", return_value=img)
@@ -127,6 +139,7 @@ class TestScorePhotos(unittest.TestCase):
                 score_photos(model, ["https://example.com/a.jpg"])
 
 
+@unittest.skipIf(LEGACY_MODEL_IMPORT_ERROR is not None, LEGACY_SKIP_REASON)
 class TestLoadImageFromUrl(unittest.TestCase):
     def _make_response(self, status_code=200, content_type="image/jpeg", data=None):
         resp = MagicMock()
