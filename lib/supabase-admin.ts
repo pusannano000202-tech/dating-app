@@ -1,3 +1,12 @@
+import { createClient } from '@supabase/supabase-js'
+import { getSupabaseUrl } from './utils'
+
+const browserGlobal = globalThis as { window?: unknown }
+
+if (typeof browserGlobal.window !== 'undefined') {
+  throw new Error('Supabase admin credentials are server-only')
+}
+
 export type SupabaseAdminKeyStatus =
   | { ok: true; key: string; source: 'secret' | 'legacy' }
   | { ok: false; reason: 'missing' | 'invalid' }
@@ -21,6 +30,20 @@ export function getSupabaseAdminKeyStatus(): SupabaseAdminKeyStatus {
 export function getSupabaseAdminKey() {
   const status = getSupabaseAdminKeyStatus()
   return status.ok ? status.key : null
+}
+
+export function createSupabaseAdminClient() {
+  const adminKey = getSupabaseAdminKey()
+  const supabaseUrl = getSupabaseUrl()
+  if (!adminKey || !supabaseUrl) return null
+
+  return createClient(supabaseUrl, adminKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+  })
 }
 
 function isSupabaseSecretKey(value: string) {

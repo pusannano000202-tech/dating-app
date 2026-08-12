@@ -1,409 +1,247 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Loader2 } from 'lucide-react'
-import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import { useParams } from 'next/navigation'
 import {
-  APP_FEE_BEG_STEPS,
-  appFeeToRefundAmount,
-  getAppFeeFlowDecision,
-} from '@/lib/refund/fee-flow'
-import { createClient } from '@/lib/supabase'
-import { isSupabaseConfigured } from '@/lib/utils'
-import SchoolMascot from '@/components/theme/SchoolMascot'
+  Check,
+  ChevronLeft,
+  Loader2,
+  RotateCcw,
+  ShieldCheck,
+  WalletCards,
+} from 'lucide-react'
+import { DEPOSIT_AMOUNT } from '@/lib/constants'
 
-type Stage = 'select' | 'ask_support' | 'notify_zero' | 'done'
-type UserGender = 'male' | 'female' | null
+type Stage = 'choose' | 'carryover_done' | 'refund_done'
+
+interface CarryoverRow {
+  status: 'available' | 'applied' | 'cancelled'
+  target_match_id: string | null
+}
 
 export default function RefundPage() {
   const params = useParams<{ id: string }>()
-  const router = useRouter()
   const matchId = params.id
-  const total = DEPOSIT_AMOUNT
-  const totalLabel = `${total.toLocaleString()}원`
-  const presetAmounts = Array.from({ length: total / 1000 + 1 }, (_, index) => index * 1000)
-  const [appFee, setAppFee] = useState<number>(0)
-  const [begStepIndex, setBegStepIndex] = useState(0)
-  const [stage, setStage] = useState<Stage>('select')
-  const [busy, setBusy] = useState(false)
+  const [stage, setStage] = useState<Stage>('choose')
+  const [busy, setBusy] = useState<'carryover' | 'refund' | null>(null)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [userGender, setUserGender] = useState<UserGender>(null)
-  const [result, setResult] = useState<{ refund: number; appRevenue: number } | null>(null)
+  const amountLabel = `${DEPOSIT_AMOUNT.toLocaleString()}원`
+
+  const loadCurrentChoice = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `/api/matches/${encodeURIComponent(matchId)}/deposit-carryover`,
+        { cache: 'no-store' },
+      )
+      if (!response.ok) return
+      const data = await response.json() as { carryover: CarryoverRow | null }
+      if (data.carryover?.status === 'available' || data.carryover?.status === 'applied') {
+        setStage('carryover_done')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [matchId])
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) return
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
-      supabase
-        .from('profiles')
-        .select('gender')
-        .eq('user_id', user.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data?.gender === 'male' || data?.gender === 'female') {
-            setUserGender(data.gender)
-          }
-        })
-    }).catch(() => undefined)
-  }, [])
+    void loadCurrentChoice()
+  }, [loadCurrentChoice])
 
-  async function submit(finalAppFee: number) {
+  async function chooseCarryover() {
     if (busy) return
-    setBusy(true)
+    setBusy('carryover')
     setError(null)
-    const normalizedAppFee = Math.max(0, Math.min(total, Math.floor(finalAppFee)))
     try {
-      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/refund`, {
+      const response = await fetch(
+        `/api/matches/${encodeURIComponent(matchId)}/deposit-carryover`,
+        { method: 'POST' },
+      )
+      const data = await response.json().catch(() => ({})) as { error?: string }
+      if (!response.ok) {
+        setError(translateError(data.error))
+        return
+      }
+      setStage('carryover_done')
+    } catch {
+      setError('연결이 불안정해요. 잠시 뒤 다시 시도해 주세요.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function requestFullRefund() {
+    if (busy) return
+    setBusy('refund')
+    setError(null)
+    try {
+      const response = await fetch(`/api/matches/${encodeURIComponent(matchId)}/refund`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          app_fee_amount: normalizedAppFee,
+          refund_amount: DEPOSIT_AMOUNT,
           zero_refund_reasons: null,
           zero_refund_comment: null,
         }),
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
+      const data = await response.json().catch(() => ({})) as {
+        error?: string
+        result?: { requested_refund_amount?: number }
+      }
+      if (!response.ok) {
         setError(translateError(data.error))
         return
       }
-      const data = await res.json() as { result: { requested_refund_amount: number; app_revenue: number } }
-      setResult({ refund: data.result.requested_refund_amount, appRevenue: data.result.app_revenue })
-      setStage('done')
+      if (data.result?.requested_refund_amount !== DEPOSIT_AMOUNT) {
+        setError('환불 금액 확인이 필요해요. 자동으로 다시 처리하지 않습니다.')
+        return
+      }
+      setStage('refund_done')
     } catch {
-      setError('처리에 실패했어요.')
+      setError('연결이 불안정해요. 잠시 뒤 다시 시도해 주세요.')
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
-
-  function handleSelectClick() {
-    const decision = getAppFeeFlowDecision(appFee)
-    if (decision.kind === 'submit') {
-      submit(decision.normalizedAppFee)
-      return
-    }
-    setBegStepIndex(0)
-    setStage('ask_support')
-  }
-
-  function handleBegReject() {
-    if (begStepIndex < APP_FEE_BEG_STEPS.length - 1) {
-      setBegStepIndex((current) => current + 1)
-      return
-    }
-    setStage('notify_zero')
-  }
-
-  const refundAmount = appFeeToRefundAmount(appFee, total)
-  const currentBegAmount = APP_FEE_BEG_STEPS[begStepIndex] ?? APP_FEE_BEG_STEPS[APP_FEE_BEG_STEPS.length - 1]
-  const nextBegAmount = APP_FEE_BEG_STEPS[begStepIndex + 1]
 
   return (
-    <main className="min-h-screen booting-paper px-5 pb-28 text-boot-ink md:pb-10">
-      <div className="max-w-md mx-auto pt-6">
-        <header className="mb-6 flex items-center gap-3">
-          <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
-            <ChevronLeft size={18} />
+    <main className="min-h-screen booting-paper px-4 pb-28 text-boot-ink md:pb-10">
+      <div className="mx-auto w-full max-w-md pt-5">
+        <header className="mb-5 flex items-center gap-3">
+          <Link
+            href={`/match/${encodeURIComponent(matchId)}`}
+            aria-label="매칭 상세로 돌아가기"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-boot-hairline bg-white"
+          >
+            <ChevronLeft size={19} />
           </Link>
-          <div>
-            <h1 className="text-xl font-black">보증금 정산</h1>
-            <p className="text-xs text-gray-500 mt-0.5">환불받을 금액과 앱 기여금을 직접 정해주세요</p>
+          <div className="min-w-0">
+            <p className="text-xs font-black text-boot-primary">만남 완료</p>
+            <h1 className="text-xl font-black">보증금은 어떻게 할까요?</h1>
           </div>
         </header>
 
+        <section className="mb-4 rounded-lg border border-boot-hairline bg-white px-4 py-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+              <ShieldCheck size={21} />
+            </div>
+            <div>
+              <p className="font-black">보증금 {amountLabel}은 그대로 보장돼요</p>
+              <p className="mt-1 text-sm leading-relaxed text-boot-muted">
+                다음 매칭에 이어 쓰거나 전액 돌려받을 수 있어요. 앱 후원금은 보증금에서 차감하지 않아요.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {error && (
-          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        {stage === 'select' && (
-          <section className="glass-card rounded-3xl border border-boot-hairline p-5">
-            <div className="mb-5 grid grid-cols-[minmax(0,1fr)_118px] items-center gap-3 rounded-2xl border border-boot-hairline bg-white/75 p-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-black text-boot-primary">환불 안내</p>
-                <h2 className="mt-1 text-base font-black leading-snug text-boot-ink">
-                  약속을 지켜줘서 고마워요
-                </h2>
-                <p className="mt-1 text-[11px] leading-relaxed text-boot-muted">
-                  보증금은 전액 환불이 기본이고, 앱 기여금은 자유롭게 정할 수 있어요.
-                </p>
-              </div>
-              <SchoolMascot
-                pose="refund"
-                size="lg"
-                className="h-[118px] w-[118px] rounded-[24px] bg-white/90"
-                label="학교별 보증금 환불 안내 마스코트"
-              />
-            </div>
-
-            <p className="text-xs text-gray-500 mb-2">보증금 총액</p>
-            <p className="gradient-fate-text mb-6 text-3xl font-black tabular-nums">{total.toLocaleString()} 원</p>
-
-            <label className="text-xs text-gray-500 mb-2 block">앱 기여금</label>
-            <input
-              type="range"
-              min={0}
-              max={total}
-              step={1000}
-              value={appFee}
-              onChange={(e) => setAppFee(parseInt(e.target.value, 10))}
-              className="w-full accent-boot-primary"
-            />
-            <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-              <span>0원</span>
-              <span data-testid="refund-app-fee-current" className="text-2xl font-black text-boot-ink tabular-nums">{appFee.toLocaleString()} 원</span>
-              <span>{total.toLocaleString()}원</span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {presetAmounts.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setAppFee(value)}
-                  className={`py-2 rounded-xl text-xs font-bold border ${
-                    appFee === value
-                      ? 'border-boot-primary/40 bg-boot-primary/10 text-boot-primary'
-                      : 'border-boot-hairline bg-white/70 text-boot-body'
-                  }`}
-                >
-                  {value.toLocaleString()}원
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-boot-hairline bg-white/80 px-4 py-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-boot-muted">환불 예정 금액</span>
-                <span data-testid="refund-amount-preview" className="font-black text-boot-ink tabular-nums">{refundAmount.toLocaleString()}원</span>
-              </div>
-              <p className="mt-2 text-[11px] text-boot-muted leading-relaxed">
-                보증금은 기본 전액 환불이고, 앱 기여금은 자율 선택이에요. 0원을 선택해도 막지 않으며, 전액 환불 전에는 3,000원, 2,000원, 1,000원 순서로 한 번 더 물어봐요.
-              </p>
-            </div>
+        {loading ? (
+          <div className="flex min-h-40 items-center justify-center gap-2 text-sm text-boot-muted">
+            <Loader2 size={18} className="animate-spin" />
+            보증금 상태 확인 중
+          </div>
+        ) : stage === 'choose' ? (
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={chooseCarryover}
+              disabled={busy !== null}
+              className="flex w-full items-center gap-4 rounded-lg border-2 border-boot-primary bg-white px-4 py-5 text-left shadow-sm disabled:opacity-50"
+            >
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-boot-primary/10 text-boot-primary">
+                {busy === 'carryover' ? <Loader2 size={24} className="animate-spin" /> : <RotateCcw size={24} />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-base font-black">다음 매칭에 그대로 사용</span>
+                <span className="mt-1 block text-sm leading-relaxed text-boot-muted">
+                  다시 결제하지 않고 {amountLabel}이 다음 약속에 자동으로 이어져요.
+                </span>
+              </span>
+            </button>
 
             <button
               type="button"
-              onClick={handleSelectClick}
-              disabled={busy}
-              className="btn-gradient w-full mt-6 py-3 rounded-2xl text-sm font-bold disabled:opacity-40"
+              onClick={requestFullRefund}
+              disabled={busy !== null}
+              className="flex w-full items-center gap-4 rounded-lg border border-boot-hairline bg-white px-4 py-5 text-left shadow-sm disabled:opacity-50"
             >
-              결정했어요
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+                {busy === 'refund' ? <Loader2 size={24} className="animate-spin" /> : <WalletCards size={24} />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-base font-black">{amountLabel} 전액 환불</span>
+                <span className="mt-1 block text-sm leading-relaxed text-boot-muted">
+                  결제했던 수단으로 전액 환불을 요청해요.
+                </span>
+              </span>
             </button>
-          </section>
-        )}
-
-        {stage === 'ask_support' && (
-          <SanjiCard
-            speech={`${currentBegAmount.toLocaleString()}원만 남겨주실래요?`}
-            sub={`보증금 ${totalLabel} 중 ${currentBegAmount.toLocaleString()}원만 앱 운영비로 남기고 나머지는 환불돼요.`}
-            acceptLabel={`${currentBegAmount.toLocaleString()}원 남기기`}
-            rejectLabel={nextBegAmount ? `${nextBegAmount.toLocaleString()}원도 부담돼요` : '그래도 전액 환불'}
-            onAccept={() => submit(currentBegAmount)}
-            onReject={handleBegReject}
-            busy={busy}
-          />
-        )}
-
-        {stage === 'notify_zero' && (
-          <ConfirmCard
-            title="전액 환불로 진행할까요?"
-            body="0원을 선택해도 전액 환불은 가능해요. 다만 운영비 0원 선택 기록은 정산 내역에 남습니다."
-            primaryLabel="전액 환불 확정"
-            secondaryLabel="1,000원 남기기"
-            danger
-            onPrimary={() => submit(0)}
-            onSecondary={() => submit(1000)}
-            busy={busy}
-          >
-            <ReactionComic userGender={userGender} />
-          </ConfirmCard>
-        )}
-
-        {stage === 'done' && result && (
-          <section className="glass-card rounded-3xl p-6 text-center">
-            <p className="mb-1 text-sm text-boot-muted">정산 완료</p>
-            <p className="text-3xl font-black gradient-fate-text mb-1">
-              {result.refund.toLocaleString()} 원 환불
+          </div>
+        ) : (
+          <section className="rounded-lg border border-boot-hairline bg-white px-5 py-7 text-center">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+              <Check size={28} strokeWidth={3} />
+            </span>
+            <h2 className="mt-4 text-xl font-black">
+              {stage === 'carryover_done' ? '다음 매칭 보증금으로 보관했어요' : '전액 환불을 접수했어요'}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-boot-muted">
+              {stage === 'carryover_done'
+                ? `다음 매칭 결제 단계에서 ${amountLabel}이 자동 적용돼요.`
+                : '결제사 처리 결과는 알림에서 확인할 수 있어요.'}
             </p>
-            <p className="mb-5 text-[11px] font-bold text-boot-primary">
-              앱 기여금 {result.appRevenue.toLocaleString()}원
-            </p>
+            {stage === 'carryover_done' && (
+              <button
+                type="button"
+                onClick={requestFullRefund}
+                disabled={busy !== null}
+                className="mt-5 w-full rounded-lg border border-boot-hairline bg-white py-3 text-sm font-bold text-boot-body disabled:opacity-50"
+              >
+                {busy === 'refund' ? '환불 요청 중...' : '아직 사용 전이라면 전액 환불하기'}
+              </button>
+            )}
             <Link
-              href={`/match/${encodeURIComponent(matchId)}`}
-              className="btn-gradient w-full block py-3 rounded-2xl text-sm font-bold"
+              href="/match"
+              className="mt-3 block w-full rounded-lg bg-boot-primary py-3 text-sm font-black text-white"
             >
-              매칭 상세로
+              매칭 홈으로
             </Link>
-            <button
-              type="button"
-              onClick={() => router.push('/notifications')}
-              className="mt-2 w-full rounded-2xl border border-boot-hairline bg-white/80 py-3 text-sm text-boot-body"
-            >
-              알림 확인
-            </button>
           </section>
         )}
+
+        <p className="mt-5 text-center text-xs leading-relaxed text-boot-muted">
+          14일 동안 선택하지 않으면 전액 환불 요청이 자동으로 접수됩니다.
+        </p>
       </div>
     </main>
   )
 }
 
-function SanjiCard({
-  speech,
-  sub,
-  acceptLabel,
-  rejectLabel,
-  onAccept,
-  onReject,
-  busy,
-}: {
-  speech: string
-  sub: string
-  acceptLabel: string
-  rejectLabel: string
-  onAccept: () => void
-  onReject: () => void
-  busy: boolean
-}) {
-  return (
-    <div className="flex flex-col items-center">
-      <div className="relative mx-auto w-full max-w-[300px] z-10">
-        <div className="glass-card rounded-3xl px-5 py-4 text-center shadow-lg">
-          <p className="text-base font-black leading-snug text-boot-ink">{speech}</p>
-          <p className="mt-2 text-xs leading-relaxed text-boot-body">{sub}</p>
-        </div>
-        <div className="flex justify-center mt-[-1px]">
-          <svg width="28" height="14" viewBox="0 0 28 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon
-              points="0,0 28,0 14,14"
-              fill="rgba(255,255,255,0.92)"
-              stroke="rgba(25,35,45,0.12)"
-              strokeWidth="1"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      <div className="mt-[-8px]">
-        <SchoolMascot
-          pose="refund"
-          size="lg"
-          className="h-[118px] w-[118px] rounded-[24px] bg-white/90"
-          label="학교별 앱 기여금 안내 마스코트"
-        />
-      </div>
-
-      <div className="flex gap-2 mt-3 w-full max-w-[320px]">
-        <button
-          type="button"
-          onClick={onReject}
-          disabled={busy}
-          className="flex-1 rounded-2xl border border-boot-hairline bg-white/80 py-3 text-sm text-boot-body disabled:opacity-40"
-        >
-          {rejectLabel}
-        </button>
-        <button
-          type="button"
-          onClick={onAccept}
-          disabled={busy}
-          className="flex-1 rounded-2xl border border-boot-primary/30 bg-boot-primary/10 py-3 text-sm font-bold text-boot-primary disabled:opacity-40"
-        >
-          {busy ? <Loader2 size={14} className="animate-spin inline" /> : acceptLabel}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function ConfirmCard({
-  title,
-  body,
-  primaryLabel,
-  secondaryLabel,
-  danger,
-  onPrimary,
-  onSecondary,
-  busy,
-  children,
-}: {
-  title: string
-  body: string
-  primaryLabel: string
-  secondaryLabel: string
-  danger?: boolean
-  onPrimary: () => void
-  onSecondary: () => void
-  busy: boolean
-  children?: React.ReactNode
-}) {
-  return (
-    <section className="glass-card rounded-3xl p-5">
-      <h2 className="text-lg font-black text-boot-ink">{title}</h2>
-      <p className="mt-2 text-sm leading-relaxed text-boot-body">{body}</p>
-      {children}
-      <div className="flex gap-2 mt-5">
-        <button
-          type="button"
-          onClick={onSecondary}
-          disabled={busy}
-          className="flex-1 rounded-2xl border border-boot-hairline bg-white/80 py-3 text-sm text-boot-body disabled:opacity-40"
-        >
-          {secondaryLabel}
-        </button>
-        <button
-          type="button"
-          onClick={onPrimary}
-          disabled={busy}
-          className={`flex-1 py-3 rounded-2xl text-sm font-bold disabled:opacity-40 ${
-            danger
-              ? 'border border-rose-200 bg-rose-50 text-rose-700'
-              : 'border border-boot-primary/30 bg-boot-primary/10 text-boot-primary'
-          }`}
-        >
-          {busy ? <Loader2 size={14} className="animate-spin inline" /> : primaryLabel}
-        </button>
-      </div>
-    </section>
-  )
-}
-
-function ReactionComic({ userGender }: { userGender: UserGender }) {
-  const counterpart = userGender === 'female' ? '남자' : userGender === 'male' ? '여자' : '상대'
-  const face = userGender === 'female' ? '😤' : userGender === 'male' ? '😒' : '😶'
-  return (
-    <div className="mt-4 rounded-3xl border border-boot-hairline bg-white/65 p-4">
-      <div className="rounded-2xl bg-white text-slate-950 px-4 py-3 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-4xl">
-            {face}
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-black text-slate-500">상대방 반응 미리보기</p>
-            <p className="mt-1 text-sm font-black">{counterpart}가 살짝 삐진 장면</p>
-            <p className="mt-1 text-xs text-slate-500">아... 앱 기여금 0원...?</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function translateError(code?: string): string {
+function translateError(code?: string) {
   switch (code) {
-    case 'match_not_completed':                    return '완료된 매칭이 아니에요.'
-    case 'no_show_cannot_refund':                  return '노쇼 처리되어 환불할 수 없어요.'
-    case 'deposit_not_found_or_already_refunded':  return '이미 환불 처리됐거나 보증금이 없어요.'
-    case 'refund_exceeds_deposit':                 return '보증금보다 많이 받을 수는 없어요.'
-    case 'invalid_refund_amount':                  return '잘못된 금액이에요.'
-    case 'both_continue_required':                 return '양쪽 모두 이어가기를 선택한 뒤에만 보증금을 정산할 수 있어요.'
-    case 'already_auto_refunded':                  return '한 명이라도 종료를 선택해 이미 전액 환불 처리됐어요.'
-    default:                                       return '처리에 실패했어요.'
+    case 'match_not_completed':
+      return '만남이 완료된 뒤 선택할 수 있어요.'
+    case 'not_match_participant':
+      return '본인이 참여한 만남의 보증금만 처리할 수 있어요.'
+    case 'no_show_cannot_carryover':
+    case 'no_show_cannot_refund':
+      return '노쇼 처리된 보증금은 이월하거나 환불할 수 없어요.'
+    case 'refund_already_requested':
+      return '이미 환불 요청이 접수됐어요.'
+    case 'deposit_not_available_for_carryover':
+    case 'deposit_not_found_or_already_refunded':
+      return '처리할 수 있는 보증금을 찾지 못했어요.'
+    case 'refund_settlement_pending':
+      return '환불 요청은 저장됐고 결제사 처리를 기다리고 있어요.'
+    case 'carryover_cancel_failed':
+      return '이월 상태를 확인하지 못해 환불을 멈췄어요. 다시 시도해 주세요.'
+    default:
+      return '보증금 처리에 실패했어요. 잠시 뒤 다시 시도해 주세요.'
   }
 }
