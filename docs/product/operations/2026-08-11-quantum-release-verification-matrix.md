@@ -114,3 +114,15 @@
 - 모바일 보증금 화면의 잘못된 `계약 연결 전` 안내와 비활성 버튼을 제거했다. 로그인 토큰으로 실제 `다음 매칭 이월`과 `전액 환불` API를 호출하며, 금융 선택 전에 확인창을 거친다.
 - 원격 deposits 재조회 결과는 `pending` 1건, 승인 키 0건, 결제 완료 시각 없음이다. 결제창 진입은 확인됐지만 승인·환불 E2E는 아직 완료가 아니다.
 - 새 Android AAB와 APK는 2026-08-12 재조회에서도 `IN_QUEUE`, 산출물 없음이다. APK 생성 전에는 실기기 Google·Kakao 복귀를 검증할 수 없다.
+
+## 2026-08-12 최종 코드리뷰·배포 준비 갱신
+
+- 위 `IN_QUEUE` 기록은 이후 완료됐다. Preview APK v4 빌드 `e8e4afd6-29d5-4829-9cc0-6f649ec10569`과 Production AAB v5 빌드 `82bb534d-3391-4129-bea7-852fee2af13e`는 모두 `FINISHED`다.
+- APK는 `artifacts/releases/android/2026-08-12/quantum-campus-preview-v4.apk`에 보관했고 SHA-256은 `5E1F09FB976D3EAD1490FACA5E947AB66A3EB4CB69475346F732A2CCD50C3563`이다. AAB는 `artifacts/releases/android/2026-08-12/quantum-campus-production-v5.aab`에 보관했고 SHA-256은 `6DD35B8E5A6B6E041958FBEB4039451168ED7CED9C047A5D37EA0D793D3339AE`다.
+- EAS 빌드 원본 로그에서 preview 환경의 운영 API 주소와 정확한 Supabase 프로젝트 주소가 builder 환경에 주입된 것을 확인했다. 공개 키 값은 검증 기록에 남기지 않는다.
+- 깨끗한 검증 작업공간의 `c9ca817`에서 웹 typecheck·production build, 모바일 typecheck·Expo Doctor 20/20·자동 테스트 153/153이 통과했다.
+- 코드리뷰에서 보증금 이월 뒤 만료된 Toss 주문번호 재사용, 환불 worker의 누락 의존 파일, 모바일 만남 사진첩의 쿠키 전용 인증, 외모분석 배포 필수 환경값 누락을 수정했다.
+- 검증된 커밋은 `codex/quantum-handphone` 브랜치로 GitHub에 올렸다. `main`에는 병합하지 않았다.
+- Vercel 브라우저는 아직 로그인 화면이며 CLI 토큰도 없다. 따라서 AI HTTPS 프로젝트 생성, `AI_SERVER_URL` 등록, 최신 웹 배포와 첫 Cron 실행은 사용자 로그인 전까지 `BLOCKED`다.
+- 현재 PC에는 `adb`가 없어 APK 자동 설치를 실행할 수 없다. APK를 실제 Android 휴대폰에 설치한 뒤 Google·Kakao 복귀를 사람 눈으로 확인해야 한다.
+- Toss 원격 기록은 계속 `pending`이고 승인 키·완료 시각이 없다. 테스트 결제 승인, 취소 API, 전액 환불, 다음 매칭 이월은 최신 웹 배포 뒤 실제 테스트 결제 1건으로 확인한다.

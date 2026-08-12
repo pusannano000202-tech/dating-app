@@ -83,3 +83,19 @@
 - `.next*`, `.tmp`, 로그, 화면 캡처 원본 중 제품 자산이 아닌 파일
 - 새벽벌 게임 작업과 Quantum 앱에 무관한 문서
 - 검증하지 않은 대량 변경을 섞는 `git add .`
+
+## 2026-08-12 실행 결과
+
+| 영역 | 최종 확인 |
+| --- | --- |
+| GitHub | `codex/quantum-handphone` 브랜치 push 완료. `main` 미병합 |
+| 웹 | 깨끗한 작업공간에서 typecheck·production build 통과 |
+| 모바일 | typecheck·Expo Doctor 20/20·자동 테스트 153/153 통과 |
+| Android | Preview APK v4·Production AAB v5 빌드 완료 및 로컬 산출물 해시 고정 |
+| EAS 환경 | 빌드 로그에서 운영 API 주소·Supabase 프로젝트 주소 주입 확인 |
+| Toss | 만료 주문 회전·환불 worker·이월 경계 수정 완료, 실제 승인 원본 E2E는 미검증 |
+| Supabase | 앱 프로젝트 migration·관리 RPC 권한 보강 확인. Free 플랜 비밀번호 유출 차단 경고는 OTP·OAuth 구조에서 출시 즉시 차단은 아님 |
+| Vercel | 로그인과 CLI 토큰이 없어 AI HTTPS 배포·최신 웹 배포는 BLOCKED |
+| 실기기 | 현재 PC에 `adb`가 없어 APK 설치·Google/Kakao 복귀는 미검증 |
+
+남은 사람 작업은 Vercel 로그인, APK 실휴대폰 설치, Toss 테스트 승인 1건이다. 이 세 가지가 끝나기 전에는 production 전체 완료로 판정하지 않는다.
