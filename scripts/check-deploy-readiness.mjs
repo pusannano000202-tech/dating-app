@@ -3,8 +3,13 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import {
+  classifyAiServerSecret,
+  classifyAiServerUrl,
+} from './deploy-readiness-env.mjs'
 
 const root = process.cwd()
+const COMMAND_TIMEOUT_MS = 10_000
 const env = {
   ...readLocalEnvFile(),
   ...process.env,
@@ -35,6 +40,7 @@ checks.push({
 checks.push(checkSecretLeaks())
 checks.push(checkPaymentEnv())
 checks.push(checkDevPreviewAuthEnv())
+checks.push(...checkAiServerEnv())
 
 checks.push({
   key: 'NEXT_PUBLIC_APP_ORIGIN',
@@ -85,6 +91,7 @@ function checkVercelCli() {
     cwd: root,
     encoding: 'utf8',
     shell: process.platform === 'win32',
+    timeout: COMMAND_TIMEOUT_MS,
   })
 
   return {
@@ -107,6 +114,7 @@ function checkVercelAuth() {
     cwd: root,
     encoding: 'utf8',
     shell: process.platform === 'win32',
+    timeout: COMMAND_TIMEOUT_MS,
     env: {
       ...process.env,
       CI: '1',
@@ -127,6 +135,7 @@ function commandExists(command) {
     ? spawnSync('where.exe', [command], {
       cwd: root,
       encoding: 'utf8',
+      timeout: COMMAND_TIMEOUT_MS,
     })
     : spawnSync('sh', ['-lc', `command -v ${command}`], {
       cwd: root,
@@ -171,6 +180,21 @@ function checkDevPreviewAuthEnv() {
     status: devAuthEnabled || legacyDemoEnabled ? 'ACTION_REQUIRED' : 'SET',
     purpose: 'production deployments must not enable dev preview auth flags',
   }
+}
+
+function checkAiServerEnv() {
+  return [
+    {
+      key: 'AI_SERVER_URL',
+      status: classifyAiServerUrl(env.AI_SERVER_URL),
+      purpose: 'appearance scoring requires a configured internal AI service URL',
+    },
+    {
+      key: 'AI_SERVER_SECRET',
+      status: classifyAiServerSecret(env.AI_SERVER_SECRET),
+      purpose: 'Next.js and the internal AI service must share a non-placeholder secret',
+    },
+  ]
 }
 
 function classifyAppOrigin(value) {
@@ -243,6 +267,10 @@ function getNextStep(key) {
       return 'keep `NEXT_PUBLIC_DEV_AUTH_BYPASS=false` and remove or disable legacy dev preview flags in production.'
     case 'NEXT_PUBLIC_APP_ORIGIN':
       return 'set `NEXT_PUBLIC_APP_ORIGIN` to the https Vercel production or preview URL.'
+    case 'AI_SERVER_URL':
+      return 'set `AI_SERVER_URL` to the deployed https appearance-scoring service URL.'
+    case 'AI_SERVER_SECRET':
+      return 'set the same 32+ character `AI_SERVER_SECRET` in Vercel and the AI service.'
     default:
       return 'inspect this check and resolve it before deploying.'
   }
