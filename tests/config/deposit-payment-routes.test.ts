@@ -6,6 +6,7 @@ import { join } from 'node:path'
 import {
   buildDepositPaymentRequestDraft,
   buildDepositCustomerKey,
+  getTossDepositOrderAction,
   getDepositPaymentReadiness,
   normalizeDepositReturnPath,
   resolveDepositPaymentProvider,
@@ -237,6 +238,40 @@ test('deposit checkout order name is readable Korean copy for Toss users', () =>
 
   assert.equal(draft.orderName, '부팅 보증금 10,000원')
   assert.doesNotMatch(draft.orderName, /[?�]|遺|蹂|湲|寃|留/)
+})
+
+test('fresh deposit attempts get unique order IDs even in the same millisecond', () => {
+  const previousNow = Date.now
+
+  try {
+    Date.now = () => 1_786_459_200_000
+    const first = buildDepositPaymentRequestDraft({
+      provider: 'toss',
+      groupId: 'group-1',
+      userId: 'user-1',
+      origin: 'https://booting.example',
+    })
+    const second = buildDepositPaymentRequestDraft({
+      provider: 'toss',
+      groupId: 'group-1',
+      userId: 'user-1',
+      origin: 'https://booting.example',
+    })
+
+    assert.notEqual(first.orderId, second.orderId)
+  } finally {
+    Date.now = previousNow
+  }
+})
+
+test('only failed terminal Toss attempts are safe to rotate', () => {
+  assert.equal(getTossDepositOrderAction('EXPIRED'), 'rotate')
+  assert.equal(getTossDepositOrderAction('ABORTED'), 'rotate')
+  assert.equal(getTossDepositOrderAction('READY'), 'reuse')
+  assert.equal(getTossDepositOrderAction('IN_PROGRESS'), 'reconcile')
+  assert.equal(getTossDepositOrderAction('DONE'), 'reconcile')
+  assert.equal(getTossDepositOrderAction('CANCELED'), 'reconcile')
+  assert.equal(getTossDepositOrderAction('PARTIAL_CANCELED'), 'reconcile')
 })
 
 test('local env example documents mock and Toss sandbox payment settings without secrets', () => {
