@@ -10,7 +10,7 @@ export async function getDepartmentCatalog(
   schoolId: string,
   signal?: AbortSignal,
 ): Promise<MobileDepartment[]> {
-  const runtime = readMobileConfig(process.env);
+  const runtime = readMobileConfig();
   try {
     const response = await fetch(
       `${runtime.apiOrigin}/university-departments/${encodeURIComponent(schoolId)}.json`,

@@ -7,7 +7,7 @@ let client: ReturnType<typeof createQuantumApiClient> | null = null;
 export function getQuantumApiClient() {
   if (client) return client;
 
-  const runtime = readMobileConfig(process.env);
+  const runtime = readMobileConfig();
   const supabase = getSupabaseClient();
   client = createQuantumApiClient({
     origin: runtime.apiOrigin,

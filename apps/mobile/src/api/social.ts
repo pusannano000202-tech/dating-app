@@ -229,7 +229,7 @@ export async function getSocialApiClient() {
     import('../config/runtime'),
     import('../lib/supabase'),
   ]).then(([{ readMobileConfig }, { getSupabaseClient }]) => {
-    const runtime = readMobileConfig(process.env);
+    const runtime = readMobileConfig();
     const supabase = getSupabaseClient();
     return createSocialApiClient({
       origin: runtime.apiOrigin,

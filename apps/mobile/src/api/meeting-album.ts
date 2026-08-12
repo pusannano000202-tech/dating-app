@@ -137,7 +137,7 @@ let defaultClient: ReturnType<typeof createMeetingAlbumApi> | null = null;
 
 export function getMeetingAlbumApi() {
   if (defaultClient) return defaultClient;
-  const runtime = readMobileConfig(process.env);
+  const runtime = readMobileConfig();
   defaultClient = createMeetingAlbumApi({
     origin: runtime.apiOrigin,
     getAccessToken: async () => {

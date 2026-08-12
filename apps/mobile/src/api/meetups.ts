@@ -155,7 +155,7 @@ let singleton: ReturnType<typeof createMeetupsApiClient> | null = null;
 
 export function getMeetupsApiClient() {
   if (singleton) return singleton;
-  const runtime = readMobileConfig(process.env);
+  const runtime = readMobileConfig();
   singleton = createMeetupsApiClient({
     origin: runtime.apiOrigin,
     getAccessToken: async () => {
