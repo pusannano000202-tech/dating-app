@@ -67,6 +67,45 @@ test('new deposit checkout consumes an available carryover before opening a prov
   assert.match(route, /reused_carryover: true/)
 })
 
+test('match UI deposit checkout returns a no-payment result when carryover covers the deposit', () => {
+  const route = readSource('app/api/deposits/route.ts')
+
+  const applyIndex = route.indexOf(".rpc('apply_available_deposit_carryover'")
+  const providerIndex = route.indexOf('resolveDepositPaymentProvider()')
+  assert.ok(applyIndex >= 0)
+  assert.ok(providerIndex >= 0)
+  assert.ok(applyIndex < providerIndex)
+  assert.match(route, /provider: 'carryover'/)
+  assert.match(route, /reused_carryover: true/)
+  assert.match(route, /payment_required: false/)
+  assert.match(route, /status: 'held'/)
+})
+
+test('expired Toss attempts rotate only an unconfirmed pending order with compare-and-set', () => {
+  const route = readSource('app/api/deposits/route.ts')
+  const payment = readSource('lib/payments/deposit.ts')
+
+  assert.match(route, /getTossPaymentByOrderId/)
+  assert.match(route, /getTossDepositOrderAction/)
+  assert.match(payment, /status === 'EXPIRED'/)
+  assert.match(payment, /status === 'ABORTED'/)
+  assert.match(route, /error\.code === 'NOT_FOUND_PAYMENT_SESSION'/)
+  assert.match(route, /\.eq\('status', 'pending'\)/)
+  assert.match(route, /\.eq\('toss_order_id', previousOrderId\)/)
+  assert.match(route, /\.is\('toss_payment_key', null\)/)
+  assert.match(route, /deposit_payment_reconciliation_required/)
+})
+
+test('existing deposit amount is validated before it can satisfy the match', () => {
+  const route = readSource('app/api/deposits/route.ts')
+
+  const amountCheckIndex = route.indexOf('deposit.amount !== DEPOSIT_AMOUNT')
+  const existingDepositIndex = route.indexOf("deposit?.status === 'paid'")
+  assert.ok(amountCheckIndex >= 0)
+  assert.ok(existingDepositIndex >= 0)
+  assert.ok(amountCheckIndex < existingDepositIndex)
+})
+
 test('Vercel cron invokes the bounded refund worker with a dedicated cron secret', () => {
   const worker = readSource('app/api/internal/payments/refunds/process/route.ts')
   const vercel = JSON.parse(readSource('vercel.json')) as {
