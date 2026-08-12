@@ -127,7 +127,7 @@ let defaultClient: ReturnType<typeof createDepositApi> | null = null;
 export function getDepositApi() {
   if (defaultClient) return defaultClient;
 
-  const runtime = readMobileConfig(process.env);
+  const runtime = readMobileConfig();
   defaultClient = createDepositApi({
     origin: runtime.apiOrigin,
     getAccessToken: async () => {

@@ -113,7 +113,7 @@ let defaultClient: ReturnType<typeof createProfilePhotosApi> | null = null;
 export function getProfilePhotosApi() {
   if (defaultClient) return defaultClient;
 
-  const runtime = readMobileConfig(process.env);
+  const runtime = readMobileConfig();
   defaultClient = createProfilePhotosApi({
     origin: runtime.apiOrigin,
     getAccessToken: async () => {

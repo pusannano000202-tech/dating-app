@@ -18,7 +18,7 @@ let autoRefreshRegistered = false;
 export function getSupabaseClient(): SupabaseClient {
   if (client) return client;
 
-  const config = readMobileConfig(process.env);
+  const config = readMobileConfig();
   client = createClient(config.supabaseUrl, config.supabasePublishableKey, {
     auth: {
       storage: Platform.OS === 'web' ? AsyncStorage : secureStorage,

@@ -6,7 +6,15 @@ export type MobileRuntimeConfig = {
   supabasePublishableKey: string;
 };
 
-export function readMobileConfig(environment: MobileRuntimeEnvironment): MobileRuntimeConfig {
+const expoPublicEnvironment: MobileRuntimeEnvironment = {
+  EXPO_PUBLIC_API_ORIGIN: process.env.EXPO_PUBLIC_API_ORIGIN,
+  EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
+  EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+};
+
+export function readMobileConfig(
+  environment: MobileRuntimeEnvironment = expoPublicEnvironment,
+): MobileRuntimeConfig {
   const apiOrigin = requireHttpUrl(environment.EXPO_PUBLIC_API_ORIGIN, 'EXPO_PUBLIC_API_ORIGIN');
   const supabaseUrl = requireHttpUrl(environment.EXPO_PUBLIC_SUPABASE_URL, 'EXPO_PUBLIC_SUPABASE_URL');
   const supabasePublishableKey = requireValue(
