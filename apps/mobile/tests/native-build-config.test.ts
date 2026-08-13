@@ -40,7 +40,7 @@ test('native splash screen uses the Quantum launch asset', () => {
 
   assert.ok(splashPlugin);
   assert.deepEqual(splashPlugin[1], {
-    backgroundColor: '#082438',
+    backgroundColor: '#FFF9F6',
     image: './assets/splash-icon.png',
     imageWidth: 200,
     resizeMode: 'contain',
