@@ -18,7 +18,7 @@ export default function TabLayout() {
         const Icon = iconByRoute[route.name as keyof typeof iconByRoute] ?? House;
         return {
           headerShown: false,
-          tabBarActiveTintColor: colors.school,
+          tabBarActiveTintColor: colors.action,
           tabBarInactiveTintColor: colors.muted,
           tabBarHideOnKeyboard: true,
           tabBarStyle: {
