@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseAdminClient } from '@/lib/supabase-admin'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
 
 interface CreateInviteBody {
   group_id?: unknown
@@ -10,16 +11,21 @@ interface CreateInviteBody {
 }
 
 export async function GET(req: NextRequest) {
-  // RPC 는 SECURITY DEFINER 이고 pending + not expired 만 안전 필드를 반환하므로
-  // 미로그인 사용자에게도 허용한다. 가입자/회원만의 미리보기로 막으면 초대 링크 UX 가 어색.
-  const supabase = createSupabaseServerClient()
-
   const token = req.nextUrl.searchParams.get('token')
   if (!token) {
     return jsonError('token_required', 400)
   }
 
-  const { data, error } = await supabase
+  if (!/^[a-f0-9]{32}$/i.test(token)) {
+    return jsonError('invite_not_found', 404)
+  }
+
+  const service = createSupabaseAdminClient()
+  if (!service) {
+    return jsonError('service_unavailable', 503)
+  }
+
+  const { data, error } = await service
     .rpc('get_group_invite_by_token', { p_token: token })
     .maybeSingle()
 
@@ -31,14 +37,15 @@ export async function GET(req: NextRequest) {
     return jsonError('invite_not_found', 404)
   }
 
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
 
   return NextResponse.json({ invite: data, authenticated: Boolean(user) })
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createSupabaseServerClient()
-  const user = await getUser(supabase)
+  const supabase = createSupabaseRequestClient(req)
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return jsonError('Unauthorized', 401)
   }
@@ -94,11 +101,6 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ invite: data }, { status: 201 })
-}
-
-async function getUser(supabase: ReturnType<typeof createSupabaseServerClient>) {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
 }
 
 async function readJson(req: NextRequest): Promise<Record<string, unknown>> {
