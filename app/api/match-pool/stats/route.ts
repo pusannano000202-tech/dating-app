@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseAdminClient } from '@/lib/supabase-admin'
 import {
   EMPTY_MATCH_POOL_STATS,
   aggregateMatchPoolStats,
@@ -7,8 +7,15 @@ import {
 } from '@/lib/match-pool-stats'
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient()
-  const { data, error } = await supabase.rpc('get_match_pool_stats')
+  const service = createSupabaseAdminClient()
+  if (!service) {
+    return NextResponse.json(
+      { ...EMPTY_MATCH_POOL_STATS, error: 'service_unavailable' },
+      { status: 503 },
+    )
+  }
+
+  const { data, error } = await service.rpc('get_match_pool_stats')
 
   if (error) {
     console.error('[match-pool/stats] Supabase RPC failed', {
