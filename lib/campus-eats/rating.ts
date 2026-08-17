@@ -12,9 +12,27 @@ export interface EloRatingResult {
   loserDelta: number
 }
 
-export function applyEloRating({ winnerId, loserId, winnerRating, loserRating }: RatedComparison): EloRatingResult {
+export function getCampusEatsEvidenceWeight({
+  visitedCandidateCount,
+  totalCandidateCount,
+  validComparisonCount,
+}: {
+  visitedCandidateCount: number
+  totalCandidateCount: number
+  validComparisonCount: number
+}): number {
+  const coverage = totalCandidateCount > 0
+    ? Math.min(1, Math.max(0, visitedCandidateCount / totalCandidateCount))
+    : 0
+  const comparisonDepth = Math.min(1, Math.max(0, validComparisonCount / 6))
+  const weight = Math.min(1, 0.5 + coverage * 0.3 + comparisonDepth * 0.21)
+  return Number((weight + Number.EPSILON).toFixed(2))
+}
+
+export function applyEloRating({ winnerId, loserId, winnerRating, loserRating, evidenceWeight = 1 }: RatedComparison): EloRatingResult {
   const expectedWinnerScore = 1 / (1 + 10 ** ((loserRating - winnerRating) / 400))
-  const winnerDelta = ELO_K_FACTOR * (1 - expectedWinnerScore)
+  const safeEvidenceWeight = Math.min(1, Math.max(0.5, evidenceWeight))
+  const winnerDelta = ELO_K_FACTOR * (1 - expectedWinnerScore) * safeEvidenceWeight
 
   return {
     winnerId,

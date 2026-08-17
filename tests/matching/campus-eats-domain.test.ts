@@ -4,7 +4,9 @@ import test from 'node:test'
 import {
   applyBattleAction,
   createBracketSession,
+  createVisitedTournamentSession,
   getNextPair,
+  getTournamentProgress,
   pairKey,
   resumeBracketSession,
 } from '../../lib/campus-eats/bracket'
@@ -14,30 +16,59 @@ import {
   createPersonalRatingState,
   restorePersonalRatingState,
 } from '../../lib/campus-eats/personal-rating'
-import { applyEloRating, carrySeasonRating, getSemesterSeason } from '../../lib/campus-eats/rating'
+import {
+  applyEloRating,
+  carrySeasonRating,
+  getSemesterSeason,
+} from '../../lib/campus-eats/rating'
 import { PNU_CAMPUS_EATS_CATEGORIES } from '../../lib/campus-eats/fixtures/pnu-categories'
 import type { BattleAction, CandidateChoice } from '../../lib/campus-eats/types'
+
+const personalRatingModule = require('../../lib/campus-eats/personal-rating') as {
+  markPersonalRatingVisits?: (state: unknown, candidateIds: readonly string[]) => any
+  applyPersonalRatingEvent: (state: unknown, event: { eventId: string; winnerId: string; loserId: string }) => any
+}
+const ratingModule = require('../../lib/campus-eats/rating') as {
+  getCampusEatsEvidenceWeight?: (input: {
+    visitedCandidateCount: number
+    totalCandidateCount: number
+    validComparisonCount: number
+  }) => number
+  applyEloRating: (input: {
+    winnerId: string
+    loserId: string
+    winnerRating: number
+    loserRating: number
+    evidenceWeight?: number
+  }) => { winnerRating: number; loserRating: number }
+}
+const markPersonalRatingVisits = personalRatingModule.markPersonalRatingVisits ?? ((state: unknown) => state as any)
+const getCampusEatsEvidenceWeight = ratingModule.getCampusEatsEvidenceWeight ?? (() => 0)
 
 function ids(count: number) {
   return Array.from({ length: count }, (_, index) => `restaurant-${index + 1}`)
 }
 
 test('personal device ratings apply a valid event once and ignore its replay', () => {
-  const initial = createPersonalRatingState(['restaurant-a', 'restaurant-b'])
-  const first = applyPersonalRatingEvent(initial, {
+  const initial = markPersonalRatingVisits(
+    createPersonalRatingState(['restaurant-a', 'restaurant-b']),
+    ['restaurant-a', 'restaurant-b'],
+  )
+  const first = personalRatingModule.applyPersonalRatingEvent(initial, {
     eventId: 'personal-event-1',
     winnerId: 'restaurant-a',
     loserId: 'restaurant-b',
   })
 
   assert.equal(first.applied, true)
-  assert.equal(first.winnerDelta, 8)
-  assert.equal(first.loserDelta, -8)
-  assert.equal(first.state.ratings['restaurant-a'], 1508)
-  assert.equal(first.state.ratings['restaurant-b'], 1492)
+  assert.equal(first.evidenceWeight, 0.8)
+  assert.equal(first.winnerDelta, 6)
+  assert.equal(first.loserDelta, -6)
+  assert.equal(first.state.ratings['restaurant-a'], 1506)
+  assert.equal(first.state.ratings['restaurant-b'], 1494)
   assert.equal(first.state.validComparisonCount, 1)
 
-  const replay = applyPersonalRatingEvent(first.state, {
+  const replay = personalRatingModule.applyPersonalRatingEvent(first.state, {
     eventId: 'personal-event-1',
     winnerId: 'restaurant-a',
     loserId: 'restaurant-b',
@@ -46,6 +77,7 @@ test('personal device ratings apply a valid event once and ignore its replay', (
   assert.equal(replay.applied, false)
   assert.equal(replay.winnerDelta, 0)
   assert.equal(replay.loserDelta, 0)
+  assert.equal(replay.evidenceWeight, 0)
   assert.deepEqual(replay.state, first.state)
 })
 
@@ -71,16 +103,47 @@ test('personal device ratings restore known candidates and discard stale candida
   }, ['restaurant-a', 'restaurant-b'])
 
   assert.deepEqual(restored, {
-    version: 1,
+    version: 2,
     ratings: { 'restaurant-a': 1512, 'restaurant-b': 1500 },
     validComparisonCount: 3,
     appliedEventIds: ['event-1'],
+    visitedCandidateIds: [],
   })
 
   assert.deepEqual(
     restorePersonalRatingState({ broken: true }, ['restaurant-a']),
     createPersonalRatingState(['restaurant-a']),
   )
+})
+
+test('visit evidence weight grows with candidate coverage and comparison depth', () => {
+  const novice = getCampusEatsEvidenceWeight({
+    visitedCandidateCount: 2,
+    totalCandidateCount: 8,
+    validComparisonCount: 0,
+  })
+  const experienced = getCampusEatsEvidenceWeight({
+    visitedCandidateCount: 7,
+    totalCandidateCount: 8,
+    validComparisonCount: 6,
+  })
+
+  assert.equal(novice, 0.58)
+  assert.equal(experienced, 0.97)
+  assert.ok(experienced > novice)
+})
+
+test('only verified visited candidates are stored once in personal evidence', () => {
+  const initial = createPersonalRatingState(['restaurant-a', 'restaurant-b', 'restaurant-c'])
+  const marked = markPersonalRatingVisits(initial, [
+    'restaurant-a',
+    'restaurant-a',
+    'unknown-restaurant',
+    'restaurant-c',
+  ])
+
+  assert.deepEqual(marked.visitedCandidateIds, ['restaurant-a', 'restaurant-c'])
+  assert.equal(marked.version, 2)
 })
 
 function candidateAction(
@@ -105,18 +168,32 @@ function skipAction(eventId: string, candidateAId: string, candidateBId: string)
   }
 }
 
-test('PNU category fixtures expose 13 verified places per category without held candidates', () => {
-  assert.deepEqual(PNU_CAMPUS_EATS_CATEGORIES.map((category) => category.id), ['donkatsu', 'coffee'])
+test('PNU category fixtures expose the verified 93-store, 94-card tournament bank', () => {
+  const expectedCategoryCounts = {
+    donkatsu: 14,
+    pizza: 12,
+    chicken: 14,
+    'coffee-main': 17,
+    'coffee-north': 13,
+    gukbap: 16,
+    milmyeon: 8,
+  } as const
+
+  assert.deepEqual(PNU_CAMPUS_EATS_CATEGORIES.map((category) => category.id), Object.keys(expectedCategoryCounts))
 
   for (const category of PNU_CAMPUS_EATS_CATEGORIES) {
-    assert.equal(category.candidates.length, 13, `${category.label} active candidate count`)
+    assert.equal(category.candidates.length, expectedCategoryCounts[category.id], `${category.label} active candidate count`)
     assert.ok(category.candidates.every((candidate) => candidate.coordinateStatus === 'search_verified'))
-    assert.ok(category.candidates.every((candidate) => candidate.roadAddress.startsWith('부산 금정구 ')))
-    assert.equal(new Set(category.candidates.map((candidate) => candidate.id)).size, 13)
+    assert.ok(category.candidates.every((candidate) => /금정구|부산대학로/.test(candidate.roadAddress)))
+    assert.equal(new Set(category.candidates.map((candidate) => candidate.id)).size, category.candidates.length)
+    assert.ok(category.candidates.every((candidate) => candidate.imageSrc?.startsWith('/campus-eats/restaurants/')))
   }
 
+  const candidates = PNU_CAMPUS_EATS_CATEGORIES.flatMap((category) => category.candidates)
+  assert.equal(candidates.length, 94)
+  assert.equal(new Set(candidates.map((candidate) => candidate.canonicalStoreId)).size, 93)
   const names = PNU_CAMPUS_EATS_CATEGORIES.flatMap((category) => category.candidates.map((candidate) => candidate.name))
-  for (const heldName of ['카츠면', '동경생돈까스네', '이태리삼촌', '쑝쑝돈까스 부산대점']) {
+  for (const heldName of ['알통떡강정', '포크']) {
     assert.equal(names.includes(heldName), false, `${heldName} must stay out of active candidates`)
   }
 })
@@ -244,6 +321,52 @@ test('eight valid comparisons resolve an eight-candidate bracket in seven compar
   assert.equal(state.acceptedComparisonCount, 7)
 })
 
+test('seven visited restaurants produce one champion after exactly six Elo comparisons', () => {
+  const visitedCandidateIds = ids(7)
+  let state = createVisitedTournamentSession({
+    visitedCandidateIds,
+    ratings: Object.fromEntries(visitedCandidateIds.map((candidateId) => [candidateId, 1500])),
+  })
+  let personalRating = markPersonalRatingVisits(
+    createPersonalRatingState(visitedCandidateIds),
+    visitedCandidateIds,
+  )
+
+  const openingProgress = getTournamentProgress(state)
+  assert.equal(openingProgress.roundLabel, '8강')
+  assert.equal(openingProgress.byeCount, 1)
+  assert.equal(openingProgress.totalComparisonCount, 6)
+
+  for (let comparisonIndex = 0; comparisonIndex < 6; comparisonIndex += 1) {
+    const pair = getNextPair(state)
+    assert.ok(pair, `comparison ${comparisonIndex + 1} must have a pair`)
+    const eventId = `visited-seven-${comparisonIndex + 1}`
+    const transition = applyBattleAction(state, candidateAction(
+      eventId,
+      pair.candidateAId,
+      pair.candidateBId,
+    ))
+    assert.equal(transition.accepted, true)
+    if (!transition.accepted) continue
+    assert.equal(transition.outcome.ratingEligible, true)
+    personalRating = applyPersonalRatingEvent(personalRating, {
+      eventId,
+      winnerId: transition.outcome.winnerId as string,
+      loserId: transition.outcome.loserId as string,
+    }).state
+    state = transition.state
+  }
+
+  assert.equal(state.status, 'completed')
+  assert.equal(state.winnerId, 'restaurant-1')
+  assert.equal(state.acceptedComparisonCount, 6)
+  assert.equal(personalRating.validComparisonCount, 6)
+  assert.equal(
+    personalRating.ratings[state.winnerId as string],
+    Math.max(...visitedCandidateIds.map((candidateId) => personalRating.ratings[candidateId])),
+  )
+})
+
 test('fifteen valid comparisons resolve a sixteen-candidate bracket', () => {
   let state = createBracketSession({ candidateIds: ids(16) })
   for (let index = 0; index < 15; index += 1) {
@@ -316,6 +439,20 @@ test('Elo uses 1500/K16 at equal rating and conserves total rating', () => {
 
   assert.equal(result.winnerRating, 1508)
   assert.equal(result.loserRating, 1492)
+  assert.equal(result.winnerRating + result.loserRating, 3000)
+})
+
+test('Elo scales a valid comparison by evidence weight while conserving total rating', () => {
+  const result = ratingModule.applyEloRating({
+    winnerId: 'a',
+    loserId: 'b',
+    winnerRating: 1500,
+    loserRating: 1500,
+    evidenceWeight: 0.5,
+  })
+
+  assert.equal(result.winnerRating, 1504)
+  assert.equal(result.loserRating, 1496)
   assert.equal(result.winnerRating + result.loserRating, 3000)
 })
 
