@@ -38,6 +38,11 @@ supabase/.temp/
 # 빌드 캐시
 tsconfig.tsbuildinfo
 .tmp/
+.next-*/
+
+# 로컬 검증 실행 기록
+scripts/qa/.runs/
+.coverage
 
 # 생성 산출물
 output/

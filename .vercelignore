@@ -1,6 +1,7 @@
 # Dependencies and build outputs
 node_modules/
 .next/
+.next-*/
 out/
 dist/
 build/
@@ -20,6 +21,7 @@ build/
 
 # Local agent/work artifacts
 .tmp/
+tmp/
 .codex/
 .codex-remote-attachments/
 .claude/
@@ -27,6 +29,12 @@ build/
 .planning/
 .agents/
 output/
+artifacts/
+apps/mobile/
+gwating-app/
+docs/
+tests/
+*.log
 
 # Python/cache artifacts
 __pycache__/

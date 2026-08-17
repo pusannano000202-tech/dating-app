@@ -362,7 +362,8 @@ test('deployment readiness checker verifies git, Vercel link, and Toss env witho
 test('tracked secret scanner blocks real payment and service-role keys without printing values', () => {
   const scanner = readSource('scripts/check-secret-leaks.mjs')
 
-  assert.match(scanner, /git ls-files/)
+  assert.match(scanner, /listGitFiles\(\['ls-files', '-z'\]\)/)
+  assert.match(scanner, /listGitFiles\(\['ls-files', '-z', '--others', '--exclude-standard'\]\)/)
   assert.match(scanner, /toss_api_key/)
   assert.match(scanner, /supabase_service_role_jwt/)
   assert.match(scanner, /tracked_supabase_public_jwt_env/)
@@ -376,6 +377,13 @@ test('tracked secret scanner blocks real payment and service-role keys without p
     stdio: 'pipe',
   })
   assert.match(output, /Tracked secret scan passed/)
+
+  const allOutput = execFileSync('node', ['scripts/check-secret-leaks.mjs', '--include-untracked'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    stdio: 'pipe',
+  })
+  assert.match(allOutput, /Tracked and untracked secret scan passed/)
 })
 
 test('payment env checker rejects malformed Toss and service role values without printing secrets', () => {

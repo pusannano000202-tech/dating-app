@@ -19,7 +19,9 @@ const detectors = [
   },
 ]
 
-const files = listTrackedFiles()
+const includeUntracked = process.argv.includes('--include-untracked')
+const scanLabel = includeUntracked ? 'Tracked and untracked' : 'Tracked'
+const files = includeUntracked ? listTrackedAndUntrackedFiles() : listTrackedFiles()
 const findings = []
 
 for (const file of files) {
@@ -34,23 +36,34 @@ for (const file of files) {
 }
 
 if (findings.length > 0) {
-  console.error('Tracked secret scan failed. Remove matched secrets from git-tracked files.')
+  console.error(`${scanLabel} secret scan failed. Remove matched secrets before committing.`)
   for (const finding of findings) {
     console.error(`${finding.file}:${finding.line}:${finding.detector}`)
   }
   process.exit(1)
 }
 
-console.log('Tracked secret scan passed.')
+console.log(`${scanLabel} secret scan passed.`)
 
 function listTrackedFiles() {
-  const result = spawnSync('git', ['ls-files', '-z'], {
+  return listGitFiles(['ls-files', '-z'])
+}
+
+function listTrackedAndUntrackedFiles() {
+  return [...new Set([
+    ...listTrackedFiles(),
+    ...listGitFiles(['ls-files', '-z', '--others', '--exclude-standard']),
+  ])]
+}
+
+function listGitFiles(args) {
+  const result = spawnSync('git', args, {
     cwd: root,
     encoding: 'buffer',
   })
 
   if (result.status !== 0) {
-    throw new Error('git ls-files failed')
+    throw new Error(`git ${args.join(' ')} failed`)
   }
 
   return result.stdout
