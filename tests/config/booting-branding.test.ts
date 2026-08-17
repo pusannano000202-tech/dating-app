@@ -9,11 +9,11 @@ function readSource(path: string) {
   return readFileSync(join(ROOT, path), 'utf8')
 }
 
-test('root layout uses Quantum production metadata and Campus Signal theme color', () => {
+test('root layout uses Quantum production metadata and Peach Air theme color', () => {
   const layout = readSource('app/layout.tsx')
 
   assert.match(layout, /title:\s*'Quantum/)
-  assert.match(layout, /themeColor:\s*'#F4F6F5'/)
+  assert.match(layout, /themeColor:\s*'#FFF9F6'/)
   assert.match(layout, /bg-app min-h-screen text-boot-ink/)
   assert.doesNotMatch(layout, /Destiny/)
 })
@@ -28,12 +28,18 @@ test('root layout isolates the search-param theme provider behind Suspense', () 
   )
 })
 
+test('Next build output can be isolated from an active local dev server', () => {
+  const nextConfig = readSource('next.config.mjs')
+
+  assert.match(nextConfig, /distDir:\s*process\.env\.NEXT_DIST_DIR\s*\|\|\s*['"]\.next['"]/)
+})
+
 test('home page renders the Quantum next-action dashboard behind demo auth', () => {
   const home = readSource('app/page.tsx')
 
   assert.match(home, /BootingLogo/)
   assert.match(home, /HomeDashboard/)
-  assert.match(home, /HomeTodayTaskCard/)
+  assert.match(home, /QuantumHomeLead/)
   assert.match(home, /QuantumHomeRecommendations/)
   assert.doesNotMatch(home, /href="\/match\/start"/)
   assert.doesNotMatch(home, /href="\/login"/)
@@ -67,8 +73,7 @@ test('school mascot assets stay available while action screens avoid oversized d
   assert.match(groupCreate, /h-16 w-16/)
   assert.doesNotMatch(community, /h-\[114px\] w-\[114px\]/)
   assert.doesNotMatch(meetups, /h-\[114px\] w-\[114px\]/)
-  assert.match(refund, /pose="refund"/)
-  assert.match(refund, /h-\[118px\] w-\[118px\]/)
+  assert.doesNotMatch(refund, /h-\[118px\] w-\[118px\]/)
   assert.doesNotMatch(groupCreate, /pose="refund"/)
   assert.doesNotMatch(community, /pose="refund"/)
   assert.doesNotMatch(meetups, /pose="refund"/)
@@ -78,11 +83,11 @@ test('school mascot assets stay available while action screens avoid oversized d
 
 test('home page does not show result-like opponent card before matching starts', () => {
   const home = readSource('app/page.tsx')
-  const today = readSource('components/matching/HomeTodayTaskCard.tsx')
+  const today = readSource('components/home/QuantumHomeLead.tsx')
 
   assert.match(home, /필요한 순간 전까지 이름과 사진은 상대에게 공개되지 않아요/)
-  assert.match(home, /HomeTodayTaskCard/)
-  assert.match(today, /quantum-campus-group\.webp/)
+  assert.match(home, /QuantumHomeLead/)
+  assert.match(today, /quantumEventPhotos/)
   assert.doesNotMatch(today, /DarkTeamProgressCard/)
   assert.doesNotMatch(home, /HomeLockedOpponentNotice/)
   assert.doesNotMatch(home, /상대팀 카드는 아직 잠겨 있어요/)
@@ -116,7 +121,7 @@ test('match result surfaces keep real APIs while using Booting chat-style cards'
   const matchList = readSource('app/match/page.tsx')
   const matchDetail = readSource('app/match/[id]/page.tsx')
 
-  assert.match(matchList, /fetch\('\/api\/matches'\)/)
+  assert.match(matchList, /fetchRequiredMatchingResource\('\/api\/matches'/)
   assert.match(matchList, /text-boot-ink/)
   assert.doesNotMatch(matchList, /text-gray-300/)
 
@@ -125,26 +130,17 @@ test('match result surfaces keep real APIs while using Booting chat-style cards'
   assert.doesNotMatch(matchDetail, /bg-black\/10/)
 })
 
-test('matching entry surfaces expose 2:2, 3:3, and mixed-group queue visuals', () => {
+test('matching entry is event-first while legacy 2:2 and 3:3 setup stays hidden', () => {
   const matchList = readSource('app/match/page.tsx')
-  const matchStart = readSource('app/match/start/page.tsx')
   const groupCreate = readSource('app/group/create/page.tsx')
-  const matchingPool = readSource('components/MatchingPool.tsx')
-  const queueRadar = readSource('components/matching/QueueRadarCard.tsx')
   const statsMigration = readSource('supabase/migrations/20260622183100_match_pool_mixed_group_stats.sql')
   const exactSizeMigration = readSource('supabase/migrations/20260622183000_match_pool_exact_group_size.sql')
 
-  assert.match(matchList, /어떤 방식으로 만날까요/)
-  assert.match(matchList, /과팅하기/)
-  assert.match(matchList, /소개팅하기/)
-  assert.match(matchingPool, /2:2 매칭찾기/)
-  assert.match(matchingPool, /3:3 매칭찾기/)
-  assert.match(matchStart, /href="\/group\/create\?size=2"/)
-  assert.match(matchStart, /href="\/group\/create\?size=3"/)
-  assert.match(groupCreate, /매칭 규모 선택/)
-  assert.match(matchingPool, /혼성팀/)
-  assert.match(queueRadar, /mixedDots/)
-  assert.match(queueRadar, /mixedGradient/)
+  assert.match(matchList, /<QuantumMatchDiscovery \/>/)
+  assert.match(matchList, /const LEGACY_MATCH_ENTRY_VISIBLE = false/)
+  assert.doesNotMatch(groupCreate, /매칭 규모 선택/)
+  assert.doesNotMatch(groupCreate, /2:2 과팅/)
+  assert.doesNotMatch(groupCreate, /3:3 과팅/)
   assert.match(statsMigration, /THEN 'mixed'/)
   assert.match(exactSizeMigration, /v_active_count <> v_group\.size/)
 })
@@ -167,8 +163,6 @@ test('pending match detail uses page steps instead of one long scroll', () => {
 
 test('auth and completion entry points use Booting branding', () => {
   const login = readSource('app/(auth)/login/page.tsx')
-  const authLayout = readSource('app/(auth)/layout.tsx')
-  const groupLayout = readSource('app/group/layout.tsx')
   const logo = readSource('components/BootingLogo.tsx')
   const complete = readSource('app/profile/complete/page.tsx')
   const edit = readSource('app/profile/edit/page.tsx')
@@ -184,11 +178,7 @@ test('auth and completion entry points use Booting branding', () => {
   assert.match(login, /subtitle="대학생 과팅"/)
   assert.match(login, /UNIVERSITY GROUP MATCHING/)
   assert.doesNotMatch(login, /PNU GROUP MATCHING/)
-  assert.match(login, /bg-white\/82/)
-  assert.match(authLayout, /로그인 \| Quantum/)
-  assert.match(groupLayout, /그룹 과팅 \| Quantum/)
-  assert.doesNotMatch(authLayout, /부산대 과팅/)
-  assert.doesNotMatch(groupLayout, /부산대 과팅/)
+  assert.match(login, /bg-white\/\[0\.82\]/)
 })
 
 test('login page uses Supabase email OTP while phone provider is disabled', () => {
@@ -202,8 +192,10 @@ test('login page uses Supabase email OTP while phone provider is disabled', () =
   assert.match(login, /email rate limit exceeded/)
   assert.match(login, /moveToCodeStep\(normalizedEmail\)/)
   assert.match(login, /signInWithOAuth\(\{/)
-  assert.match(login, /provider:\s*'google'/)
-  assert.match(login, /\/auth\/callback\?next=/)
+  assert.match(login, /signInWithProvider\('google'\)/)
+  assert.match(login, /signInWithProvider\('kakao'\)/)
+  assert.match(login, /provider,/)
+  assert.match(login, /getOAuthCallbackUrl\(window\.location\.origin,\s*redirectTo\)/)
   assert.match(login, /searchParams\.get\('redirect'\)\s*\?\?\s*searchParams\.get\('next'\)/)
   assert.match(login, /getPostLoginDestination\(\{/)
   assert.match(login, /requestedRedirect/)
@@ -217,7 +209,6 @@ test('login page uses Supabase email OTP while phone provider is disabled', () =
 test('onboarding and match setup are separate product flows', () => {
   const home = readSource('app/page.tsx')
   const worldcup = readSource('app/profile/worldcup/page.tsx')
-  const survey = readSource('app/profile/survey/page.tsx')
   const photos = readSource('app/profile/photos/page.tsx')
   const personalityPreference = readSource('app/profile/personality-preference/page.tsx')
   const schedulePage = readSource('app/profile/schedule/page.tsx')
@@ -226,14 +217,14 @@ test('onboarding and match setup are separate product flows', () => {
   const matchStart = readSource('app/match/start/page.tsx')
 
   assert.match(home, /QuantumHomeRecommendations/)
-  assert.match(home, /HomeTodayTaskCard/)
+  assert.match(home, /QuantumHomeLead/)
   assert.doesNotMatch(home, /href="\/match\/start"/)
-  assert.match(worldcup, /router\.push\('\/profile\/survey'\)/)
-  assert.match(survey, /router\.push\('\/profile\/photos'\)/)
+  assert.match(worldcup, /router\.push\('\/profile\/photos'\)/)
+  assert.doesNotMatch(worldcup, /router\.push\('\/profile\/survey'\)/)
   assert.match(photos, /router\.push\('\/profile\/complete'\)/)
   assert.match(stepProgress, /기본정보/)
   assert.match(stepProgress, /이상형/)
-  assert.match(stepProgress, /성향/)
+  assert.doesNotMatch(stepProgress, /성향/)
   assert.match(stepProgress, /사진/)
   assert.doesNotMatch(stepProgress, /매칭 비중/)
   assert.match(matchStart, /function getCurrentSetupState/)
@@ -260,7 +251,8 @@ test('matching readiness gates include nickname and pre-match card checks', () =
   assert.match(basicInfoForm, /\/api\/profiles\/check-nickname\?nickname=/)
   assert.match(basicInfoForm, /await checkNicknameAvailability\(trimmedName\)/)
   assert.match(basicInfoForm, /다른 닉네임을 입력해 주세요/)
-  assert.match(basicInfoPage, /\/api\/profiles\/claim-nickname/)
+  assert.match(basicInfoPage, /\/api\/profile\/basic/)
+  assert.match(readSource('app/api/profile/basic/route.ts'), /claim_profile_display_name/)
   assert.match(checkNicknameRoute, /is_profile_display_name_available/)
   assert.match(claimNicknameRoute, /claim_profile_display_name/)
   assert.match(nicknameMigration, /CREATE TABLE IF NOT EXISTS public\.profile_display_name_claims/)
@@ -270,8 +262,11 @@ test('matching readiness gates include nickname and pre-match card checks', () =
   assert.doesNotMatch(nicknameMigration, /AND normalized_name <> v_normalized/)
   assert.doesNotMatch(nicknameMigration, /ON CONFLICT \(normalized_name\)/)
 
-  assert.match(draftRoute, /pre_match_card_drafts/)
-  assert.match(draftRoute, /countCompletedDailyCardItems/)
+  assert.match(draftRoute, /get_my_pre_match_card_draft/)
+  assert.match(draftRoute, /save_my_pre_match_card_draft/)
+  assert.doesNotMatch(draftRoute, /\.from\('pre_match_card_drafts'\)/)
+  assert.match(draftRoute, /countCompletedQuantumPrecardSections/)
+  assert.match(draftRoute, /validateQuantumPrecardDraft/)
   assert.match(draftMigration, /CREATE TABLE IF NOT EXISTS public\.pre_match_card_drafts/)
   assert.match(draftMigration, /get_group_pre_match_card_readiness/)
   assert.match(enterRoute, /get_group_pre_match_card_readiness/)

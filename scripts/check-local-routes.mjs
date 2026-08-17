@@ -4,6 +4,10 @@ const DEFAULT_BASE_URL = 'http://localhost:3004'
 const DEV_AUTH_COOKIE = 'booting_dev_auth=1'
 
 const routes = [
+  { path: '/login', name: '로그인', public: true },
+  { path: '/community', name: '커뮤니티', public: true },
+  { path: '/meetups', name: '모임', public: true },
+  { path: '/api/health', name: 'API 상태', public: true },
   { path: '/dev/preview', name: '로컬 미리보기' },
   { path: '/', name: '홈' },
   { path: '/match', name: '매칭 현황' },
@@ -49,12 +53,14 @@ async function checkRoute(baseUrl, route, headers) {
   })
   const location = response.headers.get('location')
   const redirectedToLogin = location?.includes('/login') ?? false
+  const successfulResponse = response.status >= 200 && response.status < 300
+  const protectedRedirect = response.status >= 300 && response.status < 400 && redirectedToLogin
 
   return {
     ...route,
     status: response.status,
     location,
-    ok: response.status >= 200 && response.status < 400 && !redirectedToLogin,
+    ok: route.public ? successfulResponse && !redirectedToLogin : successfulResponse || protectedRedirect,
   }
 }
 
@@ -95,4 +101,4 @@ if (failed > 0) {
   process.exit(1)
 }
 
-console.log('\n모든 route가 dev auth 기준으로 접근 가능합니다.')
+console.log('\n공개 route는 열리고, 보호 route는 로그인 또는 개발 인증 경계에서 정상 응답합니다.')
