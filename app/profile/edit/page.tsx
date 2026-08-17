@@ -1,106 +1,154 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
-  Crosshair, ClipboardList, Camera,
-  Brain, CalendarDays, SlidersHorizontal, ChevronRight,
-  Heart,
-  AlertTriangle, Pencil, Check,
+  AlertTriangle,
+  Bell,
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  CircleDollarSign,
+  Images,
+  MessageCircle,
+  ShieldCheck,
+  UsersRound,
 } from 'lucide-react'
+
 import BootingLogo from '@/components/BootingLogo'
 import { createClient } from '@/lib/supabase'
-import { APPEARANCE_TYPE_INFO } from '@/lib/constants'
-import type { AppearanceType, Gender } from '@/lib/types'
+import type { Gender } from '@/lib/types'
 
-const EDIT_SECTIONS = [
-  {
-    href: '/profile/worldcup',
-    icon: Crosshair,
-    iconBg: 'from-boot-primary to-boot-coral',
-    title: '이상형 스타일',
-    desc: '선호하는 외모 타입 다시 고르기',
-  },
-  {
-    href: '/profile/basic',
-    icon: ClipboardList,
-    iconBg: 'from-sky-500 to-cyan-400',
-    title: '기본 정보',
-    desc: '나이, 키, 학과 등 수정하기',
-  },
-  {
-    href: '/profile/photos',
-    icon: Camera,
-    iconBg: 'from-boot-coral to-amber-400',
-    title: '사진',
-    desc: '프로필 사진 바꾸기',
-  },
-  {
-    href: '/profile/survey',
-    icon: Brain,
-    iconBg: 'from-emerald-500 to-teal-400',
-    title: '성격 테스트',
-    desc: 'Big5 성격 테스트 다시 하기',
-  },
-  {
-    href: '/profile/personality-preference',
-    icon: Heart,
-    iconBg: 'from-rose-500 to-boot-coral',
-    title: '상대 성격 취향',
-    desc: '끌리는 상대 성격 다시 고르기',
-  },
-  {
-    href: '/profile/schedule',
-    icon: CalendarDays,
-    iconBg: 'from-boot-primary to-sky-500',
-    title: '가능한 시간대',
-    desc: '과팅 가능한 요일/시간 수정',
-  },
-  {
-    href: '/profile/preferences',
-    icon: SlidersHorizontal,
-    iconBg: 'from-amber-400 to-boot-coral',
-    title: '매칭 가중치',
-    desc: '중요하게 보는 조건 조정하기',
-  },
-]
-
-interface ProfileSummary {
+type ProfileSummary = {
   display_name: string | null
   gender: Gender | null
   age: number | null
   school: string | null
   department: string | null
-  appearance_type: AppearanceType | null
   photo_count: number
+}
+
+type FriendSummary = {
+  user_id: string
+  display_name: string | null
+  status: string
+  photo_url: string | null
+}
+
+type FriendPendingRequest = {
+  status: string
+}
+
+type FriendRequestPayload = {
+  friends?: FriendSummary[]
+  sent?: FriendPendingRequest[]
+  received?: FriendPendingRequest[]
+}
+
+type FriendPendingCounts = {
+  sentPending: number
+  receivedPending: number
+}
+
+type GroupPayload = {
+  group?: { id?: string } | null
+}
+
+type DepositSummaryPayload = {
+  total_active?: number
+  paid_count?: number
+  all_paid?: boolean
+  error?: string
+}
+
+type DepositSummaryState = {
+  status: 'loading' | 'ready' | 'missing' | 'unavailable' | 'error'
+  paidCount: number
+  totalCount: number
+  message?: string
+}
+
+const QUICK_ACTIONS = [
+  { href: '/friends', icon: UsersRound, label: '친구 관리', tone: 'bg-boot-info-soft text-boot-info' },
+  { href: '/chat', icon: MessageCircle, label: '채팅', tone: 'bg-[#EAF6F4] text-[#147A70]' },
+  { href: '/notifications', icon: Bell, label: '알림', tone: 'bg-[#FFF5DE] text-[#A66B00]' },
+  { href: '/match', icon: CircleDollarSign, label: '보증금', tone: 'bg-[#FFF0ED] text-[#C84C3E]' },
+]
+
+const INITIAL_DEPOSIT_SUMMARY: DepositSummaryState = {
+  status: 'loading',
+  paidCount: 0,
+  totalCount: 0,
 }
 
 export default function ProfileEditPage() {
   const router = useRouter()
+  const [summary, setSummary] = useState<ProfileSummary | null>(null)
+  const [photos, setPhotos] = useState<string[]>([])
+  const [friends, setFriends] = useState<FriendSummary[]>([])
+  const [friendPending, setFriendPending] = useState<FriendPendingCounts | null>(null)
+  const [depositSummary, setDepositSummary] = useState<DepositSummaryState>(INITIAL_DEPOSIT_SUMMARY)
+  const [loading, setLoading] = useState(true)
   const [showConfirm, setShowConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
-  const [summary, setSummary] = useState<ProfileSummary | null>(null)
-  const [editingName, setEditingName] = useState(false)
-  const [nameDraft, setNameDraft] = useState('')
-  const [savingName, setSavingName] = useState(false)
-  const [nameError, setNameError] = useState<string | null>(null)
 
   useEffect(() => {
+    let active = true
     const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return
-      const [{ data: profile }, { count }] = await Promise.all([
+
+    async function loadHub() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login?redirect=%2Fprofile%2Fedit')
+        return
+      }
+
+      const [
+        { data: profile },
+        photoResponse,
+        friendResponse,
+        groupsResponse,
+      ] = await Promise.all([
         supabase
           .from('profiles')
-          .select('display_name, gender, age, school, department, appearance_type')
+          .select('display_name, gender, age, school, department')
           .eq('user_id', user.id)
           .single(),
-        supabase
-          .from('photos')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id),
+        fetch('/api/profile/photos', { cache: 'no-store' }),
+        fetch('/api/friend-requests', { cache: 'no-store' }),
+        fetch('/api/groups', { cache: 'no-store' }),
       ])
+
+      if (!active) return
+
+      const photoPayload = photoResponse.ok
+        ? await photoResponse.json().catch(() => null) as { photos?: string[] } | null
+        : null
+      const friendPayload = friendResponse.ok
+        ? await friendResponse.json().catch(() => null) as FriendRequestPayload | null
+        : null
+      const groupsPayload = groupsResponse.ok
+        ? await groupsResponse.json().catch(() => null) as GroupPayload | null
+        : null
+
+      const nextPhotos = Array.isArray(photoPayload?.photos) ? photoPayload.photos : []
+      const sent = Array.isArray(friendPayload?.sent) ? friendPayload.sent : null
+      const received = Array.isArray(friendPayload?.received) ? friendPayload.received : null
+
+      setPhotos(nextPhotos)
+      setFriends(Array.isArray(friendPayload?.friends) ? friendPayload.friends : [])
+      setFriendPending(sent || received ? {
+        sentPending: sent ? sent.filter((row) => row.status === 'pending').length : 0,
+        receivedPending: received ? received.filter((row) => row.status === 'pending').length : 0,
+      } : null)
+
+      const nextDepositSummary = await loadDepositSummary(groupsPayload)
+      if (active) {
+        setDepositSummary(nextDepositSummary)
+      }
+
       if (profile) {
         setSummary({
           display_name: profile.display_name ?? null,
@@ -108,243 +156,315 @@ export default function ProfileEditPage() {
           age: profile.age,
           school: profile.school,
           department: profile.department,
-          appearance_type: profile.appearance_type as AppearanceType | null,
-          photo_count: count ?? 0,
+          photo_count: nextPhotos.length,
         })
       }
-    })
-  }, [])
-
-  function startEditName() {
-    if (!summary) return
-    setNameDraft(summary.display_name ?? '')
-    setNameError(null)
-    setEditingName(true)
-  }
-
-  async function saveDisplayName() {
-    if (savingName) return
-    const trimmed = nameDraft.trim()
-    if (trimmed.length < 2 || trimmed.length > 20) {
-      setNameError('이름은 2~20자 사이로 입력해줘.')
-      return
+      setLoading(false)
     }
-    setSavingName(true)
-    setNameError(null)
-    try {
-      const res = await fetch('/api/profiles/claim-nickname', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nickname: trimmed }),
+
+    void loadHub().catch(() => {
+      if (!active) return
+      setDepositSummary({
+        status: 'error',
+        paidCount: 0,
+        totalCount: 0,
+        message: '마이 정보를 불러오지 못했어요. 잠시 후 다시 열어 주세요.',
       })
-      if (res.status === 401) {
-        router.push('/login')
-        return
-      }
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        setNameError(translateNicknameClaimError(data.error))
-        return
-      }
-      setSummary((s) => s ? { ...s, display_name: trimmed } : s)
-      setEditingName(false)
-    } catch {
-      setNameError('저장에 실패했어요. 잠시 후 다시 시도해줘.')
-    } finally {
-      setSavingName(false)
-    }
-  }
+      setLoading(false)
+    })
+    return () => { active = false }
+  }, [router])
 
   async function handleReset() {
     setResetting(true)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
-      await supabase.from('profiles').delete().eq('user_id', user.id)
-      await supabase.from('photos').delete().eq('user_id', user.id)
-      router.push('/profile/worldcup')
-    } catch {
+      if (!user) {
+        router.push('/login')
+        return
+      }
+      const photoResponse = await fetch('/api/profile/photos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true }),
+      })
+      if (!photoResponse.ok && photoResponse.status !== 404) {
+        throw new Error('profile_photo_reset_failed')
+      }
+      router.push('/profile/basic')
+    } finally {
       setResetting(false)
       setShowConfirm(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen flex-col booting-paper px-5 pb-28 text-boot-ink">
-      {/* 헤더 */}
-      <div className="relative pt-6 mb-7 flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 glass rounded-xl border border-boot-hairline text-boot-body hover:text-boot-primary">
-          <ChevronRight className="w-5 h-5 rotate-180" />
-        </button>
-        <div>
-          <h1 className="text-xl font-black">Quantum 프로필 수정</h1>
-          <p className="text-xs text-boot-muted mt-0.5">수정할 항목을 골라줘</p>
-        </div>
-      </div>
-
-      {/* 프로필 요약 카드 — 로딩 스켈레톤 */}
-      {!summary && (
-        <div className="glass-card rounded-2xl border border-boot-hairline p-4 mb-5 animate-pulse">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-boot-soft flex-shrink-0" />
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-boot-hairline rounded w-3/4" />
-              <div className="h-3 bg-boot-hairline/70 rounded w-1/2" />
-              <div className="flex gap-2 mt-1">
-                <div className="h-4 bg-boot-hairline rounded-full w-20" />
-                <div className="h-4 bg-boot-hairline/70 rounded-full w-14" />
-              </div>
-            </div>
+    <main className="min-h-screen bg-boot-canvas pb-28 text-boot-ink">
+      <div className="mx-auto w-full max-w-4xl px-4 pt-5 sm:px-6 sm:pt-7">
+        <header className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="뒤로 가기"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-boot-hairline bg-white text-boot-muted"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <div>
+            <p className="text-xs font-black text-boot-info">QUANTUM MY</p>
+            <h1 className="mt-0.5 text-2xl font-black">마이</h1>
           </div>
-        </div>
-      )}
+        </header>
 
-      {/* 프로필 요약 카드 */}
-      {summary && (
-        <div className="relative glass-card rounded-2xl border border-boot-hairline p-4 mb-5">
-          <div className="flex items-center gap-4">
-            <div className="flex-shrink-0">
-              <BootingLogo size="sm" showSubtitle={false} />
-            </div>
-            <div className="flex-1 min-w-0">
-              {editingName ? (
-                <div className="mb-1">
-                  <div className="flex gap-1.5 items-center">
-                    <input
-                      type="text"
-                      value={nameDraft}
-                      onChange={(e) => setNameDraft(e.target.value)}
-                      maxLength={20}
-                      autoFocus
-                      placeholder="2~20자"
-                      className="flex-1 min-w-0 rounded-lg border border-boot-hairline bg-white px-2 py-1 text-sm font-bold text-boot-ink focus:outline-none focus:border-boot-primary"
-                    />
-                    <button
-                      type="button"
-                      onClick={saveDisplayName}
-                      disabled={savingName}
-                      className="p-1.5 rounded-lg bg-boot-soft border border-boot-primary/30 text-boot-primary disabled:opacity-50"
-                      aria-label="저장"
-                    >
-                      <Check size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setEditingName(false); setNameError(null) }}
-                      disabled={savingName}
-                      className="p-1.5 rounded-lg text-boot-muted hover:text-boot-body"
-                      aria-label="취소"
-                    >
-                      ✕
-                    </button>
+        {loading ? <ProfileSkeleton /> : (
+          <>
+            <section className="mt-5 grid gap-4 border-y border-boot-hairline py-5 sm:grid-cols-[132px_minmax(0,1fr)]">
+              <Link
+                href="/profile/photos"
+                aria-label="내 프로필 사진 바꾸기"
+                className="group relative mx-auto aspect-[4/5] w-28 overflow-hidden rounded-lg bg-[#E8EFEC] sm:mx-0 sm:w-32"
+              >
+                {photos[0] ? (
+                  <Image src={photos[0]} alt="내 프로필 사진" fill priority sizes="128px" className="object-cover" />
+                ) : (
+                  <span className="flex h-full items-center justify-center"><BootingLogo size="sm" showSubtitle={false} /></span>
+                )}
+                <span className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-black/70 text-white">
+                  <Camera size={17} />
+                </span>
+              </Link>
+
+              <div className="flex min-w-0 flex-col justify-center">
+                <Link href="/profile/basic" className="group flex items-start justify-between gap-3 py-1">
+                  <div className="min-w-0">
+                    <p className="truncate text-xl font-black">{summary?.display_name ?? '프로필을 완성해 주세요'}</p>
+                    <p className="mt-1 text-sm font-bold text-boot-muted">
+                      {genderLabel(summary?.gender)}{summary?.age ? ` · ${summary.age}세` : ''}{summary?.school ? ` · ${summary.school}` : ''}
+                    </p>
+                    {summary?.department ? <p className="mt-1 truncate text-sm font-bold text-boot-muted">{summary.department}</p> : null}
                   </div>
-                  {nameError && (
-                    <p className="mt-1 text-[10px] text-red-400">{nameError}</p>
-                  )}
+                  <ChevronRight size={18} className="mt-1 shrink-0 text-boot-muted" />
+                </Link>
+                <p className="mt-4 text-xs font-bold leading-5 text-boot-muted">사진이나 이름을 누르면 바로 프로필을 바꿀 수 있어요.</p>
+              </div>
+            </section>
+
+            <section className="grid grid-cols-3 border-b border-boot-hairline" aria-label="내 활동 요약">
+              <SummaryLink href="/friends" value={`${friends.length}`} label="친구" />
+              <SummaryLink href="/profile/photos" value={`${summary?.photo_count ?? 0}`} label="내 프로필 사진" />
+              <SummaryLink
+                href="/match"
+                value={depositSummaryLabel(depositSummary)}
+                label="보증금"
+                tone={depositSummaryTone(depositSummary)}
+              />
+            </section>
+
+            <section className="mt-3 grid grid-cols-4 gap-2">
+              {QUICK_ACTIONS.map(({ href, icon: Icon, label, tone }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex min-h-11 items-center justify-center gap-2 rounded-lg px-2 text-center text-xs font-black ${tone}`}
+                >
+                  <Icon size={18} />
+                  <span className="leading-tight">{label}</span>
+                </Link>
+              ))}
+            </section>
+
+            <section className="py-6" aria-labelledby="friends-heading">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h2 id="friends-heading" className="text-lg font-black">내 친구</h2>
+                  <p className="mt-1 text-xs font-bold text-boot-muted">같이 모임에 초대하거나 1:1 약속을 보낼 수 있어요.</p>
+                </div>
+                <Link href="/friends" className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-info">전체 보기 <ChevronRight size={15} /></Link>
+              </div>
+              {friendPending !== null ? (
+                <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-black text-boot-muted">
+                  <span className="rounded-full border border-boot-hairline bg-white px-3 py-1.5">받은 제안 {friendPending.receivedPending}건</span>
+                  <span className="rounded-full border border-boot-hairline bg-white px-3 py-1.5">보낸 제안 {friendPending.sentPending}건</span>
+                </div>
+              ) : null}
+              {friends.length ? (
+                <div className="mt-4 flex gap-4 overflow-x-auto pb-1">
+                  {friends.slice(0, 8).map((friend) => (
+                    <Link key={friend.user_id} href={`/friends/${friend.user_id}`} className="w-16 shrink-0 text-center">
+                      <span className="relative mx-auto flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-boot-info-soft text-lg font-black text-boot-info">
+                        {friend.photo_url ? <Image src={friend.photo_url} alt="" fill sizes="64px" className="object-cover" /> : initials(friend.display_name)}
+                      </span>
+                      <span className="mt-2 block truncate text-xs font-black">{friend.display_name ?? '친구'}</span>
+                    </Link>
+                  ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <p className="text-base font-black truncate">
-                    {summary.display_name ?? '이름을 입력해주세요'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={startEditName}
-                    className="p-1 rounded text-boot-muted hover:text-boot-primary"
-                    aria-label="이름 수정"
-                  >
-                    <Pencil size={12} />
-                  </button>
+                <Link href="/friends" className="mt-4 flex min-h-20 items-center gap-3 rounded-lg bg-white px-4">
+                  <UsersRound className="text-boot-info" size={22} />
+                  <span><span className="block text-sm font-black">아직 친구가 없어요</span><span className="mt-1 block text-xs font-bold text-boot-muted">친구를 찾아 다음 모임에 같이 참여해 보세요.</span></span>
+                </Link>
+              )}
+            </section>
+
+            <section className="border-t border-boot-hairline py-6" aria-labelledby="photos-heading">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h2 id="photos-heading" className="text-lg font-black">내 프로필 사진</h2>
+                  <p className="mt-1 text-xs font-bold text-boot-muted">직접 올린 프로필 사진만 보여요.</p>
+                </div>
+                <Link href="/profile/photos" className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-info">사진 관리 <ChevronRight size={15} /></Link>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {photos.slice(0, 3).map((photo, index) => (
+                  <Link key={photo} href="/profile/photos" className="relative aspect-square overflow-hidden rounded-lg bg-[#E8EFEC]">
+                    <Image src={photo} alt={`프로필 사진 ${index + 1}`} fill sizes="(max-width: 640px) 30vw, 180px" className="object-cover" />
+                  </Link>
+                ))}
+                {photos.length === 0 ? (
+                  <Link href="/profile/photos" className="col-span-3 flex min-h-28 items-center justify-center gap-2 rounded-lg border border-dashed border-boot-hairline bg-white text-sm font-black text-boot-info"><Images size={20} /> 첫 사진 올리기</Link>
+                ) : null}
+              </div>
+            </section>
+
+            <section className="border-t border-boot-hairline py-6" aria-labelledby="memories-heading">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h2 id="memories-heading" className="text-lg font-black">만남 사진첩</h2>
+                  <p className="mt-1 text-xs font-bold text-boot-muted">참가자 전용 만남 사진첩은 서버 연결 후 이곳에 모여요.</p>
+                </div>
+                <Link href="/match" className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-info">만남 보기 <ChevronRight size={15} /></Link>
+              </div>
+              <Link
+                href="/match"
+                className="mt-4 flex min-h-28 items-center justify-center gap-2 rounded-lg border border-dashed border-boot-hairline bg-white text-sm font-black text-boot-info"
+              >
+                <Images size={20} /> 만남 사진첩 연결 준비 중
+              </Link>
+            </section>
+
+            <section className="border-t border-boot-hairline py-6">
+              <h2 className="text-lg font-black">보증금 상태</h2>
+              <p className="mt-1 text-xs font-bold text-boot-muted">
+                {depositSummaryMessage(depositSummary)}
+              </p>
+              <p className={`mt-3 text-sm font-black ${depositSummaryTone(depositSummary)}`}>
+                {depositSummaryLabel(depositSummary)}
+              </p>
+            </section>
+
+            <section className="flex items-start gap-3 border-y border-[#CBE3DD] bg-[#EAF6F4] px-4 py-4">
+              <ShieldCheck className="mt-0.5 shrink-0 text-[#147A70]" size={20} />
+              <div><p className="text-sm font-black text-[#0D514A]">신고와 안전 도움</p><p className="mt-1 text-xs font-bold leading-5 text-[#356D67]">만남 상세에서 신고할 수 있고, 긴급한 상황은 112·119에 먼저 연락해 주세요.</p></div>
+            </section>
+
+            <div className="py-6">
+              {!showConfirm ? (
+                <button type="button" onClick={() => setShowConfirm(true)} className="flex min-h-11 w-full items-center justify-center gap-2 text-xs font-black text-[#B44236]"><AlertTriangle size={16} /> 프로필 초기화</button>
+              ) : (
+                <div className="rounded-lg border border-[#F1B4AD] bg-white p-4">
+                  <p className="text-sm font-black">프로필을 처음부터 다시 만들까요?</p>
+                  <p className="mt-1 text-xs font-bold text-boot-muted">저장된 기본정보와 사진이 삭제되며 되돌릴 수 없어요.</p>
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <button type="button" onClick={() => setShowConfirm(false)} className="min-h-11 rounded-lg border border-boot-hairline text-sm font-black">취소</button>
+                    <button type="button" onClick={() => void handleReset()} disabled={resetting} className="min-h-11 rounded-lg bg-[#B44236] text-sm font-black text-white disabled:opacity-50">{resetting ? '초기화 중...' : '초기화'}</button>
+                  </div>
                 </div>
               )}
-              <p className="text-sm font-bold">
-                {summary.gender === 'male' ? '남' : summary.gender === 'female' ? '여' : '?'}
-                {summary.age != null ? ` · ${summary.age}세` : ''}
-                {summary.school ? ` · ${summary.school}` : ''}
-              </p>
-              {summary.department && (
-                <p className="text-xs text-boot-muted mt-0.5 truncate">{summary.department}</p>
-              )}
-              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                {summary.appearance_type && (
-                  <span className="text-[10px] bg-boot-soft text-boot-primary rounded-full px-2 py-0.5">
-                    {APPEARANCE_TYPE_INFO[summary.appearance_type].label} 스타일 선호
-                  </span>
-                )}
-                <span className="text-[10px] bg-white/80 text-boot-muted rounded-full px-2 py-0.5 border border-boot-hairline">
-                  사진 {summary.photo_count}장
-                </span>
-              </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* 수정 섹션 리스트 */}
-      <div className="relative flex flex-col gap-2.5">
-        {EDIT_SECTIONS.map(({ href, icon: Icon, iconBg, title, desc }) => (
-          <Link
-            key={href}
-            href={href}
-            className="glass-card rounded-2xl px-4 py-3.5 flex items-center gap-4 hover:border-boot-primary/30 border border-boot-hairline transition-all hover:bg-white/95 active:scale-[0.99]"
-          >
-            {/* 컬러 아이콘 박스 */}
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${iconBg} flex items-center justify-center flex-shrink-0 shadow-lg`}>
-              <Icon className="w-5 h-5 text-white" strokeWidth={1.8} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold">{title}</p>
-              <p className="text-xs text-boot-muted mt-0.5">{desc}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-boot-muted flex-shrink-0" />
-          </Link>
-        ))}
-
-        {/* 위험 구역 */}
-        <div className="mt-3 pt-4 border-t border-boot-hairline">
-          {!showConfirm ? (
-            <button
-              onClick={() => setShowConfirm(true)}
-              className="w-full py-3.5 rounded-2xl text-sm text-red-400 glass border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/5 transition-all flex items-center justify-center gap-2"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              프로필 초기화
-            </button>
-          ) : (
-            <div className="glass-card rounded-2xl p-4 border border-red-500/30">
-              <p className="text-sm font-bold text-red-400 mb-1">정말 초기화할 거야?</p>
-              <p className="text-xs text-boot-muted mb-4">프로필 정보가 모두 삭제돼. 되돌릴 수 없어.</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowConfirm(false)}
-                  className="flex-1 py-2.5 rounded-xl glass text-sm font-medium"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleReset}
-                  disabled={resetting}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500/20 border border-red-500/40 text-sm font-bold text-red-400 disabled:opacity-50"
-                >
-                  {resetting ? '초기화 중...' : '초기화'}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
-    </div>
+    </main>
   )
 }
 
-function translateNicknameClaimError(code?: string): string {
-  switch (code) {
-    case 'nickname_taken':
-      return '이미 사용 중인 이름이에요.'
-    case 'invalid_nickname':
-      return '이름은 2~20자 사이로 입력해줘.'
-    default:
-      return '저장에 실패했어요. 잠시 후 다시 시도해줘.'
+function SummaryLink({ href, value, label, tone }: { href: string; value: string; label: string; tone?: string }) {
+  return (
+    <Link href={href} className="flex min-h-20 flex-col items-center justify-center border-r border-boot-hairline last:border-r-0">
+      <strong className={`text-lg font-black ${tone ?? 'text-boot-info'}`}>{value}</strong>
+      <span className="mt-1 text-xs font-bold text-boot-muted">{label}</span>
+    </Link>
+  )
+}
+
+function ProfileSkeleton() {
+  return <div className="mt-5 h-72 animate-pulse rounded-lg bg-white" aria-label="프로필을 불러오는 중" />
+}
+
+function genderLabel(gender?: Gender | null) {
+  if (gender === 'male') return '남'
+  if (gender === 'female') return '여'
+  return '성별 미입력'
+}
+
+function initials(name: string | null) {
+  return name?.trim().slice(0, 1) || 'Q'
+}
+
+function depositSummaryLabel(summary: DepositSummaryState) {
+  if (summary.status === 'ready') return '준비 완료'
+  if (summary.status === 'missing') return '미등록'
+  if (summary.status === 'error') return '조회 실패'
+  if (summary.status === 'unavailable') return '조회 불가'
+  return '조회 중'
+}
+
+function depositSummaryTone(summary: DepositSummaryState) {
+  if (summary.status === 'ready') return 'text-[#147A70]'
+  if (summary.status === 'missing') return 'text-[#B44236]'
+  if (summary.status === 'error' || summary.status === 'unavailable') return 'text-[#8A6B00]'
+  return 'text-boot-muted'
+}
+
+function depositSummaryMessage(summary: DepositSummaryState) {
+  if (summary.status === 'loading') return '보증금 상태를 조회하고 있어요.'
+  if (summary.status === 'error') return summary.message ?? '보증금 상태 조회에 실패했어요.'
+  if (summary.message && (summary.status === 'unavailable' || summary.status === 'missing' || summary.status === 'ready')) {
+    return summary.message
+  }
+  return `${summary.paidCount}/${summary.totalCount}명 기준`
+}
+
+async function loadDepositSummary(groupsPayload: GroupPayload | null): Promise<DepositSummaryState> {
+  const groupId = groupsPayload?.group?.id
+  if (!groupId) {
+    return { status: 'unavailable', paidCount: 0, totalCount: 0, message: '그룹이 없어 보증금 상태를 확인할 수 없어요.' }
+  }
+
+  const response = await fetch(`/api/deposits/summary?group_id=${encodeURIComponent(groupId)}`, { cache: 'no-store' })
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null) as { error?: string } | null
+    return {
+      status: 'error',
+      paidCount: 0,
+      totalCount: 0,
+      message: payload?.error ?? '보증금 상태를 불러오지 못했어요.',
+    }
+  }
+
+  const payload = await response.json().catch(() => null) as DepositSummaryPayload | null
+  if (!payload || typeof payload.total_active !== 'number' || typeof payload.paid_count !== 'number') {
+    return {
+      status: 'error',
+      paidCount: 0,
+      totalCount: 0,
+      message: '보증금 응답 형식이 예상과 달라요.',
+    }
+  }
+
+  if (payload.total_active <= 0) {
+    return {
+      status: 'unavailable',
+      paidCount: payload.paid_count,
+      totalCount: payload.total_active,
+      message: '아직 보증금이 필요한 매칭이 없어요.',
+    }
+  }
+
+  return {
+    status: payload.all_paid || payload.paid_count === payload.total_active ? 'ready' : 'missing',
+    paidCount: payload.paid_count,
+    totalCount: payload.total_active,
   }
 }

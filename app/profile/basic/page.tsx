@@ -8,51 +8,84 @@ import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { DEV_BASIC_PROFILE_STORAGE_KEY } from '@/lib/profile/dev-basic-profile'
 import { createClient } from '@/lib/supabase'
 
+const PROFILE_LOAD_TIMEOUT_MS = 10_000
+
 export default function BasicInfoPage() {
   const router = useRouter()
   const [initialData, setInitialData] = useState<Partial<BasicInfoData> | undefined>(undefined)
   const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadAttempt, setLoadAttempt] = useState(0)
   const [saving, setSaving] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        if (isDevPreviewClientSession()) {
-          try {
-            const stored = sessionStorage.getItem(DEV_BASIC_PROFILE_STORAGE_KEY)
-            if (stored) {
-              setInitialData(JSON.parse(stored) as Partial<BasicInfoData>)
+    let active = true
+
+    async function loadProfile() {
+      setLoaded(false)
+      setLoadError(null)
+
+      try {
+        const supabase = createClient()
+        await withTimeout((async () => {
+          const { data: { user }, error: authError } = await supabase.auth.getUser()
+          const isDevPreview = isDevPreviewClientSession()
+          if (authError && !isDevPreview) throw authError
+
+          if (!user) {
+            if (isDevPreview) {
+              try {
+                const stored = sessionStorage.getItem(DEV_BASIC_PROFILE_STORAGE_KEY)
+                if (stored && active) {
+                  setInitialData(JSON.parse(stored) as Partial<BasicInfoData>)
+                }
+              } catch {}
             }
-          } catch {}
-        }
-        setLoaded(true)
-        return
-      }
-      Promise.all([
-        supabase
-          .from('profiles')
-          .select('display_name, gender, age, height, body_type, hair_density, school, department, year')
-          .eq('user_id', user.id)
-          .single(),
-        supabase
-          .from('users')
-          .select('phone')
-          .eq('id', user.id)
-          .single(),
-      ])
-        .then(([profileResult, userResult]) => {
-          if (profileResult.data || userResult.data) {
+            return
+          }
+
+          const [profileResult, userResult] = await Promise.all([
+            supabase
+              .from('profiles')
+              .select('display_name, gender, age, height, body_type, hair_density, school, department, year')
+              .eq('user_id', user.id)
+              .single(),
+            supabase
+              .from('users')
+              .select('phone')
+              .eq('id', user.id)
+              .single(),
+          ])
+
+          if (profileResult.error && profileResult.error.code !== 'PGRST116') {
+            throw profileResult.error
+          }
+          if (userResult.error && userResult.error.code !== 'PGRST116') {
+            throw userResult.error
+          }
+
+          if (active && (profileResult.data || userResult.data)) {
             setInitialData({
               ...(profileResult.data as Partial<BasicInfoData> | null ?? {}),
               phone: typeof userResult.data?.phone === 'string' ? userResult.data.phone : '',
             })
           }
-          setLoaded(true)
-        })
-    })
-  }, [])
+        })(), PROFILE_LOAD_TIMEOUT_MS)
+      } catch {
+        if (active) {
+          setLoadError('프로필 정보를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요.')
+        }
+      } finally {
+        if (active) setLoaded(true)
+      }
+    }
+
+    void loadProfile()
+    return () => {
+      active = false
+    }
+  }, [loadAttempt])
 
   async function handleSubmit(data: BasicInfoData) {
     setSaving(true)
@@ -72,22 +105,16 @@ export default function BasicInfoPage() {
         return
       }
 
-      const { phone, ...profileData } = data
-      const nicknameClaim = await claimNickname(profileData.display_name)
-      if (!nicknameClaim.ok) {
-        setServerError(translateNicknameClaimError(nicknameClaim.error))
+      const response = await fetch('/api/profile/basic', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, phone: '' }),
+      })
+      const payload = await response.json().catch(() => ({})) as { error?: string }
+      if (!response.ok) {
+        setServerError(translateBasicProfileSaveError(payload.error))
         return
       }
-
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({ user_id: user.id, ...profileData }, { onConflict: 'user_id' })
-      if (error) throw error
-
-      const { error: userError } = await supabase
-        .from('users')
-        .upsert({ id: user.id, phone }, { onConflict: 'id' })
-      if (userError) throw userError
 
       router.push('/profile/worldcup')
     } catch {
@@ -105,7 +132,19 @@ export default function BasicInfoPage() {
         <p className="mt-2 text-sm leading-6 text-boot-muted">매칭에 필요한 정보부터 짧게 묻고, 마지막에 한 번에 확인해요.</p>
       </header>
 
-      {loaded ? (
+      {loaded && loadError ? (
+        <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-4">
+          <p className="text-sm font-black text-rose-800">프로필을 불러오지 못했어요</p>
+          <p className="mt-1 text-sm leading-6 text-rose-700">{loadError}</p>
+          <button
+            type="button"
+            onClick={() => setLoadAttempt((current) => current + 1)}
+            className="mt-4 min-h-11 rounded-lg border border-rose-300 bg-white px-4 text-sm font-black text-rose-800"
+          >
+            다시 불러오기
+          </button>
+        </div>
+      ) : loaded ? (
         <BasicInfoConversation
           key={initialData ? 'loaded' : 'empty'}
           initialValue={initialData}
@@ -124,29 +163,38 @@ export default function BasicInfoPage() {
   )
 }
 
-async function claimNickname(nickname: string): Promise<{ ok: true } | { ok: false; error?: string }> {
-  try {
-    const res = await fetch('/api/profiles/claim-nickname', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nickname }),
-    })
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => reject(new Error('profile_load_timeout')), timeoutMs)
 
-    if (res.ok) return { ok: true }
-    const data = await res.json().catch(() => ({})) as { error?: string }
-    return { ok: false, error: data.error }
-  } catch {
-    return { ok: false, error: 'nickname_claim_failed' }
-  }
+    promise.then(
+      (value) => {
+        window.clearTimeout(timeoutId)
+        resolve(value)
+      },
+      (error) => {
+        window.clearTimeout(timeoutId)
+        reject(error)
+      },
+    )
+  })
 }
 
-function translateNicknameClaimError(code?: string): string {
+function translateBasicProfileSaveError(code?: string): string {
   switch (code) {
     case 'nickname_taken':
       return '이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.'
     case 'invalid_nickname':
       return '닉네임은 2~20자 사이로 입력해 주세요.'
+    case 'invalid_phone':
+      return '휴대폰 번호 형식을 다시 확인해 주세요.'
+    case 'phone_verification_required':
+      return '확인되지 않은 전화번호는 저장할 수 없어요. 앱 안의 채팅을 이용해 주세요.'
+    case 'school_change_requires_support':
+      return '학교 변경은 본인 확인이 필요해요. 고객지원에 문의해 주세요.'
+    case 'unauthorized':
+      return '로그인 시간이 만료됐어요. 다시 로그인한 뒤 저장해 주세요.'
     default:
-      return '닉네임을 확정하지 못했어요. 잠시 후 다시 시도해 주세요.'
+      return '기본 정보를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.'
   }
 }

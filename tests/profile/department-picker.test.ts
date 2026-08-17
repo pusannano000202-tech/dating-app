@@ -304,6 +304,9 @@ test('picker owns one school catalog request, aborts stale requests, and exposes
   assert.match(source, /role="option"[\s\S]*tabIndex=\{-1\}/)
   assert.doesNotMatch(source, /기존 입력 유지/)
   assert.match(source, /학과 비우기/)
+  assert.match(source, /aria-label="학과 목록 열기"/)
+  assert.match(source, /onClick=\{openDepartmentList\}/)
+  assert.match(source, /ChevronDown/)
 })
 
 test('BasicInfoForm delegates school-aware department selection without PNU-only state', () => {
