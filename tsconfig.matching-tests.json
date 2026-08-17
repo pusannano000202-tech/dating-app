@@ -4,6 +4,7 @@
     "lib": ["ES2022"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -16,6 +17,16 @@
     "components/matching/group-create/**/*.ts",
     "lib/match-pool-stats.ts",
     "lib/matching/**/*.ts",
+    "lib/notifications/**/*.ts",
+    "lib/community/meetup-cylinder.ts",
+    "lib/campus-eats/types.ts",
+    "lib/campus-eats/bracket.ts",
+    "lib/campus-eats/eligibility.ts",
+    "lib/campus-eats/personal-rating.ts",
+    "lib/campus-eats/rating.ts",
+    "lib/campus-eats/repository.ts",
+    "lib/campus-eats/url-state.ts",
+    "lib/campus-eats/fixtures/pnu-categories.ts",
     "tests/matching/**/*.ts"
   ]
 }
