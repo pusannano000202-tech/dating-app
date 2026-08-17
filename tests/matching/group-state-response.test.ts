@@ -3,9 +3,13 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+function readSource(path: string): string {
+  return readFileSync(path, 'utf8').replace(/\r\n/g, '\n')
+}
+
 test('group state contract: fail-closed reads, atomic mutation RPCs, and response identity', () => {
   const routePath = join(process.cwd(), 'app/api/groups/route.ts')
-  const route = readFileSync(routePath, 'utf8').replace(/\r\n/g, '\n')
+  const route = readSource(routePath)
 
   assert.match(route, /return NextResponse\.json\(\{\s*\.{3}state\.result,\s*current_user_id:\s*user\.id\s*\}\)/)
   assert.match(route, /const stateLoad = await loadGroupState\(supabase, user\.id\)/)
@@ -182,7 +186,7 @@ test('group state contract: fail-closed reads, atomic mutation RPCs, and respons
 
 test('group RPC error contract: exact tokens, status mapping, and create-race recovery', () => {
   const routePath = join(process.cwd(), 'app/api/groups/route.ts')
-  const route = readFileSync(routePath, 'utf8')
+  const route = readSource(routePath)
 
   assert.match(route, /function mapGroupRpcError\(operation: GroupRpcOperation, error: GroupRpcError\)/)
   assert.match(route, /function hasGroupRpcErrorToken\(error: GroupRpcError, token: string\)/)

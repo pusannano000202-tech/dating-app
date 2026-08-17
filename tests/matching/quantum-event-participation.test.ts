@@ -3,6 +3,10 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 
+function readSource(filePath: string): string {
+  return fs.readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n')
+}
+
 test('participation input accepts only catalog events and approved party types', () => {
   const helperPath = path.join(process.cwd(), 'lib/matching/quantum-event-participation.ts')
   assert.ok(fs.existsSync(helperPath), 'quantum-event-participation.ts must exist')
@@ -61,7 +65,7 @@ test('participation input accepts only catalog events and approved party types',
 test('participation API has read, atomic meeting readiness, and cancel boundaries', () => {
   const routePath = path.join(process.cwd(), 'app/api/match/event-participation/route.ts')
   assert.ok(fs.existsSync(routePath), 'event participation API route must exist')
-  const route = fs.readFileSync(routePath, 'utf8')
+  const route = readSource(routePath)
 
   assert.match(route, /export async function GET/)
   assert.match(route, /export async function POST/)
@@ -81,7 +85,7 @@ test('participation API has read, atomic meeting readiness, and cancel boundarie
 
 test('participation API marks every private response as non-cacheable', () => {
   const routePath = path.join(process.cwd(), 'app/api/match/event-participation/route.ts')
-  const route = fs.readFileSync(routePath, 'utf8')
+  const route = readSource(routePath)
 
   assert.match(route, /const PRIVATE_NO_STORE_HEADERS = \{ 'Cache-Control': 'private, no-store, max-age=0' \}/)
   assert.match(route, /function json\(body: unknown, init\?: ResponseInit\)/)
@@ -92,7 +96,7 @@ test('participation API marks every private response as non-cacheable', () => {
 
 test('application UI recovers when the saved preference disappears during submission', () => {
   const sourcePath = path.join(process.cwd(), 'components/matching/QuantumEventApplicationStatus.tsx')
-  const source = fs.readFileSync(sourcePath, 'utf8')
+  const source = readSource(sourcePath)
 
   assert.match(source, /payload\.error === 'profile_preference_required'/)
   assert.match(source, /setPreparationState\('missing_preference'\)/)
@@ -102,7 +106,7 @@ test('application UI recovers when the saved preference disappears during submis
 
 test('cancellation API preserves boolean and structured RPC results for the client', () => {
   const routePath = path.join(process.cwd(), 'app/api/match/event-participation/route.ts')
-  const route = fs.readFileSync(routePath, 'utf8')
+  const route = readSource(routePath)
 
   assert.match(route, /const \{ data, error \} = await supabase\.rpc\('cancel_my_quantum_event_participation'\)/)
   assert.match(route, /const cancellation = normalizeCancellationResponse\(data\)/)
@@ -114,7 +118,7 @@ test('cancellation API preserves boolean and structured RPC results for the clie
 
 test('cancel false recovers the current participation through the shared lifecycle reader', () => {
   const routePath = path.join(process.cwd(), 'app/api/match/event-participation/route.ts')
-  const route = fs.readFileSync(routePath, 'utf8')
+  const route = readSource(routePath)
 
   assert.match(route, /isActiveQuantumEventLifecycle/)
   assert.match(route, /async function readCurrentParticipation\(/)
@@ -126,7 +130,7 @@ test('cancel false recovers the current participation through the shared lifecyc
 
 test('cancellation UI blocks duplicate requests and branches between a remaining participation and discovery', () => {
   const wheelPath = path.join(process.cwd(), 'components/matching/QuantumEventWheel.tsx')
-  const wheel = fs.readFileSync(wheelPath, 'utf8')
+  const wheel = readSource(wheelPath)
 
   assert.match(wheel, /if \(!participation \|\| saving\) return\s*\n\s*if \(cancelInFlightRef\.current\) return\s*\n\s*\n\s*cancelInFlightRef\.current = true\s*\n\s*setSaving\(true\)/)
   assert.doesNotMatch(wheel, /window\.confirm\('이 약속 참여를 취소할까요\?'/)
@@ -145,7 +149,7 @@ test('cancellation UI blocks duplicate requests and branches between a remaining
 
 test('cancellation request and delayed redirect are cleaned up on unmount', () => {
   const wheelPath = path.join(process.cwd(), 'components/matching/QuantumEventWheel.tsx')
-  const wheel = fs.readFileSync(wheelPath, 'utf8')
+  const wheel = readSource(wheelPath)
 
   assert.match(wheel, /const cancelRequestControllerRef = useRef<AbortController \| null>\(null\)/)
   assert.match(wheel, /const cancelRedirectTimerRef = useRef<number \| null>\(null\)/)
@@ -159,7 +163,7 @@ test('cancellation request and delayed redirect are cleaned up on unmount', () =
 
 test('cancellation feedback remains visible while the current participation stays on screen', () => {
   const wheelPath = path.join(process.cwd(), 'components/matching/QuantumEventWheel.tsx')
-  const wheel = fs.readFileSync(wheelPath, 'utf8')
+  const wheel = readSource(wheelPath)
   const commandCenterBranch = wheel.match(
     /if \(participation && !dismissedCancelledParticipation\) \{[\s\S]*?\n  \}\n\n  return \(/,
   )?.[0]
@@ -170,18 +174,20 @@ test('cancellation feedback remains visible while the current participation stay
   assert.match(commandCenterBranch, /\{message\}/)
 })
 
-test('remote QA event stats do not fake a friend-party application without a group', () => {
-  const scriptPath = path.join(process.cwd(), 'scripts/run-remote-product-e2e.mjs')
-  const script = fs.readFileSync(scriptPath, 'utf8')
+test('remote QA starts from solo applications and joins friends through the invite contract', () => {
+  const scriptPath = path.join(process.cwd(), 'scripts/qa/release-e2e-event-room.mjs')
+  const script = readSource(scriptPath)
 
-  assert.doesNotMatch(script, /\[userB, 'friends'\]/)
-  assert.match(script, /for \(const user of \[userA, userB\]\)/)
   assert.match(script, /party_type: 'solo'/)
+  assert.doesNotMatch(script, /party_type: 'friends'/)
+  assert.match(script, /async function createInvite\(/)
+  assert.match(script, /'\/api\/match\/event-room-invites'/)
+  assert.match(script, /'\/api\/match\/event-room-invites\/accept'/)
 })
 
 test('event lifecycle QA can use an isolated event instead of colliding with a live application', () => {
   const scriptPath = path.join(process.cwd(), 'scripts/run-quantum-event-lifecycle-e2e.mjs')
-  const script = fs.readFileSync(scriptPath, 'utf8')
+  const script = readSource(scriptPath)
 
   assert.match(script, /process\.env\.QA_EVENT_ID/)
   assert.doesNotMatch(script, /const eventId = 'tonight-onsenjjang-run'/)
@@ -189,7 +195,7 @@ test('event lifecycle QA can use an isolated event instead of colliding with a l
 
 test('event lifecycle QA follows the occurrence gender capacities instead of assuming 3:2', () => {
   const scriptPath = path.join(process.cwd(), 'scripts/run-quantum-event-lifecycle-e2e.mjs')
-  const script = fs.readFileSync(scriptPath, 'utf8')
+  const script = readSource(scriptPath)
 
   assert.match(script, /get_or_create_quantum_event_occurrence/)
   assert.match(script, /male_capacity,female_capacity,required_total/)
@@ -200,7 +206,7 @@ test('event lifecycle QA follows the occurrence gender capacities instead of ass
 
 test('event room QA requires an empty event selected through environment variables', () => {
   const scriptPath = path.join(process.cwd(), 'scripts/qa/release-e2e-event-room.mjs')
-  const script = fs.readFileSync(scriptPath, 'utf8')
+  const script = readSource(scriptPath)
 
   assert.match(script, /process\.env\.QA_EVENT_ID/)
   assert.match(script, /process\.env\.QA_EVENT_MODE/)

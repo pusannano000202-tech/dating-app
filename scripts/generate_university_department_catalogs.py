@@ -459,7 +459,9 @@ def check_outputs(outputs: dict[Path, bytes]) -> bool:
         if not path.exists():
             problems.append(f"missing: {relative_path}")
             continue
-        if path.read_bytes() != expected_content:
+        actual_content = path.read_bytes().replace(b"\r\n", b"\n")
+        normalized_expected = expected_content.replace(b"\r\n", b"\n")
+        if actual_content != normalized_expected:
             problems.append(f"outdated: {relative_path}")
 
     if problems:
