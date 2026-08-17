@@ -1,13 +1,15 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
-import Link from 'next/link'
-import { Bell, LockKeyhole } from 'lucide-react'
+import { LockKeyhole } from 'lucide-react'
 import { DEV_AUTH_COOKIE, getDevAuthCookieValue, isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { isSupabaseConfigured } from '@/lib/utils'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BootingLogo from '@/components/BootingLogo'
 import HomeInfoButton from '@/components/matching/HomeInfoButton'
-import HomeTodayTaskCard from '@/components/matching/HomeTodayTaskCard'
+import NotificationBell from '@/components/NotificationBell'
+import QuantumHomeLead from '@/components/home/QuantumHomeLead'
+import QuantumHomeParticipation from '@/components/home/QuantumHomeParticipation'
+import QuantumHomePulse from '@/components/home/QuantumHomePulse'
 import QuantumHomeRecommendations from '@/components/home/QuantumHomeRecommendations'
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>
@@ -15,7 +17,6 @@ type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient
 type ProfileGate = {
   gender: string | null
   appearance_type: string | null
-  big5_openness: number | null
 }
 
 async function getOnboardingRedirect(
@@ -24,13 +25,12 @@ async function getOnboardingRedirect(
 ): Promise<string | null> {
   const { data: profile } = await supabase
     .from('profiles')
-    .select('gender, appearance_type, big5_openness')
+    .select('gender, appearance_type')
     .eq('user_id', userId)
     .maybeSingle<ProfileGate>()
 
   if (!profile?.gender) return '/profile/basic'
   if (!profile.appearance_type) return '/profile/worldcup'
-  if (profile.big5_openness == null) return '/profile/survey'
 
   const { count } = await supabase
     .from('photos')
@@ -50,13 +50,7 @@ function HomeDashboard() {
           <BootingLogo size="md" />
           <div className="flex items-center gap-2">
             <HomeInfoButton />
-            <Link
-              href="/notifications"
-              className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body transition-colors hover:border-boot-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-boot-primary"
-              aria-label="알림"
-            >
-              <Bell size={18} />
-            </Link>
+            <NotificationBell />
           </div>
         </header>
 
@@ -66,7 +60,11 @@ function HomeDashboard() {
         </section>
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
-          <HomeTodayTaskCard />
+          <QuantumHomeParticipation fallback={<QuantumHomeLead />} />
+          <QuantumHomePulse />
+        </div>
+
+        <div className="mt-8">
           <QuantumHomeRecommendations />
         </div>
 

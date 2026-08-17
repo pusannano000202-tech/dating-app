@@ -38,7 +38,7 @@ export interface GroupSummary {
   gender: Gender
   size: number
   departmentCodes: string[]
-  avgSelfAppearanceScore: number | null
+  avgAppearanceScoreNormalized: number | null
   avgAppearanceVector: NumericVector | null
   avgPreferredAppearanceVector: NumericVector | null
   avgPreferredAxisZVector: NumericVector | null
@@ -57,7 +57,7 @@ export interface GroupSummary {
 
 export interface GroupMemberSummary {
   userId: string
-  selfAppearanceScore: number
+  appearanceScoreNormalized: number
   appearanceVector: NumericVector
   preferredAxisZVector: NumericVector
   big5: Big5Vector

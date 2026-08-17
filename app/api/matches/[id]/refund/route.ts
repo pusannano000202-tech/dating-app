@@ -6,11 +6,11 @@ import {
   type PreparedRefundResult,
   type RefundDepositRow,
 } from '@/lib/payments/refund-settlement'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

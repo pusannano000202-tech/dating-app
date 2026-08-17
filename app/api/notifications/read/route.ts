@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 // POST /api/notifications/read
 // body: { notification_id: string } → 개별 읽음
 // body: {} (or { all: true }) → 전체 읽음
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -19,14 +20,14 @@ export async function POST(req: NextRequest) {
       .rpc('mark_notification_read', { p_notification_id: notificationId })
       .maybeSingle()
     if (error) {
-      return NextResponse.json({ error: error.message || 'mark_read_failed' }, { status: 400 })
+      return NextResponse.json({ error: toPublicErrorCode(error.message, 'mark_read_failed') }, { status: 400 })
     }
     return NextResponse.json({ ok: data === true })
   }
 
   const { data, error } = await supabase.rpc('mark_all_notifications_read').maybeSingle()
   if (error) {
-    return NextResponse.json({ error: error.message || 'mark_all_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'mark_all_failed') }, { status: 400 })
   }
   return NextResponse.json({ ok: true, updated: data ?? 0 })
 }

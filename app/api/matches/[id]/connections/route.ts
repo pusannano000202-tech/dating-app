@@ -12,9 +12,20 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { data: eventRoute, error: eventRouteError } = await supabase.rpc(
+    'get_quantum_event_match_route',
+    { p_match_id: params.id },
+  )
+  if (eventRouteError) {
+    return NextResponse.json({ error: 'event_route_lookup_failed' }, { status: 500 })
+  }
+  if (eventRoute !== null) {
+    return NextResponse.json({ error: 'event_match_contact_hidden' }, { status: 403 })
+  }
+
   const { data, error } = await supabase.rpc('get_match_connections', { p_match_id: params.id })
   if (error) {
-    return NextResponse.json({ error: error.message || 'lookup_failed' }, { status: 400 })
+    return NextResponse.json({ error: 'lookup_failed' }, { status: 400 })
   }
   return NextResponse.json({ connections: data ?? [] })
 }

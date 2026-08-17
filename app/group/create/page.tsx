@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, LockKeyhole } from 'lucide-react'
 import SchoolMascot from '@/components/theme/SchoolMascot'
 import SchoolName from '@/components/theme/SchoolName'
@@ -15,6 +15,7 @@ import {
   setDevPreviewGroupStatus,
 } from '@/lib/dev-match-setup'
 import { normalizeGroupSize } from '@/lib/matching/group-size'
+import { getLegacyGroupScope } from '@/lib/matching/legacy-group-scope'
 import { isMatchingGroupsPayload } from '@/lib/matching/frontend-load-state'
 import { isGroupQueueActive } from '@/lib/matching/group-queue-state'
 import {
@@ -34,7 +35,6 @@ import {
   QUEUE_VISUAL_DEFAULT,
 } from '@/components/matching/group-create/dev-state'
 import { FriendListPanel } from '@/components/matching/group-create/FriendListPanel'
-import { FreeBetaQueuePanel } from '@/components/matching/group-create/FreeBetaQueuePanel'
 import { GroupDangerZone } from '@/components/matching/group-create/GroupDangerZone'
 import { GroupHeader } from '@/components/matching/group-create/GroupHeader'
 import { GroupMemberStatusPanel } from '@/components/matching/group-create/GroupMemberStatusPanel'
@@ -50,6 +50,7 @@ import type {
 } from '@/components/matching/group-create/types'
 
 export default function GroupCreatePage() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const isDevPreview = isDevPreviewClientSession()
   const requestedSize = normalizeGroupSize(searchParams.get('size'))
@@ -108,9 +109,7 @@ export default function GroupCreatePage() {
   const groupStats = useMemo(() => [
     { label: groupStatusLabel, value: `${members.length}` },
     { label: groupComposition.detail, value: groupComposition.label },
-    { label: '매칭 설정 준비 완료', value: `${readyMemberCount}명` },
-    { label: '매칭 설정 입력 필요', value: `${needsSetupCount}명` },
-  ], [groupComposition.detail, groupComposition.label, groupStatusLabel, members.length, readyMemberCount, needsSetupCount])
+  ], [groupComposition.detail, groupComposition.label, groupStatusLabel, members.length])
 
   useEffect(() => {
     if (!inQueue || !groupId) {
@@ -190,11 +189,7 @@ export default function GroupCreatePage() {
     }
 
     try {
-      const res = await fetch('/api/groups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ size: requestedSize }),
-      })
+      const res = await fetch('/api/groups')
 
       if (res.status === 401) {
         setError('로그인이 필요해요.')
@@ -215,6 +210,10 @@ export default function GroupCreatePage() {
         return
       }
       const data = payload as GroupState
+      if (getLegacyGroupScope(data.group) === 'redirect_to_match') {
+        router.replace('/match')
+        return
+      }
       setState(data)
       await refreshPreMatchCardStatus()
     } catch {
@@ -666,6 +665,10 @@ export default function GroupCreatePage() {
         return '멤버의 사전 카드 준비 상태를 확인하지 못했어요. 잠시 후 다시 시도해주세요.'
       case 'member_match_setup_incomplete':
         return '멤버의 성향 선호/가능 시간/매칭 비중/사전 카드 준비가 모두 완료되어야 큐에 들어갈 수 있어요.'
+      case 'appearance_score_required':
+        return '내 매칭 기준 준비를 먼저 완료해야 큐에 들어갈 수 있어요.'
+      case 'member_appearance_score_required':
+        return '그룹 멤버 모두 매칭 기준 준비를 완료해야 큐에 들어갈 수 있어요.'
       case 'member_profile_lookup_failed':
         return '멤버 준비 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.'
       default:                    return '큐 처리에 실패했어요. 잠시 후 다시 시도해주세요.'
@@ -865,51 +868,6 @@ export default function GroupCreatePage() {
               </>
             ) : (
               <>
-                <section className="mb-5 rounded-3xl border border-boot-primary/15 bg-white/90 p-4 shadow-sm">
-                  <div className="mb-3 flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-black text-boot-primary">매칭 규모 선택</p>
-                      <h2 className="mt-1 text-lg font-black text-boot-ink">
-                        {capacity}:{capacity} 과팅으로 준비 중
-                      </h2>
-                      <p className="mt-1 text-xs leading-5 text-boot-muted">
-                        2:2와 3:3 중 하나를 고르면 같은 규모의 그룹끼리 매칭돼요. 친구 성별이 섞인 혼성 그룹도 만들 수 있어요.
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-boot-soft px-3 py-1 text-[11px] font-black text-boot-primary">
-                      {members.length}/{capacity}명
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {[2, 3].map((size) => {
-                      const selected = capacity === size
-                      const locked = members.length > size || saving
-
-                      return (
-                        <button
-                          key={size}
-                          type="button"
-                          disabled={locked || selected}
-                          onClick={() => updateGroupSize(size as 2 | 3)}
-                          className={[
-                            'min-h-[82px] rounded-2xl border px-3 py-3 text-left transition-all',
-                            selected
-                              ? 'border-boot-primary/40 bg-boot-soft text-boot-primary shadow-sm'
-                              : 'border-boot-hairline bg-white text-boot-ink hover:border-boot-primary/30 hover:bg-boot-soft/60',
-                            locked && !selected ? 'cursor-not-allowed opacity-45' : '',
-                          ].join(' ')}
-                        >
-                          <span className="block text-lg font-black">{size}:{size}</span>
-                          <span className="mt-1 block text-[11px] leading-4 text-boot-muted">
-                            {size === 2 ? '빠르게 2명이서 가볍게 매칭' : '친구 3명이 모이면 더 시끌한 매칭'}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </section>
-
                 <GroupMemberStatusPanel
                   members={members}
                   currentUserId={currentUserId}
@@ -920,6 +878,7 @@ export default function GroupCreatePage() {
                   canManageMembers={canManageMembers}
                   saving={saving}
                   onRemoveMember={removeGroupMember}
+                  showMatchSetupStatus={false}
                 />
 
                 <InviteFriendPanel
@@ -946,19 +905,12 @@ export default function GroupCreatePage() {
                   onInviteFriend={inviteFriend}
                 />
 
-                <FreeBetaQueuePanel
-                  saving={saving}
-                  canEnterQueue={canEnterQueue}
-                  isLeader={isLeader}
-                  requiredMemberCount={capacity}
-                  membersLength={members.length}
-                  needsSetupCount={needsSetupCount}
-                  currentUserSetupStatus={currentUserMatchSetup}
-                  currentUserSetupReady={currentUserSetupReady}
-                  currentUserCardReady={preMatchCardDone}
-                  groupStats={groupStats}
-                  onEnterQueue={enterQueue}
-                />
+                <Link
+                  href="/match"
+                  className="mb-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-boot-ink px-4 text-sm font-black text-white"
+                >
+                  현재 모집 중인 활동 보기
+                </Link>
               </>
             )}
           </>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 export async function POST(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -14,7 +15,7 @@ export async function POST(_req: NextRequest, props: { params: Promise<{ id: str
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'confirm_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'confirm_failed') }, { status: 400 })
   }
 
   return NextResponse.json({ result: data })

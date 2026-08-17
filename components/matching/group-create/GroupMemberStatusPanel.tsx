@@ -14,6 +14,7 @@ type GroupMemberStatusPanelProps = {
   canManageMembers: boolean
   saving: boolean
   onRemoveMember: (member: GroupMemberRecord) => void
+  showMatchSetupStatus?: boolean
 }
 
 export function GroupMemberStatusPanel({
@@ -26,6 +27,7 @@ export function GroupMemberStatusPanel({
   canManageMembers,
   saving,
   onRemoveMember,
+  showMatchSetupStatus = true,
 }: GroupMemberStatusPanelProps) {
   const [openMemberId, setOpenMemberId] = useState<string | null>(null)
   const longPressTimer = useRef<number | null>(null)
@@ -113,16 +115,18 @@ export function GroupMemberStatusPanel({
               <p className="mt-0.5 text-[10px] text-boot-muted">
                 {member.role === 'leader' ? '리더' : '멤버'} · {genderLabel}
               </p>
-              <p
-                className={[
-                  'mx-auto mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold',
-                  ready
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                    : 'border-amber-200 bg-amber-50 text-amber-700',
-                ].join(' ')}
-              >
-                {statusLabel}
-              </p>
+              {showMatchSetupStatus && (
+                <p
+                  className={[
+                    'mx-auto mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold',
+                    ready
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      : 'border-amber-200 bg-amber-50 text-amber-700',
+                  ].join(' ')}
+                >
+                  {statusLabel}
+                </p>
+              )}
 
               {canRemove && (
                 <div className="mt-auto space-y-2 pt-3">

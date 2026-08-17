@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 export async function GET(req: NextRequest) {
   const supabase = await createSupabaseServerClient()
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
   if (!key) return NextResponse.json({ error: 'missing_key' }, { status: 400 })
 
   const { data, error } = await supabase.rpc('get_app_config', { p_key: key })
-  if (error) return NextResponse.json({ error: error.message || 'lookup_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'lookup_failed') }, { status: 400 })
   return NextResponse.json({ key, value: data })
 }
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   if (!key || !('value' in body)) return NextResponse.json({ error: 'missing_key_or_value' }, { status: 400 })
 
   const { data, error } = await supabase.rpc('set_app_config', { p_key: key, p_value: body.value })
-  if (error) return NextResponse.json({ error: error.message || 'update_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'update_failed') }, { status: 400 })
   return NextResponse.json({ key, value: data })
 }
 

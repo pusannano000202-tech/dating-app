@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -13,7 +14,7 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
     .rpc('get_match_daily_cards', { p_match_id: params.id })
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'daily_cards_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'daily_cards_failed') }, { status: 400 })
   }
 
   return NextResponse.json({ cards: data ?? [] })
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     })
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'daily_card_pick_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'daily_card_pick_failed') }, { status: 400 })
   }
 
   return NextResponse.json({ card: Array.isArray(data) ? data[0] ?? null : data })
