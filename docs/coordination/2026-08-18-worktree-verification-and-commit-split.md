@@ -3,8 +3,8 @@
 ## 현재 판정
 
 - 브랜치: `codex/quantum-handphone`
-- 검증 기준 기능 HEAD: `be6a96c1`
-- 원격 브랜치 대비 기능·코드 커밋: 22개(이 검증 문서 커밋 제외)
+- 검증 기준 기능 HEAD: `65af2a52`
+- 원격 브랜치 대비 로컬 커밋: 23개(이번 검증표 갱신 커밋 전 기준)
 - 문서 작성 시 기존 작업 폴더 잔여 상태: 추적 수정 49개, 미추적 8,542개
 - 이번 출시 후보 기능은 기능·보안·테스트·문서 단위로 분리 커밋함
 - push, Vercel 배포, 원격 Supabase migration 적용: 수행하지 않음
@@ -43,6 +43,26 @@
 | 모바일 테스트 | PASS 153/153 | 전체 모바일 회귀 테스트 |
 | Expo Doctor | PASS 21/21 | SDK 의존성 정합성 |
 | 루트 의존성 감사 | PASS | 알려진 취약점 0건 |
+| 운영형 경로 점검 | PASS 18/18 | 공개 200, 개발 전용 404, 보호 경로 307 |
+
+## 원격 환경 읽기 전용 검증
+
+대상 Supabase project ref: `jyfwcanjqwboyvicoafm` (`quantum-production`, `ACTIVE_HEALTHY`)
+
+| 구분 | 결과 | 판정 |
+| --- | --- | --- |
+| 프로젝트 일치 | PASS | 로컬 ref와 원격 대상이 정확히 일치함 |
+| migration 정합성 | BLOCKED | 로컬 158개 중 157개 적용, `20260814030000_matching_profile_preference_secret_roles.sql` 미적용 |
+| 원격 전용 migration | 확인 | UUID 보정·서비스 ACL·QA 정리 3개가 원격에만 존재함 |
+| Supabase 보안 Advisor | PASS | 보안 0건, 성능 0건 |
+| public 테이블 RLS | PASS | 73개 전부 활성화, 비활성 0개 |
+| `SECURITY DEFINER` 기본 권한 | PASS | 212개 모두 고정 `search_path`, PUBLIC·anon 실행 권한 0개 |
+| authenticated 함수 권한 | REVIEW | 123개 앱 RPC 실행 가능, 개별 업무 행위 E2E는 별도 필요 |
+| 외모 점수 비공개 저장 | 저장 증거 확인 | `ready` 1건, 승인 모델·프롬프트·anchor 계약 일치, 브라우저 테이블 권한 0개 |
+| Toss 결제 상태 | 미완료 | deposit `pending` 1건, 승인·환불·이월 0건 |
+| AI 서버 | PASS | 운영 HTTPS `/health` 정상, analyzer 준비됨 |
+| Vercel 운영판 | OUTDATED | 기존 `coffee` 계약만 지원하며 `coffee-main`, `coffee-north`는 400 |
+| Expo 산출물 | 오래된 산출물만 존재 | AAB build 6, APK build 5 완료 상태이나 8월 13일 빌드로 최신 코드 아님 |
 
 ## 브라우저 검증
 
@@ -63,17 +83,17 @@
 
 ## 남은 운영 검증
 
-- 원격 Supabase migration 적용 순서, RLS, `SECURITY DEFINER` 함수 권한 감사
+- 사용자 승인 후 누락된 secret-role migration 1개를 원격에 적용하고, 원격 전용 migration 3개와 충돌하지 않는지 재검증
 - 실제 2·4·5개 계정으로 초대, 커플, 매칭, 커뮤니티, 사진 흐름 E2E
-- 실제 사진 1장 OpenAI 분석과 비공개 점수 저장·재사용
-- Toss 테스트 승인 결제, 전액 환불, 다음 매칭 이월 전체 흐름
-- Vercel 운영 환경변수, 실제 배포, 운영 경로 재검증
+- 기존 실제 OpenAI 점수 저장 증거는 확인했으나, 동일 사진 재사용과 사진 변경 무효화 API 흐름은 실제 계정으로 재검증
+- Toss 테스트 결제 승인, 전액 환불, 다음 매칭 이월 전체 흐름
+- 깨끗한 커밋만 push한 뒤 최신 Vercel 배포와 운영 `coffee-main`·`coffee-north` 계약 재검증
 - 최신 APK/AAB 생성, 실기기 설치, Google·Kakao 앱 복귀
 - 맛집 사진 사용권, 현재 영업 상태, 저해상도 원본 품질 확인
 - Campus Eats Elo·방문 기록 계정 동기화와 학교 전체 통계
 
 ## 알려진 도구·의존성 위험
 
-- 현재 Vercel CLI는 Windows 한글 사용자 표시명을 HTTP 헤더로 처리하지 못해 인증 명령이 실패함. 대시보드 인증 또는 CLI 수정이 필요함.
+- 현재 Vercel CLI 인증 파일에 실제 token이 없고, Windows 한글 환경에서 인증 오류 메시지 처리도 실패함. 대시보드 인증 또는 명시적 CLI token 연결이 필요함.
 - 모바일 `npm audit`은 Expo·Metro 전이 의존성에서 22건(중간 8, 높음 14)을 보고함. 자동 강제 수정은 Expo 57을 53으로 내리는 파괴적 변경이라 적용하지 않음.
 - 원본 작업 폴더의 잔여 변경은 이번 커밋 범위와 무관하며 자동 stage하지 않음.
