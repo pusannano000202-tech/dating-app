@@ -16,7 +16,9 @@
     "check:secrets": "node scripts/check-secret-leaks.mjs",
     "check:secrets:all": "node scripts/check-secret-leaks.mjs --include-untracked",
     "check:deploy-readiness": "node scripts/check-deploy-readiness.mjs",
+    "check:migrations": "python scripts/verify-migrations.py --max-issues 612",
     "check:routes": "node scripts/check-local-routes.mjs",
+    "test:tooling": "python -m unittest discover -s tests/tooling -p \"test_*.py\"",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {

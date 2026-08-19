@@ -212,7 +212,7 @@ HTTP 200이나 화면 렌더만으로 완료 처리하지 않는다.
 | Expo Doctor | 통과 | 21/21 |
 | Python 테스트 | 통과 | 68 통과, 운영에서 제거된 legacy PyTorch 테스트 17개 의도적 제외 |
 | Python Ruff | 통과 | 오류 0 |
-| migration 정적 보고서 | 참고용 | 161파일 스캔, 정규식 오탐 612건으로 release gate가 아님 |
+| migration 정적 검사 | 부분 게이트 | 161파일·기존 경고 612건을 기준선으로 고정해 신규 경고 증가를 CI에서 차단 |
 | 로컬 PostgreSQL 전체 재생 | 이전 증거 유지 | migration 변경이 없어 `d669bdce`의 161/161 결과 사용 |
 | 배포 준비 검사 | 실패 | Vercel 인증·연결, Toss/AI 운영 환경값, 공개 origin 미설정 |
 | GitHub PR 상태 조회 | 통과 | PR #14 초안, main 대상, 병합 충돌 없음. `52a60b38`에서 Python 48초·Next.js·Vercel Preview Comments 성공 |
@@ -229,3 +229,16 @@ HTTP 200이나 화면 렌더만으로 완료 처리하지 않는다.
   Google·Kakao 앱 복귀는 실제 외부 환경에서 확인해야 한다.
 - Vercel CLI 로그인과 프로젝트 연결, `AI_SERVER_URL`, `AI_SERVER_SECRET`,
   `NEXT_PUBLIC_APP_ORIGIN`, Toss 운영 환경값이 준비되기 전에는 배포하지 않는다.
+
+## 10. 마이그레이션 정적 검사 회귀 방지
+
+- 기존 도구는 경고가 있어도 항상 종료 코드 `0`을 반환해 CI 게이트로 사용할 수
+  없었다. 기본 보고 모드는 호환성을 위해 유지하되 `--strict`와 `--max-issues`를
+  추가했다.
+- 현재 161개 파일의 정규식 경고 612건을 수량 기준선으로 고정했다. CI의
+  `Supabase migrations - warning baseline` 작업은 613건 이상이 되면 실패한다.
+- `npm run test:tooling`은 보고 모드, strict 모드, 기준선 이하 통과와 초과 실패를
+  작은 격리 migration으로 검증한다.
+- `npm run check:migrations`는 현재 저장소 기준선을 재현한다. 이 통과는 신규 정적
+  경고가 증가하지 않았다는 뜻이며, 실제 PostgreSQL 전체 재생·RLS·원격 advisor
+  검증을 대신하지 않는다.

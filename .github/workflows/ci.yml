@@ -7,6 +7,30 @@ on:
     branches: [main]
 
 jobs:
+  migration-verification:
+    name: Supabase migrations - warning baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Test migration verifier
+        run: npm run test:tooling
+
+      - name: Reject new migration warnings
+        run: npm run check:migrations
+
   # ─── 외모 AI 서버 (Python) ───────────────────────────────────────────────
   appearance-tests:
     name: Appearance AI — pytest

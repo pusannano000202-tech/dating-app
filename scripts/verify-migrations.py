@@ -24,9 +24,12 @@ What it does NOT catch
 
 Usage:
     python scripts/verify-migrations.py
+    python scripts/verify-migrations.py --strict
+    python scripts/verify-migrations.py --max-issues 612
 """
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -330,7 +333,33 @@ def parse_file(path: Path) -> FileReport:
     return report
 
 
-def main() -> int:
+def non_negative_integer(value: str) -> int:
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError('must be zero or greater')
+    return parsed
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description='Statically verify Supabase migration ordering and references.',
+    )
+    issue_limit = parser.add_mutually_exclusive_group()
+    issue_limit.add_argument(
+        '--strict',
+        action='store_true',
+        help='Return a failure exit status when any issue is found.',
+    )
+    issue_limit.add_argument(
+        '--max-issues',
+        type=non_negative_integer,
+        help='Return a failure exit status only when issues exceed this limit.',
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     files = sorted(MIG_DIR.glob('*.sql'))
     if not files:
         print('no migrations found')
@@ -516,10 +545,28 @@ def main() -> int:
         print()
         print('PASS - no dependency-order issues found.')
         return 0
-    else:
+
+    configured_limit = 0 if args.strict else args.max_issues
+    if configured_limit is None:
         print()
-        print('CHECK - see warnings above. Some may be false positives from regex parsing.')
-        return 0  # exit 0; we treat as report not gate
+        print('REPORT - warnings found; exit status remains zero.')
+        print('Some warnings may be false positives from regex parsing.')
+        return 0
+
+    if total_issues > configured_limit:
+        print()
+        print(
+            f'FAIL - {total_issues} issue(s) exceed the configured limit of '
+            f'{configured_limit}.'
+        )
+        return 1
+
+    print()
+    print(
+        f'PASS - {total_issues} issue(s) are within the configured limit of '
+        f'{configured_limit}.'
+    )
+    return 0
 
 
 if __name__ == '__main__':
