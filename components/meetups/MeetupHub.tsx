@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowRight,
@@ -172,13 +171,13 @@ export default function MeetupHub() {
               운동, 게임, 스터디처럼 하고 싶은 일을 고르고 바로 참여하거나 직접 열 수 있어요.
             </p>
           </div>
-          <Link
+          <a
             href="/meetups/create"
             className="hidden min-h-11 shrink-0 items-center gap-2 rounded-[8px] bg-boot-primary px-4 py-3 text-sm font-black text-white sm:flex"
           >
             <Plus size={18} />
             모임 만들기
-          </Link>
+          </a>
         </header>
 
         <section className="py-5" aria-labelledby="meetup-ideas-heading">
@@ -311,7 +310,7 @@ export default function MeetupHub() {
           {visibleIdeas.length > 0 ? (
             <MeetupIdeaCylinder ideas={visibleIdeas} onBrowseCategory={browseIdeaCategory} />
           ) : (
-            <Link
+            <a
               href={category === 'all' ? '/meetups/create' : `/meetups/create?category=${category}`}
               className="mt-4 flex min-h-20 items-center justify-between rounded-[8px] border border-boot-hairline bg-white px-4"
             >
@@ -322,7 +321,7 @@ export default function MeetupHub() {
                 <span className="mt-1 block text-xs font-bold text-boot-muted">현재 표시된 카테고리에 등록된 아이디어가 없습니다.</span>
               </span>
               <ArrowRight size={18} className="text-boot-primary" />
-            </Link>
+            </a>
           )}
         </section>
 
@@ -332,9 +331,9 @@ export default function MeetupHub() {
               <h2 id="open-meetups-heading" className="text-lg font-black">실제 모임 목록</h2>
               <p className="mt-1 text-xs font-bold text-boot-muted">현재 만들어져 참여할 수 있는 모임이에요.</p>
             </div>
-            <Link href="/meetups/create" className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-primary sm:hidden">
+            <a href="/meetups/create" className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-primary sm:hidden">
               <Plus size={16} /> 모임 만들기
-            </Link>
+            </a>
           </div>
 
           {notice ? <p className="mt-3 rounded-[8px] bg-white px-3 py-2 text-xs font-bold text-boot-primary" role="status">{notice}</p> : null}
@@ -395,7 +394,7 @@ function MeetupListState({ state }: { state: LoadState }) {
     return (
       <div className="mt-4 flex min-h-24 items-center justify-between gap-4 rounded-[8px] border border-boot-hairline bg-white p-4">
         <p className="text-sm font-bold leading-6 text-boot-muted">모임에 참여하려면 다시 로그인해 주세요.</p>
-        <Link href="/login?redirect=%2Fmeetups" className="shrink-0 text-sm font-black text-boot-primary">로그인</Link>
+        <a href="/login?redirect=%2Fmeetups" className="shrink-0 text-sm font-black text-boot-primary">로그인</a>
       </div>
     )
   }

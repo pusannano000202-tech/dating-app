@@ -12,10 +12,11 @@ function readSource(path: string): string {
 }
 
 test('public meetup actions use document navigation so auth redirects keep query parameters', () => {
-  const meetups = readSource('app/meetups/page.tsx')
+  const meetups = readSource('components/meetups/MeetupHub.tsx')
 
-  assert.match(meetups, /<a[\s\S]*href=\{featuredAction\.href\}/)
-  assert.match(meetups, /<a[\s\S]*key=\{action\.title\}[\s\S]*href=\{action\.href\}/)
+  assert.match(meetups, /<a[\s\S]*href="\/meetups\/create"/)
+  assert.match(meetups, /<a[\s\S]*href=\{category === 'all' \? '\/meetups\/create' : `\/meetups\/create\?category=\$\{category\}`\}/)
+  assert.doesNotMatch(meetups, /import Link from 'next\/link'/)
 })
 
 test('community preview is development-only unless production explicitly enables it', () => {

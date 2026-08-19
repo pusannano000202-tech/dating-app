@@ -37,7 +37,7 @@ interface DepositRow {
 }
 
 export async function GET(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -449,7 +449,7 @@ interface DepositMatchRow {
 }
 
 async function validateDepositMatchContext(
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  supabase: ReturnType<typeof createSupabaseRequestClient>,
   params: { matchId: string; groupId: string; userId: string },
 ): Promise<DepositMatchValidation> {
   const matchLookup = await supabase
