@@ -4,6 +4,7 @@ import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ChevronLeft, LogIn, MailCheck, MessageCircle, Send, Sparkles } from 'lucide-react'
+import { isOAuthProviderEnabled } from '@/lib/auth/provider-availability'
 import { getPostLoginDestination } from '@/lib/auth/redirect'
 import { createClient } from '@/lib/supabase'
 import {
@@ -12,7 +13,7 @@ import {
   type QuantumOAuthProvider,
 } from '@/lib/auth/oauth-login'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
-import { getSupabaseConfigIssue } from '@/lib/utils'
+import { getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 import BootingLogo from '@/components/BootingLogo'
 
 type LoginStep = 'email' | 'code'
@@ -169,6 +170,20 @@ function LoginContent() {
     setLoading(true)
     setOAuthProvider(provider)
     try {
+      const providerEnabled = await isOAuthProviderEnabled({
+        provider,
+        supabaseUrl: getSupabaseUrl(),
+        publicKey: getSupabasePublicKey(),
+        fetcher: window.fetch.bind(window),
+      })
+      if (!providerEnabled) {
+        const providerLabel = provider === 'google' ? 'Google' : '카카오'
+        setError(`${providerLabel} 로그인이 아직 준비되지 않았어요. 이메일로 계속해줘.`)
+        setOAuthProvider(null)
+        setLoading(false)
+        return
+      }
+
       const supabase = createClient()
       const callbackUrl = getOAuthCallbackUrl(window.location.origin, redirectTo)
       const { error: err } = await supabase.auth.signInWithOAuth({
@@ -214,7 +229,7 @@ function LoginContent() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#17120f] text-boot-ink">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#17120f] text-boot-ink">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,142,95,0.30),transparent_34%),linear-gradient(135deg,#271b16_0%,#17120f_42%,#fff3ec_100%)]" />
       <video
         className={[
@@ -358,7 +373,7 @@ function LoginContent() {
                       />
                     </label>
 
-                    {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+                    {error && <p role="alert" className="mb-3 text-xs font-bold text-red-500">{error}</p>}
 
                     <button
                       type="submit"
@@ -401,7 +416,7 @@ function LoginContent() {
                     ))}
                   </div>
 
-                  {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+                  {error && <p role="alert" className="mb-3 text-xs font-bold text-red-500">{error}</p>}
 
                   <button
                     type="button"
