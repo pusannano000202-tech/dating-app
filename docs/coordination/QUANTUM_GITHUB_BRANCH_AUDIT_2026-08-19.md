@@ -1,8 +1,9 @@
 # Quantum GitHub 브랜치 통합 감사
 
-> 상태: `LOCAL_VERIFIED`
+> 상태: `BRANCH_PUSHED`
 > 기준일: 2026-08-19
 > 통합 브랜치: `codex/main-integration-20260819`
+> 원격 통합 브랜치: `origin/codex/main-integration-20260819`
 > 원격 `main` 직접 push 및 원격 브랜치 삭제: 수행하지 않음
 
 ## 1. 고정한 기준점
@@ -95,7 +96,7 @@ Google 전용 브랜치를 그대로 합치지 않고 Google·Kakao 모두를 �
 | 모바일 테스트 / Expo Doctor | PASS_WITH_RISK | 153/153, 타입 검사 통과, Expo Doctor 21/21; 의존성 감사 22건 별도 기록 |
 | Python 테스트 | PASS_WITH_SKIP | 66 통과, 17 legacy PyTorch 제외, Ruff 통과 |
 | 비밀정보 / DB 권한 경계 검사 | PASS_LOCAL | 추적 비밀정보 0건, Node 운영 의존성 취약점 0건, 관련 소스 계약 테스트 통과 |
-| GitHub 통합 브랜치 push | READY | 로컬 검증 완료 후 이 문서 커밋과 함께 수행 |
+| GitHub 통합 브랜치 push | PASS | `origin/codex/main-integration-20260819` 게시 및 upstream 연결 완료 |
 | `main` push | BLOCKED | 사용자 별도 승인 필요 |
 | 원격 브랜치 삭제 | BLOCKED | PR 및 최종 통합 이후 승인 필요 |
 
