@@ -55,6 +55,29 @@ class TestStartupConfiguration(unittest.TestCase):
         self.assertIn("fastapi", requirements.lower())
         self.assertIn("openai", requirements.lower())
 
+    def test_development_dependencies_extend_the_openai_runtime_only(self):
+        service_root = Path(__file__).resolve().parents[1]
+        requirements = (service_root / "requirements-dev.txt").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("-r requirements-runtime.txt", requirements)
+        self.assertNotIn("-r requirements.txt", requirements)
+        self.assertNotIn("torch", requirements.lower())
+        self.assertNotIn("torchvision", requirements.lower())
+
+    def test_ci_uses_supported_python_and_has_a_timeout(self):
+        repository_root = Path(__file__).resolve().parents[3]
+        workflow = (repository_root / ".github" / "workflows" / "ci.yml").read_text(
+            encoding="utf-8"
+        )
+        appearance_job = workflow.split("appearance-tests:", maxsplit=1)[1].split(
+            "nextjs-typecheck:", maxsplit=1
+        )[0]
+
+        self.assertIn('python-version: "3.12"', appearance_job)
+        self.assertIn("timeout-minutes:", appearance_job)
+
     def test_compose_builds_the_service_from_repository_root(self):
         compose_file = Path(__file__).resolve().parents[3] / "docker-compose.yml"
         compose = compose_file.read_text(encoding="utf-8")
