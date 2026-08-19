@@ -1,14 +1,14 @@
 """Unit tests for supabase_client.py — no real Supabase connection required."""
-import unittest
-from unittest.mock import MagicMock, patch
 import sys
 import types
+import unittest
+from unittest.mock import MagicMock, patch
 
 sys.modules.setdefault(
     "supabase",
     types.SimpleNamespace(Client=object, create_client=MagicMock()),
 )
-import supabase_client as sc
+import supabase_client as sc  # noqa: E402
 
 
 def _reset_singleton():

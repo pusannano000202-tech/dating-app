@@ -13,7 +13,6 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         home = read("app/page.tsx")
         basic = read("app/profile/basic/page.tsx")
         worldcup = read("app/profile/worldcup/page.tsx")
-        survey = read("app/profile/survey/page.tsx")
         progress = read("components/profile/StepProgress.tsx")
         login = read("app/(auth)/login/page.tsx")
         redirect = read("lib/auth/redirect.ts")
@@ -26,13 +25,13 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
         )
 
         self.assertIn("router.push('/profile/worldcup')", basic)
-        self.assertIn("router.push('/profile/survey')", worldcup)
-        self.assertIn("router.push('/profile/photos')", survey)
+        self.assertIn("router.push('/profile/photos')", worldcup)
+        self.assertNotIn("router.push('/profile/survey')", worldcup)
 
         self.assertLess(progress.index("path: '/profile/basic'"), progress.index("path: '/profile/worldcup'"))
         self.assertLess(progress.index("path: '/profile/worldcup'"), progress.index("path: '/profile/photos'"))
-        self.assertIn("?? '/'", login)
-        self.assertNotIn("?? '/profile/basic'", login)
+        self.assertIn("getPostLoginDestination", login)
+        self.assertIn("return '/profile/basic'", redirect)
 
     def test_friend_relationship_tables_exist_before_group_invites(self):
         migration = read("supabase/migrations/20260521000001_matching_create_core_tables.sql")
@@ -47,10 +46,6 @@ class TestGroupOnboardingAndFriendFlow(unittest.TestCase):
 
     def test_group_create_screen_is_friend_invite_based(self):
         page = read("app/group/create/page.tsx")
-        invite_panel = read("components/matching/group-create/InviteFriendPanel.tsx")
-        member_panel = read("components/matching/group-create/GroupMemberStatusPanel.tsx")
-        queue_panel = read("components/matching/group-create/FreeBetaQueuePanel.tsx")
-
         self.assertIn("친구 초대", page)
         self.assertIn("현재 함께하는 친구", page)
         self.assertIn("GroupMemberStatusPanel", page)

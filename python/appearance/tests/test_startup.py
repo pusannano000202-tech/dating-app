@@ -1,8 +1,8 @@
 """Regression coverage for local and container service startup."""
 
+import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import unittest
 
 import main as server_module
 

@@ -11,7 +11,14 @@ try:
     import torch.nn as nn
     from PIL import Image
 
-    from model import build_model, score_image, score_photos, load_image_from_url, SCORE_MIN, SCORE_MAX
+    from model import (
+        SCORE_MAX,
+        SCORE_MIN,
+        build_model,
+        load_image_from_url,
+        score_image,
+        score_photos,
+    )
 except (ImportError, OSError, RuntimeError) as exc:
     LEGACY_MODEL_IMPORT_ERROR = exc
 
