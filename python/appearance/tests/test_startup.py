@@ -14,7 +14,10 @@ class TestStartupConfiguration(unittest.TestCase):
             module_path = repository_root / "python" / "appearance" / "main.py"
             module_path.parent.mkdir(parents=True)
             root_env = repository_root / ".env.local"
-            root_env.write_text("AI_SERVER_SECRET=test-secret\n", encoding="utf-8")
+            root_env.write_text(
+                "AI_SERVER_SECRET=test-secret-0123456789abcdef012345\n",
+                encoding="utf-8",
+            )
 
             self.assertTrue(hasattr(server_module, "find_root_env_file"))
             self.assertEqual(server_module.find_root_env_file(module_path), root_env)

@@ -195,6 +195,46 @@ test('Toss deposit readiness requires checkout, refund, and reconciliation serve
   assert.match(paymentLib, /getSupabaseAdminKeyStatus/)
 })
 
+test('Toss deposit readiness rejects an internal payment secret shorter than 32 characters', () => {
+  const envChecker = readSource('scripts/check-payment-env.mjs')
+  const previousEnv = {
+    NEXT_PUBLIC_TOSS_CLIENT_KEY: process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY,
+    TOSS_SECRET_KEY: process.env.TOSS_SECRET_KEY,
+    PAYMENT_INTERNAL_SECRET: process.env.PAYMENT_INTERNAL_SECRET,
+    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  }
+
+  assert.match(envChecker, /PAYMENT_INTERNAL_SECRET[\s\S]{0,180}value\.length >= 32/)
+  assert.match(envChecker, /CRON_SECRET[\s\S]{0,180}value\.length >= 32/)
+
+  try {
+    process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY = 'test_ck_fake_client_key_1234567890'
+    process.env.TOSS_SECRET_KEY = 'test_sk_fake_server_key_1234567890'
+    process.env.PAYMENT_INTERNAL_SECRET = 'x'.repeat(31)
+    process.env.SUPABASE_SECRET_KEY = 'sb_secret_fake_server_key_1234567890'
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    const rejected = getDepositPaymentReadiness('toss')
+    assert.equal(rejected.ok, false)
+    if (!rejected.ok) {
+      assert.deepEqual(rejected.invalid, ['PAYMENT_INTERNAL_SECRET'])
+    }
+
+    process.env.PAYMENT_INTERNAL_SECRET = 'x'.repeat(32)
+    assert.deepEqual(getDepositPaymentReadiness('toss'), {
+      ok: true,
+      provider: 'toss',
+    })
+  } finally {
+    restoreEnv('NEXT_PUBLIC_TOSS_CLIENT_KEY', previousEnv.NEXT_PUBLIC_TOSS_CLIENT_KEY)
+    restoreEnv('TOSS_SECRET_KEY', previousEnv.TOSS_SECRET_KEY)
+    restoreEnv('PAYMENT_INTERNAL_SECRET', previousEnv.PAYMENT_INTERNAL_SECRET)
+    restoreEnv('SUPABASE_SECRET_KEY', previousEnv.SUPABASE_SECRET_KEY)
+    restoreEnv('SUPABASE_SERVICE_ROLE_KEY', previousEnv.SUPABASE_SERVICE_ROLE_KEY)
+  }
+})
+
 test('mock deposit readiness requires the same server settlement credential as its route', () => {
   const previousEnv = {
     NODE_ENV: process.env.NODE_ENV,
@@ -395,8 +435,8 @@ test('payment env checker rejects malformed Toss and service role values without
     NEXT_PUBLIC_SUPABASE_ANON_KEY: makeFakeJwt({ role: 'anon' }),
     NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
     TOSS_SECRET_KEY: ['test', 'sk', 'fake_secret_key'].join('_'),
-    PAYMENT_INTERNAL_SECRET: 'local-internal-secret',
-    CRON_SECRET: 'local-refund-cron-secret',
+    PAYMENT_INTERNAL_SECRET: 'local-payment-internal-secret-123456',
+    CRON_SECRET: 'local-refund-cron-secret-1234567890',
     SUPABASE_SERVICE_ROLE_KEY: `${makeFakeJwt({ role: 'service_role' })}그저`,
   }
 
@@ -429,8 +469,8 @@ test('payment env checker rejects Toss keys with trailing prose or unsafe charac
     PAYMENT_PROVIDER: 'toss',
     NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
     TOSS_SECRET_KEY: 'test_sk_fake_secret_key 이거니까',
-    PAYMENT_INTERNAL_SECRET: 'local-internal-secret',
-    CRON_SECRET: 'local-refund-cron-secret',
+    PAYMENT_INTERNAL_SECRET: 'local-payment-internal-secret-123456',
+    CRON_SECRET: 'local-refund-cron-secret-1234567890',
     SUPABASE_SERVICE_ROLE_KEY: makeFakeJwt({ role: 'service_role' }),
   }
 
@@ -464,7 +504,7 @@ test('payment env checker blocks Toss deployment when the refund cron secret is 
     PAYMENT_PROVIDER: 'toss',
     NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
     TOSS_SECRET_KEY: 'test_sk_fake_secret_key',
-    PAYMENT_INTERNAL_SECRET: 'local-internal-secret',
+    PAYMENT_INTERNAL_SECRET: 'local-payment-internal-secret-123456',
     SUPABASE_SERVICE_ROLE_KEY: makeFakeJwt({ role: 'service_role' }),
   }
 
@@ -497,8 +537,8 @@ test('payment env checker rejects mixed Toss test and live key environments', ()
     PAYMENT_PROVIDER: 'toss',
     NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_fake_client_key',
     TOSS_SECRET_KEY: 'live_sk_fake_secret_key',
-    PAYMENT_INTERNAL_SECRET: 'local-internal-secret',
-    CRON_SECRET: 'local-refund-cron-secret',
+    PAYMENT_INTERNAL_SECRET: 'local-payment-internal-secret-123456',
+    CRON_SECRET: 'local-refund-cron-secret-1234567890',
     SUPABASE_SERVICE_ROLE_KEY: makeFakeJwt({ role: 'service_role' }),
   }
 
@@ -530,7 +570,7 @@ test('payment env checker rejects copied placeholder deployment values', () => {
     NEXT_PUBLIC_TOSS_CLIENT_KEY: 'test_ck_your_client_key',
     TOSS_SECRET_KEY: 'test_sk_your_secret_key',
     PAYMENT_INTERNAL_SECRET: 'replace_me_secret',
-    CRON_SECRET: 'local-refund-cron-secret',
+    CRON_SECRET: 'local-refund-cron-secret-1234567890',
     SUPABASE_SERVICE_ROLE_KEY: makeFakeJwt({ role: 'service_role' }),
   }
 
@@ -1019,6 +1059,9 @@ test('automatic refund worker is protected, bounded, leased, and evidence-finali
 test('internal Toss cancellation resolves the owned deposit before calling the provider', () => {
   const cancelRoute = readSource('app/api/payments/deposit/cancel/route.ts')
 
+  assert.match(cancelRoute, /isAuthorizedInternalRequest/)
+  assert.doesNotMatch(cancelRoute, /providedSecret !== internalSecret/)
+  assert.doesNotMatch(cancelRoute, /function readBearerToken/)
   assert.match(cancelRoute, /deposit_id_required/)
   assert.match(cancelRoute, /match_id_required/)
   assert.match(cancelRoute, /group_id_required/)

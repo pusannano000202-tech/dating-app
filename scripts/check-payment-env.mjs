@@ -57,13 +57,13 @@ if (provider === 'toss') {
       key: 'PAYMENT_INTERNAL_SECRET',
       required: true,
       purpose: 'protect internal refund/cancel calls',
-      validate: (value) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
+      validate: (value) => value.length >= 32 && !hasUnsafeEnvValueCharacters(value),
     },
     {
       key: 'CRON_SECRET',
       required: true,
       purpose: 'authenticate scheduled refund processing',
-      validate: (value) => value.length >= 16 && !hasUnsafeEnvValueCharacters(value),
+      validate: (value) => value.length >= 32 && !hasUnsafeEnvValueCharacters(value),
     },
     {
       key: 'SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY',

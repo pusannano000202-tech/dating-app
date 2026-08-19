@@ -94,7 +94,7 @@ test('Toss runtime readiness rejects configured keys that include copied prose',
   try {
     process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY = 'test_ck_fake_client_key'
     process.env.TOSS_SECRET_KEY = 'test_sk_fake_secret_key 이거니까'
-    process.env.PAYMENT_INTERNAL_SECRET = 'local-internal-secret'
+    process.env.PAYMENT_INTERNAL_SECRET = 'local-payment-internal-secret-123456'
     process.env.SUPABASE_SERVICE_ROLE_KEY = makeFakeJwt({ role: 'service_role' })
 
     const readiness = getDepositPaymentReadiness('toss')

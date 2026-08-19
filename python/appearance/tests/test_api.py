@@ -4,7 +4,8 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-os.environ.setdefault("AI_SERVER_SECRET", "test-ai-secret")
+TEST_AI_SERVER_SECRET = "test-ai-secret-0123456789abcdef012345"
+os.environ.setdefault("AI_SERVER_SECRET", TEST_AI_SERVER_SECRET)
 os.environ.setdefault("APPEARANCE_ALLOWED_PHOTO_HOSTS", "storage.example")
 os.environ.setdefault("NEXT_PUBLIC_SUPABASE_URL", "https://project-ref.supabase.co")
 
@@ -126,7 +127,7 @@ class TestRequestIdMiddleware(unittest.TestCase):
 class TestScorePhotosEndpoint(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
-        self.auth_headers = {"Authorization": "Bearer test-ai-secret"}
+        self.auth_headers = {"Authorization": f"Bearer {TEST_AI_SERVER_SECRET}"}
 
     def post_score(self, payload):
         return self.client.post(

@@ -454,6 +454,8 @@ test('appearance score API uses owned storage paths and persists only to the pri
   assert.match(scoreRoute, /['"]user_id['"][\s\S]{0,200}?['"]request_id['"]/)
   assert.match(pythonRoute, /AI_SERVER_SECRET/)
   assert.match(pythonRoute, /compare_digest/)
+  assert.match(scoreRoute, /AI_SERVER_SECRET\.length < 32/)
+  assert.match(pythonRoute, /len\(expected_secret\) < 32/)
 
   assert.equal(isOwnedAppearanceStoragePath('user-1/photo_0.jpg', 'user-1'), true)
   assert.equal(isOwnedAppearanceStoragePath('user-1/photo_2.webp', 'user-1'), true)

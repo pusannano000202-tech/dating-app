@@ -74,7 +74,7 @@ export function getDepositPaymentReadiness(provider: DepositPaymentProvider): De
     },
     {
       key: 'PAYMENT_INTERNAL_SECRET',
-      validate: (value: string) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
+      validate: (value: string) => value.length >= 32 && !hasUnsafeEnvValueCharacters(value),
     },
   ] as const
   const missing: string[] = checks

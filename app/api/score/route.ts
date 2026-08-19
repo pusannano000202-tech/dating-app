@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     return scoreFailure('profile_gender_required', 409)
   }
 
-  if (!AI_SERVER_URL || !AI_SERVER_SECRET) {
+  if (!AI_SERVER_URL || AI_SERVER_SECRET.length < 32) {
     return scoreFailure('ai_server_not_configured', 503)
   }
 

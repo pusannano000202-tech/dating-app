@@ -182,7 +182,7 @@ async def score_photos_endpoint(
     authorization: Annotated[str | None, Header()] = None,
 ):
     expected_secret = os.getenv("AI_SERVER_SECRET", "").strip()
-    if not expected_secret:
+    if len(expected_secret) < 32:
         raise HTTPException(status_code=503, detail="AI server auth is not configured")
 
     prefix = "Bearer "
