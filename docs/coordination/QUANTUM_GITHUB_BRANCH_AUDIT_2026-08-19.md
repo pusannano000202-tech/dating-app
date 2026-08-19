@@ -1,6 +1,6 @@
 # Quantum GitHub 브랜치 통합 감사
 
-> 상태: `BRANCH_PUSHED`
+> 상태: `DRAFT_PR_GREEN`
 > 기준일: 2026-08-19
 > 통합 브랜치: `codex/main-integration-20260819`
 > 원격 통합 브랜치: `origin/codex/main-integration-20260819`
@@ -15,7 +15,7 @@
 | 공통 조상 | 양 브랜치 merge-base | `da31dfda` | 분기 전 기준 |
 | 과거 혼합 접수함 | `C:\데이팅앱만들기` | 추적 변경 49, 미추적 249 | 코드 통합에 사용하지 않고 그대로 보존 |
 | 삭제 없는 보관소 | `C:\QuantumArchive\2026-08-19-workspace-reconciliation` | 8,289개 / 369,627,772 bytes | Git 비대상 자료 보존 |
-| 격리 통합 공간 | `C:\Users\82108\.config\superpowers\worktrees\데이팅앱만들기\quantum-main-integration-20260819` | 코드 HEAD `64e165af` | 이번 통합 전용 |
+| 격리 통합 공간 | `C:\Users\82108\.config\superpowers\worktrees\데이팅앱만들기\quantum-main-integration-20260819` | 코드 HEAD `c3206160` | 이번 통합 전용 |
 
 ## 2. 커밋 중복과 고유 변경
 
@@ -27,7 +27,7 @@
 
 단순 merge는 인증, API, 화면, 마이그레이션, 의존성 파일 등 90개 이상의 충돌을 만든다. 따라서 동일 패치 15개를 자동으로 건너뛰고 최신 제품 고유 변경만 `origin/main` 위에 재배치한다.
 
-재배치와 후속 수정이 끝난 코드 HEAD `64e165af`는 `origin/main`보다 68개 커밋 앞서고, 비교 범위 `origin/main...HEAD`에는 780개 파일이 포함된다. `origin/main`이 통합 결과의 조상임을 직접 확인했다.
+재배치와 후속 수정이 끝난 코드 HEAD `c3206160`는 `origin/main`보다 71개 커밋 앞서고, 비교 범위 `origin/main...HEAD`에는 780개 파일이 포함된다. `origin/main`이 통합 결과의 조상임을 직접 확인했다.
 
 ## 3. 원격 브랜치 분류
 
@@ -97,6 +97,9 @@ Google 전용 브랜치를 그대로 합치지 않고 Google·Kakao 모두를 �
 | Python 테스트 | PASS_WITH_SKIP | 66 통과, 17 legacy PyTorch 제외, Ruff 통과 |
 | 비밀정보 / DB 권한 경계 검사 | PASS_LOCAL | 추적 비밀정보 0건, Node 운영 의존성 취약점 0건, 관련 소스 계약 테스트 통과 |
 | GitHub 통합 브랜치 push | PASS | `origin/codex/main-integration-20260819` 게시 및 upstream 연결 완료 |
+| GitHub 초안 PR | PASS | PR #14, base `main`, head `codex/main-integration-20260819`, mergeable 확인 |
+| GitHub Actions | PASS | run #178: Next.js 타입·845개 테스트·lint, Python Ruff·pytest 모두 성공 |
+| Vercel 미리보기 | PASS_PREVIEW | PR #14 미리보기 배포 `Ready`; 운영 배포 증거는 아님 |
 | `main` push | BLOCKED | 사용자 별도 승인 필요 |
 | 원격 브랜치 삭제 | BLOCKED | PR 및 최종 통합 이후 승인 필요 |
 
@@ -107,6 +110,7 @@ Google 전용 브랜치를 그대로 합치지 않고 Google·Kakao 모두를 �
 3. Python 소스 검사가 폐기된 `성향 설문` 가입 단계를 기대하던 문제를 현재 계약인 `기본정보 -> 이상형 월드컵 -> 사진`으로 맞췄다.
 4. Google 제공자만 확인하던 원격 수정은 Google·Kakao 공통 fail-closed 검사로 일반화했다.
 5. 빌드가 자동 변경한 `next-env.d.ts`와 `tsconfig.json`은 검증 결과물에 포함하지 않고 원래 Git 상태로 복원했다.
+6. 첫 GitHub Actions 실행의 결제 환경 테스트 1건이 CI의 placeholder publishable key를 상속해 의도와 다른 사유로 실패했다. 결제 테스트가 Supabase 공개 키 환경을 명시적으로 격리하도록 수정했고, 같은 CI 환경을 로컬에서 재현한 뒤 run #178 전체 성공을 확인했다.
 
 ## 7. 남은 배포·운영 위험
 
