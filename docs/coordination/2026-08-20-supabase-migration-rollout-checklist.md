@@ -215,7 +215,7 @@ HTTP 200이나 화면 렌더만으로 완료 처리하지 않는다.
 | migration 정적 보고서 | 참고용 | 161파일 스캔, 정규식 오탐 612건으로 release gate가 아님 |
 | 로컬 PostgreSQL 전체 재생 | 이전 증거 유지 | migration 변경이 없어 `d669bdce`의 161/161 결과 사용 |
 | 배포 준비 검사 | 실패 | Vercel 인증·연결, Toss/AI 운영 환경값, 공개 origin 미설정 |
-| GitHub PR 상태 조회 | 확인 | PR #14 초안, main 대상, 병합 충돌 없음. CI 정지 원인 수정 후 최신 푸시 재확인 필요 |
+| GitHub PR 상태 조회 | 통과 | PR #14 초안, main 대상, 병합 충돌 없음. `52a60b38`에서 Python 48초·Next.js·Vercel Preview Comments 성공 |
 
 ### 재검토 후 남은 출시 증거
 
