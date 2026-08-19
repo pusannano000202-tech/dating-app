@@ -98,7 +98,7 @@ Google 전용 브랜치를 그대로 합치지 않고 Google·Kakao 모두를 �
 | 비밀정보 / DB 권한 경계 검사 | PASS_LOCAL | 추적 비밀정보 0건, Node 운영 의존성 취약점 0건, 관련 소스 계약 테스트 통과 |
 | GitHub 통합 브랜치 push | PASS | `origin/codex/main-integration-20260819` 게시 및 upstream 연결 완료 |
 | GitHub 초안 PR | PASS | PR #14, base `main`, head `codex/main-integration-20260819`, mergeable 확인 |
-| GitHub Actions | PASS | run #178: Next.js 타입·845개 테스트·lint, Python Ruff·pytest 모두 성공 |
+| GitHub Actions | PASS | 최신 PR 워크플로: Next.js 타입·845개 테스트·lint, Python Ruff·pytest 모두 성공 |
 | Vercel 미리보기 | PASS_PREVIEW | PR #14 미리보기 배포 `Ready`; 운영 배포 증거는 아님 |
 | `main` push | BLOCKED | 사용자 별도 승인 필요 |
 | 원격 브랜치 삭제 | BLOCKED | PR 및 최종 통합 이후 승인 필요 |
@@ -110,7 +110,7 @@ Google 전용 브랜치를 그대로 합치지 않고 Google·Kakao 모두를 �
 3. Python 소스 검사가 폐기된 `성향 설문` 가입 단계를 기대하던 문제를 현재 계약인 `기본정보 -> 이상형 월드컵 -> 사진`으로 맞췄다.
 4. Google 제공자만 확인하던 원격 수정은 Google·Kakao 공통 fail-closed 검사로 일반화했다.
 5. 빌드가 자동 변경한 `next-env.d.ts`와 `tsconfig.json`은 검증 결과물에 포함하지 않고 원래 Git 상태로 복원했다.
-6. 첫 GitHub Actions 실행의 결제 환경 테스트 1건이 CI의 placeholder publishable key를 상속해 의도와 다른 사유로 실패했다. 결제 테스트가 Supabase 공개 키 환경을 명시적으로 격리하도록 수정했고, 같은 CI 환경을 로컬에서 재현한 뒤 run #178 전체 성공을 확인했다.
+6. 첫 GitHub Actions 실행의 결제 환경 테스트 1건이 CI의 placeholder publishable key를 상속해 의도와 다른 사유로 실패했다. 결제 테스트가 Supabase 공개 키 환경을 명시적으로 격리하도록 수정했고, 같은 CI 환경을 로컬에서 재현한 뒤 최신 PR 워크플로 전체 성공을 확인했다.
 
 ## 7. 남은 배포·운영 위험
 
@@ -119,4 +119,3 @@ Google 전용 브랜치를 그대로 합치지 않고 Google·Kakao 모두를 �
 - Python 테스트는 OpenAI 운영 경로 66건을 통과했지만 legacy PyTorch 모델 17건은 런타임 이미지에서 제외된다. FastAPI TestClient의 `httpx` 전환 경고 1건이 남는다.
 - Supabase 마이그레이션의 원격 적용, 실제 RLS, 실제 계정 다중 E2E, Toss 승인·환불·이월, 실제 OpenAI 사진 분석, APK/AAB 실기기 설치는 이 로컬 통합 검증의 증거가 아니다.
 - 원격 브랜치는 이번 단계에서 삭제하지 않는다. 통합 PR 검토 후 흡수 확인표를 기준으로 별도 승인받아 정리한다.
-

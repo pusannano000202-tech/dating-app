@@ -65,9 +65,8 @@
 **Files:**
 - Update: `docs/coordination/QUANTUM_GITHUB_BRANCH_AUDIT_2026-08-19.md`
 
-- [ ] Confirm the integration worktree has only intentional commits and no untracked files.
-- [ ] Confirm `origin/main` is an ancestor of the integration branch.
-- [ ] Produce the exact commit range and file summary for review.
-- [ ] Push only `codex/main-integration-20260819` after local verification.
-- [ ] Do not delete remote branches or push `main` until the integrated branch and PR state are reviewed.
-
+- [x] Confirm the integration worktree has only intentional commits and no untracked files.
+- [x] Confirm `origin/main` is an ancestor of the integration branch.
+- [x] Produce the exact commit range and file summary for review.
+- [x] Push only `codex/main-integration-20260819` after local verification.
+- [x] Do not delete remote branches or push `main` until the integrated branch and PR state are reviewed.
