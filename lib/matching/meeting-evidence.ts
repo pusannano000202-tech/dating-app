@@ -1,3 +1,5 @@
+import sharp from 'sharp'
+
 export const MEETING_EVIDENCE_BUCKET = 'meeting-evidence'
 export const MEETING_EVIDENCE_MAX_BYTES = 12 * 1024 * 1024
 
@@ -68,6 +70,17 @@ export function validateMeetingEvidenceSignature(
     return { ok: false, error: 'file_signature_mismatch' }
   }
   return { ok: true }
+}
+
+export async function sanitizeMeetingEvidenceImage(bytes: Buffer): Promise<Buffer> {
+  return sharp(bytes, {
+    failOn: 'error',
+    limitInputPixels: 40_000_000,
+  })
+    .rotate()
+    .resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 88, mozjpeg: true })
+    .toBuffer()
 }
 
 export function buildMeetingEvidencePath(

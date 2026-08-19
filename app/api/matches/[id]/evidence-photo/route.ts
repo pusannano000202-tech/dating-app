@@ -6,6 +6,7 @@ import { createSupabaseRequestClient } from '@/lib/supabase-request'
 import {
   MEETING_EVIDENCE_BUCKET,
   buildMeetingEvidencePath,
+  sanitizeMeetingEvidenceImage,
   validateMeetingEvidenceFile,
   validateMeetingEvidenceSignature,
 } from '@/lib/matching/meeting-evidence'
@@ -66,7 +67,14 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
   if (!signatureValidation.ok) {
     return NextResponse.json({ error: signatureValidation.error }, { status: 422 })
   }
-  const fileSha256 = createHash('sha256').update(bytes).digest('hex')
+  let sanitizedBytes: Buffer
+  try {
+    sanitizedBytes = await sanitizeMeetingEvidenceImage(bytes)
+  } catch {
+    return NextResponse.json({ error: 'photo_content_invalid' }, { status: 422 })
+  }
+
+  const fileSha256 = createHash('sha256').update(sanitizedBytes).digest('hex')
   const existing = await findExistingEvidence(admin, params.id, fileSha256)
   if (existing.error) return NextResponse.json({ error: 'schema_unavailable' }, { status: 503 })
   if (existing.data) {
@@ -86,10 +94,10 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
   }
 
   const evidenceId = randomUUID()
-  const storagePath = buildMeetingEvidencePath(params.id, evidenceId, validation.extension)
+  const storagePath = buildMeetingEvidencePath(params.id, evidenceId, 'jpg')
   const { error: uploadError } = await admin.storage
     .from(MEETING_EVIDENCE_BUCKET)
-    .upload(storagePath, bytes, { contentType: photo.type, upsert: false })
+    .upload(storagePath, sanitizedBytes, { contentType: 'image/jpeg', upsert: false })
 
   if (uploadError) {
     return NextResponse.json({ error: 'schema_unavailable' }, { status: 503 })
@@ -103,8 +111,8 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
       uploader_user_id: authData.user.id,
       storage_path: storagePath,
       file_sha256: fileSha256,
-      content_type: photo.type,
-      byte_size: photo.size,
+      content_type: 'image/jpeg',
+      byte_size: sanitizedBytes.length,
     })
     .select('id, submitted_at, status')
     .single()

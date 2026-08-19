@@ -6,6 +6,7 @@ import test from 'node:test'
 import {
   MEETING_EVIDENCE_BUCKET,
   buildMeetingEvidencePath,
+  sanitizeMeetingEvidenceImage,
   validateMeetingEvidenceFile,
   validateMeetingEvidenceSignature,
 } from '../../lib/matching/meeting-evidence'
@@ -76,6 +77,35 @@ test('meeting evidence rejects a file whose bytes do not match the declared imag
   )
 })
 
+test('meeting evidence is decoded and re-encoded without embedded metadata before storage', async () => {
+  const sharp = (await import('sharp')).default
+  const source = await sharp({
+    create: {
+      width: 40,
+      height: 24,
+      channels: 3,
+      background: { r: 245, g: 180, b: 155 },
+    },
+  })
+    .jpeg()
+    .withExif({ IFD0: { Artist: 'private-device-owner' } })
+    .toBuffer()
+
+  const sanitized = await sanitizeMeetingEvidenceImage(source)
+  const metadata = await sharp(sanitized).metadata()
+
+  assert.equal(metadata.format, 'jpeg')
+  assert.equal(metadata.exif, undefined)
+  assert.equal(metadata.xmp, undefined)
+  assert.ok(sanitized.length > 0)
+})
+
+test('meeting evidence rejects image-signature bytes that cannot be decoded as an image', async () => {
+  await assert.rejects(
+    sanitizeMeetingEvidenceImage(Buffer.from([0xff, 0xd8, 0xff, 0x00, 0x01])),
+  )
+})
+
 test('meeting evidence migration is private, idempotent, and never auto-forfeits deposits', () => {
   const migration = readMigration()
 
@@ -110,6 +140,9 @@ test('meeting evidence APIs use request auth, server admin storage, and particip
 
   assert.match(uploadRoute, /validateMeetingEvidenceFile/)
   assert.match(uploadRoute, /validateMeetingEvidenceSignature/)
+  assert.match(uploadRoute, /sanitizeMeetingEvidenceImage/)
+  assert.match(uploadRoute, /contentType:\s*'image\/jpeg'/)
+  assert.match(uploadRoute, /byte_size:\s*sanitizedBytes\.length/)
   assert.match(uploadRoute, /buildMeetingOperations/)
   assert.match(uploadRoute, /file_sha256/)
   assert.match(uploadRoute, /MEETING_EVIDENCE_BUCKET/)
