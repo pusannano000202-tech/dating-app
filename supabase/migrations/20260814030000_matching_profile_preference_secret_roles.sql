@@ -2424,7 +2424,7 @@ BEGIN
   SET status = 'cancelled',
       cancelled_at = v_now,
       updated_at = v_now
-  WHERE invite.status = 'pending'
+  WHERE invite.status IN ('pending', 'accepted')
     AND invite.occurrence_id = v_participation.occurrence_id
     AND (
       invite.inviter_user_id = ANY(v_affected_user_ids)

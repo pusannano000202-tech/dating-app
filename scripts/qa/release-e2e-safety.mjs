@@ -2,6 +2,8 @@ import { randomBytes } from 'node:crypto'
 
 export const TARGET_PROJECT_REF = 'jyfwcanjqwboyvicoafm'
 
+const LOOPBACK_HOSTNAMES = new Set(['127.0.0.1', 'localhost', '[::1]'])
+
 export function assertRemoteMutationAllowed(env) {
   if (env.QA_ALLOW_REMOTE_MUTATION !== TARGET_PROJECT_REF) {
     throw new Error('remote_mutation_not_acknowledged')
@@ -12,6 +14,20 @@ export function assertRemoteMutationAllowed(env) {
     throw new Error('target_project_ref_mismatch')
   }
   return TARGET_PROJECT_REF
+}
+
+export function assertQaMutationAllowed(env) {
+  let hostname = ''
+  try { hostname = new URL(env.NEXT_PUBLIC_SUPABASE_URL).hostname } catch {}
+
+  if (LOOPBACK_HOSTNAMES.has(hostname)) {
+    if (env.QA_ALLOW_LOCAL_MUTATION !== 'local') {
+      throw new Error('local_mutation_not_acknowledged')
+    }
+    return 'local'
+  }
+
+  return assertRemoteMutationAllowed(env)
 }
 
 export function validateRunId(runId) {

@@ -5,7 +5,7 @@ import nextEnv from '@next/env'
 import { createClient } from '@supabase/supabase-js'
 
 import {
-  assertRemoteMutationAllowed,
+  assertQaMutationAllowed,
   createReleaseE2eManifest,
   createRunId,
   progress,
@@ -28,7 +28,7 @@ function failureCode(error) {
 
 export async function createRuntime(suite, requestedRunId) {
   loadEnvConfig(process.cwd())
-  assertRemoteMutationAllowed(process.env)
+  assertQaMutationAllowed(process.env)
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const publicKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const adminKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY

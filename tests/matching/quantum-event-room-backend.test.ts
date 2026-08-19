@@ -452,11 +452,12 @@ test('all client RPCs have fixed search paths and least-privilege grants', () =>
   }
 })
 
-test('remote event-room E2E covers the current B precard, hard capacity, invite expiry, and outsider denial', () => {
+test('remote event-room E2E covers the current preference and secret-role contract, capacity, invite expiry, and outsider denial', () => {
   const script = readSource('scripts/qa/release-e2e-event-room.mjs')
 
-  assert.match(script, /quantum-precard-b-v1/)
-  assert.match(script, /draft\?\.completed_items !== 7/)
+  assert.match(script, /\/api\/profile\/quantum-preferences/)
+  assert.match(script, /meeting_moment/)
+  assert.match(script, /role_confirmation_required/)
   assert.match(script, /first_room_capacity_exceeded/)
   assert.match(script, /second_room_overflow_failed/)
   assert.match(script, /invite_reservation_not_fifteen_minutes/)

@@ -281,7 +281,7 @@ LANGUAGE sql
 STABLE
 SET search_path = ''
 AS $$
-  SELECT pg_catalog.coalesce((
+  SELECT COALESCE((
     SELECT draft.completed_items = 7
       AND pg_catalog.strpos(draft.content_text, 'quantum-precard-b-v1') = 1
     FROM public.pre_match_card_drafts AS draft
@@ -416,11 +416,11 @@ BEGIN
   END IF;
 
   v_interests_section := private.quantum_event_card_section(v_content, '관심사');
-  SELECT pg_catalog.coalesce(pg_catalog.jsonb_agg(safe_interest.interest), '[]'::JSONB)
+  SELECT COALESCE(pg_catalog.jsonb_agg(safe_interest.interest), '[]'::JSONB)
   INTO v_interests
   FROM (
     SELECT private.quantum_event_safe_card_text(split_interest.value, 20) AS interest
-    FROM pg_catalog.regexp_split_to_table(pg_catalog.coalesce(v_interests_section, ''), '[[:space:]]*·[[:space:]]*')
+    FROM pg_catalog.regexp_split_to_table(COALESCE(v_interests_section, ''), '[[:space:]]*·[[:space:]]*')
       WITH ORDINALITY AS split_interest(value, position)
     ORDER BY split_interest.position
     LIMIT 5

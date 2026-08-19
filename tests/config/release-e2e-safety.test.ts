@@ -44,6 +44,24 @@ test('release E2E remote mutation is fail closed for the exact target project ac
   })`), { ok: true, value: TARGET_PROJECT_REF })
 })
 
+test('release E2E local mutation requires a separate loopback-only acknowledgement', () => {
+  assert.deepEqual(runSafetyProbe(`safety.assertQaMutationAllowed({
+    NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+  })`), { ok: false, error: 'local_mutation_not_acknowledged' })
+  assert.deepEqual(runSafetyProbe(`safety.assertQaMutationAllowed({
+    QA_ALLOW_LOCAL_MUTATION: 'local',
+    NEXT_PUBLIC_SUPABASE_URL: 'https://example.com',
+  })`), { ok: false, error: 'remote_mutation_not_acknowledged' })
+  assert.deepEqual(runSafetyProbe(`safety.assertQaMutationAllowed({
+    QA_ALLOW_LOCAL_MUTATION: 'local',
+    NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+  })`), { ok: true, value: 'local' })
+  assert.deepEqual(runSafetyProbe(`safety.assertQaMutationAllowed({
+    QA_ALLOW_LOCAL_MUTATION: 'local',
+    NEXT_PUBLIC_SUPABASE_URL: 'http://localhost:54321',
+  })`), { ok: true, value: 'local' })
+})
+
 test('release E2E manifests carry only a validated run id and cleanup discovers accounts by that tag', () => {
   const runId = 'qa-release-mem0ry-safe777'
   const probe = runSafetyProbe(`({
@@ -137,6 +155,12 @@ test('release E2E progress output is redacted and the scenario scripts cover the
   assert.match(eventRoom, /decline_quantum_event_room_invite/)
   assert.match(eventRoom, /cancel_quantum_event_room_invite/)
   assert.match(eventRoom, /get_my_quantum_event_room_participants/)
+  assert.match(eventRoom, /api\/profile\/quantum-preferences/)
+  assert.match(eventRoom, /meeting_moment/)
+  assert.match(eventRoom, /profile_preference/)
+  assert.match(eventRoom, /second_room_overflow/)
+  assert.match(eventRoom, /invite_expiry_simulated/)
+  assert.match(eventRoom, /role_confirmation_required/)
   assert.match(eventRoom, /same_room_after_accept/)
   assert.match(eventRoom, /forbiddenParticipantKeys/)
   assert.match(eventRoom, /cleanupUsersByRunId/)

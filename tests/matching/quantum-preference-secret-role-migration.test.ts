@@ -430,7 +430,10 @@ test('cancellation preserves honest friend ownership and clears every active roo
   assert.match(cancellation, /leader_user_id/i)
   assert.match(cancellation, /status\s*=\s*'cancelled'/i)
   assert.match(cancellation, /public\.quantum_event_room_invites/i)
-  assert.match(cancellation, /invite\.status\s*=\s*'pending'|status\s+in\s*\(\s*'pending'/i)
+  assert.match(
+    cancellation,
+    /invite\.status\s+in\s*\(\s*'pending'\s*,\s*'accepted'\s*\)/i,
+  )
   assert.match(cancellation, /delete from public\.quantum_event_room_card_snapshots/i)
   assert.match(cancellation, /private\.quantum_event_meeting_moment_drafts/i)
   assert.match(cancellation, /private\.quantum_event_secret_role_assignments/i)
