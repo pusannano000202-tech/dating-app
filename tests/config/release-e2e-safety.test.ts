@@ -30,6 +30,43 @@ function runSafetyProbe(expression: string): unknown {
   return JSON.parse(output)
 }
 
+function runImageProbe(expression: string): unknown {
+  const moduleUrl = pathToFileURL(
+    path.join(ROOT, 'scripts/qa/release-e2e-image.mjs'),
+  ).href
+  const program = [
+    `import * as image from ${JSON.stringify(moduleUrl)};`,
+    'try {',
+    `  process.stdout.write(JSON.stringify({ ok: true, value: (${expression}) }));`,
+    '} catch (error) {',
+    "  process.stdout.write(JSON.stringify({ ok: false, error: error instanceof Error ? error.message : 'unknown' }));",
+    '}',
+  ].join('\n')
+  const output = execFileSync(process.execPath, ['--input-type=module', '--eval', program], {
+    encoding: 'utf8',
+  })
+  return JSON.parse(output)
+}
+
+test('appearance E2E derives the upload type from file bytes instead of the extension', () => {
+  assert.deepEqual(
+    runImageProbe('image.detectUploadImage(Uint8Array.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]))'),
+    { ok: true, value: { contentType: 'image/png', filename: 'appearance-check.png' } },
+  )
+  assert.deepEqual(
+    runImageProbe('image.detectUploadImage(Uint8Array.from([0xff,0xd8,0xff]))'),
+    { ok: true, value: { contentType: 'image/jpeg', filename: 'appearance-check.jpg' } },
+  )
+  assert.deepEqual(
+    runImageProbe('image.detectUploadImage(Uint8Array.from([0x52,0x49,0x46,0x46,0,0,0,0,0x57,0x45,0x42,0x50]))'),
+    { ok: true, value: { contentType: 'image/webp', filename: 'appearance-check.webp' } },
+  )
+  assert.deepEqual(
+    runImageProbe('image.detectUploadImage(Uint8Array.from([1,2,3]))'),
+    { ok: false, error: 'qa_photo_type_unsupported' },
+  )
+})
+
 test('release E2E remote mutation is fail closed for the exact target project acknowledgement', () => {
   assert.deepEqual(runSafetyProbe(`safety.assertRemoteMutationAllowed({
     NEXT_PUBLIC_SUPABASE_URL: 'https://${TARGET_PROJECT_REF}.supabase.co',

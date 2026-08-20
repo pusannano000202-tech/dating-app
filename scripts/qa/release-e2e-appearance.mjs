@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 
+import { detectUploadImage } from './release-e2e-image.mjs'
 import { createQaAccount, createRuntime, executeWithCleanup } from './release-e2e-runtime.mjs'
 
 const photoPath = process.env.QA_APPEARANCE_PHOTO_PATH
@@ -12,8 +13,13 @@ await executeWithCleanup(runtime, async () => {
   if (!baseUrl) throw new Error('qa_base_url_missing')
 
   const photoBytes = await readFile(photoPath)
+  const uploadImage = detectUploadImage(photoBytes)
   const form = new FormData()
-  form.append('photos', new Blob([photoBytes], { type: 'image/jpeg' }), 'appearance-check.jpg')
+  form.append(
+    'photos',
+    new Blob([photoBytes], { type: uploadImage.contentType }),
+    uploadImage.filename,
+  )
   const upload = await fetch(`${baseUrl}/api/profile/photos`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${account.token}` },
