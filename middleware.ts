@@ -23,6 +23,10 @@ function setDevAuthCookie(response: NextResponse): void {
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+
+  if (process.env.NODE_ENV === 'production' && (pathname === '/dev' || pathname.startsWith('/dev/'))) {
+    return new NextResponse(null, { status: 404 })
+  }
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
   const canBypassAuth = isDevAuthBypassEnabled()
   const shouldIssueDevAuth = shouldIssueDevAuthCookie({ pathname })

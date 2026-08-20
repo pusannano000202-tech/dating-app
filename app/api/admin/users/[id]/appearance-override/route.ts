@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     p_score: score,
     p_reason: typeof body.reason === 'string' ? body.reason : null,
   })
-  if (error) return NextResponse.json({ error: error.message || 'override_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'override_failed') }, { status: 400 })
   return NextResponse.json({ effective_score: data })
 }
 
@@ -33,7 +34,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     p_user_id: params.id,
     p_reason: typeof body.reason === 'string' ? body.reason : null,
   })
-  if (error) return NextResponse.json({ error: error.message || 'clear_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'clear_failed') }, { status: 400 })
   return NextResponse.json({ effective_score: data })
 }
 

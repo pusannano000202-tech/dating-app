@@ -55,6 +55,7 @@ export interface RatedComparison {
   loserId: string
   winnerRating: number
   loserRating: number
+  evidenceWeight?: number
 }
 
 export type PublicationReason =

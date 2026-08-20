@@ -3,11 +3,17 @@
 import { FormEvent, Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowRight, ChevronLeft, LogIn, MailCheck, Send, Sparkles } from 'lucide-react'
+import { ArrowRight, ChevronLeft, LogIn, MailCheck, MessageCircle, Send, Sparkles } from 'lucide-react'
+import { isOAuthProviderEnabled } from '@/lib/auth/provider-availability'
 import { getPostLoginDestination } from '@/lib/auth/redirect'
 import { createClient } from '@/lib/supabase'
+import {
+  getOAuthCallbackUrl,
+  getOAuthLoginErrorMessage,
+  type QuantumOAuthProvider,
+} from '@/lib/auth/oauth-login'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
-import { getSupabaseConfigIssue } from '@/lib/utils'
+import { getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 import BootingLogo from '@/components/BootingLogo'
 
 type LoginStep = 'email' | 'code'
@@ -40,6 +46,7 @@ function LoginContent() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
+  const [oauthProvider, setOAuthProvider] = useState<QuantumOAuthProvider | null>(null)
   const [error, setError] = useState<string | null>(authError)
   const [resendCooldown, setResendCooldown] = useState(0)
   const [showAuth, setShowAuth] = useState(Boolean(authError))
@@ -152,7 +159,7 @@ function LoginContent() {
     }
   }
 
-  async function signInWithGoogle() {
+  async function signInWithProvider(provider: QuantumOAuthProvider) {
     setError(null)
 
     if (supabaseConfigIssue) {
@@ -161,11 +168,26 @@ function LoginContent() {
     }
 
     setLoading(true)
+    setOAuthProvider(provider)
     try {
+      const providerEnabled = await isOAuthProviderEnabled({
+        provider,
+        supabaseUrl: getSupabaseUrl(),
+        publicKey: getSupabasePublicKey(),
+        fetcher: window.fetch.bind(window),
+      })
+      if (!providerEnabled) {
+        const providerLabel = provider === 'google' ? 'Google' : '카카오'
+        setError(`${providerLabel} 로그인이 아직 준비되지 않았어요. 이메일로 계속해줘.`)
+        setOAuthProvider(null)
+        setLoading(false)
+        return
+      }
+
       const supabase = createClient()
-      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`
+      const callbackUrl = getOAuthCallbackUrl(window.location.origin, redirectTo)
       const { error: err } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider,
         options: {
           redirectTo: callbackUrl,
         },
@@ -173,7 +195,8 @@ function LoginContent() {
 
       if (err) throw err
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Google 로그인으로 이동하지 못했어요. 다시 시도해줘.')
+      setError(getOAuthLoginErrorMessage(provider, e))
+      setOAuthProvider(null)
       setLoading(false)
     }
   }
@@ -206,7 +229,7 @@ function LoginContent() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#17120f] text-boot-ink">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#17120f] text-boot-ink">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,142,95,0.30),transparent_34%),linear-gradient(135deg,#271b16_0%,#17120f_42%,#fff3ec_100%)]" />
       <video
         className={[
@@ -230,7 +253,7 @@ function LoginContent() {
 
       <section className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-7 pt-7">
         <header className="flex items-center justify-between">
-          <div className="rounded-2xl border border-white/45 bg-white/82 px-3 py-2 shadow-sm backdrop-blur-xl">
+          <div className="rounded-2xl border border-white/[0.45] bg-white/[0.82] px-3 py-2 shadow-sm backdrop-blur-xl">
             <BootingLogo size="md" subtitle="대학생 과팅" />
           </div>
           {showAuth && (
@@ -240,7 +263,7 @@ function LoginContent() {
                 setShowAuth(false)
                 setError(null)
               }}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/45 bg-white/75 text-boot-ink shadow-sm backdrop-blur-xl"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.45] bg-white/75 text-boot-ink shadow-sm backdrop-blur-xl"
               aria-label="인트로로 돌아가기"
             >
               <ChevronLeft size={19} strokeWidth={2.8} />
@@ -250,7 +273,7 @@ function LoginContent() {
 
         {!showAuth ? (
           <div className="flex flex-1 flex-col justify-end pb-8">
-            <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/45 bg-white/78 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary shadow-sm backdrop-blur-xl">
+            <div className="mb-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-white/[0.45] bg-white/[0.78] px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary shadow-sm backdrop-blur-xl">
               <Sparkles size={12} />
               UNIVERSITY GROUP MATCHING
             </div>
@@ -260,7 +283,7 @@ function LoginContent() {
               <br />
               시작해보세요
             </h1>
-            <p className="mt-4 max-w-[19rem] text-[15px] font-bold leading-7 text-white/86 drop-shadow-[0_4px_12px_rgba(0,0,0,0.38)]">
+            <p className="mt-4 max-w-[19rem] text-[15px] font-bold leading-7 text-white/[0.86] drop-shadow-[0_4px_12px_rgba(0,0,0,0.38)]">
               친구를 모으고, 조건이 맞는 팀을 찾고, 만남 전까지 필요한 정보만 차례로 열어봐요.
             </p>
 
@@ -278,13 +301,13 @@ function LoginContent() {
                 <Link
                   href="/dev/preview"
                   prefetch={false}
-                  className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[22px] border border-white/55 bg-white/82 text-sm font-black text-boot-ink shadow-sm backdrop-blur-xl transition-colors hover:bg-white"
+                  className="mt-3 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[22px] border border-white/[0.55] bg-white/[0.82] text-sm font-black text-boot-ink shadow-sm backdrop-blur-xl transition-colors hover:bg-white"
                 >
                   로컬로 둘러보기
                   <ArrowRight size={16} strokeWidth={2.7} />
                 </Link>
 
-                <p className="mt-4 text-center text-[12px] font-bold leading-5 text-white/78">
+                <p className="mt-4 text-center text-[12px] font-bold leading-5 text-white/[0.78]">
                   실제 로그인은 위 버튼으로, 시연은 로컬 둘러보기로 바로 확인할 수 있어요.
                 </p>
               </>
@@ -292,7 +315,7 @@ function LoginContent() {
           </div>
         ) : (
           <div className="flex flex-1 flex-col justify-end pb-3">
-            <div className="rounded-[30px] border border-white/60 bg-white/92 p-6 shadow-[0_26px_70px_rgba(23,18,15,0.22)] backdrop-blur-2xl">
+            <div className="rounded-[30px] border border-white/60 bg-white/[0.92] p-6 shadow-[0_26px_70px_rgba(23,18,15,0.22)] backdrop-blur-2xl">
               <div className="mb-6">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-boot-primary">Login</p>
                 <h1 className="mt-2 text-2xl font-black leading-tight">Quantum 시작하기</h1>
@@ -305,12 +328,22 @@ function LoginContent() {
                 <div>
                   <button
                     type="button"
-                    onClick={() => void signInWithGoogle()}
+                    onClick={() => void signInWithProvider('kakao')}
                     disabled={loading}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-boot-hairline bg-white px-4 py-3.5 text-sm font-black text-boot-ink shadow-sm transition-all hover:border-boot-primary/30 hover:bg-boot-soft disabled:opacity-70"
+                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-4 py-3.5 text-sm font-black text-[#191919] shadow-sm transition-all hover:bg-[#F4DC00] disabled:opacity-70"
+                  >
+                    <MessageCircle size={16} strokeWidth={2.7} />
+                    {oauthProvider === 'kakao' ? '카카오로 이동 중...' : '카카오로 계속하기'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void signInWithProvider('google')}
+                    disabled={loading}
+                    className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-boot-hairline bg-white px-4 py-3.5 text-sm font-black text-boot-ink shadow-sm transition-all hover:border-boot-primary/30 hover:bg-boot-soft disabled:opacity-70"
                   >
                     <LogIn size={15} strokeWidth={2.6} />
-                    Google 계정으로 계속하기
+                    {oauthProvider === 'google' ? 'Google로 이동 중...' : 'Google 계정으로 계속하기'}
                   </button>
 
                   <div className="my-5 flex items-center gap-3 text-[11px] font-black text-boot-muted">
@@ -340,7 +373,7 @@ function LoginContent() {
                       />
                     </label>
 
-                    {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+                    {error && <p role="alert" className="mb-3 text-xs font-bold text-red-500">{error}</p>}
 
                     <button
                       type="submit"
@@ -383,7 +416,7 @@ function LoginContent() {
                     ))}
                   </div>
 
-                  {error && <p className="mb-3 text-xs font-bold text-red-500">{error}</p>}
+                  {error && <p role="alert" className="mb-3 text-xs font-bold text-red-500">{error}</p>}
 
                   <button
                     type="button"

@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-08-01T01:27:57.555Z",
+  "anchors": [
+    {
+      "anchorId": "female-005-a",
+      "genderBank": "female",
+      "targetScore": 5,
+      "reviewerScore": 14,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-005-a.png"
+    },
+    {
+      "anchorId": "female-005-b",
+      "genderBank": "female",
+      "targetScore": 5,
+      "reviewerScore": 15,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-005-b.png"
+    },
+    {
+      "anchorId": "female-low-b1-01",
+      "genderBank": "female",
+      "targetScore": 5,
+      "reviewerScore": 5,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-low-b1-01.png"
+    },
+    {
+      "anchorId": "female-low-b1-02",
+      "genderBank": "female",
+      "targetScore": 5,
+      "reviewerScore": 5,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-low-b1-02.png"
+    },
+    {
+      "anchorId": "female-015-a",
+      "genderBank": "female",
+      "targetScore": 15,
+      "reviewerScore": 19,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-015-a.png"
+    },
+    {
+      "anchorId": "female-015-b",
+      "genderBank": "female",
+      "targetScore": 15,
+      "reviewerScore": 43,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-015-b.png"
+    },
+    {
+      "anchorId": "female-low-b1-03",
+      "genderBank": "female",
+      "targetScore": 15,
+      "reviewerScore": 5,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-low-b1-03.png"
+    },
+    {
+      "anchorId": "female-low-b1-04",
+      "genderBank": "female",
+      "targetScore": 15,
+      "reviewerScore": 10,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-low-b1-04.png"
+    },
+    {
+      "anchorId": "female-025-a",
+      "genderBank": "female",
+      "targetScore": 25,
+      "reviewerScore": 12,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-025-a.png"
+    },
+    {
+      "anchorId": "female-025-b",
+      "genderBank": "female",
+      "targetScore": 25,
+      "reviewerScore": 27,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-025-b.png"
+    },
+    {
+      "anchorId": "female-low-b1-05",
+      "genderBank": "female",
+      "targetScore": 25,
+      "reviewerScore": 25,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-low-b1-05.png"
+    },
+    {
+      "anchorId": "female-030-a",
+      "genderBank": "female",
+      "targetScore": 30,
+      "reviewerScore": 40,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-030-a.png"
+    },
+    {
+      "anchorId": "female-030-b",
+      "genderBank": "female",
+      "targetScore": 30,
+      "reviewerScore": 43,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-030-b.png"
+    },
+    {
+      "anchorId": "female-040-a",
+      "genderBank": "female",
+      "targetScore": 40,
+      "reviewerScore": 66,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-040-a.png"
+    },
+    {
+      "anchorId": "female-040-b",
+      "genderBank": "female",
+      "targetScore": 40,
+      "reviewerScore": 65,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-040-b.png"
+    },
+    {
+      "anchorId": "female-050-a",
+      "genderBank": "female",
+      "targetScore": 50,
+      "reviewerScore": 83,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-050-a.png"
+    },
+    {
+      "anchorId": "female-050-b",
+      "genderBank": "female",
+      "targetScore": 50,
+      "reviewerScore": 78,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-050-b.png"
+    },
+    {
+      "anchorId": "female-070-a",
+      "genderBank": "female",
+      "targetScore": 70,
+      "reviewerScore": 85,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-070-a.png"
+    },
+    {
+      "anchorId": "female-070-b",
+      "genderBank": "female",
+      "targetScore": 70,
+      "reviewerScore": 87,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-070-b.png"
+    },
+    {
+      "anchorId": "female-085-a",
+      "genderBank": "female",
+      "targetScore": 85,
+      "reviewerScore": 88,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-085-a.png"
+    },
+    {
+      "anchorId": "female-085-b",
+      "genderBank": "female",
+      "targetScore": 85,
+      "reviewerScore": 90,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-085-b.png"
+    },
+    {
+      "anchorId": "female-095-a",
+      "genderBank": "female",
+      "targetScore": 95,
+      "reviewerScore": 96,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-095-a.png"
+    },
+    {
+      "anchorId": "female-095-b",
+      "genderBank": "female",
+      "targetScore": 95,
+      "reviewerScore": 96,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/female-095-b.png"
+    },
+    {
+      "anchorId": "male-005-a",
+      "genderBank": "male",
+      "targetScore": 5,
+      "reviewerScore": 37,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-005-a.png"
+    },
+    {
+      "anchorId": "male-005-b",
+      "genderBank": "male",
+      "targetScore": 5,
+      "reviewerScore": 10,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-005-b.png"
+    },
+    {
+      "anchorId": "male-015-a",
+      "genderBank": "male",
+      "targetScore": 15,
+      "reviewerScore": 23,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-015-a.png"
+    },
+    {
+      "anchorId": "male-015-b",
+      "genderBank": "male",
+      "targetScore": 15,
+      "reviewerScore": 30,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-015-b.png"
+    },
+    {
+      "anchorId": "male-025-a",
+      "genderBank": "male",
+      "targetScore": 25,
+      "reviewerScore": 59,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-025-a.png"
+    },
+    {
+      "anchorId": "male-025-b",
+      "genderBank": "male",
+      "targetScore": 25,
+      "reviewerScore": 61,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-025-b.png"
+    },
+    {
+      "anchorId": "male-030-a",
+      "genderBank": "male",
+      "targetScore": 30,
+      "reviewerScore": 37,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-030-a.png"
+    },
+    {
+      "anchorId": "male-030-b",
+      "genderBank": "male",
+      "targetScore": 30,
+      "reviewerScore": 43,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-030-b.png"
+    },
+    {
+      "anchorId": "male-040-a",
+      "genderBank": "male",
+      "targetScore": 40,
+      "reviewerScore": 64,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-040-a.png"
+    },
+    {
+      "anchorId": "male-040-b",
+      "genderBank": "male",
+      "targetScore": 40,
+      "reviewerScore": 71,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-040-b.png"
+    },
+    {
+      "anchorId": "male-050-a",
+      "genderBank": "male",
+      "targetScore": 50,
+      "reviewerScore": 77,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-050-a.png"
+    },
+    {
+      "anchorId": "male-050-b",
+      "genderBank": "male",
+      "targetScore": 50,
+      "reviewerScore": 78,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-050-b.png"
+    },
+    {
+      "anchorId": "male-070-a",
+      "genderBank": "male",
+      "targetScore": 70,
+      "reviewerScore": 84,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-070-a.png"
+    },
+    {
+      "anchorId": "male-070-b",
+      "genderBank": "male",
+      "targetScore": 70,
+      "reviewerScore": 88,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-070-b.png"
+    },
+    {
+      "anchorId": "male-085-a",
+      "genderBank": "male",
+      "targetScore": 85,
+      "reviewerScore": 91,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-085-a.png"
+    },
+    {
+      "anchorId": "male-085-b",
+      "genderBank": "male",
+      "targetScore": 85,
+      "reviewerScore": 94,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-085-b.png"
+    },
+    {
+      "anchorId": "male-095-a",
+      "genderBank": "male",
+      "targetScore": 95,
+      "reviewerScore": 96,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-095-a.png"
+    },
+    {
+      "anchorId": "male-095-b",
+      "genderBank": "male",
+      "targetScore": 95,
+      "reviewerScore": 97,
+      "reviewStatus": "approved",
+      "imagePath": "/appearance-calibration-v2/anchors/male-095-b.png"
+    }
+  ]
+}

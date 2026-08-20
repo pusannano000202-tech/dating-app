@@ -9,8 +9,8 @@ import {
   Loader2,
   Search,
   Send,
-  UserCheck,
-  UserPlus,
+  RotateCcw,
+  UserMinus,
   UserRoundPlus,
   UserX,
   UsersRound,
@@ -42,20 +42,30 @@ interface FriendSummary {
   user_id: string
   display_name: string | null
   status: string
+  photo_url?: string | null
+}
+
+interface HiddenFriendSummary {
+  user_id: string
+  display_name: string | null
+  can_restore: boolean
+  blocked_at: string | null
 }
 
 interface FriendsState {
   sent: FriendRequestRow[]
   received: FriendRequestRow[]
   friends: FriendSummary[]
+  hidden_friends: HiddenFriendSummary[]
   current_user_id?: string
 }
 
-const EMPTY: FriendsState = { sent: [], received: [], friends: [] }
+const EMPTY: FriendsState = { sent: [], received: [], friends: [], hidden_friends: [] }
 const DEV_FRIENDS_STATE: FriendsState = {
   sent: [],
   received: [],
   current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
+  hidden_friends: [],
   friends: DEV_PREVIEW_GROUP_MEMBERS
     .filter((member) => member.user_id !== DEV_PREVIEW_CURRENT_USER_ID)
     .map((member) => ({
@@ -209,6 +219,45 @@ export default function FriendsPage() {
     }
   }
 
+  async function removeFriend(friend: FriendSummary) {
+    if (saving) return
+    if (!window.confirm(`${friend.display_name ?? '이 친구'}님과의 연결을 숨길까요? 서로의 프로필이 닫히고 다음 매칭에서도 만나지 않아요.`)) return
+    setSaving(true)
+    setError(null)
+    try {
+      const response = await fetch(`/api/friends/${encodeURIComponent(friend.user_id)}/connection`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) throw new Error('remove_failed')
+      setSuccess('친구 연결을 숨겼어요. 숨긴 친구 관리에서 다시 연결할 수 있어요.')
+      await refresh()
+    } catch {
+      setError('친구 연결을 숨기지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function restoreFriend(friend: HiddenFriendSummary) {
+    if (saving || !friend.can_restore) return
+    setSaving(true)
+    setError(null)
+    try {
+      const response = await fetch(`/api/friends/${encodeURIComponent(friend.user_id)}/connection`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore' }),
+      })
+      if (!response.ok) throw new Error('restore_failed')
+      setSuccess('친구를 다시 연결했어요.')
+      await refresh()
+    } catch {
+      setError('친구를 다시 연결하지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const pendingReceived = useMemo(
     () => state.received.filter((request) => request.status === 'pending'),
     [state.received]
@@ -223,17 +272,17 @@ export default function FriendsPage() {
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-6 flex items-center gap-3">
           <Link
-            href="/group/create"
+            href="/profile/edit"
             className="flex h-10 w-10 items-center justify-center rounded-2xl border border-boot-hairline bg-white/90 text-boot-body shadow-sm"
-            aria-label="그룹으로 돌아가기"
+            aria-label="마이로 돌아가기"
           >
             <ChevronLeft size={18} />
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-black text-boot-primary">Invite</p>
-            <h1 className="text-2xl font-black">친구 초대</h1>
+            <p className="text-xs font-black text-boot-primary">Friends</p>
+            <h1 className="text-2xl font-black">친구 관리</h1>
             <p className="mt-0.5 text-xs leading-5 text-boot-muted">
-              이메일 로그인 기준에서는 링크 초대가 가장 빠릅니다.
+              친구를 찾고, 수락한 친구와 둘만의 약속을 잡아요.
             </p>
           </div>
         </header>
@@ -257,28 +306,28 @@ export default function FriendsPage() {
               <UsersRound size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-black leading-tight">그룹 초대 링크로 바로 모으기</h2>
+              <h2 className="text-lg font-black leading-tight">친구와 바로 약속 잡기</h2>
               <p className="mt-1 text-sm leading-6 text-boot-muted">
-                초대 링크를 받은 친구는 로그인/회원가입 후 초대를 수락하면 그룹에 들어와요.
+                친구 요청을 수락하면 서로의 프로필을 보고 밥, 카페, 산책 약속을 제안할 수 있어요.
               </p>
             </div>
           </div>
 
           <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <MiniStep number="1" label="그룹 만들기" />
-            <MiniStep number="2" label="링크 보내기" />
-            <MiniStep number="3" label="친구 수락" />
+            <MiniStep number="1" label="친구 찾기" />
+            <MiniStep number="2" label="요청 수락" />
+            <MiniStep number="3" label="약속 제안" />
           </div>
 
           <Link
-            href="/group/create"
+            href="#friend-list"
             className="btn-gradient flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-black"
           >
-            그룹 초대 링크 만들기
+            내 친구에서 약속 잡기
             <ArrowRight size={17} />
           </Link>
           <p className="mt-3 text-center text-[11px] leading-5 text-boot-muted">
-            그룹 화면에서 `초대 링크 복사`를 누르면 카카오톡이나 메시지로 바로 보낼 수 있어요.
+            친구를 누르면 밥 먹기, 카페, 산책 제안을 바로 보낼 수 있어요.
           </p>
         </section>
 
@@ -288,7 +337,7 @@ export default function FriendsPage() {
           onRequestSent={refresh}
         />
 
-        <section className="mb-5 rounded-3xl border border-boot-hairline bg-white/90 p-4 shadow-sm">
+        <section id="friend-search" className="mb-5 scroll-mt-4 rounded-3xl border border-boot-hairline bg-white/90 p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-black">닉네임으로 친구 찾기</h2>
@@ -368,27 +417,68 @@ export default function FriendsPage() {
               </section>
             )}
 
-            <section className="mb-5">
+            <section id="friend-list" className="mb-5 scroll-mt-4">
               <SectionTitle title="친구 목록" count={state.friends.length} />
               {state.friends.length === 0 ? (
                 <EmptyFriends />
               ) : (
                 <div className="space-y-2">
                   {state.friends.map((friend) => (
-                    <div key={friend.user_id} className="glass-card flex items-center gap-3 rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 shadow-sm">
-                      <InitialBadge value={friend.display_name ?? friend.user_id} tone="soft" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-black">
-                          {friend.display_name ?? `친구 ${friend.user_id.slice(0, 8)}`}
-                        </p>
-                        <p className="mt-0.5 text-[11px] text-boot-muted">친구 등록 완료</p>
-                      </div>
-                      <UserCheck size={17} className="text-emerald-600" />
+                    <div key={friend.user_id} className="glass-card flex items-center gap-2 rounded-lg border border-boot-hairline bg-white/90 p-2 shadow-sm">
+                      <Link
+                        href={`/friends/${encodeURIComponent(friend.user_id)}?name=${encodeURIComponent(friend.display_name ?? 'Quantum 친구')}`}
+                        className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-1 transition-colors hover:bg-boot-soft/60"
+                      >
+                        <InitialBadge value={friend.display_name ?? friend.user_id} tone="soft" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-black">
+                            {friend.display_name ?? `친구 ${friend.user_id.slice(0, 8)}`}
+                          </p>
+                          <p className="mt-0.5 text-[11px] text-boot-muted">프로필 보기 · 약속 제안하기</p>
+                        </div>
+                        <ChevronLeft size={17} className="rotate-180 text-boot-muted" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => void removeFriend(friend)}
+                        disabled={saving}
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-rose-200 text-rose-600 disabled:opacity-40"
+                        aria-label={`${friend.display_name ?? '친구'} 연결 숨기기`}
+                        title="친구 연결 숨기기"
+                      >
+                        <UserMinus size={17} aria-hidden="true" />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
             </section>
+
+            {state.hidden_friends.length > 0 ? (
+              <section className="mb-5">
+                <SectionTitle title="숨긴 친구 관리" count={state.hidden_friends.length} />
+                <p className="mb-3 px-1 text-xs leading-5 text-boot-muted">여기서는 프로필이 열리지 않아요. 내가 숨긴 관계만 다시 연결할 수 있어요.</p>
+                <div className="space-y-2">
+                  {state.hidden_friends.map((friend) => (
+                    <div key={friend.user_id} className="flex items-center gap-3 rounded-lg border border-boot-hairline bg-white/80 px-4 py-3">
+                      <InitialBadge value={friend.display_name ?? '숨김'} tone="soft" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-black">{friend.display_name ?? '숨긴 친구'}</p>
+                        <p className="mt-0.5 text-[11px] text-boot-muted">프로필 비공개 · 다음 매칭 제외</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => void restoreFriend(friend)}
+                        disabled={saving || !friend.can_restore}
+                        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-boot-primary/25 bg-boot-soft px-3 text-xs font-black text-boot-primary disabled:opacity-40"
+                      >
+                        <RotateCcw size={14} aria-hidden="true" /> 다시 연결
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {pendingSent.length > 0 && (
               <section className="mb-5">
@@ -472,13 +562,13 @@ function EmptyFriends() {
       </div>
       <p className="mt-3 text-sm font-black">아직 등록된 친구가 없어요</p>
       <p className="mt-1 text-xs leading-5 text-boot-muted">
-        괜찮아요. 닉네임으로 친구를 찾거나, 그룹 초대 링크를 보내고 친구가 로그인 후 수락하면 됩니다.
+        닉네임으로 친구를 찾아 요청을 보내세요. 상대가 수락하면 프로필에서 바로 약속을 제안할 수 있어요.
       </p>
       <Link
-        href="/group/create"
+        href="#friend-search"
         className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
       >
-        그룹 초대하러 가기
+        닉네임으로 친구 찾기
         <ArrowRight size={14} />
       </Link>
     </div>

@@ -66,9 +66,13 @@ export default function SchedulePage() {
         router.push('/login')
         return
       }
-      const { error: dbErr } = await supabase.from('profiles')
-        .upsert({ user_id: user.id, available_timeslots: timeslots }, { onConflict: 'user_id' })
+      const { data: updatedProfile, error: dbErr } = await supabase.from('profiles')
+        .update({ available_timeslots: timeslots })
+        .eq('user_id', user.id)
+        .select('user_id')
+        .maybeSingle()
       if (dbErr) throw dbErr
+      if (!updatedProfile) throw new Error('profile_record_missing')
       router.push(getSequentialMatchStartRedirect('/profile/preferences', '/profile/preferences'))
     } catch { setError('저장 중 오류가 발생했어요.') }
     finally { setSaving(false) }

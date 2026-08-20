@@ -31,6 +31,7 @@ import {
 } from '@/lib/matching/frontend-load-state'
 import { isGroupQueueActive } from '@/lib/matching/group-queue-state'
 import { isActiveMatchStatus } from '@/lib/matching/match-view-state'
+import { fetchRequiredMatchingResource } from '@/lib/matching/fetch-required-resource'
 
 type GroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
 
@@ -104,8 +105,8 @@ export default function HomeTodayTaskCard() {
 
     try {
       const [groupRes, matchRes, cardDraftRes] = await Promise.all([
-        fetch('/api/groups'),
-        fetch('/api/matches'),
+        fetchRequiredMatchingResource('/api/groups', (path) => fetch(path, { cache: 'no-store' })),
+        fetchRequiredMatchingResource('/api/matches', (path) => fetch(path, { cache: 'no-store' })),
         fetch('/api/profile/match-card-draft'),
       ])
 

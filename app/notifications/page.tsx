@@ -5,10 +5,12 @@ import Link from 'next/link'
 import {
   Bell,
   CheckCheck,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Gift,
   Heart,
+  HeartHandshake,
   Loader2,
   MessageSquareText,
   PartyPopper,
@@ -237,7 +239,7 @@ export default function NotificationsPage() {
                 <MatchNotificationCard
                   key={n.id}
                   notification={n}
-                  href={getNotificationHref(n.kind, matchId)}
+                  href={getNotificationHref(n.kind, matchId, n.payload)}
                   unread={unread}
                   onClick={() => unread && markOne(n.id)}
                 />
@@ -337,8 +339,13 @@ function KindIcon({ kind }: { kind: string }) {
     case 'phone_revealed': return <Phone size={18} />
     case 'review_request': return <MessageSquareText size={18} />
     case 'friend_request_received': return <Heart size={18} />
+    case 'quantum_event_room_invite': return <Users size={18} />
     case 'meeting_reminder': return <Bell size={18} />
     case 'campus_seven_guide': return <Sparkles size={18} />
+    case 'couple_party_invite': return <Heart size={18} />
+    case 'couple_party_accepted': return <CheckCircle2 size={18} />
+    case 'couple_party_matched': return <Users size={18} />
+    case 'couple_party_completed': return <HeartHandshake size={18} />
     default: return <Bell size={18} />
   }
 }
@@ -355,6 +362,7 @@ function kindLabel(kind: string, payload: Record<string, unknown>, isSolo = fals
     case 'phone_revealed': return '상대 연락처가 공개됐어요'
     case 'review_request': return '평가를 작성해주세요'
     case 'friend_request_received': return '친구 요청이 도착했어요'
+    case 'quantum_event_room_invite': return '같은 방 초대가 도착했어요'
     case 'meeting_reminder': return '약속이 다가오고 있어요'
     case 'continuation_choice_request': return '이 만남, 이어갈래요?'
     case 'both_continue': return '양쪽 모두 이어가기 선택'
@@ -362,6 +370,10 @@ function kindLabel(kind: string, payload: Record<string, unknown>, isSolo = fals
     case 'refund_processed': return '환불 완료'
     case 'attendance_confirmed': return '출석 확인됨'
     case 'no_show_confirmed': return '노쇼 확정'
+    case 'couple_party_invite': return '커플 더블데이트 초대가 도착했어요'
+    case 'couple_party_accepted': return '파트너가 더블데이트 초대를 수락했어요'
+    case 'couple_party_matched': return '함께할 다른 커플을 찾았어요'
+    case 'couple_party_completed': return '더블데이트 친구 연결이 완료됐어요'
     default: return '알림'
   }
 }
@@ -387,6 +399,13 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
       return '5점 별점과 한 줄 후기를 남겨주세요.'
     case 'friend_request_received':
       return '받은 요청을 친구 목록에서 확인하세요.'
+    case 'quantum_event_room_invite': {
+      const inviter = typeof payload.inviter_display_name === 'string'
+        ? payload.inviter_display_name
+        : '친구'
+      const room = typeof payload.room_label === 'string' ? ` ${payload.room_label}` : ''
+      return `${inviter}님이${room}에 같이 가자고 초대했어요. 자리는 15분 동안 예약돼요.`
+    }
     case 'meeting_reminder':
       return '오늘 만남 시간과 장소를 다시 확인해주세요.'
     case 'continuation_choice_request':
@@ -410,13 +429,29 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
     }
     case 'no_show_confirmed':
       return '약속 장소에 오지 않은 기록이 남았어요. 보증금 환불이 제한될 수 있어요.'
+    case 'couple_party_invite':
+      return '내 파트너가 보낸 초대를 확인하고 커플팀을 완성해 주세요.'
+    case 'couple_party_accepted':
+      return '두 사람이 한 팀이 됐어요. 함께할 다른 커플을 찾고 있어요.'
+    case 'couple_party_matched':
+      return '상대 프로필은 숨긴 채 시간과 장소만 확인할 수 있어요.'
+    case 'couple_party_completed':
+      return '만남이 끝나 네 사람이 친구로 연결됐어요. 이제 프로필을 확인할 수 있어요.'
     default:
       return ''
   }
 }
 
-function getNotificationHref(kind: string, matchId: string | null) {
+function getNotificationHref(kind: string, matchId: string | null, payload: Record<string, unknown>) {
   if (kind === 'campus_seven_guide') return '/match/campus-seven'
+  if (kind === 'quantum_event_room_invite') {
+    const token = typeof payload.token === 'string' ? payload.token : ''
+    return token ? `/match/invite/${encodeURIComponent(token)}` : '/match'
+  }
+  if (kind === 'couple_party_invite' || kind === 'couple_party_accepted' || kind === 'couple_party_matched' || kind === 'couple_party_completed') {
+    const partyId = typeof payload.party_id === 'string' ? payload.party_id : ''
+    return `/match/couples/double-date${partyId ? `?party=${encodeURIComponent(partyId)}` : ''}`
+  }
   if (!matchId) return '/match'
   if (kind === 'review_request') return `/match/${encodeURIComponent(matchId)}/review`
   if (kind === 'continuation_choice_request') return `/match/${encodeURIComponent(matchId)}/continuation`

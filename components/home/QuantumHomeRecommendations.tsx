@@ -15,7 +15,7 @@ const recommendations = [
     priority: true,
   },
   {
-    href: '/meetups?focus=featured',
+    href: '/meetups',
     eyebrow: '오늘 저녁',
     title: '부담 적은 모임부터',
     description: '지금 참여하기 좋은 학교 앞 모임을 먼저 보여드려요.',

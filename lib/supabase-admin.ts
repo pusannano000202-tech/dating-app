@@ -1,6 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 import { getSupabaseUrl } from './utils'
 
+const browserGlobal = globalThis as { window?: unknown }
+
+if (typeof browserGlobal.window !== 'undefined') {
+  throw new Error('Supabase admin credentials are server-only')
+}
+
 export type SupabaseAdminKeyStatus =
   | { ok: true; key: string; source: 'secret' | 'legacy' }
   | { ok: false; reason: 'missing' | 'invalid' }
@@ -35,6 +41,7 @@ export function createSupabaseAdminClient() {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
+      detectSessionInUrl: false,
     },
   })
 }

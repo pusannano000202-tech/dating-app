@@ -12,7 +12,7 @@ function readSource(path: string): string {
 test('department friend API returns suggestions without creating active friendships', () => {
   const route = readSource('app/api/friends/department-sync/route.ts')
 
-  assert.match(route, /createSupabaseServerClient/)
+  assert.match(route, /createSupabaseRequestClient\(req\)/)
   assert.match(route, /\.auth\.getUser\(\)/)
   assert.match(route, /get_department_friend_suggestions/)
   assert.match(route, /normalizeLimit/)

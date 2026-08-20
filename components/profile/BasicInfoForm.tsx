@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowRight, ChevronLeft, ClipboardList, GraduationCap, Loader2, Phone, Ruler, UserRound } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ClipboardList, GraduationCap, Loader2, Ruler, UserRound } from 'lucide-react'
 import type { BodyType, Gender, HairDensity } from '@/lib/types'
 import {
   SCHOOL_THEMES,
@@ -108,7 +108,6 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
   const [displayName, setDisplayName] = useState(initialValue?.display_name ?? '')
   const [nicknameCheck, setNicknameCheck] = useState<{ value: string; available: boolean; message: string } | null>(null)
   const [checkingNickname, setCheckingNickname] = useState(false)
-  const [phone, setPhone] = useState(initialValue?.phone ?? '')
   const [gender, setGender] = useState<Gender | null>(initialValue?.gender ?? null)
   const [age, setAge] = useState(initialValue?.age?.toString() ?? '')
   const [height, setHeight] = useState(initialValue?.height?.toString() ?? '')
@@ -205,10 +204,6 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
         setError('친구에게 보일 이름을 2~20자로 입력해 주세요.')
         return false
       }
-      if (!normalizePhone(phone)) {
-        setError('휴대폰 번호를 010-1234-5678 형식으로 입력해 주세요.')
-        return false
-      }
     }
     if (targetStep === 1) {
       const ageNumber = Number.parseInt(age, 10)
@@ -242,11 +237,10 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
     }
     setError(null)
     return true
-  }, [age, departmentValidationState, displayName, gender, height, phone, school])
+  }, [age, departmentValidationState, displayName, gender, height, school])
 
   const handleSubmit = useCallback(async () => {
     const trimmedName = displayName.trim()
-    const normalizedPhone = normalizePhone(phone)
     for (const requiredStep of [0, 1, 3, 4]) {
       if (!validateStep(requiredStep)) {
         setStep(requiredStep)
@@ -262,7 +256,7 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
 
     onSubmit({
       display_name: trimmedName,
-      phone: normalizedPhone,
+      phone: '',
       gender: gender as Gender,
       age: ageNumber,
       height: height ? Number.parseInt(height, 10) : null,
@@ -272,16 +266,15 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
       department: department.trim() || null,
       year,
     })
-  }, [age, bodyType, checkNicknameAvailability, department, displayName, gender, hairDensity, height, nicknameCheck, onSubmit, phone, school, validateStep, year])
+  }, [age, bodyType, checkNicknameAvailability, department, displayName, gender, hairDensity, height, nicknameCheck, onSubmit, school, validateStep, year])
 
   const summaryRows = useMemo(() => [
     ['닉네임', displayName || '미입력', 0],
-    ['연락처', phone || '미입력', 0],
     ['기본 정보', [gender === 'male' ? '남자' : gender === 'female' ? '여자' : '미선택', age ? `${age}세` : '나이 미입력', height ? `${height}cm` : null].filter(Boolean).join(' · '), 1],
     ['선택 정보', [bodyType ? BODY_TYPES.find((item) => item.key === bodyType)?.label : null, gender === 'male' && hairDensity ? HAIR_DENSITIES.find((item) => item.key === hairDensity)?.label : null].filter(Boolean).join(' · ') || '건너뜀', 2],
     ['학교', school || '미입력', 3],
     ['학과 / 학년', [department || null, year ? `${year}학년` : null].filter(Boolean).join(' · ') || '건너뜀', 4],
-  ], [age, bodyType, department, displayName, gender, hairDensity, height, phone, school, year])
+  ], [age, bodyType, department, displayName, gender, hairDensity, height, school, year])
 
   function moveNext() {
     if (!validateStep(step)) return
@@ -325,10 +318,9 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
             </div>
             {nicknameCheck && <p className={`mt-2 text-xs font-bold ${nicknameCheck.available ? 'text-emerald-700' : 'text-rose-700'}`}>{nicknameCheck.message}</p>}
           </label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-black text-boot-ink">휴대폰 번호 <span className="text-rose-600">*</span></span>
-            <div className="relative"><Phone size={17} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-boot-muted" /><input type="tel" inputMode="tel" placeholder="010-1234-5678" value={phone} onChange={(event) => setPhone(formatPhoneInput(event.target.value))} disabled={saving} maxLength={13} className={`${inputClass} pl-10`} /></div>
-          </label>
+          <p className="rounded-lg bg-boot-soft px-3 py-3 text-xs font-bold leading-5 text-boot-muted">
+            연락은 앱 안의 채팅으로만 이어져요. 외부 전화번호는 프로필에 입력하지 않아요.
+          </p>
         </div>
       )}
 
@@ -366,17 +358,4 @@ export default function BasicInfoForm({ initialValue, onSubmit, saving = false, 
       </footer>
     </section>
   )
-}
-
-function normalizePhone(input: string): string {
-  const digits = input.replace(/\D/g, '')
-  if (!/^010\d{8}$/.test(digits)) return ''
-  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
-}
-
-function formatPhoneInput(input: string): string {
-  const digits = input.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 3) return digits
-  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
-  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
 }

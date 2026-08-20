@@ -20,7 +20,7 @@ export function isMatchable(
     return { ok: false, reason: 'no_time_overlap' }
   }
 
-  const scoreGap = Math.abs(a.avgSelfAppearanceScore - b.avgSelfAppearanceScore)
+  const scoreGap = Math.abs(a.avgAppearanceScoreNormalized - b.avgAppearanceScoreNormalized)
   if (scoreGap > config.hardFilter.SCORE_BAND_WIDTH) {
     return { ok: false, reason: 'score_band_mismatch' }
   }
@@ -38,10 +38,10 @@ function sharesDepartment(a: GroupSummary, b: GroupSummary): boolean {
 }
 
 function hasRequiredProfileData(group: GroupSummary): group is GroupSummary & {
-  avgSelfAppearanceScore: number
+  avgAppearanceScoreNormalized: number
 } {
   return (
-    typeof group.avgSelfAppearanceScore === 'number' &&
+    typeof group.avgAppearanceScoreNormalized === 'number' &&
     group.avgAppearanceVector != null &&
     group.avgPreferredAxisZVector != null &&
     group.avgBig5 != null &&

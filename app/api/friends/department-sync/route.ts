@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
 
 type DepartmentFriendSuggestionRow = {
   user_id: string
@@ -12,7 +12,7 @@ type RequestBody = {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {

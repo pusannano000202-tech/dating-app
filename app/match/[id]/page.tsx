@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, Loader2, LockKeyhole, MapPin, MessageCircle, Navigation, Phone, Sparkles, Users } from 'lucide-react'
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
 import DepositPaymentPanel from '@/components/matching/DepositPaymentPanel'
 import MatchFoundSummary from '@/components/matching/MatchFoundSummary'
+import MeetingEvidencePanel from '@/components/matching/MeetingEvidencePanel'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
@@ -278,6 +279,7 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const matchId = params.id
   const isDevPreview = isDevPreviewClientSession()
   const [match, setMatch] = useState<MatchDetail | null>(null)
@@ -331,6 +333,13 @@ export default function MatchDetailPage() {
         failClosed('매칭을 찾을 수 없어요.')
         return false
       }
+      if (res.status === 409) {
+        const conflict = await res.json().catch(() => null) as { redirect_to?: unknown } | null
+        if (typeof conflict?.redirect_to === 'string' && conflict.redirect_to.startsWith('/match/events/')) {
+          router.replace(conflict.redirect_to)
+          return false
+        }
+      }
       if (!res.ok) {
         failClosed('매칭 정보를 불러오지 못했어요.')
         return false
@@ -349,7 +358,7 @@ export default function MatchDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [isDevPreview, matchId, router])
 
   useEffect(() => {
     refresh()
@@ -1544,6 +1553,13 @@ export default function MatchDetailPage() {
                 </p>
               </section>
             )}
+
+            {(match.match_status === 'confirmed' || match.match_status === 'completed')
+              && match.scheduled_start
+              && match.scheduled_end
+              && (
+                <MeetingEvidencePanel matchId={matchId} devPreview={isDevPreview} />
+              )}
 
             {/* Contact reveal */}
             {(match.match_status === 'confirmed' || match.match_status === 'completed') && (

@@ -2,7 +2,7 @@
 // 기존 `profiles.appearance_type` 컬럼 호환용. 매칭 정밀도는 measured vector 가 책임진다.
 // 이 매핑은 PR 가능 컬럼이 추가될 때까지의 호환 레이어다.
 
-import type { AppearanceType } from '@/lib/types'
+import type { AppearanceType } from '../types'
 
 const FEMALE_MAP: Record<string, AppearanceType> = {
   '귀여운/동안형': 'cute',
@@ -37,4 +37,32 @@ export function legacyTypeFromBucketWeights(
   entries.sort((a, b) => b[1] - a[1])
   const top = entries[0][0]
   return map[top] ?? null
+}
+
+export function legacyVectorFromBucketWeights(
+  gender: 'female' | 'male',
+  bucketWeights: Record<string, number>,
+): Record<AppearanceType, number> {
+  const map = gender === 'female' ? FEMALE_MAP : MALE_MAP
+  const vector: Record<AppearanceType, number> = {
+    cute: 0,
+    pure: 0,
+    chic: 0,
+    warm: 0,
+    stylish: 0,
+    healthy: 0,
+  }
+  let total = 0
+  for (const [bucket, rawWeight] of Object.entries(bucketWeights)) {
+    const type = map[bucket]
+    if (!type || !Number.isFinite(rawWeight) || rawWeight <= 0) continue
+    vector[type] += rawWeight
+    total += rawWeight
+  }
+  if (total > 0) {
+    for (const key of Object.keys(vector) as AppearanceType[]) {
+      vector[key] = Math.round((vector[key] / total) * 1000) / 1000
+    }
+  }
+  return vector
 }

@@ -45,7 +45,7 @@ function group(overrides: Partial<GroupSummary>): GroupSummary {
     gender: 'male',
     size: 2,
     departmentCodes: ['business'],
-    avgSelfAppearanceScore: 70,
+    avgAppearanceScoreNormalized: 0.7,
     avgAppearanceVector: { warm: 0.9, chic: 0.1 },
     avgPreferredAppearanceVector: { warm: 0.9, chic: 0.1 },
     avgPreferredAxisZVector: { warm: 0.9, chic: 0.1 },
@@ -112,7 +112,7 @@ test('isMatchable rejects invalid hard-filter pairs with reason codes', () => {
         groupId: 'female-c',
         gender: 'female',
         departmentCodes: ['design'],
-        avgSelfAppearanceScore: 90,
+        avgAppearanceScoreNormalized: 0.9,
       }),
       MATCHING_CONFIG,
     ),
@@ -228,7 +228,7 @@ test('summarizeGroup averages member scores and intersects availability', () => 
   const members: GroupMemberSummary[] = [
     {
       userId: 'user-a',
-      selfAppearanceScore: 60,
+      appearanceScoreNormalized: 0.6,
       appearanceVector: { warm: 1, chic: 0 },
       preferredAxisZVector: { warm: 0.8, chic: 0.2 },
       big5: {
@@ -258,7 +258,7 @@ test('summarizeGroup averages member scores and intersects availability', () => 
     },
     {
       userId: 'user-b',
-      selfAppearanceScore: 80,
+      appearanceScoreNormalized: 0.8,
       appearanceVector: { warm: 0, chic: 1 },
       preferredAxisZVector: { warm: 0.4, chic: 0.6 },
       big5: {
@@ -297,7 +297,7 @@ test('summarizeGroup averages member scores and intersects availability', () => 
     members,
   })
 
-  assert.equal(summary.avgSelfAppearanceScore, 70)
+  assert.equal(summary.avgAppearanceScoreNormalized, 0.7)
   assert.deepEqual(summary.avgAppearanceVector, { warm: 0.5, chic: 0.5 })
   assert.deepEqual(summary.avgPreferredAxisZVector, { warm: 0.6, chic: 0.4 })
   assert.deepEqual(summary.availability.saturday, [{ start: '16:00', end: '18:00' }])

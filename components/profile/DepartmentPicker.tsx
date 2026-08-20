@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { AlertCircle, Check, Loader2, Search, Trash2 } from 'lucide-react'
+import { AlertCircle, Check, ChevronDown, Loader2, Search, Trash2 } from 'lucide-react'
 import {
   type DepartmentCatalog,
   type DepartmentCatalogLoadState,
@@ -49,6 +49,7 @@ export default function DepartmentPicker({
   const currentValueRef = useRef(value)
   const previousSchoolIdRef = useRef(schoolId)
   const inputAnchorRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const inputId = useId()
   const listboxId = useId()
 
@@ -188,6 +189,12 @@ export default function DepartmentPicker({
     }
   }
 
+  const openDepartmentList = () => {
+    if (inputDisabled || effectiveLoadState !== 'ready') return
+    setIsOpen(true)
+    inputRef.current?.focus()
+  }
+
   return (
     <div className="min-w-0" onBlur={handleBlur}>
       <div ref={inputAnchorRef} className="relative min-w-0">
@@ -200,6 +207,7 @@ export default function DepartmentPicker({
           size={16}
         />
         <input
+          ref={inputRef}
           id={inputId}
           type="text"
           role="combobox"
@@ -212,6 +220,7 @@ export default function DepartmentPicker({
           placeholder="학과명 또는 단과대명 검색"
           value={query}
           disabled={inputDisabled}
+          onClick={openDepartmentList}
           onChange={(event) => {
             const nextValue = event.target.value
             setQuery(nextValue)
@@ -259,8 +268,17 @@ export default function DepartmentPicker({
               selectDepartment(suggestions[boundedActiveIndex])
             }
           }}
-          className="w-full min-w-0 rounded-2xl border border-boot-hairline bg-white py-3.5 pl-11 pr-4 text-sm font-bold text-boot-ink outline-none transition placeholder:text-boot-muted/70 focus:border-boot-primary disabled:cursor-not-allowed disabled:bg-boot-soft disabled:opacity-60"
+          className="w-full min-w-0 rounded-lg border border-boot-hairline bg-white py-3.5 pl-11 pr-12 text-sm font-bold text-boot-ink outline-none transition placeholder:text-boot-muted/70 focus:border-boot-primary disabled:cursor-not-allowed disabled:bg-boot-soft disabled:opacity-60"
         />
+        <button
+          type="button"
+          aria-label="학과 목록 열기"
+          disabled={inputDisabled || effectiveLoadState !== 'ready'}
+          onClick={openDepartmentList}
+          className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-boot-muted hover:bg-boot-soft disabled:opacity-40"
+        >
+          <ChevronDown aria-hidden="true" size={18} className={`transition ${showSuggestions ? 'rotate-180' : ''}`} />
+        </button>
       </div>
 
       <div aria-live="polite" className="mt-2 min-h-5 text-xs font-bold leading-5 text-boot-muted">
@@ -299,7 +317,7 @@ export default function DepartmentPicker({
         <div
           id={listboxId}
           role="listbox"
-          className="relative z-50 mt-2 w-full min-w-0 overflow-y-auto rounded-2xl border border-boot-hairline bg-white p-1 shadow-lg"
+          className="relative z-50 mt-2 w-full min-w-0 overflow-y-auto rounded-lg border border-boot-hairline bg-white p-1 shadow-lg"
           style={{ maxHeight: suggestionMaxHeight }}
         >
           {suggestions.map((department, index) => (

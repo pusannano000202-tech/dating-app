@@ -29,4 +29,24 @@ test('enter_match_pool requires the active member count to exactly match the sel
   assert.match(migration, /v_active_count <> v_group\.size/)
   assert.match(migration, /group_not_full/)
   assert.match(migration, /Requires active member count to equal groups\.size/)
+
+  const routePath = join(process.cwd(), 'app/api/match-pool/enter/route.ts')
+  const route = readFileSync(routePath, 'utf8')
+
+  assert.match(route, /if\s*\(\s*activeMembers\.length\s*<\s*2\s*\)\s*\{/)
+  assert.match(route, /if\s*\(\s*activeMembers\.length\s*!==\s*group\.size\s*\)\s*\{/)
+  assert.ok(!/activeMembers\.length\s*<\s*group\.size/.test(route))
+  assert.match(route, /select\('user_id'\)/)
+  assert.match(route, /select\('id,\s*size,\s*status,\s*leader_user_id'\)/)
+  assert.match(route, /const isLeader = group\.leader_user_id === user\.id/)
+  assert.ok(route.indexOf("if (activeMembers.length < 2)") < route.indexOf('activeMembers.length !== group.size'))
+  assert.ok(route.indexOf("if (!activeMembers.some((row: { user_id: string }) => row.user_id === user.id))") <
+    route.indexOf('if (!isLeader)'))
+
+  assert.match(migration, /v_group\.leader_user_id\s*\<\>\s*v_caller/)
+  assert.match(route, /if\s*\(\s*!isLeader\s*\)\s*\{/)
+  assert.ok(!/select\('user_id, role'\)/.test(route))
+  assert.ok(!/row\.role\s*===\s*'leader'/.test(route))
+
+  assert.match(route, /return NextResponse\.json\(\{ error: 'group_not_full' \}, \{ status: 409 \}\)/)
 })

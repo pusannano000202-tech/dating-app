@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 export async function GET(_req: NextRequest) {
   const supabase = await createSupabaseServerClient()
@@ -7,6 +8,6 @@ export async function GET(_req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data, error } = await supabase.rpc('admin_list_pending_matches')
-  if (error) return NextResponse.json({ error: error.message || 'lookup_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'lookup_failed') }, { status: 400 })
   return NextResponse.json({ matches: data ?? [] })
 }

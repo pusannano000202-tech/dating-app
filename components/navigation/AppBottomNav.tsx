@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, MessageCircleMore, UserRound, UsersRound, Zap } from 'lucide-react'
+import { Home, MessageCircle, MessageCircleMore, UserRound, UsersRound, Zap } from 'lucide-react'
 
 const hiddenExactRoutes = new Set(['/login', '/dev/preview'])
 
@@ -11,12 +11,14 @@ const tabs = [
   { href: '/match', label: '매칭', Icon: Zap },
   { href: '/meetups', label: '모임', Icon: UsersRound },
   { href: '/community', label: '커뮤니티', Icon: MessageCircleMore },
+  { href: '/chat', label: '채팅', Icon: MessageCircle },
   { href: '/profile/edit', label: '마이', Icon: UserRound },
 ]
 
 function shouldHide(pathname: string): boolean {
   if (hiddenExactRoutes.has(pathname)) return true
   if (pathname.startsWith('/admin')) return true
+  if (pathname.startsWith('/match/events/')) return true
   return false
 }
 

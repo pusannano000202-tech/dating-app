@@ -1,4 +1,7 @@
 const TOSS_API_BASE_URL = 'https://api.tosspayments.com/v1'
+const DEFAULT_TOSS_API_TIMEOUT_MS = 8_000
+const MIN_TOSS_API_TIMEOUT_MS = 50
+const MAX_TOSS_API_TIMEOUT_MS = 10_000
 
 export interface TossPaymentObject {
   paymentKey: string
@@ -195,9 +198,32 @@ async function requestTossPayment(path: string, options: TossPaymentRequestOptio
     init.body = JSON.stringify(options.body)
   }
 
-  const res = await fetch(`${TOSS_API_BASE_URL}${path}`, {
-    ...init,
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), resolveTossApiTimeoutMs())
+  let res: Response
+
+  try {
+    res = await fetch(`${TOSS_API_BASE_URL}${path}`, {
+      ...init,
+      signal: controller.signal,
+    })
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw new TossPaymentError(
+        'Toss payment request timed out.',
+        504,
+        'payment_provider_timeout',
+      )
+    }
+
+    throw new TossPaymentError(
+      'Toss payment provider is unavailable.',
+      502,
+      'payment_provider_unavailable',
+    )
+  } finally {
+    clearTimeout(timeout)
+  }
 
   const json = await readJson(res)
   if (!res.ok) {
@@ -210,6 +236,16 @@ async function requestTossPayment(path: string, options: TossPaymentRequestOptio
   }
 
   return json as TossPaymentObject
+}
+
+function resolveTossApiTimeoutMs() {
+  const parsed = Number.parseInt(process.env.TOSS_API_TIMEOUT_MS ?? '', 10)
+  if (!Number.isFinite(parsed)) return DEFAULT_TOSS_API_TIMEOUT_MS
+  return Math.min(MAX_TOSS_API_TIMEOUT_MS, Math.max(MIN_TOSS_API_TIMEOUT_MS, parsed))
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof Error && error.name === 'AbortError'
 }
 
 async function readJson(res: Response): Promise<unknown> {
