@@ -295,3 +295,49 @@ HTTP 200이나 화면 렌더만으로 완료 처리하지 않는다.
   비밀번호 로그인을 추가하기 전 반드시 활성화 여부를 다시 결정한다.
 - 운영 migration 적용, Advisor 증분, 실제 Toss 환불·이월, 실제 OpenAI 분석,
   다계정 완료 흐름, APK/AAB 실기기 검증은 별도 운영 증거가 필요하다.
+
+## 12. 2026-08-20 외부 연동·출시 증거 재확인
+
+이 절의 결과가 8절과 9절에 적힌 이전 차단 상태보다 최신이다. 이번 확인에서도
+`main` 병합, 운영 배포, 운영 migration 적용은 수행하지 않았다.
+
+### 해소된 항목
+
+| 항목 | 결과 | 증거와 한계 |
+| --- | --- | --- |
+| GitHub Actions | 통과 | PR #14의 실행 #188 (`32309493358`)에서 Next.js, Python, migration 기준선 검사가 모두 성공했다. |
+| Vercel 인증·프로젝트 연결 | 통과 | 계정 `pusannano000202-tech`, 프로젝트 `dating-app` 연결과 Preview `Ready`를 확인했다. Windows 한글 호스트명이 Vercel CLI User-Agent를 깨뜨리는 로컬 도구 문제가 있어 이번 확인은 영문 호스트명으로 격리 실행했다. |
+| Vercel 운영 환경변수 이름 | 통과 | Production과 Preview에 Supabase, Toss, `AI_SERVER_URL`, `AI_SERVER_SECRET`, `NEXT_PUBLIC_APP_ORIGIN`, 내부 결제·cron 비밀키 이름이 존재함을 확인했다. 암호화된 값 자체의 일치 여부는 출력하거나 비교하지 않았다. |
+| Vercel Preview 상태 | 통과 | 보호 우회 토큰을 사용한 `/api/health`가 `200`, `supabase: true`를 반환했다. 운영 배포 증거는 아니다. |
+| 실제 OpenAI 외모분석 | 통과 | 실행 `qa-release-mt1esfx1-a785531acdded1dd`에서 실제 분석, 비공개 점수 저장, 두 번째 요청의 점수 재사용, 사진·계정 정리까지 확인했다. 현재 로컬 코드와 운영 Supabase·AI 서버를 조합한 증거이며 Vercel 운영판 증거는 아니다. |
+| 보증금 반환·이월 상태 머신 | 통과 | 실행 `qa-release-mt1expsy-ad13c388ba1c2c8f`에서 mock 결제의 전액 10,000원 반환, 다음 매칭 이월, 중복 실행 방지, 테스트 데이터 정리를 확인했다. Toss 승인·취소 API 증거는 아니다. |
+| Expo 계정·기존 산출물 | 확인 | EAS 계정 `quantum-pusan`과 기존 AAB/APK를 확인했지만, 기존 산출물 fingerprint와 현재 소스 fingerprint가 달라 최신 설치본으로 인정하지 않는다. |
+| 로컬 전체 회귀 검사 | 통과 | 웹 850/850 (`auth` 18, `config` 286, `matching` 415, `profile` 131), 타입 검사, 린트, 비밀정보 검사, npm 취약점 0건, migration 경고 기준선 612건 이내를 확인했다. |
+
+### 운영 적용 전에 남은 항목
+
+- 로컬 migration은 161개, 운영 이력은 160개다. 운영에 없는 파일은
+  `20260814030000_matching_profile_preference_secret_roles.sql` 하나다.
+- 이 migration을 먼저 적용하면 운영 DB가 아직 병합되지 않은 PR 코드보다 앞서므로,
+  PR 병합과 운영 적용 승인을 받기 전에는 적용하지 않는다.
+- 현재 원격 Advisor 기준선은 Security 165건(RLS 정책 없음 41, 인증 사용자가 실행
+  가능한 `SECURITY DEFINER` 함수 123, 유출 비밀번호 보호 1), Performance 38건
+  (인덱스 없는 외래 키 3, 미사용 인덱스 35)이다. migration 적용 직후 같은 방식으로
+  다시 조회해 증분을 비교한다.
+- 운영 DB의 Toss 기록은 `pending` 1건뿐이며 `paymentKey`, 승인 시각, 환불 시각이
+  없다. 따라서 실제 Toss 전액 환불은 승인된 테스트 결제 1건이 생기기 전까지
+  실행할 수 없다.
+- 이벤트룸 8계정 검증은 초대·알림·15분 예약·5인 정원·6번째 두 번째 방 편성·취소와
+  권한 차단까지 통과했다. 완료 후 역할 맞히기와 프로필 공개 전환은 운영 migration
+  적용 후 다시 검증한다.
+- 현재 소스 fingerprint로 새 AAB/APK를 만든 뒤 실제 Android 기기에서 설치,
+  Google·Kakao 로그인 앱 복귀를 확인해야 한다. 새 빌드는 과금 가능성이 있어
+  사용자 승인 없이 시작하지 않는다.
+
+### 이번 보완 코드
+
+- 외모분석 E2E가 파일 확장자만 믿고 모든 파일을 JPEG로 업로드하던 문제를 수정했다.
+  JPEG, PNG, WebP 파일 시그니처에서 실제 MIME과 파일명을 결정하고, 알 수 없는
+  형식은 원격 업로드 전에 중단한다.
+- 테스트용 얼굴 파일이 `.jpg` 확장자지만 실제 바이트는 PNG여서 발생하던 `415`
+  실패를 재현한 뒤 수정했으며, JPEG·PNG·WebP·미지원 형식 회귀 테스트를 추가했다.
