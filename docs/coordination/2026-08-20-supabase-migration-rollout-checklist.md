@@ -313,6 +313,7 @@ HTTP 200이나 화면 렌더만으로 완료 처리하지 않는다.
 | 보증금 반환·이월 상태 머신 | 통과 | 실행 `qa-release-mt1expsy-ad13c388ba1c2c8f`에서 mock 결제의 전액 10,000원 반환, 다음 매칭 이월, 중복 실행 방지, 테스트 데이터 정리를 확인했다. Toss 승인·취소 API 증거는 아니다. |
 | Expo 계정·기존 산출물 | 확인 | EAS 계정 `quantum-pusan`과 기존 AAB/APK를 확인했지만, 기존 산출물 fingerprint와 현재 소스 fingerprint가 달라 최신 설치본으로 인정하지 않는다. |
 | 로컬 전체 회귀 검사 | 통과 | 웹 850/850 (`auth` 18, `config` 286, `matching` 415, `profile` 131), 타입 검사, 린트, 비밀정보 검사, npm 취약점 0건, migration 경고 기준선 612건 이내를 확인했다. |
+| 모바일 의존성 감사 | 보류 | Critical 0, High 8, Moderate 8이다. 모두 Expo CLI·Metro·Xcode 등 빌드 도구의 간접 의존 경로이며, `npm audit` 자동 수정안은 Expo 57을 53으로 되돌리는 major 변경이라 적용하지 않았다. 실제 앱 런타임 취약점으로 확인된 것은 아니지만, Expo 호환 릴리스 또는 통제된 SDK 업그레이드 후 다시 감사한다. |
 
 ### 운영 적용 전에 남은 항목
 
