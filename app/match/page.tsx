@@ -24,6 +24,8 @@ import NotificationBell from '@/components/NotificationBell'
 import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 import CampusSevenMatchEntry from '@/components/matching/campus-seven/CampusSevenMatchEntry'
+import QuantumMatchDiscovery from '@/components/matching/QuantumMatchDiscovery'
+import QuantumEventRoomInviteInbox from '@/components/matching/QuantumEventRoomInviteInbox'
 import {
   getMatchingFrontendLoadFailure,
   getMatchingFrontendLoadMessage,
@@ -32,8 +34,11 @@ import {
 } from '@/lib/matching/frontend-load-state'
 import { isGroupQueueActive as hasActiveGroupQueue } from '@/lib/matching/group-queue-state'
 import { isActiveMatchStatus } from '@/lib/matching/match-view-state'
+import { fetchRequiredMatchingResource } from '@/lib/matching/fetch-required-resource'
 
 type MatchMode = 'group' | 'solo'
+
+const CAMPUS_SEVEN_VISIBLE = process.env.NEXT_PUBLIC_CAMPUS_SEVEN_VISIBLE === 'true'
 
 interface MatchRow {
   match_id: string
@@ -210,9 +215,9 @@ export default function MatchesPage() {
       setSoloQueueActive(false)
 
       const [matchRes, poolRes, groupRes] = await Promise.all([
-        fetch('/api/matches'),
+        fetchRequiredMatchingResource('/api/matches', (path) => fetch(path, { cache: 'no-store' })),
         fetch('/api/match-pool/stats'),
-        fetch('/api/groups'),
+        fetchRequiredMatchingResource('/api/groups', (path) => fetch(path, { cache: 'no-store' })),
       ])
 
       const requiredFailure = getMatchingFrontendLoadFailure({
@@ -388,7 +393,7 @@ export default function MatchesPage() {
     }
   }, [cancelingQueue, refresh])
 
-  if (loadFailure && !loading) {
+  if (LEGACY_MATCH_ENTRY_VISIBLE && loadFailure && !loading) {
     return (
       <MatchingLoadFailureScreen
         failure={loadFailure}
@@ -432,14 +437,19 @@ export default function MatchesPage() {
     ? rawSoloFlowActive
     : groupFlowActive
   const hasAnyStartedMatching = groupFlowActive || rawSoloFlowActive
+  const shouldShowLegacyStatus = LEGACY_MATCH_ENTRY_VISIBLE && !loading
+    && (hasAnyStartedMatching || hasMatchResults)
   const soloResultHref = isSoloMode
     ? visibleMatches.find((match) => match.match_mode === 'solo')?.match_id
     : undefined
-  const shouldShowMatchingPool = !loading && !hasAnyStartedMatching && !hasMatchResults
+  const shouldShowMatchingPool = LEGACY_MATCH_ENTRY_VISIBLE && !loading && !hasAnyStartedMatching && !hasMatchResults
+  const shouldShowLegacyResult = LEGACY_MATCH_ENTRY_VISIBLE && currentMatchResult
   const canCancelActiveQueue = !loading
+    && LEGACY_MATCH_ENTRY_VISIBLE
     && !hasMatchResults
     && hasAnyStartedMatching
   const canCancelCurrentMatch = !loading
+    && LEGACY_MATCH_ENTRY_VISIBLE
     && currentMatchResult?.match_status === 'pending'
   const teamCardName = loading
     ? '매칭 상태 확인 중'
@@ -473,8 +483,8 @@ export default function MatchesPage() {
 
   return (
     <main className="min-h-screen booting-paper px-4 pb-24 text-boot-ink sm:px-6">
-      <div className="mx-auto w-full max-w-2xl pt-5 sm:pt-7">
-        <header className="mb-5 flex items-center gap-3">
+      <div className="mx-auto w-full max-w-6xl pt-5 sm:pt-7">
+        <header className="mx-auto mb-2 flex w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
           <Link href="/" className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body hover:border-boot-primary hover:text-boot-primary" aria-label="홈으로 돌아가기">
             <ChevronLeft size={18} />
           </Link>
@@ -485,6 +495,11 @@ export default function MatchesPage() {
           <NotificationBell />
         </header>
 
+        <QuantumEventRoomInviteInbox />
+        <QuantumMatchDiscovery />
+
+        <div className="mx-auto w-full max-w-2xl">
+        {shouldShowLegacyStatus && (
         <section className="mb-4 border-y border-boot-hairline bg-white px-1 py-4">
           <div className="flex items-center gap-4">
             <SchoolMascot
@@ -503,9 +518,11 @@ export default function MatchesPage() {
             </div>
           </div>
         </section>
+        )}
 
-        <CampusSevenMatchEntry href="/match/campus-seven" />
+        {CAMPUS_SEVEN_VISIBLE && <CampusSevenMatchEntry href="/match/campus-seven" />}
 
+        {shouldShowLegacyStatus && (
         <DarkTeamProgressCard
           className="mb-4"
           groupName={teamCardName}
@@ -528,6 +545,7 @@ export default function MatchesPage() {
                 }
               : undefined}
         />
+        )}
 
         {(canCancelActiveQueue || canCancelCurrentMatch) && (
           <QueueControlStrip
@@ -543,7 +561,7 @@ export default function MatchesPage() {
           />
         )}
 
-        {loading ? (
+        {LEGACY_MATCH_ENTRY_VISIBLE && loading ? (
           <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
@@ -557,28 +575,28 @@ export default function MatchesPage() {
               </div>
             </div>
           </section>
-        ) : currentMatchResult ? (
+        ) : shouldShowLegacyResult ? (
           <>
             <LockedOpponentCard
               className="mb-5"
               eyebrow={isSoloMode ? '추천 상대' : '추천 상대팀'}
               title={isSoloMode ? '소개팅 상대 후보' : '가매칭 후보'}
-              participantCount={currentMatchResult?.opp_group_size ?? 1}
-              chips={getOpponentFactChips(currentMatchResult)}
+              participantCount={shouldShowLegacyResult.opp_group_size ?? 1}
+              chips={getOpponentFactChips(shouldShowLegacyResult)}
               description={isSoloMode
                 ? '보증금과 사전 카드가 끝나면 상대의 카드와 약속 정보가 단계적으로 열려요'
                 : '보증금과 사전 카드가 끝나면 상대 정보가 단계적으로 열려요'}
             />
             <PostMatchFlowCard
-              match={currentMatchResult}
+              match={shouldShowLegacyResult}
               cancelAction={canCancelCurrentMatch ? {
                 label: isSoloMode ? '1:1 가매칭 취소하기' : '가매칭 취소하기',
-                onClick: () => handleCancelMatchResult(currentMatchResult),
+                onClick: () => handleCancelMatchResult(shouldShowLegacyResult),
                 disabled: cancelingQueue,
               } : undefined}
             />
           </>
-        ) : isGroupQueueActive ? (
+        ) : LEGACY_MATCH_ENTRY_VISIBLE && isGroupQueueActive ? (
           <ActiveGroupQueuePanel
             capacity={activeGroupSize}
             membersCount={groupSummary.members.length}
@@ -586,7 +604,7 @@ export default function MatchesPage() {
             canceling={cancelingQueue}
             onCancel={handleCancelGroupQueue}
           />
-        ) : hasStartedMatching && !hasMatchResults ? (
+        ) : LEGACY_MATCH_ENTRY_VISIBLE && hasStartedMatching && !hasMatchResults ? (
           <MatchSearchingPrivacyCard
             mode={effectiveMatchMode}
             canceling={cancelingQueue}
@@ -594,7 +612,7 @@ export default function MatchesPage() {
           />
         ) : null}
 
-        {!loading && !hasAnyStartedMatching && (
+        {LEGACY_MATCH_ENTRY_VISIBLE && !loading && !hasAnyStartedMatching && devPreviewActive && (
           <section className="mb-5 rounded-[30px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
             <div className="mb-4 flex items-start gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
@@ -622,7 +640,7 @@ export default function MatchesPage() {
           </section>
         )}
 
-        {shouldShowMatchingPool && (
+        {LEGACY_MATCH_ENTRY_VISIBLE && shouldShowMatchingPool && devPreviewActive && (
         <section className="mb-5">
           <MatchingPool
             stats={poolStats}
@@ -638,18 +656,18 @@ export default function MatchesPage() {
         </section>
         )}
 
-        {error && (
+        {LEGACY_MATCH_ENTRY_VISIBLE && error && (
           <div className="mb-4 rounded-2xl border border-red-400/20 bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        {loading ? (
+        {LEGACY_MATCH_ENTRY_VISIBLE && loading ? (
           <section className="glass flex items-center gap-3 rounded-3xl p-5 text-sm text-boot-muted">
             <Loader2 size={18} className="animate-spin" />
             매칭 정보를 확인하는 중
           </section>
-        ) : visibleMatches.length === 0 && !hasStartedMatching ? (
+        ) : LEGACY_MATCH_ENTRY_VISIBLE && visibleMatches.length === 0 && !hasStartedMatching && devPreviewActive ? (
           <section className="glass rounded-3xl p-5 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-boot-primary/15 bg-boot-soft">
               <CalendarClock size={20} className="text-boot-primary" />
@@ -681,10 +699,13 @@ export default function MatchesPage() {
             </p>
           </section>
         ) : null}
+        </div>
       </div>
     </main>
   )
 }
+
+const LEGACY_MATCH_ENTRY_VISIBLE = false as boolean
 
 function confirmAction(message: string): boolean {
   if (typeof window.confirm !== 'function') return true
@@ -950,8 +971,8 @@ function MatchingLoadFailureScreen({
 
   return (
     <main className="min-h-screen booting-paper px-4 pb-24 text-boot-ink sm:px-6">
-      <div className="mx-auto w-full max-w-2xl pt-5 sm:pt-7">
-        <header className="mb-5 flex items-center gap-3">
+      <div className="mx-auto w-full max-w-6xl pt-5 sm:pt-7">
+        <header className="mx-auto mb-2 flex w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
           <Link href="/" className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body hover:border-boot-primary hover:text-boot-primary" aria-label="홈으로 돌아가기">
             <ChevronLeft size={18} />
           </Link>
@@ -961,7 +982,9 @@ function MatchingLoadFailureScreen({
           </div>
         </header>
 
-        <section className="rounded-lg border border-boot-primary/15 bg-white px-5 py-6 shadow-[0_14px_34px_rgba(24,35,31,0.08)]">
+        <QuantumMatchDiscovery />
+
+        <section className="mx-auto w-full max-w-2xl rounded-lg border border-boot-primary/15 bg-white px-5 py-6 shadow-[0_14px_34px_rgba(24,35,31,0.08)]">
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-boot-soft text-boot-primary">
             <RotateCw size={21} />
           </div>

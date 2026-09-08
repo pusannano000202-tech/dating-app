@@ -24,21 +24,41 @@ What it does NOT catch
 
 Usage:
     python scripts/verify-migrations.py
+    python scripts/verify-migrations.py --strict
+    python scripts/verify-migrations.py --max-issues 232
+    python scripts/verify-migrations.py --baseline scripts/migration-warning-baseline.json
 """
 from __future__ import annotations
 
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
 MIG_DIR = Path('supabase/migrations')
+
+PG_CATALOG_RELATIONS = {
+    'pg_attribute',
+    'pg_class',
+    'pg_constraint',
+    'pg_database',
+    'pg_db_role_setting',
+    'pg_depend',
+    'pg_namespace',
+    'pg_proc',
+    'pg_roles',
+}
 
 # Supabase baseline objects assumed to always exist.
 BASELINE_RELATIONS = {
     'auth.users',
     'auth.identities',
+    # Supabase Auth keeps each refresh-token session here. Security-definer
+    # functions may bind a JWT session_id to this server-owned relation.
+    'auth.sessions',
     'storage.objects',
     'storage.buckets',
     'pg_constraint',
@@ -49,6 +69,7 @@ BASELINE_RELATIONS = {
     'public.pg_attribute',
     'public.pg_proc',
     'public.pg_class',
+    *(f'pg_catalog.{name}' for name in PG_CATALOG_RELATIONS),
     # cross-branch (성준 영역 matching/group-engine):
     # 20260516_matching_add_venues_and_match_meetings.sql 에서 추가됨.
     # 본 브랜치 z36 의 get_match_scheduled_reveal_at 가 참조함.
@@ -58,6 +79,8 @@ BASELINE_RELATIONS = {
 
 # Names that our naive regex picks up but are not real relations
 SPURIOUS_NAMES = {
+    # REVOKE ... FROM PUBLIC is a role clause, not a relation reference.
+    'public.public',
     'public.on',
     'public.to',
     'public.not',
@@ -140,8 +163,104 @@ def normalize_name(name: str) -> str:
 
 def schema_qualify(name: str) -> str:
     if '.' not in name:
+        if name in PG_CATALOG_RELATIONS:
+            return f'pg_catalog.{name}'
         return f'public.{name}'
     return name
+
+
+def query_code_mask(text: str) -> str:
+    """Hide comments/string literals without shifting source positions or lines.
+
+    Dollar-quoted function bodies remain visible because this dependency checker
+    also inspects the SQL inside PL/pgSQL. This is not a PostgreSQL grammar parser.
+    """
+    result = list(text)
+    index = 0
+    while index < len(text):
+        start = index
+        if text.startswith('--', index):
+            end = text.find('\n', index)
+            index = len(text) if end < 0 else end
+        elif text.startswith('/*', index):
+            nesting = 1
+            index += 2
+            while index < len(text) and nesting:
+                if text.startswith('/*', index):
+                    nesting += 1
+                    index += 2
+                elif text.startswith('*/', index):
+                    nesting -= 1
+                    index += 2
+                else:
+                    index += 1
+        elif text[index] == "'":
+            index += 1
+            while index < len(text):
+                if text.startswith("''", index):
+                    index += 2
+                elif text[index] == "'":
+                    index += 1
+                    break
+                else:
+                    index += 1
+        else:
+            index += 1
+            continue
+        for cursor in range(start, index):
+            if result[cursor] not in '\r\n':
+                result[cursor] = ' '
+    return ''.join(result)
+
+
+def query_reference_context(code: str):
+    """Track WITH query scope and EXTRACT separators, not a global alias allowlist."""
+    depths = [0] * (len(code) + 1)
+    stack: list[int] = []
+    closes: dict[int, int] = {}
+    for index, char in enumerate(code):
+        depths[index] = len(stack)
+        if char == '(':
+            stack.append(index)
+        elif char == ')' and stack:
+            closes[stack.pop()] = index
+    depths[len(code)] = len(stack)
+    cte_scopes: list[tuple[int, int, set[str]]] = []
+    for match in re.finditer(r'\bWITH\s+(?:RECURSIVE\s+)?', code, re.IGNORECASE):
+        cursor = match.end()
+        names: set[str] = set()
+        while cursor < len(code):
+            alias = re.match(r'\s*("[^"]+"|\w+)\s*', code[cursor:])
+            if not alias:
+                break
+            name = normalize_name(alias.group(1))
+            cursor += alias.end()
+            if cursor in closes:  # Optional CTE column names.
+                cursor = closes[cursor] + 1
+            declaration = re.match(r'\s*AS\s+(?:(?:NOT\s+)?MATERIALIZED\s*)?\(', code[cursor:], re.IGNORECASE)
+            if not declaration:
+                break
+            opening = cursor + declaration.end() - 1
+            if opening not in closes:
+                break
+            names.add(name)
+            cursor = closes[opening] + 1
+            comma = re.match(r'\s*,', code[cursor:])
+            if not comma:
+                break
+            cursor += comma.end()
+        if names:
+            depth = depths[match.start()]
+            end = next((position for position in range(cursor, len(code))
+                        if (code[position] == ';' and depths[position] <= depth)
+                        or (code[position] == ')' and depths[position] == depth)), len(code))
+            cte_scopes.append((match.start(), end, names))
+    extract_scopes = []
+    for match in re.finditer(r'\bEXTRACT\s*\(', code, re.IGNORECASE):
+        opening = match.end() - 1
+        if opening in closes:
+            extract_scopes.append((opening, closes[opening], depths[opening] + 1))
+    return depths, cte_scopes, extract_scopes
 
 
 def parse_file(path: Path) -> FileReport:
@@ -159,6 +278,14 @@ def parse_file(path: Path) -> FileReport:
         else:
             stripped_lines.append(ln)
     stripped = '\n'.join(stripped_lines)
+    query_code = query_code_mask(text)
+    query_depths, cte_scopes, extract_scopes = query_reference_context(query_code)
+
+    def is_cte_reference(name: str, position: int) -> bool:
+        return '.' not in name and any(
+            start <= position < end and normalize_name(name) in names
+            for start, end, names in cte_scopes
+        )
 
     # CREATE TABLE [IF NOT EXISTS] <name> (
     for m in re.finditer(r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w.\"]+)", stripped, re.IGNORECASE):
@@ -167,7 +294,7 @@ def parse_file(path: Path) -> FileReport:
         report.defs.append(Object('table', name, path.name, line))
 
     # ALTER TABLE <name> ADD COLUMN ...  -- treat as table reference, columns later
-    for m in re.finditer(r"ALTER\s+TABLE\s+([\w.\"]+)", stripped, re.IGNORECASE):
+    for m in re.finditer(r"ALTER\s+TABLE\s+([\w.\"]+)", query_code, re.IGNORECASE):
         name = schema_qualify(normalize_name(m.group(1)))
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'table', path.name, line, 'ALTER TABLE'))
@@ -225,7 +352,7 @@ def parse_file(path: Path) -> FileReport:
         report.refs.append(Reference(f'{table}::{pname}', 'policy', path.name, line, f'DROP POLICY {pname}'))
 
     # CREATE TRIGGER <name> ON <table>
-    for m in re.finditer(r"CREATE\s+TRIGGER\s+(\w+)[^;]*?ON\s+([\w.\"]+)", stripped, re.IGNORECASE | re.DOTALL):
+    for m in re.finditer(r"CREATE\s+TRIGGER\s+(\w+)[^;]*?ON\s+([\w.\"]+)", query_code, re.IGNORECASE | re.DOTALL):
         tname = m.group(1).lower()
         table = schema_qualify(normalize_name(m.group(2)))
         line = stripped.count('\n', 0, m.start()) + 1
@@ -233,7 +360,7 @@ def parse_file(path: Path) -> FileReport:
         report.refs.append(Reference(table, 'table', path.name, line, f'CREATE TRIGGER {tname}'))
 
     # DROP TRIGGER
-    for m in re.finditer(r"DROP\s+TRIGGER(?:\s+IF\s+EXISTS)?\s+(\w+)\s+ON\s+([\w.\"]+)", stripped, re.IGNORECASE):
+    for m in re.finditer(r"DROP\s+TRIGGER(?:\s+IF\s+EXISTS)?\s+(\w+)\s+ON\s+([\w.\"]+)", query_code, re.IGNORECASE):
         tname = m.group(1).lower()
         table = schema_qualify(normalize_name(m.group(2)))
         line = stripped.count('\n', 0, m.start()) + 1
@@ -260,13 +387,29 @@ def parse_file(path: Path) -> FileReport:
         report.refs.append(Reference(name, 'table', path.name, line, 'FK REFERENCES'))
 
     # JOIN <table>
-    for m in re.finditer(r"\bJOIN\s+([\w.\"]+)", stripped, re.IGNORECASE):
+    for m in re.finditer(r"\bJOIN\s+([\w.\"]+)", query_code, re.IGNORECASE):
+        if re.match(r"\s*\(", query_code[m.end():]) or is_cte_reference(m.group(1), m.start()):
+            continue
         name = schema_qualify(normalize_name(m.group(1)))
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'table', path.name, line, 'JOIN'))
 
     # FROM <table> (best effort; ignores subqueries)
-    for m in re.finditer(r"\bFROM\s+([\w.\"]+)(?!\s*\()", stripped, re.IGNORECASE):
+    for m in re.finditer(r"\bFROM\s+([\w.\"]+)", query_code, re.IGNORECASE):
+        if is_cte_reference(m.group(1), m.start()):
+            continue
+        if any(start < m.start() < end and query_depths[m.start()] == depth for start, end, depth in extract_scopes):
+            continue
+        # `IS [NOT] DISTINCT FROM value` is a comparison operator, not a
+        # relation reference. Keep this check generic so EXCLUDED fields and
+        # PL/pgSQL variables are both handled without adding name allowlists.
+        if re.search(r"\bDISTINCT\s+$", query_code[:m.start()], re.IGNORECASE):
+            continue
+        # A set-returning function is a function reference, not a relation.
+        # Checking after the complete capture avoids the negative-lookahead
+        # backtracking bug that truncated `round_ids(` to `round_id`.
+        if re.match(r"\s*\(", query_code[m.end():]):
+            continue
         name = schema_qualify(normalize_name(m.group(1)))
         # Skip obvious aliases or CTE names
         if name in ('public.deleted', 'public.inserted', 'public.updated'):
@@ -274,8 +417,18 @@ def parse_file(path: Path) -> FileReport:
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'table', path.name, line, 'FROM'))
 
+    # Trigger event lists are not DML. Keep the following function body outside
+    # this range so its real UPDATE dependencies are still checked.
+    trigger_headers = [(m.start(), m.end()) for m in re.finditer(
+        r'\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:CONSTRAINT\s+)?TRIGGER\s+[\w."]+\s+(?:BEFORE|AFTER|INSTEAD\s+OF)\b[^;]*?\bON\s+',
+        query_code, re.IGNORECASE,
+    )]
     # UPDATE <table>
-    for m in re.finditer(r"\bUPDATE\s+([\w.\"]+)", stripped, re.IGNORECASE):
+    for m in re.finditer(r"\bUPDATE\s+([\w.\"]+)", query_code, re.IGNORECASE):
+        if any(start <= m.start() < end for start, end in trigger_headers):
+            continue
+        if re.search(r"\bFOR\s+(?:NO\s+KEY\s+)?$", query_code[:m.start()], re.IGNORECASE):
+            continue
         name = schema_qualify(normalize_name(m.group(1)))
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'table', path.name, line, 'UPDATE'))
@@ -293,7 +446,7 @@ def parse_file(path: Path) -> FileReport:
         report.refs.append(Reference(name, 'table', path.name, line, 'DELETE'))
 
     # EXECUTE FUNCTION <fn>
-    for m in re.finditer(r"EXECUTE\s+(?:FUNCTION|PROCEDURE)\s+([\w.\"]+)", stripped, re.IGNORECASE):
+    for m in re.finditer(r"EXECUTE\s+(?:FUNCTION|PROCEDURE)\s+([\w.\"]+)", query_code, re.IGNORECASE):
         name = schema_qualify(normalize_name(m.group(1)))
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'function', path.name, line, 'EXECUTE FN'))
@@ -330,7 +483,88 @@ def parse_file(path: Path) -> FileReport:
     return report
 
 
-def main() -> int:
+def non_negative_integer(value: str) -> int:
+    parsed = int(value)
+    if parsed < 0:
+        raise argparse.ArgumentTypeError('must be zero or greater')
+    return parsed
+
+
+def load_issue_fingerprint_baseline(path: Path) -> list[str]:
+    try:
+        payload = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError(str(error)) from error
+
+    if not isinstance(payload, dict) or payload.get('version') != 1:
+        raise ValueError('expected an object with version 1')
+
+    issues = payload.get('issues')
+    if not isinstance(issues, list) or not all(isinstance(issue, str) for issue in issues):
+        raise ValueError('expected "issues" to be a list of strings')
+
+    return issues
+
+
+def compare_issue_fingerprints(current: list[str], baseline: list[str]) -> int:
+    current_counts = Counter(current)
+    baseline_counts = Counter(baseline)
+    # This is a warning ratchet: resolved approved warnings may disappear, but
+    # every current identity (including duplicate multiplicity) must be known.
+    new_issues = current_counts - baseline_counts
+    resolved_issues = baseline_counts - current_counts
+
+    if not new_issues:
+        print()
+        if resolved_issues:
+            print(
+                f'PASS - {len(current)} issue fingerprint(s) are covered by the '
+                'configured baseline.'
+            )
+            print(f'Resolved baseline fingerprints: {sum(resolved_issues.values())}')
+        else:
+            print(
+                f'PASS - {len(current)} issue fingerprint(s) match the configured '
+                'baseline.'
+            )
+        return 0
+
+    print()
+    print('FAIL - issue fingerprint baseline mismatch.')
+    print(f'New issue fingerprints: {sum(new_issues.values())}')
+    for issue in sorted(new_issues.elements()):
+        print(f'  + {issue}')
+    print(f'Resolved baseline fingerprints: {sum(resolved_issues.values())}')
+    for issue in sorted(resolved_issues.elements()):
+        print(f'  - {issue}')
+    return 1
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description='Statically verify Supabase migration ordering and references.',
+    )
+    issue_limit = parser.add_mutually_exclusive_group()
+    issue_limit.add_argument(
+        '--strict',
+        action='store_true',
+        help='Return a failure exit status when any issue is found.',
+    )
+    issue_limit.add_argument(
+        '--max-issues',
+        type=non_negative_integer,
+        help='Return a failure exit status only when issues exceed this limit.',
+    )
+    issue_limit.add_argument(
+        '--baseline',
+        type=Path,
+        help='Fail when a current issue identity is absent from a versioned JSON baseline.',
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     files = sorted(MIG_DIR.glob('*.sql'))
     if not files:
         print('no migrations found')
@@ -348,6 +582,7 @@ def main() -> int:
 
     total_issues = 0
     file_issue_summary = []
+    issue_fingerprints: list[str] = []
 
     print('=' * 72)
     print('Migration apply order (ASCII sort):')
@@ -433,6 +668,7 @@ def main() -> int:
             file_issue_summary.append((rep.name, len(rep.issues)))
             print(f'WARN {rep.name}')
             for issue in rep.issues:
+                issue_fingerprints.append(f'{rep.name}: {issue}')
                 print(f'   {issue}')
 
     # Cross-file: detect duplicate policy CREATE without matching DROP earlier
@@ -465,6 +701,7 @@ def main() -> int:
         print()
         print('WARN Policy duplicate-create issues:')
         for di in duplicate_policy_issues:
+            issue_fingerprints.append(f'policy-duplicate: {di}')
             print(f'   {di}')
         total_issues += len(duplicate_policy_issues)
 
@@ -496,6 +733,7 @@ def main() -> int:
         print()
         print('WARN Trigger duplicate-create issues:')
         for di in duplicate_trigger_issues:
+            issue_fingerprints.append(f'trigger-duplicate: {di}')
             print(f'   {di}')
         total_issues += len(duplicate_trigger_issues)
 
@@ -512,14 +750,44 @@ def main() -> int:
         for n, c in file_issue_summary:
             print(f'  {n}: {c}')
 
+    if args.baseline is not None:
+        try:
+            baseline_issues = load_issue_fingerprint_baseline(args.baseline)
+        except ValueError as error:
+            print()
+            print(
+                'FAIL - unable to load issue fingerprint baseline: '
+                f'{args.baseline}: {error}'
+            )
+            return 1
+        return compare_issue_fingerprints(issue_fingerprints, baseline_issues)
+
     if total_issues == 0:
         print()
         print('PASS - no dependency-order issues found.')
         return 0
-    else:
+
+    configured_limit = 0 if args.strict else args.max_issues
+    if configured_limit is None:
         print()
-        print('CHECK - see warnings above. Some may be false positives from regex parsing.')
-        return 0  # exit 0; we treat as report not gate
+        print('REPORT - warnings found; exit status remains zero.')
+        print('Some warnings may be false positives from regex parsing.')
+        return 0
+
+    if total_issues > configured_limit:
+        print()
+        print(
+            f'FAIL - {total_issues} issue(s) exceed the configured limit of '
+            f'{configured_limit}.'
+        )
+        return 1
+
+    print()
+    print(
+        f'PASS - {total_issues} issue(s) are within the configured limit of '
+        f'{configured_limit}.'
+    )
+    return 0
 
 
 if __name__ == '__main__':

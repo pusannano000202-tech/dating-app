@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, Loader2, Send, Star } from 'lucide-react'
+import { getQuantumEventById, isQuantumPartyType } from '@/lib/matching/quantum-event-catalog'
 
 type IssueKey = 'no_show' | 'profile_mismatch' | 'inappropriate_behavior' | 'good_match'
 
@@ -26,7 +27,13 @@ interface ExistingReview {
 export default function MatchReviewPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const matchId = params.id
+  const eventId = searchParams.get('event')
+  const party = searchParams.get('party')
+  const backHref = eventId && getQuantumEventById(eventId) && isQuantumPartyType(party)
+    ? `/match/events/${encodeURIComponent(eventId)}?party=${encodeURIComponent(party)}`
+    : `/match/${encodeURIComponent(matchId)}`
 
   const [score, setScore] = useState(0)
   const [issues, setIssues] = useState<Set<IssueKey>>(new Set())
@@ -84,7 +91,7 @@ export default function MatchReviewPage() {
         setError(translateError(data.error))
         return
       }
-      router.push(`/match/${encodeURIComponent(matchId)}`)
+      router.push(backHref)
     } catch {
       setError('제출에 실패했어요.')
     } finally {
@@ -98,6 +105,8 @@ export default function MatchReviewPage() {
       case 'match_not_completed':     return '아직 완료된 매칭이 아니에요.'
       case 'not_match_participant':   return '본인이 참여한 매칭만 평가할 수 있어요.'
       case 'match_not_found':         return '매칭을 찾을 수 없어요.'
+      case 'comment_too_long':        return '코멘트는 500자 이하로 작성해 주세요.'
+      case 'review_already_exists':   return '이미 이 만남의 후기를 제출했어요.'
       default:                         return code?.startsWith('invalid_reported_issue') ? '잘못된 이슈 항목이에요.' : '제출에 실패했어요. 잠시 후 다시 시도해주세요.'
     }
   }
@@ -106,12 +115,12 @@ export default function MatchReviewPage() {
     <main className="min-h-screen px-5 pb-10">
       <div className="max-w-md mx-auto pt-6">
         <header className="mb-6 flex items-center gap-3">
-          <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
+          <Link href={backHref} className="p-2 glass rounded-xl">
             <ChevronLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-xl font-black">매칭 평가</h1>
-            <p className="text-xs text-gray-500 mt-0.5">상대 그룹에 대한 만남 후 평가</p>
+            <h1 className="text-xl font-black">만남 후기</h1>
+            <p className="text-xs text-gray-500 mt-0.5">오늘 함께한 만남을 알려주세요.</p>
           </div>
         </header>
 

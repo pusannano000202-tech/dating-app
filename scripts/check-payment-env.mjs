@@ -57,7 +57,13 @@ if (provider === 'toss') {
       key: 'PAYMENT_INTERNAL_SECRET',
       required: true,
       purpose: 'protect internal refund/cancel calls',
-      validate: (value) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
+      validate: (value) => value.length >= 32 && !hasUnsafeEnvValueCharacters(value),
+    },
+    {
+      key: 'CRON_SECRET',
+      required: true,
+      purpose: 'authenticate scheduled refund processing',
+      validate: (value) => value.length >= 32 && !hasUnsafeEnvValueCharacters(value),
     },
     {
       key: 'SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY',
@@ -83,6 +89,10 @@ console.table(rows)
 
 const missing = rows.filter((row) => row.required === 'yes' && row.status === 'MISSING')
 const invalid = rows.filter((row) => row.required === 'yes' && row.status === 'INVALID')
+const tossKeyEnvironmentMismatch = provider === 'toss'
+  && tossKeyEnvironment(env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
+  && tossKeyEnvironment(env.TOSS_SECRET_KEY)
+  && tossKeyEnvironment(env.NEXT_PUBLIC_TOSS_CLIENT_KEY) !== tossKeyEnvironment(env.TOSS_SECRET_KEY)
 
 if (provider === 'mock') {
   console.log('mock provider: Toss keys are not required for local UI review.')
@@ -95,6 +105,11 @@ if (missing.length > 0) {
 
 if (invalid.length > 0) {
   console.error(`Invalid payment env keys: ${invalid.map((row) => row.key).join(', ')}`)
+  process.exit(1)
+}
+
+if (tossKeyEnvironmentMismatch) {
+  console.error('Toss key environments must match: use either two test keys or two live keys.')
   process.exit(1)
 }
 
@@ -181,6 +196,12 @@ function isTossKey(value, kind) {
   if (isPlaceholderValue(value)) return false
   if (hasUnsafeEnvValueCharacters(value)) return false
   return new RegExp(`^(?:test|live)_(?:g)?${kind}_[A-Za-z0-9_-]{12,}$`).test(value)
+}
+
+function tossKeyEnvironment(value) {
+  if (typeof value !== 'string') return null
+  const match = value.match(/^(test|live)_/)
+  return match?.[1] ?? null
 }
 
 function isSupabaseJwtWithRole(value, role) {

@@ -7,9 +7,12 @@ export async function POST(_req: NextRequest, props: { params: Promise<{ id: str
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data, error } = await supabase
-    .rpc('finalize_no_show', { p_match_id: params.id })
-    .maybeSingle()
-  if (error) return NextResponse.json({ error: error.message || 'finalize_failed' }, { status: 400 })
-  return NextResponse.json({ result: data })
+  return NextResponse.json(
+    {
+      error: 'no_show_review_required',
+      message: '노쇼 처리는 참석 증거를 확인한 뒤 진행돼요.',
+      match_id: params.id,
+    },
+    { status: 409 },
+  )
 }

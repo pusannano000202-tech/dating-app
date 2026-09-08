@@ -7,22 +7,28 @@
 
 @layer base {
   :root {
-    --boot-canvas-rgb: 244 246 245;
+    --boot-canvas-rgb: 255 249 246;
     --boot-surface-rgb: 255 255 255;
-    --boot-soft-rgb: 235 242 246;
-    --boot-primary-rgb: 29 92 139;
-    --boot-coral-rgb: 230 93 77;
-    --boot-amber-rgb: 217 154 50;
-    --boot-ink-rgb: 24 35 31;
-    --boot-body-rgb: 68 83 77;
-    --boot-muted-rgb: 101 113 109;
-    --boot-hairline-rgb: 216 222 219;
+    --boot-soft-rgb: 252 236 230;
+    --boot-primary-rgb: 185 75 63;
+    --boot-primary-dark-rgb: 150 61 52;
+    --boot-coral-rgb: 217 107 93;
+    --boot-amber-rgb: 216 154 69;
+    --boot-info-rgb: 82 113 129;
+    --boot-info-soft-rgb: 232 240 243;
+    --boot-ink-rgb: 41 35 33;
+    --boot-body-rgb: 102 92 88;
+    --boot-muted-rgb: 139 126 120;
+    --boot-hairline-rgb: 234 217 210;
     --boot-canvas: rgb(var(--boot-canvas-rgb));
     --boot-surface: rgb(var(--boot-surface-rgb));
     --boot-soft: rgb(var(--boot-soft-rgb));
     --boot-primary: rgb(var(--boot-primary-rgb));
+    --boot-primary-dark: rgb(var(--boot-primary-dark-rgb));
     --boot-coral: rgb(var(--boot-coral-rgb));
     --boot-amber: rgb(var(--boot-amber-rgb));
+    --boot-info: rgb(var(--boot-info-rgb));
+    --boot-info-soft: rgb(var(--boot-info-soft-rgb));
     --boot-ink: rgb(var(--boot-ink-rgb));
     --boot-body: rgb(var(--boot-body-rgb));
     --boot-muted: rgb(var(--boot-muted-rgb));
@@ -162,26 +168,24 @@
 
   /* 버튼 */
   .btn-gradient {
-    background: linear-gradient(135deg, var(--boot-primary) 0%, var(--boot-coral) 62%, var(--boot-amber) 100%);
-    box-shadow: 0 12px 32px rgba(var(--boot-primary-rgb), 0.26), inset 0 1px 0 rgba(255,255,255,0.35);
+    background: var(--boot-primary);
+    box-shadow: 0 10px 24px rgba(var(--boot-primary-rgb), 0.22);
     transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
     color: white;
   }
-  .btn-gradient:hover  { opacity: 0.96; box-shadow: 0 14px 40px rgba(var(--boot-primary-rgb), 0.34), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-gradient:hover  { background: var(--boot-primary-dark); box-shadow: 0 12px 28px rgba(var(--boot-primary-rgb), 0.28); }
   .btn-gradient:active { transform: scale(0.98); }
   .btn-gradient:disabled { opacity: 0.38; cursor: not-allowed; box-shadow: none; }
 
   .btn-gradient-animated {
-    background: linear-gradient(270deg, var(--boot-primary), var(--boot-coral), var(--boot-amber), var(--boot-coral), var(--boot-primary));
-    background-size: 300% 300%;
-    animation: brand-shift 5s ease infinite;
-    box-shadow: 0 12px 34px rgba(var(--boot-primary-rgb), 0.28);
+    background: var(--boot-primary);
+    box-shadow: 0 10px 24px rgba(var(--boot-primary-rgb), 0.22);
     transition: transform 0.1s, box-shadow 0.2s;
     color: white;
   }
-  .btn-gradient-animated:hover  { box-shadow: 0 14px 42px rgba(var(--boot-primary-rgb), 0.38); }
+  .btn-gradient-animated:hover  { background: var(--boot-primary-dark); box-shadow: 0 12px 28px rgba(var(--boot-primary-rgb), 0.28); }
   .btn-gradient-animated:active { transform: scale(0.98); }
-  .btn-gradient-animated:disabled { opacity: 0.38; cursor: not-allowed; animation: none; }
+  .btn-gradient-animated:disabled { opacity: 0.38; cursor: not-allowed; }
 
   /* 특수 효과 */
   .animate-pulse-glow  { animation: pulse-glow 3s ease-in-out infinite; }

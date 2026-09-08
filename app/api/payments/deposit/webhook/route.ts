@@ -144,12 +144,6 @@ export async function POST(req: NextRequest) {
       provider,
       received: true,
       status: result.status,
-      deposit: result.deposit,
-      payment: {
-        orderId: payment.orderId,
-        paymentKey: payment.paymentKey,
-        status: payment.status,
-      },
     }, { status: result.httpStatus })
   } catch (error) {
     if (error instanceof TossPaymentError) {

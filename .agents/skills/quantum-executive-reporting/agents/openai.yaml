@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quantum Executive Reporting"
+  short_description: "Standardize approval-gated visual workroom reports"
+  default_prompt: "Return the current Quantum workroom result to the executive room with approval gates, plain language, and visual evidence."

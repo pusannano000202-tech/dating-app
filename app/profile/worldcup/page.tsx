@@ -99,7 +99,7 @@ export default function WorldcupPage() {
         } catch {
           // sessionStorage 미지원 환경은 조용히 무시
         }
-        router.push('/profile/survey')
+        router.push('/profile/photos')
         return
       }
 
@@ -110,7 +110,7 @@ export default function WorldcupPage() {
           try {
             sessionStorage.setItem(SESSION_KEY, JSON.stringify(result))
           } catch {}
-          router.push('/profile/survey')
+          router.push('/profile/photos')
           return
         }
         router.push('/login')
@@ -123,10 +123,9 @@ export default function WorldcupPage() {
         result.preferred_bucket_weights,
       )
 
-      // 마이그레이션 20260521_profile_add_preference_vectors.sql 에 정의된 컬럼들에
+      // 마이그레이션 20260521000002_profile_add_preference_vectors.sql 에 정의된 컬럼들에
       // 월드컵 결과 영속 저장 (D-09 결정).
       const profileUpdate: Record<string, unknown> = {
-        user_id: user.id,
         preferred_appearance_vector: result.preferred_appearance_vector,
         preferred_appearance_delta_vector: result.preferred_appearance_delta_vector,
         preferred_choice_delta_vector: result.preferred_choice_delta_vector,
@@ -142,10 +141,14 @@ export default function WorldcupPage() {
         profileUpdate.appearance_type = legacyType
       }
 
-      const { error: profileError } = await supabase
+      const { data: updatedProfile, error: profileError } = await supabase
         .from('profiles')
-        .upsert(profileUpdate, { onConflict: 'user_id' })
+        .update(profileUpdate)
+        .eq('user_id', user.id)
+        .select('user_id')
+        .maybeSingle()
       if (profileError) throw profileError
+      if (!updatedProfile) throw new Error('profile_record_missing')
 
       // worldcup_choice_logs 에 라운드별 선택 기록 batch insert
       // 매칭 엔진 디버깅 + 향후 ML 학습 데이터용. 사용자 노출 금지.
@@ -177,7 +180,7 @@ export default function WorldcupPage() {
         sessionStorage.removeItem(SESSION_KEY)
       } catch {}
 
-      router.push('/profile/survey')
+      router.push('/profile/photos')
     } catch {
       setSaveError('저장 중 오류가 발생했어. 다시 시도해줘.')
     } finally {

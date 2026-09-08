@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 interface MatchDetailForCard {
   match_id: string
@@ -21,7 +22,7 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'card_lookup_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'card_lookup_failed') }, { status: 400 })
   }
   if (!data) {
     return NextResponse.json({ error: 'match_not_found' }, { status: 404 })
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     .maybeSingle()
 
   if (detailError) {
-    return NextResponse.json({ error: detailError.message || 'match_lookup_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(detailError.message, 'match_lookup_failed') }, { status: 400 })
   }
   if (!detailData) {
     return NextResponse.json({ error: 'match_not_found' }, { status: 404 })
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'card_save_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'card_save_failed') }, { status: 400 })
   }
 
   return NextResponse.json({ card: data }, { status: 201 })

@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "Quantum",
+    "slug": "quantum-campus",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "quantum",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.quantum.campus"
+    },
+    "android": {
+      "package": "com.quantum.campus",
+      "blockedPermissions": [
+        "android.permission.DUMP",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF9F6",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "프로필에 사용할 사진을 선택하려면 사진 접근이 필요해요.",
+          "cameraPermission": false
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFF9F6",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain"
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9ac0b05b-a234-461c-96e7-20617ff33f1e"
+      }
+    },
+    "owner": "quantum-pusan"
+  }
+}

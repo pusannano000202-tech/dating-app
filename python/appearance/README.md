@@ -1,17 +1,34 @@
-# 외모 AI 추론 서버
+# 외모 분석 서버
 
-충현 담당 모듈. SCUT-FBP5500 + ResNet50 기반 외모 점수 산출 후 Supabase에 저장.
+승인된 기준사진과 OpenAI Vision을 사용해 내부 매칭용 외모 점수와 외모 유형을 계산합니다.
+이 서버는 브라우저나 모바일 앱이 직접 호출하지 않습니다. Next.js의 `/api/score`가
+서버 전용 비밀값으로 호출하고, 결과는 Next.js가 Supabase 비공개 테이블에 저장합니다.
 
 ## 실행
 
 ```bash
 cd python/appearance
-cp .env.example .env   # Supabase URL/Key 입력
-pip install -r requirements.txt
+cp .env.example .env
+pip install -r requirements-runtime.txt
 python main.py
 ```
 
 서버: `http://localhost:8001`
+
+## Photo URL security
+
+`POST /api/score-photos` only accepts HTTPS image URLs from exact hostnames in
+`APPEARANCE_ALLOWED_PHOTO_HOSTS` plus the hostname in
+`NEXT_PUBLIC_SUPABASE_URL`. Userinfo is forbidden, and only no port or port
+`443` is allowed. The combined allowlist fails closed when empty. Use storage
+hostnames only, for example:
+
+```env
+APPEARANCE_ALLOWED_PHOTO_HOSTS=your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+```
+
+Validation responses intentionally omit submitted URLs and credentials.
 
 ## 엔드포인트
 
@@ -19,10 +36,15 @@ python main.py
 ```json
 { "user_id": "uuid", "photo_urls": ["https://..."] }
 ```
-응답: `{ "status": "ok" }` — 점수는 응답에 포함하지 않음 (Supabase에만 저장)
+요청 헤더: `Authorization: Bearer <AI_SERVER_SECRET>`
+
+응답에는 Next.js 서버가 비공개 저장에 사용하는 점수, 외모 유형, 모델·프롬프트·기준사진
+버전이 포함됩니다. 이 응답을 클라이언트에 그대로 전달하면 안 됩니다.
 
 ### `GET /health`
 서버/모델 상태 확인
+
+Vercel 배포에서는 같은 응답을 `GET /api/health`에서도 확인할 수 있습니다.
 
 ## Docker로 실행
 
@@ -30,10 +52,10 @@ python main.py
 cd python/appearance
 docker build -t appearance-ai .
 docker run -p 8001:8001 \
-  -e SUPABASE_URL=https://... \
-  -e SUPABASE_SERVICE_KEY=... \
-  -v $(pwd)/weights:/app/weights \
-  -e MODEL_WEIGHTS_PATH=/app/weights/resnet50_scut.pth \
+  -e OPENAI_API_KEY=... \
+  -e AI_SERVER_SECRET=... \
+  -e NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co \
+  -e APPEARANCE_ALLOWED_PHOTO_HOSTS=your-project.supabase.co \
   appearance-ai
 ```
 
@@ -44,7 +66,7 @@ docker run -p 8001:8001 \
 ```bash
 # .env 파일 준비
 cp python/appearance/.env.example python/appearance/.env
-# (SUPABASE_URL, SUPABASE_SERVICE_KEY 입력)
+# OPENAI_API_KEY, AI_SERVER_SECRET, Supabase URL 입력
 
 docker compose up appearance-ai
 ```
@@ -61,9 +83,19 @@ make lint        # ruff 린트
 python test_server.py
 ```
 
-## 모델 가중치
+## Vercel에 별도 서비스로 배포
 
-`weights/resnet50_scut.pth` 위치에 SCUT-FBP5500으로 파인튜닝된 가중치 파일을 넣으면 된다.
-파일이 없으면 ImageNet pretrained backbone으로 동작 (개발/테스트용).
+기존 `dating-app` 웹 프로젝트와 같은 Vercel 계정을 사용하되, 새 프로젝트의 Root Directory를
+`python/appearance`로 지정합니다. 별도 Render·Railway 계정은 필요하지 않습니다.
 
-가중치 파일은 용량이 크므로 Git에 포함하지 않는다. 별도 공유.
+필수 환경값:
+
+- `OPENAI_API_KEY`
+- `AI_SERVER_SECRET` (웹 프로젝트의 값과 동일)
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `APPEARANCE_ALLOWED_PHOTO_HOSTS`
+- `APPEARANCE_ANCHOR_BASE_URL`
+
+배포 후 `https://<appearance-project>.vercel.app/api/health`가
+`status=ok`, `analyzer_ready=true`인지 확인하고, 웹 프로젝트의 `AI_SERVER_URL`에는
+도메인만 입력합니다. 예: `https://<appearance-project>.vercel.app`.

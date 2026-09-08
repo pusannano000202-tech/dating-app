@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-09-05T00:00:00+09:00",
+  "target_branch": "codex/integrated-campus-20260905",
+  "source_worktree": "C:/Users/82108/.config/superpowers/worktrees/데이팅앱만들기/quantum-five-meeting-g4-shell",
+  "imports": [
+    {
+      "source": "lib/matching/day1-dalmuti-rules.ts",
+      "sha256": "48a172821a8b3468cbb13de447c695be66731936a7ab240d6bb464a8f4676a20",
+      "target": "lib/matching/day1-dalmuti-rules.ts",
+      "selection": "Korean rule copy only; image and preview metadata excluded"
+    },
+    {
+      "source": "lib/matching/day2-conversation-roulette.ts",
+      "sha256": "a3d0605646499ed558951e28ecf63ec7097a636711890e57f515e26333720ece",
+      "target": "lib/matching/day2-conversation-roulette.ts",
+      "selection": "approved conversation questions only"
+    },
+    {
+      "source": "lib/matching/day4-same-answer-cards.ts",
+      "sha256": "0ce6c096e1abef67445bcbaab7fdb6ac880b8de32dfcd1717852d06614bd7111",
+      "target": "lib/matching/day4-same-answer-cards.ts",
+      "selection": "consent-safe card prompts and guides only"
+    },
+    {
+      "source": "lib/matching/five-meeting-content.ts",
+      "sha256": "98bede57e865d338eceb937332a9ba00deea106f82ca2a56d76335222be288b1",
+      "target": "supabase/migrations/20260905120000_integrated_continuation_and_weekly.sql and components/matching/OccurrenceContentExperience.tsx",
+      "selection": "Day 3 server-authoritative 5/6-person team balancing, adjusted scoring, free-play fallback and tied-result rules only; deprecated Day 2 roles and hidden missions excluded"
+    }
+  ],
+  "note": "No FIVE schema, provider, auth, config, image asset, preview controller, or test file was copied. Only the listed approved content copy and rule slices were selectively ported into the new server-backed flow."
+}

@@ -73,20 +73,21 @@ export default function SurveyPage() {
         return
       }
 
-      const { error: dbErr } = await supabase
+      const profileUpdate = {
+        big5_openness: scores.openness,
+        big5_conscientiousness: scores.conscientiousness,
+        big5_extraversion: scores.extraversion,
+        big5_agreeableness: scores.agreeableness,
+        big5_neuroticism: scores.neuroticism,
+      }
+      const { data: updatedProfile, error: dbErr } = await supabase
         .from('profiles')
-        .upsert(
-          {
-            user_id: user.id,
-            big5_openness:           scores.openness,
-            big5_conscientiousness:  scores.conscientiousness,
-            big5_extraversion:       scores.extraversion,
-            big5_agreeableness:      scores.agreeableness,
-            big5_neuroticism:        scores.neuroticism,
-          },
-          { onConflict: 'user_id' }
-        )
+        .update(profileUpdate)
+        .eq('user_id', user.id)
+        .select('user_id')
+        .maybeSingle()
       if (dbErr) throw dbErr
+      if (!updatedProfile) throw new Error('profile_record_missing')
       router.push('/profile/photos')
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해줘.')

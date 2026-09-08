@@ -1,73 +1,33 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, MapPinned, UsersRound } from 'lucide-react'
+import { ArrowRight, ChevronRight } from 'lucide-react'
 
-const recommendations = [
-  {
-    href: '/community/campus-eats?mode=battle&category=donkatsu',
-    eyebrow: '이번 주',
-    title: '부산대 돈까스 8강',
-    description: '가본 곳끼리 비교하면 내 대진이 바로 이어져요.',
-    image: '/campus-eats/preview/cutlet-katsu.webp',
-    imageAlt: '시안용 돈까스 한 접시',
-    Icon: MapPinned,
-    action: '바로 대결 시작',
-    priority: true,
-  },
-  {
-    href: '/meetups?focus=featured',
-    eyebrow: '오늘 저녁',
-    title: '부담 적은 모임부터',
-    description: '지금 참여하기 좋은 학교 앞 모임을 먼저 보여드려요.',
-    image: '/images/quantum-campus-group.webp',
-    imageAlt: '캠퍼스 라운지에서 대화하는 대학생 네 명',
-    Icon: UsersRound,
-    action: '추천 모임 보기',
-    priority: true,
-  },
+const discovery = [
+  { href: '/community/voice', title: '목소리로 먼저 친해져요', label: '보이스 · 응원부터 고민까지', image: '/social-scenes/voice.png', alt: '함께 경기를 보며 응원하는 친구들의 예시 장면' },
+  { href: '/community/content', title: '내 취향, 우리 학교 순위', label: '맛집 · MBTI · 배달 · 장소', image: '/social-scenes/content.png', alt: '음식과 학교 주변 공간을 담은 취향 콘텐츠 이미지' },
+  { href: '/community/stories', title: '오늘의 이야기 나누기', label: '게시판 · 학교 친구들의 공감', image: '/social-scenes/posts.png', alt: '카페에서 오늘의 이야기를 기록하는 예시 장면' },
 ] as const
 
 export default function QuantumHomeRecommendations() {
-  return (
-    <section aria-labelledby="quantum-home-recommendations">
-      <div className="mb-3 flex items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-black text-boot-primary">QUANTUM PICK</p>
-          <h2 id="quantum-home-recommendations" className="mt-1 text-xl font-black">지금 해볼 것</h2>
+  return <section aria-labelledby="quantum-home-recommendations">
+    <h2 id="quantum-home-recommendations" className="mb-3 text-lg font-black tracking-tight">캠퍼스 플레이북</h2>
+    <Link href="/community/department" className="group block overflow-hidden rounded-xl border border-[#e8cfc4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b34c3e]">
+      <div className="relative aspect-[1.95/1] overflow-hidden bg-[#213427] sm:aspect-[2.45/1]">
+        <Image src="/social-scenes/home-playmaker-football.webp" alt="캠퍼스 운동장에서 축구를 즐기는 대학생 친구들의 예시 장면" fill sizes="(min-width:1024px) 540px, 100vw" className="object-cover object-[62%_center]" priority />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/15 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-center px-5 text-white sm:px-7">
+          <p className="text-[11px] font-bold tracking-widest text-white/85">우리 학과, 한 팀으로</p>
+          <p className="mt-2 text-[29px] font-black leading-[1.15] tracking-tight sm:text-4xl">우리 과 이름으로,<br />한 판.</p>
+          <p className="mt-3 text-xs font-bold">게임 · 축구</p>
         </div>
-        <p className="text-xs font-bold text-boot-muted">두 가지만 골랐어요</p>
+        <span className="absolute bottom-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#292320]"><ArrowRight size={20} aria-hidden="true" /></span>
       </div>
-
-      <div className="grid gap-3">
-        {recommendations.map(({ href, eyebrow, title, description, image, imageAlt, Icon, action, priority }) => (
-          <Link
-            key={href}
-            href={href}
-            className="group grid min-h-[132px] grid-cols-[124px_minmax(0,1fr)] overflow-hidden rounded-lg border border-boot-hairline bg-white transition-colors duration-200 hover:border-boot-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-boot-primary"
-          >
-            <span className="relative min-h-[132px] overflow-hidden bg-boot-soft">
-              <Image
-                src={image}
-                alt={imageAlt}
-                fill
-                sizes="124px"
-                className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-                priority={priority}
-              />
-            </span>
-            <span className="flex min-w-0 flex-col justify-center px-4 py-3">
-              <span className="flex items-center gap-1.5 text-[11px] font-black text-boot-coral">
-                <Icon size={14} />{eyebrow}
-              </span>
-              <span className="mt-1 block text-lg font-black leading-6">{title}</span>
-              <span className="mt-1 block text-xs font-bold leading-5 text-boot-muted">{description}</span>
-              <span className="mt-2 flex items-center gap-1 text-xs font-black text-boot-primary">
-                {action}<ArrowRight size={14} />
-              </span>
-            </span>
-          </Link>
-        ))}
-      </div>
-    </section>
-  )
+      <span className="flex min-h-12 items-center justify-center gap-2 bg-white/40 px-3 text-sm font-black text-[#a43f32]">학과 대항 둘러보기 <ArrowRight size={18} aria-hidden="true" /></span>
+    </Link>
+    <div className="mt-3 divide-y divide-[#edddd4]">{discovery.map(item => <Link key={item.href} href={item.href} className="group flex min-h-24 items-center gap-3 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b34c3e]">
+      <span className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-[#f0e2d8]"><Image src={item.image} alt={item.alt} fill sizes="96px" className="object-cover" /></span>
+      <span className="min-w-0 flex-1"><span className="block text-[15px] font-bold tracking-tight">{item.title}</span><span className="mt-1 block text-xs leading-5 text-[#807169]">{item.label}</span></span>
+      <ChevronRight size={18} className="shrink-0 text-[#8b6a5a]" aria-hidden="true" />
+    </Link>)}</div>
+  </section>
 }

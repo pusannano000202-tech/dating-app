@@ -37,12 +37,12 @@ test('readDevBasicProfileGender ignores malformed stored profile data', () => {
   assert.equal(readDevBasicProfileGender(() => JSON.stringify({ gender: 'unknown' })), null)
 })
 
-test('dev basic profile stores gender under the key worldcup reads', () => {
+test('production basic profile does not create an unauthenticated dev-login bypass', () => {
   const basicPage = readSource('app/profile/basic/page.tsx')
   const worldcupPage = readSource('app/profile/worldcup/page.tsx')
 
-  assert.match(basicPage, /DEV_BASIC_PROFILE_STORAGE_KEY/)
-  assert.match(basicPage, /sessionStorage\.setItem\(DEV_BASIC_PROFILE_STORAGE_KEY, JSON\.stringify\(data\)\)/)
+  assert.doesNotMatch(basicPage, /DEV_BASIC_PROFILE_STORAGE_KEY/)
+  assert.doesNotMatch(basicPage, /sessionStorage\.setItem/)
   assert.match(worldcupPage, /readDevBasicProfileGender\(\)/)
   assert.equal(DEV_BASIC_PROFILE_STORAGE_KEY, 'booting_dev_basic_profile')
 })

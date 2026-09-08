@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {"target":"ES2022","lib":["ES2022","DOM"],"module":"commonjs","moduleResolution":"node","strict":true,"esModuleInterop":true,"skipLibCheck":true,"rootDir":".","outDir":".tmp/voice-tests","types":["node"],"noEmit":false},
+  "include":["lib/voice/contracts.ts","lib/voice/policy.ts","lib/participation/summary.ts","tests/voice/**/*.ts"]
+}

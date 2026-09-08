@@ -304,9 +304,12 @@ test('picker owns one school catalog request, aborts stale requests, and exposes
   assert.match(source, /role="option"[\s\S]*tabIndex=\{-1\}/)
   assert.doesNotMatch(source, /기존 입력 유지/)
   assert.match(source, /학과 비우기/)
+  assert.match(source, /aria-label="학과 목록 열기"/)
+  assert.match(source, /onClick=\{openDepartmentList\}/)
+  assert.match(source, /ChevronDown/)
 })
 
-test('BasicInfoForm delegates school-aware department selection without PNU-only state', () => {
+test('BasicInfoForm keeps the approved PNU self-selection scope and delegates department validation', () => {
   const source = readFileSync(BASIC_INFO_FORM_PATH, 'utf8')
 
   assert.match(source, /import DepartmentPicker from ['"]@\/components\/profile\/DepartmentPicker['"]/)
@@ -314,49 +317,21 @@ test('BasicInfoForm delegates school-aware department selection without PNU-only
   assert.doesNotMatch(source, /getDepartmentCollege|searchDepartments|deptSuggestions|deptRef/)
   assert.match(
     source,
-    /<DepartmentPicker[\s\S]*schoolId=\{selectedSchoolTheme\?\.id \?\? ''\}[\s\S]*value=\{department\}[\s\S]*onChange=\{setDepartment\}[\s\S]*allowCustomEntry=\{true\}/,
+    /<DepartmentPicker[\s\S]*schoolId=\{schoolTheme\?\.id \?\? 'pnu'\}[\s\S]*value=\{department\}[\s\S]*onChange=\{setDepartment\}[\s\S]*allowCustomEntry=\{true\}/,
   )
-  assert.match(source, /const selectedSchoolTheme = resolveSchoolTheme\(school\)/)
-  assert.match(source, /resolveInitialFormSchool\(initialValue\?\.school\)/)
-  assert.match(source, /routeTheme = resolveSchoolTheme\(params\.get\('school'\)/)
-  assert.match(source, /resolveInitialProfileSchool\(\{/)
-  assert.match(source, /isDevPreview = isDevPreviewClientSession\(\)/)
-  assert.match(source, /applySchoolThemeIfKnown\(school\)/)
-  assert.match(source, /window\.history\.replaceState/)
-  assert.match(source, /changeSchool\(theme\.name\)[\s\S]*persistFormSchoolTheme\(theme\)/)
+  assert.match(source, /resolveSchoolTheme\(PILOT_SIGNUP_SCHOOL_THEMES\[0\]\.id\)/)
+  assert.match(source, /school_scope:\s*'pnu_self_selected'/)
+  assert.match(source, /setSchoolSelected\(\(value\) => !value\)/)
+  assert.match(source, /본인이 부산대 구성원이라면 눌러서 선택/)
+  assert.doesNotMatch(source, /resolveInitialFormSchool|persistFormSchoolTheme|changeSchool/)
   assert.match(source, /onValidationChange=\{setDepartmentValidationState\}/)
-  assert.match(source, /departmentValidationState === 'confirmation-required'/)
   assert.match(source, /departmentValidationState !== 'ready'/)
 })
 
-test('BasicInfoForm keeps browser-only school restoration out of the first render', () => {
+test('BasicInfoForm does not restore an untrusted browser-selected school', () => {
   const source = readFileSync(BASIC_INFO_FORM_PATH, 'utf8')
 
-  assert.doesNotMatch(source, /useState\(\(\) => resolveInitialFormSchool\(/)
-  assert.match(source, /resolveHydrationSafeInitialProfileSchool/)
-  assert.match(source, /useEffect\(\(\) => \{[\s\S]*resolveInitialFormSchool[\s\S]*setSchool/)
-  assert.ok(
-    source.indexOf('const restoredSchool = resolveInitialFormSchool') <
-      source.indexOf('applySchoolThemeIfKnown(school)'),
-  )
-  assert.match(source, /const \[schoolRestoreComplete, setSchoolRestoreComplete\] = useState\(false\)/)
-  assert.match(source, /setSchoolRestoreComplete\(true\)/)
-  assert.doesNotMatch(source, /if \(restoredSchool === hydrationSafeInitialSchool\) return/)
-  assert.match(
-    source,
-    /useEffect\(\(\) => \{\s*if \(!schoolRestoreComplete\) return\s*applySchoolThemeIfKnown\(school\)/,
-  )
-})
-
-test('BasicInfoForm locks department validation synchronously before changing schools', () => {
-  const source = readFileSync(BASIC_INFO_FORM_PATH, 'utf8')
-
-  assert.match(
-    source,
-    /setDepartmentValidationState\([\s\S]*resolveDepartmentValidationForSchoolChange[\s\S]*\)[\s\S]*setSchool\(nextSchool\)/,
-  )
-  assert.match(source, /onChange=\{\(event\) => changeSchool\(event\.target\.value\)\}/)
-  assert.match(source, /changeSchool\(theme\.name\)[\s\S]*persistFormSchoolTheme\(theme\)/)
-  assert.match(source, /currentSchoolId: selectedSchoolTheme\?\.id \?\? ''/)
-  assert.match(source, /nextSchoolId: resolveSchoolTheme\(nextSchool\)\?\.id \?\? ''/)
+  assert.doesNotMatch(source, /localStorage|getItem\(|routeTheme|params\.get\('school'\)/)
+  assert.match(source, /initialValue\?\.school_scope === 'pnu_self_selected'/)
+  assert.match(source, /schoolSelected \? '부산대학교 · 직접 선택' : '미선택'/)
 })

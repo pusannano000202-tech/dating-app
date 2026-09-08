@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowRight,
   ChevronLeft,
@@ -9,15 +10,18 @@ import {
   Loader2,
   Search,
   Send,
-  UserCheck,
-  UserPlus,
+  RotateCcw,
+  UserMinus,
   UserRoundPlus,
   UserX,
   UsersRound,
+  Share2,
 } from 'lucide-react'
-import { DepartmentAutoFriendPanel } from '@/components/matching/group-create/DepartmentAutoFriendPanel'
+import ConversationList from '@/components/friends/ConversationList'
+import FriendSceneBadge from '@/components/friends/FriendSceneBadge'
 import DevPreviewNotice from '@/components/dev/DevPreviewNotice'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
+import { parseFriendSceneList, type FriendSceneSummary } from '@/lib/friends/scene'
 import {
   DEV_PREVIEW_CURRENT_USER_ID,
   DEV_PREVIEW_GROUP_MEMBERS,
@@ -42,20 +46,30 @@ interface FriendSummary {
   user_id: string
   display_name: string | null
   status: string
+  photo_url?: string | null
+}
+
+interface HiddenFriendSummary {
+  user_id: string
+  display_name: string | null
+  can_restore: boolean
+  blocked_at: string | null
 }
 
 interface FriendsState {
   sent: FriendRequestRow[]
   received: FriendRequestRow[]
   friends: FriendSummary[]
+  hidden_friends: HiddenFriendSummary[]
   current_user_id?: string
 }
 
-const EMPTY: FriendsState = { sent: [], received: [], friends: [] }
+const EMPTY: FriendsState = { sent: [], received: [], friends: [], hidden_friends: [] }
 const DEV_FRIENDS_STATE: FriendsState = {
   sent: [],
   received: [],
   current_user_id: DEV_PREVIEW_CURRENT_USER_ID,
+  hidden_friends: [],
   friends: DEV_PREVIEW_GROUP_MEMBERS
     .filter((member) => member.user_id !== DEV_PREVIEW_CURRENT_USER_ID)
     .map((member) => ({
@@ -74,6 +88,28 @@ export default function FriendsPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [spaceTab, setSpaceTab] = useState<'friends' | 'messages'>('friends')
+  const [friendScenes, setFriendScenes] = useState<Map<string, FriendSceneSummary>>(new Map())
+  const [friendSceneState, setFriendSceneState] = useState<'loading' | 'ready' | 'unavailable'>('loading')
+  const inviteAttempt = useRef<string | null>(null)
+
+  async function shareFriendInvite() {
+    if (saving) return
+    setSaving(true); setError(null); setSuccess(null)
+    inviteAttempt.current ??= crypto.randomUUID()
+    try {
+      const response = await fetch('/api/friend-invites', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idempotency_key: inviteAttempt.current }) })
+      const payload = await response.json().catch(() => null) as { invite_url?: string; error?: string } | null
+      if (!response.ok || typeof payload?.invite_url !== 'string') { setError(payload?.error === 'rate_limited' ? '초대를 너무 자주 만들었어요. 잠시 뒤 다시 시도해 주세요.' : payload?.error === 'friend_name_required' ? '프로필 기본 정보에서 친구가 알아볼 이름을 먼저 입력해 주세요.' : '친구 초대 링크를 만들지 못했어요.'); return }
+      const shareUrl = new URL(payload.invite_url, window.location.origin).toString()
+      inviteAttempt.current = null
+      if (navigator.share) await navigator.share({ title: 'Quantum 친구 초대', url: shareUrl })
+      else { await navigator.clipboard.writeText(shareUrl); setSuccess('친구 초대 링크를 복사했어요.') }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      setError('친구 초대 링크를 공유하지 못했어요.')
+    } finally { setSaving(false) }
+  }
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -104,9 +140,34 @@ export default function FriendsPage() {
     }
   }, [isDevPreview])
 
+  const refreshFriendScenes = useCallback(async () => {
+    if (isDevPreview) {
+      setFriendScenes(new Map())
+      setFriendSceneState('ready')
+      return
+    }
+    setFriendSceneState('loading')
+    try {
+      const response = await fetch('/api/friends/scenes', { cache: 'no-store' })
+      const payload = await response.json().catch(() => null)
+      const parsed = response.ok ? parseFriendSceneList(payload) : null
+      if (!parsed) throw new Error('friend_scene_unavailable')
+      setFriendScenes(new Map(parsed.map((row) => [row.friendUserId, row])))
+      setFriendSceneState('ready')
+    } catch {
+      setFriendScenes(new Map())
+      setFriendSceneState('unavailable')
+    }
+  }, [isDevPreview])
+
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    void refresh()
+    void refreshFriendScenes()
+  }, [refresh, refreshFriendScenes])
+
+  useEffect(() => {
+    setSpaceTab(new URLSearchParams(window.location.search).get('tab') === 'messages' ? 'messages' : 'friends')
+  }, [])
 
   useEffect(() => {
     setPreviewNoticeReady(true)
@@ -209,6 +270,53 @@ export default function FriendsPage() {
     }
   }
 
+  async function removeFriend(friend: FriendSummary) {
+    if (saving) return
+    if (!window.confirm(`${friend.display_name ?? '이 친구'}님과의 연결을 숨길까요? 서로의 프로필이 닫히고 다음 매칭에서도 만나지 않아요.`)) return
+    setSaving(true)
+    setError(null)
+    try {
+      const response = await fetch(`/api/friends/${encodeURIComponent(friend.user_id)}/connection`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({})) as { error?: string }
+        setError(translateError(data.error))
+        return
+      }
+      setSuccess('친구 연결을 숨겼어요. 숨긴 친구 관리에서 다시 연결할 수 있어요.')
+      await refresh()
+    } catch {
+      setError('친구 연결을 숨기지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function restoreFriend(friend: HiddenFriendSummary) {
+    if (saving || !friend.can_restore) return
+    setSaving(true)
+    setError(null)
+    try {
+      const response = await fetch(`/api/friends/${encodeURIComponent(friend.user_id)}/connection`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore' }),
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({})) as { error?: string }
+        setError(translateError(data.error))
+        return
+      }
+      setSuccess('친구를 다시 연결했어요.')
+      await refresh()
+    } catch {
+      setError('친구를 다시 연결하지 못했어요.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const pendingReceived = useMemo(
     () => state.received.filter((request) => request.status === 'pending'),
     [state.received]
@@ -218,22 +326,30 @@ export default function FriendsPage() {
     [state.sent]
   )
 
+  function chooseSpaceTab(tab: 'friends' | 'messages') {
+    setSpaceTab(tab)
+    const url = new URL(window.location.href)
+    if (tab === 'messages') url.searchParams.set('tab', 'messages')
+    else url.searchParams.delete('tab')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }
+
   return (
     <main className="min-h-screen booting-band px-5 pb-28 pt-7 text-boot-ink">
       <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
         <header className="mb-6 flex items-center gap-3">
           <Link
-            href="/group/create"
+            href="/profile/edit"
             className="flex h-10 w-10 items-center justify-center rounded-2xl border border-boot-hairline bg-white/90 text-boot-body shadow-sm"
-            aria-label="그룹으로 돌아가기"
+            aria-label="마이로 돌아가기"
           >
             <ChevronLeft size={18} />
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-black text-boot-primary">Invite</p>
-            <h1 className="text-2xl font-black">친구 초대</h1>
+            <p className="text-xs font-black text-boot-primary">Friends</p>
+            <h1 className="text-2xl font-black">친구 관리</h1>
             <p className="mt-0.5 text-xs leading-5 text-boot-muted">
-              이메일 로그인 기준에서는 링크 초대가 가장 빠릅니다.
+              친구를 찾고, 수락한 친구와 둘만의 약속을 잡아요.
             </p>
           </div>
         </header>
@@ -251,44 +367,50 @@ export default function FriendsPage() {
           </div>
         )}
 
+        <nav aria-label="친구 공간" className="mb-5 grid grid-cols-2 rounded-2xl border border-[#E8D9C9] bg-[#FFF9F2] p-1">
+          <button type="button" aria-pressed={spaceTab === 'friends'} onClick={() => chooseSpaceTab('friends')} className={`${spaceTab === 'friends' ? 'bg-[#B94B3F] text-white shadow-sm' : 'text-[#9A4E30]'} min-h-11 rounded-xl text-sm font-black`}>친구</button>
+          <button type="button" aria-pressed={spaceTab === 'messages'} onClick={() => chooseSpaceTab('messages')} className={`${spaceTab === 'messages' ? 'bg-[#B94B3F] text-white shadow-sm' : 'text-[#9A4E30]'} min-h-11 rounded-xl text-sm font-black`}>대화</button>
+        </nav>
+
+        {spaceTab === 'friends' ? <>
+        {loading ? <section className="glass-card mb-5 flex items-center gap-3 rounded-3xl border border-boot-hairline bg-white/85 p-5 text-sm text-boot-muted"><Loader2 size={18} className="animate-spin" />친구 정보를 불러오는 중</section> : <FriendDirectory state={state} friendScenes={friendScenes} friendSceneState={friendSceneState} saving={saving} onRemove={removeFriend} />}
+        <details className="mb-5 rounded-2xl border border-[#E8D9C9] bg-[#FFF9F2] p-3">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-1 text-sm font-black text-[#9A4E30]">친구 추가·요청 관리<span className="text-[11px]">{loading ? '요청 확인 중' : state === EMPTY && error ? '대기 요청 미확인' : `대기 ${pendingReceived.length + pendingSent.length}개`}</span></summary>
+          <div className="border-t border-[#E8D9C9] pt-4">
         <section className="glass-card mb-5 rounded-3xl border border-boot-primary/20 bg-white/95 p-5 shadow-sm">
           <div className="mb-4 flex items-start gap-3">
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-boot-soft text-boot-primary">
               <UsersRound size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-black leading-tight">그룹 초대 링크로 바로 모으기</h2>
+              <h2 className="text-lg font-black leading-tight">친구와 바로 약속 잡기</h2>
               <p className="mt-1 text-sm leading-6 text-boot-muted">
-                초대 링크를 받은 친구는 로그인/회원가입 후 초대를 수락하면 그룹에 들어와요.
+                친구 요청을 수락하면 서로의 프로필을 보고 밥, 카페, 산책 약속을 제안할 수 있어요.
               </p>
             </div>
           </div>
 
           <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <MiniStep number="1" label="그룹 만들기" />
-            <MiniStep number="2" label="링크 보내기" />
-            <MiniStep number="3" label="친구 수락" />
+            <MiniStep number="1" label="친구 찾기" />
+            <MiniStep number="2" label="요청 수락" />
+            <MiniStep number="3" label="약속 제안" />
           </div>
 
           <Link
-            href="/group/create"
+            href="#friend-list"
             className="btn-gradient flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-black"
           >
-            그룹 초대 링크 만들기
+            내 친구에서 약속 잡기
             <ArrowRight size={17} />
           </Link>
           <p className="mt-3 text-center text-[11px] leading-5 text-boot-muted">
-            그룹 화면에서 `초대 링크 복사`를 누르면 카카오톡이나 메시지로 바로 보낼 수 있어요.
+            친구를 누르면 밥 먹기, 카페, 산책 제안을 바로 보낼 수 있어요.
           </p>
         </section>
 
-        <DepartmentAutoFriendPanel
-          disabled={saving}
-          preview={isDevPreview}
-          onRequestSent={refresh}
-        />
+        <button type="button" onClick={() => void shareFriendInvite()} disabled={saving || isDevPreview} className="mb-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-boot-primary/25 bg-white font-black text-boot-primary disabled:opacity-50"><Share2 size={18} />친구 초대 링크 공유</button>
 
-        <section className="mb-5 rounded-3xl border border-boot-hairline bg-white/90 p-4 shadow-sm">
+        <section id="friend-search" className="mb-5 scroll-mt-4 rounded-3xl border border-boot-hairline bg-white/90 p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-black">닉네임으로 친구 찾기</h2>
@@ -320,12 +442,7 @@ export default function FriendsPage() {
           </div>
         </section>
 
-        {loading ? (
-          <section className="glass-card flex items-center gap-3 rounded-3xl border border-boot-hairline bg-white/85 p-5 text-sm text-boot-muted">
-            <Loader2 size={18} className="animate-spin" />
-            친구 정보를 불러오는 중
-          </section>
-        ) : (
+        {!loading ? (
           <>
             {pendingReceived.length > 0 && (
               <section className="mb-5">
@@ -368,27 +485,31 @@ export default function FriendsPage() {
               </section>
             )}
 
-            <section className="mb-5">
-              <SectionTitle title="친구 목록" count={state.friends.length} />
-              {state.friends.length === 0 ? (
-                <EmptyFriends />
-              ) : (
+            {state.hidden_friends.length > 0 ? (
+              <section className="mb-5">
+                <SectionTitle title="숨긴 친구 관리" count={state.hidden_friends.length} />
+                <p className="mb-3 px-1 text-xs leading-5 text-boot-muted">여기서는 프로필이 열리지 않아요. 내가 숨긴 관계만 다시 연결할 수 있어요.</p>
                 <div className="space-y-2">
-                  {state.friends.map((friend) => (
-                    <div key={friend.user_id} className="glass-card flex items-center gap-3 rounded-2xl border border-boot-hairline bg-white/90 px-4 py-3 shadow-sm">
-                      <InitialBadge value={friend.display_name ?? friend.user_id} tone="soft" />
+                  {state.hidden_friends.map((friend) => (
+                    <div key={friend.user_id} className="flex items-center gap-3 rounded-lg border border-boot-hairline bg-white/80 px-4 py-3">
+                      <InitialBadge value={friend.display_name ?? '숨김'} tone="soft" />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-black">
-                          {friend.display_name ?? `친구 ${friend.user_id.slice(0, 8)}`}
-                        </p>
-                        <p className="mt-0.5 text-[11px] text-boot-muted">친구 등록 완료</p>
+                        <p className="truncate text-sm font-black">{friend.display_name ?? '숨긴 친구'}</p>
+                        <p className="mt-0.5 text-[11px] text-boot-muted">프로필 비공개 · 다음 매칭 제외</p>
                       </div>
-                      <UserCheck size={17} className="text-emerald-600" />
+                      <button
+                        type="button"
+                        onClick={() => void restoreFriend(friend)}
+                        disabled={saving || !friend.can_restore}
+                        className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-boot-primary/25 bg-boot-soft px-3 text-xs font-black text-boot-primary disabled:opacity-40"
+                      >
+                        <RotateCcw size={14} aria-hidden="true" /> 다시 연결
+                      </button>
                     </div>
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
+            ) : null}
 
             {pendingSent.length > 0 && (
               <section className="mb-5">
@@ -422,10 +543,50 @@ export default function FriendsPage() {
               </section>
             )}
           </>
-        )}
+        ) : null}
+          </div>
+        </details>
+        </> : !isDevPreview ? <ConversationList /> : <p className="rounded-2xl border border-dashed border-boot-hairline bg-white p-5 text-center text-sm font-bold text-boot-muted">디자인 미리보기에서는 실제 대화를 불러오지 않아요.</p>}
       </div>
     </main>
   )
+}
+
+function FriendDirectory({ state, friendScenes, friendSceneState, saving, onRemove }: {
+  state: FriendsState
+  friendScenes: Map<string, FriendSceneSummary>
+  friendSceneState: 'loading' | 'ready' | 'unavailable'
+  saving: boolean
+  onRemove: (friend: FriendSummary) => Promise<void>
+}) {
+  return <section id="friend-list" className="mb-5 scroll-mt-4">
+    <SectionTitle title="친구 목록" count={state.friends.length} />
+    {friendSceneState === 'unavailable' ? <p role="status" className="mb-3 rounded-xl border border-[#E8D9C9] bg-[#FFF9F2] px-3 py-2 text-xs font-bold leading-5 text-[#9A4E30]">친구 출처는 불러오지 못했어요. 친구 목록은 그대로 이용할 수 있어요.</p> : null}
+    {state.friends.length === 0 ? <EmptyFriends /> : <div className="space-y-2">
+      {state.friends.map((friend) => {
+        const scene = friendScenes.get(friend.user_id)
+        return <div key={friend.user_id} className="glass-card flex items-center gap-2 rounded-lg border border-boot-hairline bg-white/90 p-2 shadow-sm">
+          <Link href={`/friends/${encodeURIComponent(friend.user_id)}`} className="flex min-w-0 flex-1 items-center gap-3 rounded-md px-2 py-1 transition-colors hover:bg-boot-soft/60">
+            <FriendAvatar friend={friend} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-black">{friend.display_name ?? `친구 ${friend.user_id.slice(0, 8)}`}</p>
+              <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                <FriendSceneBadge kind={friendSceneState === 'ready' ? (scene?.kind ?? 'unclassified') : null} evidence={friendSceneState === 'ready' ? (scene?.evidence ?? 'unknown') : null} />
+                <span className="text-[11px] text-boot-muted">프로필 · 1:1 대화</span>
+              </div>
+            </div>
+            <ChevronLeft size={17} className="rotate-180 text-boot-muted" />
+          </Link>
+          <button type="button" onClick={() => void onRemove(friend)} disabled={saving} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-rose-200 text-rose-600 disabled:opacity-40" aria-label={`${friend.display_name ?? '친구'} 연결 숨기기`} title="친구 연결 숨기기"><UserMinus size={17} aria-hidden="true" /></button>
+        </div>
+      })}
+    </div>}
+  </section>
+}
+
+function FriendAvatar({ friend }: { friend: FriendSummary }) {
+  if (!friend.photo_url) return <InitialBadge value={friend.display_name ?? friend.user_id} tone="soft" />
+  return <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-2xl border border-boot-hairline bg-white"><Image src={friend.photo_url} alt="" fill sizes="40px" className="object-cover" unoptimized /></span>
 }
 
 function MiniStep({ number, label }: { number: string; label: string }) {
@@ -472,13 +633,13 @@ function EmptyFriends() {
       </div>
       <p className="mt-3 text-sm font-black">아직 등록된 친구가 없어요</p>
       <p className="mt-1 text-xs leading-5 text-boot-muted">
-        괜찮아요. 닉네임으로 친구를 찾거나, 그룹 초대 링크를 보내고 친구가 로그인 후 수락하면 됩니다.
+        닉네임으로 친구를 찾아 요청을 보내세요. 상대가 수락하면 프로필에서 바로 약속을 제안할 수 있어요.
       </p>
       <Link
-        href="/group/create"
+        href="#friend-search"
         className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-boot-primary/25 bg-boot-soft px-4 py-2 text-xs font-bold text-boot-primary"
       >
-        그룹 초대하러 가기
+        닉네임으로 친구 찾기
         <ArrowRight size={14} />
       </Link>
     </div>
@@ -497,6 +658,7 @@ function translateError(code?: string) {
     case 'request_not_pending': return '이미 처리된 요청이에요.'
     case 'request_expired':     return '만료된 요청이에요.'
     case 'request_not_found':   return '요청을 찾을 수 없어요.'
+    case 'friend_pair_retryable': return '상태를 변경 중이에요. 잠시 후 다시 눌러주세요.'
     default:                    return '처리에 실패했어요. 잠시 후 다시 시도해주세요.'
   }
 }

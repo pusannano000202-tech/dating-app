@@ -1,0 +1,65 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/internal/retention/process",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/internal/voice/reconcile",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/match/continuation-notifications",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/payments/continuation/reconcile",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/community/mbti/refresh",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/internal/tonight/prepare",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/allocate",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/deposit-gate",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/partner-acceptance-gate",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/notifications/dispatch",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/refunds/process",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/settlements/process",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/deposits/finalize",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/tonight/deposits/reconcile",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/internal/payments/refunds/process",
+      "schedule": "0 19 * * *"
+    }
+  ]
+}

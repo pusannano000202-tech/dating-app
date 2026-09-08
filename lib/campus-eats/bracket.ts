@@ -9,6 +9,22 @@ export interface CreateBracketSessionInput {
   candidateIds: readonly string[]
 }
 
+export interface CreateVisitedTournamentSessionInput {
+  visitedCandidateIds: readonly string[]
+  ratings?: Readonly<Record<string, number>>
+}
+
+export type TournamentProgress = {
+  roundLabel: string
+  currentRoundMatchNumber: number
+  currentRoundMatchCount: number
+  completedComparisonCount: number
+  totalComparisonCount: number
+  byeCount: number
+}
+
+const BYE_PREFIX = '__campus_eats_bye__:'
+
 export type BattleTransition =
   | {
       accepted: true
@@ -28,11 +44,32 @@ export function pairKey(candidateAId: string, candidateBId: string) {
 }
 
 export function createBracketSession({ candidateIds }: CreateBracketSessionInput): BracketSession {
-  if (candidateIds.length !== 8 && candidateIds.length !== 16) {
-    throw new Error('Bracket candidate count must be 8 or 16')
+  if (candidateIds.length < 2 || candidateIds.length > 32) {
+    throw new Error('Bracket candidate count must be between 2 and 32')
   }
   if (new Set(candidateIds).size !== candidateIds.length) {
     throw new Error('Bracket candidates must be unique')
+  }
+
+  const bracketSize = nextPowerOfTwo(candidateIds.length)
+  const byeCount = bracketSize - candidateIds.length
+  const roundCandidateIds: string[] = []
+  const roundWinners: Record<string, string> = {}
+  let candidateIndex = 0
+
+  for (let pairIndex = 0; pairIndex < bracketSize / 2; pairIndex += 1) {
+    const slotIndex = pairIndex * 2
+    const candidateAId = candidateIds[candidateIndex]
+    candidateIndex += 1
+    if (pairIndex < byeCount) {
+      roundCandidateIds.push(candidateAId, `${BYE_PREFIX}${pairIndex}`)
+      roundWinners[String(slotIndex)] = candidateAId
+      continue
+    }
+
+    const candidateBId = candidateIds[candidateIndex]
+    candidateIndex += 1
+    roundCandidateIds.push(candidateAId, candidateBId)
   }
 
   return {
@@ -40,15 +77,49 @@ export function createBracketSession({ candidateIds }: CreateBracketSessionInput
     status: 'active',
     generation: 0,
     generationAttempts: 0,
-    generationAttemptBudget: candidateIds.length / 2,
+    generationAttemptBudget: bracketSize / 2 - byeCount,
     attemptedPairKeysInGeneration: [],
     pairAttempts: {},
-    roundCandidateIds: [...candidateIds],
-    roundWinners: {},
+    roundCandidateIds,
+    roundWinners,
     acceptedComparisonCount: 0,
     eventOutcomes: {},
     eventFingerprints: {},
   }
+}
+
+export function createVisitedTournamentSession({
+  visitedCandidateIds,
+  ratings = {},
+}: CreateVisitedTournamentSessionInput): BracketSession {
+  const originalOrder = new Map(visitedCandidateIds.map((candidateId, index) => [candidateId, index]))
+  const seededCandidateIds = [...visitedCandidateIds].sort((candidateAId, candidateBId) => {
+    const ratingDelta = (ratings[candidateBId] ?? 1500) - (ratings[candidateAId] ?? 1500)
+    return ratingDelta || (originalOrder.get(candidateAId) as number) - (originalOrder.get(candidateBId) as number)
+  })
+
+  return createBracketSession({ candidateIds: seededCandidateIds })
+}
+
+export function getTournamentProgress(state: BracketSession): TournamentProgress {
+  const roundSize = state.roundCandidateIds.length
+  const currentRoundMatchCount = Math.max(1, state.generationAttemptBudget)
+  const currentRoundMatchNumber = state.status === 'active'
+    ? Math.min(currentRoundMatchCount, state.generationAttempts + 1)
+    : currentRoundMatchCount
+
+  return {
+    roundLabel: roundSize <= 2 ? '결승' : roundSize <= 4 ? '준결승' : `${roundSize}강`,
+    currentRoundMatchNumber,
+    currentRoundMatchCount,
+    completedComparisonCount: state.acceptedComparisonCount,
+    totalComparisonCount: state.candidateIds.length - 1,
+    byeCount: nextPowerOfTwo(state.candidateIds.length) - state.candidateIds.length,
+  }
+}
+
+function nextPowerOfTwo(value: number) {
+  return 2 ** Math.ceil(Math.log2(value))
 }
 
 export function getNextPair(state: BracketSession): CandidatePair | undefined {

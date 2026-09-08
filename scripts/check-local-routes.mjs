@@ -4,9 +4,26 @@ const DEFAULT_BASE_URL = 'http://localhost:3004'
 const DEV_AUTH_COOKIE = 'booting_dev_auth=1'
 
 const routes = [
-  { path: '/dev/preview', name: '로컬 미리보기' },
+  { path: '/login', name: '로그인', public: true },
+  { path: '/community', name: '커뮤니티', public: true },
+  { path: '/community/campus-eats', name: '부산대 맛집 지도', public: true },
+  { path: '/meetups', name: '모임', public: true },
+  { path: '/api/health', name: 'API 상태', public: true },
+  {
+    path: '/tonight/invite/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    name: '오늘밤 친구 초대 토큰 보관 진입',
+    public: true,
+    forbiddenBodyText: 'NEXT_REDIRECT;replace;/login?redirect=%2Ftonight',
+  },
+  { path: '/dev/preview', name: '로컬 미리보기', devOnly: true },
+  { path: '/dev/tonight-release-rehearsal', name: '오늘밤 역할 통합 검토', devOnly: true },
   { path: '/', name: '홈' },
   { path: '/match', name: '매칭 현황' },
+  { path: '/tonight', name: '오늘밤 사용자 여정' },
+  { path: '/tonight/invite/resume', name: '오늘밤 친구 초대 인증 복귀' },
+  { path: '/partner/tonight', name: '오늘밤 업장 운영' },
+  { path: '/admin/tonight', name: '오늘밤 운영자 상황판' },
+  { path: '/admin/super-admin/tonight', name: '오늘밤 최고관리자 통제실' },
   { path: '/notifications', name: '알림' },
   { path: '/profile/basic', name: '기본정보' },
   { path: '/profile/worldcup', name: '이상형 월드컵' },
@@ -41,20 +58,30 @@ function toUrl(baseUrl, path) {
   return new URL(path, baseUrl).toString()
 }
 
-async function checkRoute(baseUrl, route, headers) {
+async function checkRoute(baseUrl, route, headers, noDevAuth) {
   const url = toUrl(baseUrl, route.path)
   const response = await fetch(url, {
     redirect: 'manual',
     headers,
   })
   const location = response.headers.get('location')
+  const body = route.forbiddenBodyText ? await response.text() : ''
+  const containsForbiddenBody = route.forbiddenBodyText
+    ? body.includes(route.forbiddenBodyText)
+    : false
   const redirectedToLogin = location?.includes('/login') ?? false
+  const successfulResponse = response.status >= 200 && response.status < 300
+  const protectedRedirect = response.status >= 300 && response.status < 400 && redirectedToLogin
+  const disabledDevOnlyRoute = route.devOnly && noDevAuth && response.status === 404
 
   return {
     ...route,
     status: response.status,
     location,
-    ok: response.status >= 200 && response.status < 400 && !redirectedToLogin,
+    containsForbiddenBody,
+    ok: route.public
+      ? successfulResponse && !redirectedToLogin && !containsForbiddenBody
+      : successfulResponse || protectedRedirect || disabledDevOnlyRoute,
   }
 }
 
@@ -70,7 +97,7 @@ const results = []
 
 for (const route of routes) {
   try {
-    results.push(await checkRoute(args.baseUrl, route, headers))
+    results.push(await checkRoute(args.baseUrl, route, headers, args.noDevAuth))
   } catch (error) {
     results.push({
       ...route,
@@ -86,7 +113,8 @@ let failed = 0
 for (const result of results) {
   const label = result.ok ? 'OK' : 'FAIL'
   const suffix = result.location ? ` -> ${result.location}` : result.error ? ` (${result.error})` : ''
-  console.log(`${label.padEnd(5)} ${String(result.status).padEnd(5)} ${result.path.padEnd(28)} ${result.name}${suffix}`)
+  const bodySuffix = result.containsForbiddenBody ? ' (응답 본문에 로그인 redirect 포함)' : ''
+  console.log(`${label.padEnd(5)} ${String(result.status).padEnd(5)} ${result.path.padEnd(28)} ${result.name}${suffix}${bodySuffix}`)
   if (!result.ok) failed += 1
 }
 
@@ -95,4 +123,4 @@ if (failed > 0) {
   process.exit(1)
 }
 
-console.log('\n모든 route가 dev auth 기준으로 접근 가능합니다.')
+console.log('\n공개 route는 열리고, 보호 route는 로그인 또는 개발 인증 경계에서 정상 응답합니다.')

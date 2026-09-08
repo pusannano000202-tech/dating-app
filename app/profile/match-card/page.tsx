@@ -1,262 +1,170 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { ChevronLeft, RefreshCw, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
-import { ArrowRight, ChevronLeft, StickyNote } from 'lucide-react'
-import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
-import { ButtonLink } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Chip } from '@/components/ui/Chip'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+import QuantumProfilePreferenceWizard from '@/components/profile/QuantumProfilePreferenceWizard'
 import { PageShell } from '@/components/ui/PageShell'
 import {
-  buildDailyCardSubmissionText,
-  countCompletedDailyCardItems,
-  createDailyCardDraftFromSubmissionText,
-  createEmptyDailyCardDraft,
-  decodeDailyCardDebateAnswers,
-  encodeDailyCardDebateAnswers,
-  type DailyCardDraft,
-  type DailyCardFieldId,
-} from '@/lib/matching/daily-card-authoring'
-import {
-  getPreMatchCardDraftCookie,
-} from '@/lib/matching/pre-match-card-draft'
+  createEmptyQuantumProfilePreference,
+  parseQuantumProfilePreference,
+  validateQuantumProfilePreference,
+  type QuantumProfilePreferenceDraft,
+} from '@/lib/matching/quantum-profile-preferences'
 
-const STORAGE_KEY = 'booting_pre_match_card_draft_text'
-const SUBMITTED_AT_KEY = 'booting_pre_match_card_draft_submitted_at'
-const MINIMUM_DAILY_CARD_ITEMS_TO_SAVE = 4
-const TOTAL_DAILY_CARD_ITEMS = 6
+type LoadState = 'loading' | 'ready' | 'error'
 
 export default function ProfileMatchCardPage() {
-  const [draft, setDraft] = useState<DailyCardDraft>(() => createEmptyDailyCardDraft())
-  const [submittedAt, setSubmittedAt] = useState<string | null>(null)
+  const router = useRouter()
+  const saveInFlight = useRef(false)
+  const [draft, setDraft] = useState<QuantumProfilePreferenceDraft>(() => createEmptyQuantumProfilePreference())
+  const [backHref, setBackHref] = useState('/match')
+  const [loadState, setLoadState] = useState<LoadState>('loading')
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [savedToServer, setSavedToServer] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const savedText = window.localStorage.getItem(STORAGE_KEY)
-    if (savedText) {
-      setDraft(createDailyCardDraftFromSubmissionText(savedText))
-    }
-    setSubmittedAt(window.localStorage.getItem(SUBMITTED_AT_KEY))
-
-    let alive = true
-    async function loadServerDraft() {
-      try {
-        const res = await fetch('/api/profile/match-card-draft', { cache: 'no-store' })
-        if (!res.ok) return
-        const data = await res.json() as {
-          draft?: { content_text?: string; submitted_at?: string | null } | null
-        }
-        if (!alive || !data.draft?.content_text) return
-        window.localStorage.setItem(STORAGE_KEY, data.draft.content_text)
-        if (data.draft.submitted_at) {
-          window.localStorage.setItem(SUBMITTED_AT_KEY, data.draft.submitted_at)
-        }
-        document.cookie = getPreMatchCardDraftCookie()
-        setDraft(createDailyCardDraftFromSubmissionText(data.draft.content_text))
-        setSubmittedAt(data.draft.submitted_at ?? null)
-        setSavedToServer(true)
-      } catch {
-        // 로그인 전 preview나 네트워크 오류에서는 기존 로컬 초안을 그대로 사용한다.
+  const loadPreference = useCallback(async () => {
+    setLoadState('loading')
+    setLoadError(null)
+    try {
+      const response = await fetch('/api/profile/quantum-preferences', { cache: 'no-store' })
+      const payload = await response.json().catch(() => ({})) as { preference?: unknown; error?: string }
+      if (!response.ok) {
+        setLoadError(response.status === 401
+          ? '로그인한 뒤 내 취향 카드를 불러올 수 있어요.'
+          : translatePreferenceError(payload.error, 'load'))
+        setLoadState('error')
+        return false
       }
-    }
 
-    void loadServerDraft()
-    return () => {
-      alive = false
+      if (payload.preference === null) {
+        setDraft(createEmptyQuantumProfilePreference())
+      } else {
+        const preference = parseQuantumProfilePreference(payload.preference)
+        if (!preference) {
+          setLoadError('저장된 취향 카드를 확인하지 못했어요. 빈 값으로 바꾸지 않았어요.')
+          setLoadState('error')
+          return false
+        }
+        setDraft(preference)
+      }
+      setLoadState('ready')
+      return true
+    } catch {
+      setLoadError('내 취향 카드를 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.')
+      setLoadState('error')
+      return false
     }
   }, [])
 
-  const completedCount = countCompletedDailyCardItems(draft)
-  const submissionText = useMemo(() => buildDailyCardSubmissionText(draft), [draft])
-  const tooLong = submissionText.length > 500
-  const canSave = completedCount >= MINIMUM_DAILY_CARD_ITEMS_TO_SAVE && !tooLong
+  useEffect(() => {
+    setBackHref(getRedirectTarget())
+    void loadPreference()
+  }, [loadPreference])
 
-  function updateDailyCardDraft(fieldId: DailyCardFieldId, value: string) {
-    setDraft((current) => ({ ...current, [fieldId]: value }))
-    setSaved(false)
+  function updateDraft(nextDraft: QuantumProfilePreferenceDraft) {
+    setDraft(nextDraft)
     setSaveError(null)
   }
 
-  function updateDailyCardDebateAnswer(promptId: string, value: string) {
-    setDraft((current) => {
-      const answers = decodeDailyCardDebateAnswers(current.debate)
-      return {
-        ...current,
-        debate: encodeDailyCardDebateAnswers({
-          ...answers,
-          [promptId]: value,
-        }),
-      }
-    })
-    setSaved(false)
-    setSaveError(null)
-  }
+  async function savePreference() {
+    if (saveInFlight.current) return
+    const validation = validateQuantumProfilePreference(draft)
+    if (!validation.ok) {
+      setSaveError('필수 항목을 확인해 주세요. 연락처나 SNS 아이디는 적을 수 없어요.')
+      return
+    }
 
-  async function saveDraft() {
-    if (!canSave || saving) return
-
+    saveInFlight.current = true
     setSaving(true)
     setSaveError(null)
-
-    const now = new Date().toISOString()
-    let persistedSubmittedAt = now
-    let persistedToServer = false
-
     try {
-      const res = await fetch('/api/profile/match-card-draft', {
-        method: 'POST',
+      const response = await fetch('/api/profile/quantum-preferences', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content_text: submissionText }),
+        body: JSON.stringify({ preference: { ...draft, updatedAt: null } }),
       })
-
-      if (res.ok) {
-        const data = await res.json() as {
-          draft?: { submitted_at?: string | null } | null
-        }
-        persistedSubmittedAt = data.draft?.submitted_at ?? now
-        persistedToServer = true
-      } else if (res.status !== 401) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        setSaveError(translateSaveError(data.error))
-        setSaving(false)
+      const payload = await response.json().catch(() => ({})) as { error?: string }
+      if (!response.ok) {
+        setSaveError(response.status === 401
+          ? '로그인한 뒤 내 취향을 저장할 수 있어요.'
+          : translatePreferenceError(payload.error, 'save'))
         return
       }
+
+      const refreshed = await loadPreference()
+      if (!refreshed) {
+        setSaveError('저장은 되었지만 서버 값을 다시 확인하지 못했어요. 다시 불러오기로 확인해 주세요.')
+        return
+      }
+      router.replace(getRedirectTarget())
     } catch {
-      // 로컬 preview에서는 API 없이도 화면 검토가 가능해야 하므로 임시 저장으로 fallback한다.
+      setSaveError('내 취향을 저장하지 못했어요. 연결을 확인하고 다시 시도해 주세요.')
+    } finally {
+      saveInFlight.current = false
+      setSaving(false)
     }
-
-    window.localStorage.setItem(STORAGE_KEY, submissionText)
-    window.localStorage.setItem(SUBMITTED_AT_KEY, persistedSubmittedAt)
-    document.cookie = getPreMatchCardDraftCookie()
-    setSubmittedAt(persistedSubmittedAt)
-    setSavedToServer(persistedToServer)
-    setSaved(true)
-    setSaving(false)
-  }
-
-  function getRedirectTarget() {
-    const params = new URLSearchParams(window.location.search)
-    const redirect = params.get('redirect')
-    if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//')) {
-      return '/match/start'
-    }
-    return redirect
   }
 
   return (
     <PageShell>
-      <header className="mb-5 flex items-center gap-3">
-        <Link
-          href="/match/start"
-          className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary"
-          aria-label="뒤로 가기"
-        >
-          <ChevronLeft size={18} />
+      <header className="mb-5 flex items-start gap-3">
+        <Link href={backHref} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#E8CEC7] bg-white text-[#6F5C57] shadow-sm" aria-label="뒤로 가기">
+          <ChevronLeft size={20} aria-hidden="true" />
         </Link>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-black text-boot-primary">사전 카드 초안</p>
-          <h1 className="text-2xl font-black">하루 한 장씩 열릴 대화 재료</h1>
-          <p className="mt-0.5 text-xs leading-5 text-boot-muted">
-            매칭 전에 6개 항목 중 4개 이상을 채우면 준비 단계로 넘어갈 수 있어요.
-          </p>
+          <p className="text-xs font-black text-[#C24F43]">MY PREFERENCE</p>
+          <h1 className="mt-1 text-2xl font-black text-[#241B19]">내 취향 카드</h1>
+          <p className="mt-2 text-sm font-bold leading-6 text-[#74635F]">평소 취향은 한 번 저장하고 다음 만남부터 다시 써요.</p>
         </div>
       </header>
 
-      <Card variant="soft" className="mb-4">
-        <div className="flex items-start gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-boot-primary">
-            <StickyNote size={20} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-base font-black">내 카드 항목 {completedCount}/{TOTAL_DAILY_CARD_ITEMS} 완료</h2>
-              <Chip tone={canSave ? 'success' : 'warning'}>
-                {canSave ? '저장 가능' : `${MINIMUM_DAILY_CARD_ITEMS_TO_SAVE}개 필요`}
-              </Chip>
-            </div>
-            <p className="mt-1 text-xs leading-5 text-boot-muted">
-              음식점, 노래, 논쟁 카드처럼 상대가 눌러보고 대화하기 쉬운 재료를 먼저 만들어둡니다.
-            </p>
-          </div>
-        </div>
-      </Card>
-
-      <DailyCardHintWizard
-        draft={draft}
-        completedCount={completedCount}
-        minimumToSave={MINIMUM_DAILY_CARD_ITEMS_TO_SAVE}
-        totalCount={TOTAL_DAILY_CARD_ITEMS}
-        submittedAt={submittedAt}
-        canSave={canSave}
-        tooLong={tooLong}
-        saving={saving}
-        onTextChange={updateDailyCardDraft}
-        onDebateAnswer={updateDailyCardDebateAnswer}
-        onSave={saveDraft}
-        formatSubmittedAt={formatSubmittedAt}
-      />
-
-      <div className="mt-4 grid gap-2">
-        {saved && (
-          <p className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-xs font-bold text-emerald-700">
-            {savedToServer
-              ? '사전 카드 초안이 DB에 저장됐어요. 이제 매칭 찾기 준비로 돌아갈 수 있어요.'
-              : '사전 카드 초안이 현재 기기에 임시 저장됐어요. 로컬 검토용으로 다음 단계를 볼 수 있어요.'}
-          </p>
-        )}
-        {saveError && (
-          <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-xs font-bold text-red-700">
-            {saveError}
-          </p>
-        )}
-        <ButtonLink
-          href={saved ? getRedirectTarget() : '#'}
-          onClick={(event) => {
-            if (!saved) {
-              event.preventDefault()
-              void saveDraft()
-            }
-          }}
-          variant={canSave ? 'gradient' : 'ghost'}
-          size="lg"
-          fullWidth
-          aria-disabled={!canSave}
-          className={!canSave ? 'pointer-events-none opacity-45' : ''}
-        >
-          {saved ? '매칭 준비로 돌아가기' : '저장하고 다음으로'}
-          <ArrowRight size={17} />
-        </ButtonLink>
-        <p className="text-center text-[11px] leading-5 text-boot-muted">
-          로그인 상태에서는 이 초안이 DB에 저장되어 그룹원이 모두 준비됐는지 확인하는 데 쓰여요.
-          상대 공개용 카드는 가매칭 후 확정 카드 단계에서 따로 제출합니다.
-        </p>
+      <div className="mb-5 flex items-start gap-3 border-l-2 border-[#D95A4C] bg-[#FFF6F2] px-4 py-3">
+        <ShieldCheck size={18} className="mt-0.5 shrink-0 text-[#B84237]" aria-hidden="true" />
+        <p className="text-xs font-bold leading-5 text-[#6D5751]">사진·실명·학과·연락처·외모점수는 만남 전 카드에 포함하지 않아요.</p>
       </div>
+
+      {loadState === 'loading' ? <p className="py-8 text-sm font-bold text-[#74635F]">내 취향 카드를 불러오고 있어요.</p> : null}
+      {loadState === 'error' ? (
+        <section className="border-y border-[#E8CEC7] bg-[#FFF9F7] py-6">
+          <p role="alert" className="text-sm font-bold leading-6 text-[#9F3D33]">{loadError ?? '내 취향 카드를 불러오지 못했어요.'}</p>
+          <button type="button" onClick={() => void loadPreference()} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-[#D6BDB6] bg-white px-4 text-sm font-black text-[#6B4C45]">
+            <RefreshCw size={17} aria-hidden="true" /> 다시 불러오기
+          </button>
+        </section>
+      ) : null}
+      {loadState === 'ready' ? (
+        <QuantumProfilePreferenceWizard draft={draft} saving={saving} saveError={saveError} onChange={updateDraft} onSave={() => void savePreference()} />
+      ) : null}
     </PageShell>
   )
 }
 
-function translateSaveError(code?: string): string {
-  switch (code) {
-    case 'card_incomplete':
-      return '사전 카드 항목을 4개 이상 채워야 저장할 수 있어요.'
-    case 'invalid_card_content':
-      return '카드 내용은 10자 이상 500자 이하로 작성해 주세요.'
-    default:
-      return '사전 카드 초안을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.'
+function getRedirectTarget() {
+  if (typeof window === 'undefined') return '/match'
+  const redirect = new URLSearchParams(window.location.search).get('redirect')
+  if (!redirect
+    || !redirect.startsWith('/')
+    || redirect.startsWith('//')
+    || /\\|%2f|%5c/i.test(redirect)) return '/match'
+
+  try {
+    const origin = 'https://quantum.local'
+    const target = new URL(redirect, origin)
+    if (target.origin !== origin
+      || (target.pathname !== '/match' && !target.pathname.startsWith('/match/'))) return '/match'
+    return `${target.pathname}${target.search}`
+  } catch {
+    return '/match'
   }
 }
 
-function formatSubmittedAt(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return iso
-
-  const month = (d.getMonth() + 1).toString().padStart(2, '0')
-  const date = d.getDate().toString().padStart(2, '0')
-  const hour = d.getHours().toString().padStart(2, '0')
-  const minute = d.getMinutes().toString().padStart(2, '0')
-  return `${month}.${date} ${hour}:${minute}`
+function translatePreferenceError(code: string | undefined, action: 'load' | 'save') {
+  if (code === 'schema_unavailable') return '취향 저장 기능을 준비 중이에요. 이 상태에서는 저장하지 않았어요.'
+  if (code === 'invalid_profile_preference') return '음악 항목에서 연락처·SNS·링크를 빼고 필수 선택을 다시 확인해 주세요.'
+  if (action === 'load') return '내 취향 카드를 불러오지 못했어요. 빈 값으로 바꾸지 않았어요.'
+  return '내 취향을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.'
 }

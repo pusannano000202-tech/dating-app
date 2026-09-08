@@ -1,0 +1,4 @@
+interface:
+  display_name: "퀀텀 작업 지능 배정"
+  short_description: "작업마다 Sol·Terra·Luna와 사고 강도 선택"
+  default_prompt: "퀀텀 작업 지능 배정 기준으로 요청을 단계별로 나누고 적절한 모델, 사고 강도, 도구와 승격 조건을 결정해 주세요."

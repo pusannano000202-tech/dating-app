@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import AppearanceScoreGate from '@/components/matching/AppearanceScoreGate'
 import {
   ArrowRight,
   CalendarClock,
@@ -23,6 +24,14 @@ import {
   getMatchSetupStatus,
   type MatchSetupProfile,
 } from '@/lib/matching/match-setup-status'
+import { isGroupQueueActive } from '@/lib/matching/group-queue-state'
+import {
+  getQuantumEventById,
+  getQuantumEventStartHref,
+  isQuantumPartyType,
+  type QuantumEvent,
+  type QuantumPartyType,
+} from '@/lib/matching/quantum-event-catalog'
 import {
   PRE_MATCH_CARD_DRAFT_COOKIE,
   isPreMatchCardDraftCookieDone,
@@ -40,6 +49,15 @@ type SetupStep = {
 
 type MatchStartMode = 'group' | 'solo'
 type ActiveGroupStatus = 'forming' | 'ready' | 'in_pool' | 'matched' | 'completed' | 'disbanded'
+type MatchStartSearchParams = {
+  mode?: string | string[]
+  event?: string | string[]
+  party?: string | string[]
+}
+type MatchEventContext = {
+  event: QuantumEvent
+  party: QuantumPartyType
+}
 
 const GROUP_REDIRECT_TO = '/match/start'
 const SOLO_REDIRECT_TO = '/match/start?mode=solo'
@@ -83,12 +101,24 @@ function buildSetupSteps(
   ]
 }
 
-function getMatchStartMode(searchParams?: { mode?: string | string[] }): MatchStartMode {
+function getMatchStartMode(searchParams?: MatchStartSearchParams): MatchStartMode {
   return searchParams?.mode === 'solo' ? 'solo' : 'group'
 }
 
+function readSearchParam(value: string | string[] | undefined): string | null {
+  return typeof value === 'string' ? value : null
+}
+
+function getMatchEventContext(searchParams?: MatchStartSearchParams): MatchEventContext | null {
+  const event = getQuantumEventById(readSearchParam(searchParams?.event))
+  const party = readSearchParam(searchParams?.party)
+
+  if (!event || !isQuantumPartyType(party)) return null
+  return { event, party }
+}
+
 function buildDevMatchSetupProfile(
-  cookieStore: Awaited<Awaited<ReturnType<typeof cookies>>>,
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
 ): MatchSetupProfile {
   const isDone = (key: keyof typeof DEV_MATCH_SETUP_COOKIES) =>
     cookieStore.get(DEV_MATCH_SETUP_COOKIES[key])?.value === getDevMatchSetupCookieValue()
@@ -113,7 +143,7 @@ function getCurrentSetupState(steps: SetupStep[]) {
 }
 
 function getDevPreviewGroupStatusFromServer(
-  cookieStore: Awaited<Awaited<ReturnType<typeof cookies>>>,
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
 ): ActiveGroupStatus {
   const value = cookieStore.get(DEV_PREVIEW_GROUP_STATUS_COOKIE)?.value
   if (value === 'in_pool') return 'in_pool'
@@ -122,30 +152,42 @@ function getDevPreviewGroupStatusFromServer(
 }
 
 function isActiveGroupFlowStatus(status: string | null | undefined): boolean {
-  return status === 'in_pool' || status === 'matched'
+  return status === 'matched'
 }
 
 async function hasActiveGroupFlow(
-  supabase: Awaited<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   userId: string,
 ): Promise<boolean> {
-  const { data: membership } = await supabase
+  const { data: membership, error: membershipError } = await supabase
     .from('group_members')
     .select('group_id')
     .eq('user_id', userId)
     .is('left_at', null)
     .maybeSingle()
 
+  if (membershipError) return true
   const groupId = (membership as { group_id?: string } | null)?.group_id
   if (!groupId) return false
 
-  const { data: group } = await supabase
+  const { data: group, error: groupError } = await supabase
     .from('groups')
     .select('status')
     .eq('id', groupId)
     .maybeSingle()
 
-  return isActiveGroupFlowStatus((group as { status?: string } | null)?.status)
+  if (groupError || !group) return true
+  if (isActiveGroupFlowStatus((group as { status?: string } | null)?.status)) return true
+
+  const { data: matchPool, error: matchPoolError } = await supabase
+    .from('match_pool')
+    .select('status')
+    .eq('group_id', groupId)
+    .in('status', ['waiting', 'rolled_over'])
+    .maybeSingle()
+
+  if (matchPoolError) return true
+  return isGroupQueueActive((matchPool as { status?: string } | null)?.status)
 }
 
 function SoloBlockedByGroupFlowView() {
@@ -168,7 +210,7 @@ function SoloBlockedByGroupFlowView() {
           </div>
           <h2 className="text-xl font-black">진행 중인 과팅을 먼저 마무리해 주세요</h2>
           <p className="mt-2 text-sm leading-6 text-boot-muted">
-            부팅은 시간과 장소까지 자동으로 잡아주는 구조라, 과팅 큐에 들어간 뒤에는 동시에 소개팅을 시작하지 않도록 막아뒀어요.
+            Quantum은 시간과 장소까지 자동으로 잡아주는 구조라, 과팅 큐에 들어간 뒤에는 동시에 소개팅을 시작하지 않도록 막아뒀어요.
           </p>
           <Link
             href="/match"
@@ -186,49 +228,78 @@ function SoloBlockedByGroupFlowView() {
 function MatchStartView({
   mode,
   steps,
+  appearanceScoreReady,
+  eventContext,
   allowSoloMockActions = false,
 }: {
   mode: MatchStartMode
   steps: SetupStep[]
+  appearanceScoreReady: boolean
+  eventContext: MatchEventContext | null
   allowSoloMockActions?: boolean
 }) {
   const current = getCurrentSetupState(steps)
   const currentStep = current.currentStep
   const isSoloMode = mode === 'solo'
 
+  if (!currentStep && !appearanceScoreReady) {
+    return (
+      <AppearanceScoreGate
+        eventTitle={eventContext?.event.title}
+        eventMeta={eventContext
+          ? `${eventContext.event.schedule} · ${eventContext.party === 'solo' ? '혼자 참여' : '같은 성별 친구와 참여'}`
+          : undefined}
+      />
+    )
+  }
+
   if (!currentStep) {
     return (
       <main className="min-h-screen booting-paper px-5 pb-28 pt-7 text-boot-ink">
         <div className="mx-auto w-full max-w-[calc(100vw-2.5rem)] sm:max-w-md">
           <header className="mb-6 flex items-center gap-3">
-            <Link href="/" className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
+            <Link href={eventContext ? '/match' : '/'} className="glass rounded-xl border border-boot-hairline p-2 text-boot-body hover:text-boot-primary">
               <ChevronLeft size={18} />
             </Link>
             <div>
               <h1 className="text-2xl font-black">
-                {isSoloMode ? '1:1 소개팅 준비 완료' : '매칭찾기 준비 완료'}
+                {eventContext ? '신청 준비가 됐어요' : isSoloMode ? '1:1 소개팅 준비 완료' : '매칭찾기 준비 완료'}
               </h1>
               <p className="mt-0.5 text-xs text-boot-muted">
-                {isSoloMode
+                {eventContext
+                  ? '선택한 활동 신청을 이어갈 수 있어요.'
+                  : isSoloMode
                   ? '이제 혼자 바로 소개팅 큐에 들어갈 수 있어요.'
                   : '이제 친구와 그룹을 만들고 큐에 들어가면 됩니다.'}
               </p>
             </div>
           </header>
 
+          {eventContext && <SelectedEventBanner context={eventContext} />}
+
           <section className="glass-card mb-6 rounded-3xl border border-boot-hairline p-6 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
               <Check size={24} strokeWidth={3} />
             </div>
-            <h2 className="text-xl font-black">설정이 모두 끝났어요</h2>
+            <h2 className="text-xl font-black">{eventContext ? '필요한 준비만 확인했어요' : '설정이 모두 끝났어요'}</h2>
             <p className="mt-2 text-sm leading-6 text-boot-muted">
-              {isSoloMode
+              {eventContext
+                ? '선택한 활동과 외모 분석 준비만 확인했어요. 성향·시간·가중치·사전 카드는 이 신청에 요구하지 않아요.'
+                : isSoloMode
                 ? '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안이 준비됐습니다. 친구 초대 없이 바로 한 명을 찾아요.'
                 : '성향 선호, 안 되는 시간, 매칭 비중, 사전 카드 초안이 준비됐습니다.'}
             </p>
           </section>
 
-          {isSoloMode ? (
+          {eventContext ? (
+            <Link
+              href={`/match/events/${encodeURIComponent(eventContext.event.id)}?party=${eventContext.party}`}
+              className="flex min-h-14 w-full items-center justify-center gap-2 rounded-lg bg-boot-primary px-5 text-base font-black text-white"
+            >
+              {eventContext.party === 'solo' ? '혼자 신청 이어가기' : '친구와 신청 이어가기'}
+              <ArrowRight size={18} />
+            </Link>
+          ) : isSoloMode ? (
             allowSoloMockActions ? (
               <div className="space-y-3">
                 <Link
@@ -312,6 +383,8 @@ function MatchStartView({
           </div>
         </header>
 
+        {eventContext && <SelectedEventBanner context={eventContext} />}
+
         <details className="mb-5 rounded-2xl border border-boot-primary/15 bg-white/85 px-4 py-3 shadow-sm">
           <summary className="flex cursor-pointer items-center gap-2 text-xs font-black text-boot-ink">
             <Info size={15} className="text-boot-primary" />
@@ -390,14 +463,34 @@ function MatchStartView({
   )
 }
 
+function SelectedEventBanner({ context }: { context: MatchEventContext }) {
+  return (
+    <section className="mb-5 border-l-4 border-boot-primary bg-white px-4 py-4">
+      <p className="text-[11px] font-black text-boot-primary">선택한 다섯 명 약속</p>
+      <h2 className="mt-1 text-lg font-black text-boot-ink">{context.event.title}</h2>
+      <p className="mt-2 flex items-center gap-2 text-xs font-bold text-boot-body">
+        <CalendarClock size={15} />
+        {context.event.schedule} · {context.event.location}
+      </p>
+      <p className="mt-2 flex items-center gap-2 text-xs font-bold text-boot-muted">
+        <UsersRound size={15} />
+        총 5명 · {context.party === 'solo' ? '혼자 참여' : '같은 성별 친구와 참여'}
+      </p>
+    </section>
+  )
+}
+
 export default async function MatchStartPage(
   props: {
-    searchParams?: Promise<{ mode?: string | string[] }>
+    searchParams?: Promise<MatchStartSearchParams>
   }
 ) {
   const searchParams = await props.searchParams;
   const mode = getMatchStartMode(searchParams)
-  const redirectTo = mode === 'solo' ? SOLO_REDIRECT_TO : GROUP_REDIRECT_TO
+  const eventContext = getMatchEventContext(searchParams)
+  const redirectTo = eventContext
+    ? getQuantumEventStartHref(eventContext.event.id, eventContext.party)
+    : mode === 'solo' ? SOLO_REDIRECT_TO : GROUP_REDIRECT_TO
   const cookieStore = await cookies()
   const devAuthed =
     isDevAuthBypassEnabled() &&
@@ -407,11 +500,23 @@ export default async function MatchStartPage(
     const soloBlockedByGroupFlow = mode === 'solo' && isActiveGroupFlowStatus(getDevPreviewGroupStatusFromServer(cookieStore))
     if (soloBlockedByGroupFlow) return <SoloBlockedByGroupFlowView />
 
+    if (eventContext) {
+      redirect(`/match/events/${encodeURIComponent(eventContext.event.id)}?party=${eventContext.party}`)
+    }
+
     const profile = devAuthed ? buildDevMatchSetupProfile(cookieStore) : null
     const cardDraftDone = isPreMatchCardDraftCookieDone(
       cookieStore.get(PRE_MATCH_CARD_DRAFT_COOKIE)?.value,
     )
-    return <MatchStartView mode={mode} steps={buildSetupSteps(profile, cardDraftDone, redirectTo)} allowSoloMockActions={devAuthed} />
+    return (
+      <MatchStartView
+        mode={mode}
+        steps={eventContext ? [] : buildSetupSteps(profile, cardDraftDone, redirectTo)}
+        appearanceScoreReady
+        eventContext={eventContext}
+        allowSoloMockActions={devAuthed}
+      />
+    )
   }
 
   const supabase = await createSupabaseServerClient()
@@ -427,6 +532,9 @@ export default async function MatchStartPage(
     .eq('user_id', user.id)
     .maybeSingle()
 
+  const { data: appearanceStatus, error: appearanceStatusError } = await supabase
+    .rpc('get_my_appearance_score_status')
+
   const { data: cardDraft } = await supabase
     .from('pre_match_card_drafts')
     .select('completed_items')
@@ -436,8 +544,16 @@ export default async function MatchStartPage(
   const cardDraftDone =
     typeof cardDraft?.completed_items === 'number' &&
     cardDraft.completed_items >= 4
-  const steps = buildSetupSteps((profile as MatchSetupProfile | null) ?? null, cardDraftDone, redirectTo)
-  if (steps.every((step) => step.done) && mode === 'group') redirect('/group/create')
+  const steps = eventContext ? [] : buildSetupSteps((profile as MatchSetupProfile | null) ?? null, cardDraftDone, redirectTo)
+  const appearanceStatusRow = Array.isArray(appearanceStatus)
+    ? appearanceStatus[0]
+    : appearanceStatus
+  const appearanceScoreReady = !appearanceStatusError
+    && appearanceStatusRow?.ready === true
+  if (eventContext && appearanceScoreReady) {
+    redirect(`/match/events/${encodeURIComponent(eventContext.event.id)}?party=${eventContext.party}`)
+  }
+  if (steps.every((step) => step.done) && appearanceScoreReady && mode === 'group' && !eventContext) redirect('/group/create')
 
-  return <MatchStartView mode={mode} steps={steps} />
+  return <MatchStartView mode={mode} steps={steps} appearanceScoreReady={appearanceScoreReady} eventContext={eventContext} />
 }

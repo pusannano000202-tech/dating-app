@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/**/*.py": {
+      "includeFiles": "data/**",
+      "excludeFiles": "{tests/**,test_*.py,model.py,supabase_client.py,requirements-dev.txt,requirements.txt}"
+    }
+  }
+}

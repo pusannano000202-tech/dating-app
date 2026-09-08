@@ -61,3 +61,27 @@ test('match setup status rejects placeholder timeslots and loose weight objects'
     },
   )
 })
+
+test('match setup status rejects malformed or reversed time windows', () => {
+  assert.equal(
+    hasAvailableTimeslots({
+      slots: [{ day: 'friday', start: '25:00', end: '26:00' }],
+    }),
+    false,
+  )
+  assert.equal(
+    hasAvailableTimeslots({
+      slots: [{ day: 'friday', start: '22:00', end: '18:00' }],
+    }),
+    false,
+  )
+  assert.equal(
+    hasAvailableTimeslots({
+      slots: [
+        { day: 'friday', start: '18:00', end: '22:00' },
+        { day: 'not-a-day', start: '18:00', end: '22:00' },
+      ],
+    }),
+    false,
+  )
+})

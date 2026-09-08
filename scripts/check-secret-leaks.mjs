@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 
 const root = process.cwd()
+const COMMAND_TIMEOUT_MS = 10_000
 const detectors = [
   {
     name: 'toss_api_key',
@@ -17,9 +18,23 @@ const detectors = [
     name: 'tracked_supabase_public_jwt_env',
     find: findTrackedSupabasePublicJwtEnv,
   },
+  {
+    name: 'naver_client_secret_env',
+    find: findNaverClientSecretEnv,
+  },
+  {
+    name: 'supabase_secret_key',
+    find: findSupabaseSecretKeys,
+  },
+  {
+    name: 'server_secret_env',
+    find: findServerSecretEnv,
+  },
 ]
 
-const files = listTrackedFiles()
+const includeUntracked = process.argv.includes('--include-untracked')
+const scanLabel = includeUntracked ? 'Tracked and untracked' : 'Tracked'
+const files = includeUntracked ? listTrackedAndUntrackedFiles() : listTrackedFiles()
 const findings = []
 
 for (const file of files) {
@@ -34,23 +49,35 @@ for (const file of files) {
 }
 
 if (findings.length > 0) {
-  console.error('Tracked secret scan failed. Remove matched secrets from git-tracked files.')
+  console.error(`${scanLabel} secret scan failed. Remove matched secrets before committing.`)
   for (const finding of findings) {
     console.error(`${finding.file}:${finding.line}:${finding.detector}`)
   }
   process.exit(1)
 }
 
-console.log('Tracked secret scan passed.')
+console.log(`${scanLabel} secret scan passed.`)
 
 function listTrackedFiles() {
-  const result = spawnSync('git', ['ls-files', '-z'], {
+  return listGitFiles(['ls-files', '-z'])
+}
+
+function listTrackedAndUntrackedFiles() {
+  return [...new Set([
+    ...listTrackedFiles(),
+    ...listGitFiles(['ls-files', '-z', '--others', '--exclude-standard']),
+  ])]
+}
+
+function listGitFiles(args) {
+  const result = spawnSync('git', args, {
     cwd: root,
     encoding: 'buffer',
+    timeout: COMMAND_TIMEOUT_MS,
   })
 
-  if (result.status !== 0) {
-    throw new Error('git ls-files failed')
+  if (result.status !== 0 || result.error || result.signal) {
+    throw new Error(`git ${args.join(' ')} failed`)
   }
 
   return result.stdout
@@ -87,6 +114,35 @@ function findSupabaseServiceRoleJwt(text) {
 function findTrackedSupabasePublicJwtEnv(text) {
   return findLines(text, /NEXT_PUBLIC_SUPABASE_(?:ANON_KEY|PUBLISHABLE_KEY)\s*=\s*(eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/g)
     .filter((match) => !isAllowedPlaceholder(match.value))
+    .map((match) => match.line)
+}
+
+function findNaverClientSecretEnv(text) {
+  return findLines(text, /^[ \t]*NAVER_(?:CLIENT_SECRET|MAPS_CLIENT_SECRET)[ \t]*=[ \t]*[^\r\n]*$/gm)
+    .filter((match) => {
+      const value = match.value.slice(match.value.indexOf('=') + 1).trim()
+      return value.length > 0 && !isAllowedPlaceholder(value)
+    })
+    .map((match) => match.line)
+}
+
+function findSupabaseSecretKeys(text) {
+  return findLines(text, /sb_secret_[A-Za-z0-9_-]{12,}/g)
+    .filter((match) => !isAllowedPlaceholder(match.value))
+    .map((match) => match.line)
+}
+
+function findServerSecretEnv(text) {
+  return findLines(
+    text,
+    /^[ \t]*(?:PAYMENT_INTERNAL_SECRET|CRON_SECRET|AI_SERVER_SECRET|WEB_PUSH_VAPID_PRIVATE_KEY|CAMPUS_SEVEN_PUSH_CRON_SECRET)[ \t]*=[ \t]*[^\r\n]*$/gm,
+  )
+    .filter((match) => {
+      const value = match.value.slice(match.value.indexOf('=') + 1).trim()
+      return value.length > 0
+        && !isAllowedPlaceholder(value)
+        && !/(?:process\.env|os\.environ|getenv\(|Deno\.env|import\.meta\.env)/i.test(value)
+    })
     .map((match) => match.line)
 }
 
@@ -139,5 +195,5 @@ function readJwtPayload(value) {
 }
 
 function isAllowedPlaceholder(value) {
-  return /fake|example|placeholder|your-|your_|dummy|signature/i.test(value)
+  return /fake|example|placeholder|your-|your_|dummy|signature|replace(?:_|-)?me|replace-with|local-|test-/i.test(value)
 }

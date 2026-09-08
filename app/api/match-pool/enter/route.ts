@@ -2,13 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getMatchSetupStatus, type MatchSetupProfile } from '@/lib/matching/match-setup-status'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
-interface MatchSetupProfileRow extends MatchSetupProfile {
+interface MatchSetupProfileRow extends MatchSetupProfile { user_id: string }
+
+type AppearanceScoreReadinessRow = {
   user_id: string
+  ready: boolean
 }
 
 type PreMatchCardReadinessRow = {
   user_id: string
   has_pre_match_card: boolean
+}
+
+type EnterMatchPoolRow = {
+  id: string
+  group_id: string
+  status: string
+  entered_at: string
+  rollover_count: number
+  reused_existing_entry: boolean
 }
 
 export async function POST(req: NextRequest) {
@@ -46,9 +58,6 @@ export async function POST(req: NextRequest) {
   if (!group) {
     return NextResponse.json({ error: 'group_not_found' }, { status: 404 })
   }
-  if (group.status !== 'forming') {
-    return NextResponse.json({ error: 'group_not_open' }, { status: 409 })
-  }
 
   const activeMembers = memberRows ?? []
   const isLeader = group.leader_user_id === user.id
@@ -83,6 +92,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'member_match_setup_incomplete' }, { status: 409 })
   }
 
+  const { data: appearanceReadiness, error: appearanceReadinessError } = await supabase
+    .rpc('get_group_appearance_score_readiness', { p_group_id: groupId })
+  if (appearanceReadinessError) {
+    return NextResponse.json({ error: 'member_appearance_score_lookup_failed' }, { status: 500 })
+  }
+
+  const appearanceReadySet = new Set(
+    ((appearanceReadiness ?? []) as AppearanceScoreReadinessRow[])
+      .filter((row) => row.ready)
+      .map((row) => row.user_id)
+  )
+  const allAppearanceScoresReady = userIds.every((id) => appearanceReadySet.has(id))
+  if (!allAppearanceScoresReady) {
+    return NextResponse.json(
+      { error: appearanceReadySet.has(user.id) ? 'member_appearance_score_required' : 'appearance_score_required' },
+      { status: 409 },
+    )
+  }
+
   const { data: cardReadiness, error: cardReadinessError } = await supabase
     .rpc('get_group_pre_match_card_readiness', { p_group_id: groupId })
 
@@ -113,7 +141,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: failure.error }, { status: failure.status })
   }
 
-  return NextResponse.json({ entry: data })
+  const entry = data as EnterMatchPoolRow | null
+  return NextResponse.json({
+    entry,
+    reused_existing_entry: Boolean(entry?.reused_existing_entry),
+  })
 }
 
 function getEnterMatchPoolRpcFailure(message: string | undefined): { error: string; status: 404 | 409 | 500 } {
@@ -129,6 +161,7 @@ function getEnterMatchPoolRpcFailure(message: string | undefined): { error: stri
     message === 'not_enough_members' ||
     message === 'group_not_full' ||
     message === 'member_match_setup_incomplete' ||
+    message === 'member_appearance_score_required' ||
     message === 'member_pre_match_card_incomplete'
   ) {
     return { error: message, status: 409 }

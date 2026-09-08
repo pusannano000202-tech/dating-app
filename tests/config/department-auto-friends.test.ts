@@ -12,7 +12,7 @@ function readSource(path: string): string {
 test('department friend API returns suggestions without creating active friendships', () => {
   const route = readSource('app/api/friends/department-sync/route.ts')
 
-  assert.match(route, /createSupabaseServerClient/)
+  assert.match(route, /createSupabaseRequestClient\(req\)/)
   assert.match(route, /\.auth\.getUser\(\)/)
   assert.match(route, /get_department_friend_suggestions/)
   assert.match(route, /normalizeLimit/)
@@ -55,13 +55,14 @@ test('latest school-email retirement migration keeps explicit consent without em
   assert.doesNotMatch(suggestionFunction, /school_email_verified_at|school_verification_required/)
 })
 
-test('group and friends surfaces expose same-department suggestions and explicit requests', () => {
+test('group uses voluntary department recruitment while friend creation keeps explicit invitations', () => {
   const groupCreate = readSource('app/group/create/page.tsx')
   const friendsPage = readSource('app/friends/page.tsx')
   const panel = readSource('components/matching/group-create/DepartmentAutoFriendPanel.tsx')
 
-  assert.match(groupCreate, /DepartmentAutoFriendPanel/)
-  assert.match(friendsPage, /DepartmentAutoFriendPanel/)
+  assert.doesNotMatch(groupCreate + friendsPage, /DepartmentAutoFriendPanel/)
+  assert.match(groupCreate, /href="\/community\/department"/)
+  assert.match(friendsPage, /\/api\/friend-invites/)
   assert.match(panel, /같은 학과/)
   assert.match(panel, /추천 노출 끄기/)
   assert.match(panel, /enabled: true/)

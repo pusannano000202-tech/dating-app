@@ -43,33 +43,9 @@ export async function POST(req: NextRequest) {
     return matchContext.response
   }
 
-  const provider = resolveDepositPaymentProvider()
-  const readiness = getDepositPaymentReadiness(provider)
-  if (!readiness.ok) {
-    return NextResponse.json({
-      error: readiness.error,
-      provider: readiness.provider,
-    }, { status: 503 })
-  }
-
   const paymentService = createPaymentServiceClient()
   if (!paymentService) {
     return NextResponse.json({ error: 'server_settlement_not_configured' }, { status: 503 })
-  }
-
-  if (provider === 'mock') {
-    const { data, error } = await payMockDepositForMatch({
-      matchId,
-      groupId,
-      userId: user.id,
-    })
-
-    if (error) {
-      const status = error === 'server_mock_payment_not_configured' ? 503 : 400
-      return NextResponse.json({ error }, { status })
-    }
-
-    return NextResponse.json({ provider, status: 'paid', deposit: data }, { status: 201 })
   }
 
   const activeDeposit = await paymentService
@@ -89,10 +65,56 @@ export async function POST(req: NextRequest) {
 
   if (activeDeposit.data?.status === 'paid' || activeDeposit.data?.status === 'held') {
     return NextResponse.json({
-      provider,
+      provider: 'existing',
       status: activeDeposit.data.status,
       deposit: activeDeposit.data,
     }, { status: 200 })
+  }
+
+  if (!activeDeposit.data) {
+    const carried = await paymentService
+      .rpc('apply_available_deposit_carryover', {
+        p_match_id: matchId,
+        p_group_id: groupId,
+        p_user_id: user.id,
+      })
+      .maybeSingle()
+
+    if (carried.error) {
+      return NextResponse.json({ error: 'deposit_carryover_apply_failed' }, { status: 409 })
+    }
+    if (carried.data) {
+      return NextResponse.json({
+        provider: 'carryover',
+        status: 'held',
+        deposit: carried.data,
+        reused_carryover: true,
+      }, { status: 200 })
+    }
+  }
+
+  const provider = resolveDepositPaymentProvider()
+  const readiness = getDepositPaymentReadiness(provider)
+  if (!readiness.ok) {
+    return NextResponse.json({
+      error: readiness.error,
+      provider: readiness.provider,
+    }, { status: 503 })
+  }
+
+  if (provider === 'mock') {
+    const { data, error } = await payMockDepositForMatch({
+      matchId,
+      groupId,
+      userId: user.id,
+    })
+
+    if (error) {
+      const status = error === 'server_mock_payment_not_configured' ? 503 : 400
+      return NextResponse.json({ error }, { status })
+    }
+
+    return NextResponse.json({ provider, status: 'paid', deposit: data }, { status: 201 })
   }
 
   const pendingOrderId = (activeDeposit.data as DepositPaymentRow | null)?.toss_order_id ?? undefined
@@ -123,7 +145,7 @@ export async function POST(req: NextRequest) {
 
     if (created.error || !created.data) {
       if (created.error?.code !== '23505') {
-        return NextResponse.json({ error: created.error?.message || 'deposit_create_failed' }, { status: 400 })
+        return NextResponse.json({ error: 'deposit_create_failed' }, { status: 500 })
       }
 
       const concurrent = await paymentService
@@ -163,7 +185,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (updated.error || !updated.data) {
-      return NextResponse.json({ error: updated.error?.message || 'deposit_order_attach_failed' }, { status: 400 })
+      return NextResponse.json({ error: 'deposit_order_attach_failed' }, { status: 500 })
     }
 
     deposit = updated.data as DepositPaymentRow

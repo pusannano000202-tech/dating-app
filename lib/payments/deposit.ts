@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { DEPOSIT_AMOUNT } from '../constants'
 import { getSupabaseAdminKeyStatus } from '../supabase-admin'
 
@@ -5,6 +6,7 @@ import { getSupabaseAdminKeyStatus } from '../supabase-admin'
 export const DEPOSIT_PAYMENT_PROVIDERS = ['mock', 'toss'] as const
 
 export type DepositPaymentProvider = typeof DEPOSIT_PAYMENT_PROVIDERS[number]
+export type TossDepositOrderAction = 'reuse' | 'rotate' | 'reconcile'
 
 export type DepositPaymentReadiness =
   | { ok: true; provider: DepositPaymentProvider }
@@ -72,7 +74,7 @@ export function getDepositPaymentReadiness(provider: DepositPaymentProvider): De
     },
     {
       key: 'PAYMENT_INTERNAL_SECRET',
-      validate: (value: string) => value.length >= 12 && !hasUnsafeEnvValueCharacters(value),
+      validate: (value: string) => value.length >= 32 && !hasUnsafeEnvValueCharacters(value),
     },
   ] as const
   const missing: string[] = checks
@@ -132,6 +134,12 @@ export function isDepositPaymentAmountValid(amount: unknown): amount is number {
   return typeof amount === 'number' && Number.isInteger(amount) && amount === DEPOSIT_AMOUNT
 }
 
+export function getTossDepositOrderAction(status: string): TossDepositOrderAction {
+  if (status === 'EXPIRED' || status === 'ABORTED') return 'rotate'
+  if (status === 'READY') return 'reuse'
+  return 'reconcile'
+}
+
 export function normalizeDepositReturnPath(value: unknown) {
   if (typeof value !== 'string') return '/group/create'
 
@@ -157,7 +165,8 @@ function isDepositPaymentProvider(value: string): value is DepositPaymentProvide
 function buildDepositOrderId(groupId: string, userId: string) {
   const compactGroup = groupId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
   const compactUser = userId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12)
-  return `deposit_${compactGroup}_${compactUser}_${Date.now()}`
+  const nonce = randomUUID().replace(/-/g, '').slice(0, 12)
+  return `deposit_${compactGroup}_${compactUser}_${Date.now()}_${nonce}`
 }
 
 export function buildDepositCustomerKey(userId: string) {

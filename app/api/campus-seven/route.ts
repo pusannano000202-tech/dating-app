@@ -3,6 +3,7 @@ import { getCampusSevenActionAvailability } from '@/lib/campus-seven/action-avai
 import { redactCampusSevenLocation } from '@/lib/campus-seven/dashboard'
 import { getCampusSevenLiveGuide } from '@/lib/campus-seven/live-guide'
 import { getCampusSevenFeatureState } from '@/lib/campus-seven/program'
+import { signPrivateProfilePhotos } from '@/lib/profile/private-photo-signed-urls'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 
 type CampusSevenDashboardPayload = {
@@ -18,6 +19,7 @@ type CampusSevenDashboardPayload = {
     allowedMenuNote?: string | null
   }
   reservationTask?: unknown
+  participants?: Array<Record<string, unknown> & { userId?: unknown }>
   [key: string]: unknown
 }
 
@@ -60,14 +62,43 @@ export async function GET() {
   const releasedDashboard = dashboard
     ? redactCampusSevenLocation(dashboard, liveGuide)
     : dashboard
+  const participantUserIds = readParticipantUserIds(releasedDashboard)
+  const signedPhotos = await signPrivateProfilePhotos(participantUserIds, 1)
+  if (!signedPhotos.ok) {
+    return NextResponse.json({ error: 'photo_signing_failed' }, { status: 503 })
+  }
+  const signedDashboard = replaceCampusSevenPhotos(releasedDashboard, signedPhotos.urlsByUser)
 
   return NextResponse.json({
-    dashboard: releasedDashboard
-      ? { ...releasedDashboard, liveGuide, actionAvailability }
-      : releasedDashboard,
+    dashboard: signedDashboard
+      ? { ...signedDashboard, liveGuide, actionAvailability }
+      : signedDashboard,
     applicationsOpen: feature.applicationsOpen,
     cardPaymentsEnabled: feature.cardPaymentsEnabled,
-  })
+  }, { headers: { 'Cache-Control': 'private, no-store' } })
+}
+
+function readParticipantUserIds(dashboard: CampusSevenDashboardPayload | null): string[] {
+  if (!Array.isArray(dashboard?.participants)) return []
+  return dashboard.participants
+    .map((participant) => participant.userId)
+    .filter((userId): userId is string => typeof userId === 'string')
+}
+
+function replaceCampusSevenPhotos(
+  dashboard: CampusSevenDashboardPayload | null,
+  urlsByUser: Record<string, string[]>,
+): CampusSevenDashboardPayload | null {
+  if (!dashboard || !Array.isArray(dashboard.participants)) return dashboard
+  return {
+    ...dashboard,
+    participants: dashboard.participants.map((participant) => ({
+      ...participant,
+      photoUrl: typeof participant.userId === 'string'
+        ? urlsByUser[participant.userId]?.[0] ?? null
+        : null,
+    })),
+  }
 }
 
 function translateCampusSevenError(message = ''): string {

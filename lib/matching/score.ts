@@ -49,7 +49,7 @@ export function pairScore(
   const time = clamp01(countOverlapDays(intersectWeekdaySlots(a.availability, b.availability)) / 7)
   const scoreBand = clamp01(
     1 -
-      Math.abs(a.avgSelfAppearanceScore! - b.avgSelfAppearanceScore!) /
+      Math.abs(a.avgAppearanceScoreNormalized! - b.avgAppearanceScoreNormalized!) /
         config.hardFilter.SCORE_BAND_WIDTH,
   )
   const weightAlignment = preferenceWeightAlignment(a.preferenceWeights, b.preferenceWeights)

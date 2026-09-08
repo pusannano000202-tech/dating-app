@@ -1,0 +1,30 @@
+import { assertTrustedMutationOrigin } from '@/lib/auth/trusted-origin'
+import { meetupInputErrorResponse, meetupJson, meetupRpcErrorResponse } from '@/lib/meetups/http'
+import { asInteger, asUuid, readStrictJson } from '@/lib/server/tonight/api-contract'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { isSupabaseConfigured } from '@/lib/utils'
+
+type Context = { params: Promise<{ id: string; entryId: string }> }
+
+export async function POST(request: Request, context: Context) {
+  try {
+    assertTrustedMutationOrigin(request)
+    if (!isSupabaseConfigured()) return meetupJson({ error: 'community_schema_unavailable' }, 503)
+    const { id, entryId } = await context.params
+    const body = await readStrictJson(request, ['expected_revision', 'idempotency_key'])
+    const supabase = createSupabaseRequestClient(request)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return meetupJson({ error: 'Unauthorized' }, 401)
+    const { data, error } = await supabase.rpc('accept_department_challenge_roster_request', {
+      p_challenge_id: asUuid(id, 'challenge_id'),
+      p_roster_id: asUuid(entryId, 'roster_id'),
+      p_expected_revision: asInteger(body.expected_revision, 'expected_revision', { min: 0, max: 2_147_483_647 }),
+      p_idempotency_key: asUuid(body.idempotency_key, 'idempotency_key'),
+    })
+    if (error) return meetupRpcErrorResponse(error)
+    return meetupJson({ challenge: data })
+  } catch (error) {
+    return meetupInputErrorResponse(error)
+  }
+}
+

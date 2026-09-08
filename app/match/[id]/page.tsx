@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, Loader2, LockKeyhole, MapPin, MessageCircle, Navigation, Phone, Sparkles, Users } from 'lucide-react'
+import { useParams, useRouter } from 'next/navigation'
+import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, Clock3, Gift, Loader2, LockKeyhole, MapPin, MessageCircle, Navigation, Sparkles, Users } from 'lucide-react'
 import DailyCardHintWizard from '@/components/matching/DailyCardHintWizard'
 import DepositPaymentPanel from '@/components/matching/DepositPaymentPanel'
 import MatchFoundSummary from '@/components/matching/MatchFoundSummary'
+import MeetingEvidencePanel from '@/components/matching/MeetingEvidencePanel'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import {
@@ -29,14 +30,6 @@ import {
   type MatchDetail,
 } from '@/lib/matching/match-detail-state'
 import { getMatchViewState } from '@/lib/matching/match-view-state'
-
-interface ConnectionRow {
-  target_user_id: string
-  target_display_name: string | null
-  contact_revealed_at: string | null
-  scheduled_reveal_at: string | null
-  target_phone: string | null
-}
 
 interface AttendanceState {
   my_checked_in: boolean
@@ -170,27 +163,6 @@ function createDevMatchDetail(matchId: string): MatchDetail {
   }
 }
 
-const DEV_CONNECTIONS: ConnectionRow[] = [
-  {
-    target_user_id: 'dev-opp-1',
-    target_display_name: 'Preview A',
-    contact_revealed_at: null,
-    scheduled_reveal_at: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
-    target_phone: null,
-  },
-  {
-    target_user_id: 'dev-opp-2',
-    target_display_name: 'Preview B',
-    contact_revealed_at: null,
-    scheduled_reveal_at: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
-    target_phone: null,
-  },
-]
-
-function createDevConnections(matchId: string): ConnectionRow[] {
-  return isSoloMatchId(matchId) ? DEV_CONNECTIONS.slice(0, 1) : DEV_CONNECTIONS
-}
-
 const DEV_ATTENDANCE: AttendanceState = {
   my_checked_in: false,
   my_within_radius: false,
@@ -278,14 +250,13 @@ const DEV_DAILY_CARDS: DailyCard[] = [
 
 export default function MatchDetailPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const matchId = params.id
   const isDevPreview = isDevPreviewClientSession()
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [connections, setConnections] = useState<ConnectionRow[]>([])
-  const [connectionsLoading, setConnectionsLoading] = useState(false)
   const [attendance, setAttendance] = useState<AttendanceState | null>(null)
   const [gpsBusy, setGpsBusy] = useState(false)
   const [gpsMessage, setGpsMessage] = useState<string | null>(null)
@@ -305,7 +276,6 @@ export default function MatchDetailPage() {
 
     const failClosed = (message: string) => {
       setMatch(null)
-      setConnections([])
       setAttendance(null)
       setDailyCards([])
       setCardDraft(createEmptyDailyCardDraft())
@@ -331,6 +301,13 @@ export default function MatchDetailPage() {
         failClosed('매칭을 찾을 수 없어요.')
         return false
       }
+      if (res.status === 409) {
+        const conflict = await res.json().catch(() => null) as { redirect_to?: unknown } | null
+        if (typeof conflict?.redirect_to === 'string' && conflict.redirect_to.startsWith('/match/events/')) {
+          router.replace(conflict.redirect_to)
+          return false
+        }
+      }
       if (!res.ok) {
         failClosed('매칭 정보를 불러오지 못했어요.')
         return false
@@ -349,7 +326,7 @@ export default function MatchDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [isDevPreview, matchId])
+  }, [isDevPreview, matchId, router])
 
   useEffect(() => {
     refresh()
@@ -360,36 +337,6 @@ export default function MatchDetailPage() {
       setPendingStepIndex(0)
     }
   }, [match?.match_status, pendingStepIndex])
-
-  const refreshConnections = useCallback(async () => {
-    setConnectionsLoading(true)
-    setConnections([])
-    if (isDevPreview) {
-      setConnections(createDevConnections(matchId))
-      setConnectionsLoading(false)
-      return
-    }
-
-    try {
-      const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/connections`)
-      if (res.ok) {
-        const data = await res.json() as { connections: ConnectionRow[] }
-        setConnections(data.connections ?? [])
-      }
-    } catch {
-      // ignore - contact reveal is a secondary layer
-    } finally {
-      setConnectionsLoading(false)
-    }
-  }, [isDevPreview, matchId])
-
-  useEffect(() => {
-    if (match?.match_status === 'confirmed' || match?.match_status === 'completed') {
-      refreshConnections()
-    } else {
-      setConnections([])
-    }
-  }, [match?.match_status, refreshConnections])
 
   const refreshDailyCards = useCallback(async () => {
     setDailyCardsLoading(true)
@@ -1281,7 +1228,7 @@ export default function MatchDetailPage() {
                   <div>
                     <p className="text-xs font-black text-emerald-700">매칭 진행 가이드</p>
                     <p className="mt-0.5 text-[11px] text-boot-muted leading-relaxed">
-                      확정된 뒤에는 약속 정보, 하루 카드, 연락처 공개 조건을 순서대로 확인해요.
+                      확정된 뒤에는 약속 정보와 하루 카드, 매칭 채팅을 순서대로 확인해요.
                     </p>
                   </div>
                 </section>
@@ -1545,72 +1492,30 @@ export default function MatchDetailPage() {
               </section>
             )}
 
-            {/* Contact reveal */}
+            {(match.match_status === 'confirmed' || match.match_status === 'completed')
+              && match.scheduled_start
+              && match.scheduled_end
+              && (
+                <MeetingEvidencePanel matchId={matchId} devPreview={isDevPreview} />
+              )}
+
+            {/* Consent-first follow-up messaging; phone numbers are never auto-revealed. */}
             {(match.match_status === 'confirmed' || match.match_status === 'completed') && (
               <section className="glass-card rounded-3xl p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Phone size={16} className="text-emerald-700" />
-                  <h3 className="text-sm font-bold">상대 연락처</h3>
+                  <MessageCircle size={16} className="text-emerald-700" />
+                  <h3 className="text-sm font-bold">만남 뒤 대화 이어가기</h3>
                 </div>
                 <p className="text-xs text-boot-muted mb-3 leading-relaxed">
-                  약속 시간이 가까워지면 {match.match_mode === 'solo' ? '상대 연락처' : '상대 그룹 연락처'}가 자동으로 공개돼요.
-                  장소를 못 찾거나 늦을 때 바로 연락할 수 있어요.
+                  전화번호는 자동으로 공개하지 않아요. 현재 만남에 필요한 대화는 매칭 채팅을 이용하고,
+                  만남 뒤에도 이어가고 싶다면 친구 요청을 서로 수락한 뒤 친구 메시지를 이용해 주세요.
                 </p>
-
-                {connectionsLoading && connections.length === 0 ? (
-                  <div className="flex items-center gap-2 text-xs text-boot-muted">
-                    <Loader2 size={14} className="animate-spin" />
-                    연락처를 불러오는 중
-                  </div>
-                ) : connections.length === 0 ? (
-                  <p className="text-xs text-boot-muted">아직 공개된 상대 연락처가 없어요.</p>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {connections.map((c) => {
-                      const revealed = !!c.contact_revealed_at && !!c.target_phone
-                      const scheduledFuture = !revealed && c.scheduled_reveal_at
-                            return (
-                            <div
-                              key={c.target_user_id}
-                              className={`rounded-2xl border px-3 py-3 ${
-                                revealed
-                              ? 'border-emerald-400/30 bg-emerald-500/5'
-                              : 'border-boot-hairline'
-                          }`}
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-bold truncate">
-                                    {c.target_display_name ?? '상대 멤버'}
-                                  </p>
-                              {revealed && c.target_phone ? (
-                                <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700">
-                                  <Phone size={12} />
-                                  <a href={`tel:${c.target_phone}`} className="font-bold tracking-wider">
-                                    {c.target_phone}
-                                  </a>
-                                </div>
-                              ) : scheduledFuture ? (
-                                <p className="text-[11px] text-boot-muted mt-0.5">
-                                  {formatDateTime(c.scheduled_reveal_at!)} 자동 공개
-                                </p>
-                              ) : (
-                                <p className="text-[11px] text-boot-muted mt-0.5">
-                                  약속 시간이 정해지면 공개 예정 시간이 표시돼요.
-                                </p>
-                              )}
-                            </div>
-                            {revealed && (
-                              <span className="text-[10px] px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 border border-emerald-400/30 flex-shrink-0">
-                                공개됨
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
+                <Link
+                  href="/friends"
+                  className="flex min-h-11 w-full items-center justify-center rounded-2xl border border-boot-primary/25 bg-boot-soft px-4 py-3 text-sm font-bold text-boot-primary"
+                >
+                  수락한 친구 메시지 보기
+                </Link>
               </section>
             )}
           </>
@@ -1641,9 +1546,9 @@ function PendingUnlockPreview({ mode }: { mode?: MatchDetail['match_mode'] }) {
     },
     {
       icon: MessageCircle,
-      label: '채팅/연락처',
-      title: '약속 조건에 맞춰 열려요',
-      body: `${targetLabel}가 확정되고 약속 시간이 가까워지면 채팅과 연락처 공개 조건을 확인해요.`,
+      label: '채팅',
+      title: '확정 후 매칭 채팅이 열려요',
+      body: `${targetLabel}가 확정되면 매칭 채팅을 이용해요. 전화번호는 자동 공개하지 않고, 친구 메시지는 서로 수락한 뒤 열려요.`,
     },
   ]
 

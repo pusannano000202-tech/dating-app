@@ -57,8 +57,8 @@ export default function ContinuationPage() {
         return
       }
       await refresh()
-      // 'end' 시: 자동 전액 환불 처리됨 (z47 트리거). 별도 페이지 진입 X.
-      // 'continue' 시: 양쪽 모두 continue 도달했는지 화면에서 확인 후 사용자가 /refund 진입.
+      // 관계 선택은 보증금 처리와 분리한다. 응답 후 각 사용자가 /refund에서
+      // 전액 환불 또는 다음 매칭 이월을 직접 선택한다.
     } finally {
       setBusy(false)
     }
@@ -74,7 +74,7 @@ export default function ContinuationPage() {
           <div>
             <h1 className="text-xl font-black">이 만남, 이어갈까요?</h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              둘 다 이어가면 앱 기여금 정산으로 이동하고, 한쪽이라도 종료하면 보증금을 환불해요.
+              다시 만날지 선택한 뒤, 보증금은 각자 환불 또는 다음 매칭 이월을 정해요.
             </p>
           </div>
         </header>
@@ -98,7 +98,7 @@ export default function ContinuationPage() {
                 <p className="text-lg font-black gradient-fate-text">양쪽 모두 이어가기로 했어요 💜</p>
                 <p className="mt-3 text-sm text-gray-300 leading-relaxed">
                   서로 더 만나보고 싶은 상태예요.<br />
-                  이제 보증금 중 앱 기여금을 정하고 나머지를 환불받을 수 있어요.
+                  보증금은 다음 매칭에 이어 쓰거나 전액 환불받을 수 있어요.
                 </p>
                 <p className="mt-2 text-[11px] text-gray-500 leading-relaxed">
                   서로 계속 만나기로 한 경우에만 정산을 요청합니다.
@@ -107,12 +107,12 @@ export default function ContinuationPage() {
                   href={`/match/${encodeURIComponent(matchId)}/refund`}
                   className="btn-gradient w-full block py-3 rounded-2xl text-sm font-bold mt-5"
                 >
-                  환불/정산하기
+                  보증금 선택하기
                 </Link>
               </section>
             )}
 
-            {/* any_end 도달 (one_or_more end) — 자동 환불 처리됨, 평가만 안내 */}
+            {/* 관계 선택과 보증금 선택은 서로 독립적이다. */}
             {state.any_end && !state.both_continue && (
               <section className="glass-card rounded-3xl p-5 mb-4 border border-emerald-400/15 bg-emerald-500/[0.04]">
                 <HeartCrack size={28} className="mx-auto mb-2 text-gray-300" />
@@ -120,12 +120,18 @@ export default function ContinuationPage() {
                   이 만남은 여기서 마무리됐어요
                 </p>
                 <p className="mt-2 text-xs text-gray-500 text-center leading-relaxed">
-                  한쪽이라도 종료를 선택하면 보증금은 전액 환불 처리돼요.<br />
-                  노쇼가 없는 정상 종료 기준입니다.
+                  보증금은 각자 전액 환불받거나 다음 매칭에 이어 쓸 수 있어요.<br />
+                  14일 동안 고르지 않으면 전액 환불 요청이 자동 접수됩니다.
                 </p>
                 <Link
+                  href={`/match/${encodeURIComponent(matchId)}/refund`}
+                  className="btn-gradient block w-full py-3 rounded-2xl text-sm font-bold text-center mt-4"
+                >
+                  보증금 선택하기
+                </Link>
+                <Link
                   href={`/match/${encodeURIComponent(matchId)}/review`}
-                  className="block w-full py-3 rounded-2xl text-sm border border-white/15 text-gray-300 hover:border-white/30 text-center mt-4"
+                  className="block w-full py-3 rounded-2xl text-sm border border-white/15 text-gray-300 hover:border-white/30 text-center mt-2"
                 >
                   만남 평가 작성 (선택)
                 </Link>
@@ -145,7 +151,7 @@ export default function ContinuationPage() {
                 </p>
                 <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">
                   • 양쪽 모두 ‘이어갈래요’ → 이어가기 상태만 기록<br />
-                  • 한 명이라도 ‘충분’ → 보증금 전액 환불 후 종료
+                  • 한 명이라도 ‘충분’ → 관계 선택 종료, 보증금은 각자 선택
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -167,7 +173,7 @@ export default function ContinuationPage() {
                   >
                     <HeartCrack size={28} className="mx-auto mb-2 text-gray-400" />
                     <p className="text-sm font-bold">한 번이면 충분</p>
-                    <p className="text-[10px] text-gray-500 mt-1">환불 후 종료</p>
+                    <p className="text-[10px] text-gray-500 mt-1">환불 요청 후 종료</p>
                   </button>
                 </div>
 
@@ -188,7 +194,7 @@ export default function ContinuationPage() {
                 </p>
                 <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
                   양쪽 모두 이어가기를 선택하면 환불/정산 화면이 열려요.<br />
-                  한 명이라도 ‘충분’ 누르면 보증금은 전액 환불됩니다.
+                  한 명이라도 ‘충분’을 누르면 관계 선택만 종료되고, 보증금은 각자 선택합니다.
                 </p>
               </section>
             )}

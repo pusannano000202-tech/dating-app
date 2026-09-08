@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerClient()
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'remove_member_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'remove_member_failed') }, { status: 400 })
   }
 
   return NextResponse.json({ result: data })

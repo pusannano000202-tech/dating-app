@@ -8,24 +8,23 @@ import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 
 interface MatchChatMessage {
   id: string
-  sender_user_id: string
+  is_mine: boolean
   alias: string | null
   message: string
   created_at: string
 }
 
-const DEV_USER_ID = 'me'
 const DEV_CHAT_MESSAGES: MatchChatMessage[] = [
   {
     id: 'dev-chat-1',
-    sender_user_id: 'partner-1',
-    alias: '상대',
+    is_mine: false,
+    alias: '참가자 A',
     message: '안녕하세요! 매칭 고생해서 만났어요. 천천히 얘기 시작해볼까요?',
     created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
   },
   {
     id: 'dev-chat-2',
-    sender_user_id: DEV_USER_ID,
+    is_mine: true,
     alias: '나',
     message: '좋아요! 오늘은 편하게 말해요. 첫 만남 전에 어떤 분위기로 가고 싶은지도 미리 정하면 좋을 것 같아요.',
     created_at: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
@@ -43,7 +42,18 @@ function formatTime(iso: string): string {
   }
 }
 
-function formatError(code?: string) {
+function formatChatOpenTime(iso?: string): string {
+  if (!iso || Number.isNaN(Date.parse(iso))) return '약속 20분 전'
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: 'numeric',
+    day: 'numeric',
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(iso))
+}
+
+function formatError(code?: string, opensAt?: string) {
   switch (code) {
     case 'not_authenticated':
     case 'unauthorized':
@@ -52,6 +62,10 @@ function formatError(code?: string) {
       return '현재 매칭에서 채팅을 사용할 수 없는 상태입니다.'
     case 'invalid_message':
       return '메시지를 1자 이상 1000자 이하로 입력해 주세요.'
+    case 'chat_not_open':
+      return `팀 채팅은 약속 20분 전인 ${formatChatOpenTime(opensAt)}에 열려요.`
+    case 'chat_schedule_unavailable':
+      return '약속 시간이 확정되면 채팅 개방 시각을 알려드릴게요.'
     case 'chat_message_forbidden':
     default:
       return '채팅을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'
@@ -63,11 +77,11 @@ export default function MatchChatPage() {
   const matchId = params.id
   const isDevPreview = isDevPreviewClientSession()
   const [messages, setMessages] = useState<MatchChatMessage[]>([])
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [chatOpensAt, setChatOpensAt] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement | null>(null)
 
   const refresh = useCallback(async () => {
@@ -76,7 +90,6 @@ export default function MatchChatPage() {
 
     if (isDevPreview) {
       setMessages(DEV_CHAT_MESSAGES)
-      setCurrentUserId(DEV_USER_ID)
       setLoading(false)
       return
     }
@@ -84,15 +97,16 @@ export default function MatchChatPage() {
     try {
       const res = await fetch(`/api/matches/${encodeURIComponent(matchId)}/chat`)
       if (!res.ok) {
-        const data = await res.json().catch(() => ({} as { error?: string }))
-        setError(formatError(data?.error))
+        const data = await res.json().catch(() => ({} as { error?: string; opens_at?: string }))
+        setChatOpensAt(data?.error === 'chat_not_open' ? data.opens_at ?? null : null)
+        setError(formatError(data?.error, data?.opens_at))
         setLoading(false)
         return
       }
 
-      const data = await res.json() as { messages: MatchChatMessage[]; current_user_id?: string | null }
+      const data = await res.json() as { messages: MatchChatMessage[] }
       setMessages(data.messages ?? [])
-      setCurrentUserId(data.current_user_id ?? null)
+      setChatOpensAt(null)
       setError(null)
     } catch {
       setError('채팅을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.')
@@ -130,7 +144,7 @@ export default function MatchChatPage() {
         ...prev,
         {
           id: `dev-${Date.now()}`,
-          sender_user_id: DEV_USER_ID,
+          is_mine: true,
           alias: '나',
           message: message.trim(),
           created_at: new Date().toISOString(),
@@ -150,9 +164,10 @@ export default function MatchChatPage() {
         body: JSON.stringify({ message: message.trim() }),
       })
 
-      const data = await res.json().catch(() => ({} as { error?: string; message?: MatchChatMessage | null }))
+      const data = await res.json().catch(() => ({} as { error?: string; opens_at?: string; message?: MatchChatMessage | null }))
       if (!res.ok) {
-        setError(formatError(data.error))
+        setChatOpensAt(data.error === 'chat_not_open' ? data.opens_at ?? null : null)
+        setError(formatError(data.error, data.opens_at))
         return
       }
 
@@ -162,9 +177,6 @@ export default function MatchChatPage() {
         await refresh()
       }
       setMessage('')
-      if (data.current_user_id) {
-        setCurrentUserId(data.current_user_id)
-      }
     } catch {
       setError('메시지 전송에 실패했어요.')
     } finally {
@@ -201,7 +213,7 @@ export default function MatchChatPage() {
           ) : (
             <div className="flex flex-col gap-2 overflow-y-auto" ref={listRef}>
               {messages.map((item) => {
-                const isMe = item.sender_user_id === (currentUserId ?? DEV_USER_ID)
+                const isMe = item.is_mine
                 return (
                   <div key={item.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     <div
@@ -224,13 +236,14 @@ export default function MatchChatPage() {
           <input
             value={message}
             onChange={(event) => setMessage(event.target.value)}
+            disabled={Boolean(chatOpensAt)}
             className="glass-card flex-1 border border-boot-hairline rounded-2xl px-3 py-3 text-sm outline-none"
-            placeholder="메시지 입력"
+            placeholder={chatOpensAt ? `${formatChatOpenTime(chatOpensAt)}에 열려요` : '메시지 입력'}
             maxLength={1000}
           />
           <button
             type="submit"
-            disabled={sending || message.trim().length === 0}
+            disabled={Boolean(chatOpensAt) || sending || message.trim().length === 0}
             className="btn-gradient rounded-2xl px-3 text-sm font-bold flex items-center justify-center gap-1 disabled:opacity-40"
           >
             {sending ? <Loader2 size={15} className="animate-spin" /> : <SendHorizontal size={16} />}

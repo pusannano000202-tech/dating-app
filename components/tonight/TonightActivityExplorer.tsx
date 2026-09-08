@@ -1,0 +1,176 @@
+'use client'
+
+import Image from 'next/image'
+import { ArrowLeft, ArrowRight, Clock3, ImageOff, Users } from 'lucide-react'
+import { type RefObject, useEffect, useRef, useState } from 'react'
+
+import type { TonightActivityCard } from './types'
+
+export default function TonightActivityExplorer({
+  activities,
+  activeIndex,
+  onActiveIndexChange,
+  onContinue,
+  headingRef,
+  disabled = false,
+}: {
+  activities: readonly [TonightActivityCard, TonightActivityCard, TonightActivityCard]
+  activeIndex: number
+  onActiveIndexChange: (index: number) => void
+  onContinue: () => void
+  headingRef?: RefObject<HTMLHeadingElement | null>
+  disabled?: boolean
+}) {
+  const scrollRef = useRef<HTMLDivElement | null>(null)
+  const cardRefs = useRef<Array<HTMLElement | null>>([])
+  const hasInitialCarouselAlignment = useRef(false)
+  const [failedImageIds, setFailedImageIds] = useState<ReadonlySet<string>>(new Set())
+  const safeIndex = Math.min(Math.max(activeIndex, 0), activities.length - 1)
+
+  const moveTo = (index: number) => {
+    const nextIndex = ((index % activities.length) + activities.length) % activities.length
+    onActiveIndexChange(nextIndex)
+    cardRefs.current[nextIndex]?.scrollIntoView({
+      behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    })
+  }
+
+  useEffect(() => {
+    const container = scrollRef.current
+    if (!container) return
+
+    let frame = 0
+    const updateIndex = () => {
+      frame = 0
+      const containerLeft = container.getBoundingClientRect().left
+      const closestIndex = cardRefs.current.reduce((closest, card, index) => {
+        if (!card) return closest
+        const currentDistance = Math.abs(card.getBoundingClientRect().left - containerLeft)
+        const closestCard = cardRefs.current[closest]
+        const closestDistance = closestCard
+          ? Math.abs(closestCard.getBoundingClientRect().left - containerLeft)
+          : Number.POSITIVE_INFINITY
+        return currentDistance < closestDistance ? index : closest
+      }, 0)
+      if (closestIndex !== safeIndex) onActiveIndexChange(closestIndex)
+    }
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateIndex)
+    }
+    container.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      container.removeEventListener('scroll', onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [safeIndex, onActiveIndexChange])
+
+  useEffect(() => {
+    if (hasInitialCarouselAlignment.current) return
+    const container = scrollRef.current
+    const activeCard = cardRefs.current[safeIndex]
+    if (!container || !activeCard) return
+    container.scrollTo({ left: activeCard.offsetLeft, behavior: 'auto' })
+    hasInitialCarouselAlignment.current = true
+  }, [safeIndex])
+
+  const activeActivity = activities[safeIndex]
+
+  return (
+    <section aria-labelledby="tonight-explorer-title" className="pb-24 lg:pb-8">
+      <div className="relative mb-5 pr-14">
+        <div>
+          <p className="text-xs font-black tracking-[0.14em] text-[#b94b3f]">PNU TONIGHT</p>
+          <h1 ref={headingRef} id="tonight-explorer-title" tabIndex={-1} className="mt-1 text-[28px] font-black tracking-[-0.05em] text-[#292321] outline-none sm:text-4xl">오늘, 뭐 해볼까요?</h1>
+          <p className="mt-2 text-sm font-semibold leading-6 text-[#665c58]">옆으로 넘겨 오늘의 세 활동을 둘러보세요.</p>
+        </div>
+        <p className="absolute right-0 top-0 text-sm font-black text-[#b94b3f]" aria-live="polite" aria-atomic="true">
+          활동 {safeIndex + 1}/3<span className="sr-only"> · {activeActivity.title}</span>
+        </p>
+      </div>
+
+      <div className="lg:grid lg:grid-cols-[minmax(0,752px)_352px] lg:gap-8">
+        <div>
+          <div
+            ref={scrollRef}
+            className="-mr-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mr-0 lg:max-w-[752px] lg:pr-0"
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowLeft') { event.preventDefault(); moveTo(safeIndex - 1) }
+          if (event.key === 'ArrowRight') { event.preventDefault(); moveTo(safeIndex + 1) }
+          if (event.key === 'Home') { event.preventDefault(); moveTo(0) }
+          if (event.key === 'End') { event.preventDefault(); moveTo(activities.length - 1) }
+        }}
+            aria-label="오늘 활동 둘러보기"
+          >
+            {activities.map((activity, index) => {
+          const imageFailed = failedImageIds.has(activity.id)
+          return (
+            <article
+              key={activity.id}
+              ref={(node) => { cardRefs.current[index] = node }}
+              tabIndex={index === safeIndex ? 0 : -1}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${index + 1} / ${activities.length}: ${activity.title}`}
+              data-title={activity.title}
+              data-description={activity.description}
+              data-duration={activity.durationMinutes}
+              className="w-[min(326px,calc(100vw-64px))] shrink-0 snap-start overflow-hidden rounded-[18px] border border-[#ead9d2] bg-white shadow-[0_4px_14px_rgba(67,39,30,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f] focus-visible:ring-offset-2 sm:w-[calc(100vw-112px)] lg:w-[640px]"
+            >
+              <div className="relative h-[220px] bg-[#f4e9e4] sm:h-[320px]">
+                {imageFailed ? (
+                  <div className="flex h-full flex-col items-center justify-center bg-[#f4e9e4] text-[#8b7e78]">
+                    <ImageOff className="h-8 w-8" aria-hidden />
+                    <span className="mt-2 text-xs font-black">사진을 불러오지 못했어요</span>
+                  </div>
+                ) : (
+                  <Image
+                    src={activity.imageUrl}
+                    alt={activity.imageAlt}
+                    fill
+                    sizes="(min-width: 1024px) 640px, (min-width: 640px) calc(100vw - 112px), min(326px, calc(100vw - 64px))"
+                    className="object-cover"
+                    onError={() => setFailedImageIds((current) => new Set([...current, activity.id]))}
+                  />
+                )}
+                {!imageFailed && <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />}
+                <span className="absolute left-4 top-4 rounded-full bg-white/[0.92] px-3 py-1.5 text-xs font-black text-[#b94b3f] shadow-sm">오늘의 활동</span>
+              </div>
+              <div className="p-3.5">
+                <h2 className="text-xl font-black tracking-[-0.04em] text-[#292321]">{activity.title}</h2>
+                <p className="mt-1 max-h-10 overflow-hidden text-sm font-semibold leading-5 text-[#665c58]">{activity.description}</p>
+                <p className="mt-2 inline-flex items-center gap-2 text-sm font-black text-[#8b7e78]"><Clock3 className="h-4 w-4" aria-hidden />약 {activity.durationMinutes}분</p>
+              </div>
+            </article>
+          )
+            })}
+          </div>
+
+          <div className="mt-3 flex items-center justify-between">
+            <button type="button" onClick={() => moveTo(safeIndex - 1)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#ead9d2] bg-white text-[#665c58] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f]" aria-label="이전 활동"><ArrowLeft className="h-5 w-5" aria-hidden /></button>
+            <p className="text-xs font-bold text-[#8b7e78]">{activeActivity.title}을 보고 있어요</p>
+            <button type="button" onClick={() => moveTo(safeIndex + 1)} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#ead9d2] bg-white text-[#665c58] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f]" aria-label="다음 활동"><ArrowRight className="h-5 w-5" aria-hidden /></button>
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-[18px] border border-[#ead9d2] bg-white p-4 shadow-[0_4px_14px_rgba(67,39,30,0.06)] lg:mt-0 lg:self-start">
+        <div className="flex items-start gap-3">
+          <Users className="mt-0.5 h-5 w-5 shrink-0 text-[#b94b3f]" aria-hidden />
+          <div className="text-sm font-semibold leading-6 text-[#665c58]">
+            <p className="font-black text-[#292321]">한 신청 풀에서 팀을 만든 뒤, 팀의 순위 합산으로 활동을 정해요.</p>
+          </div>
+        </div>
+        <button type="button" onClick={onContinue} disabled={disabled} className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] bg-[#b94b3f] px-5 text-base font-black text-white shadow-[0_8px_18px_rgba(185,75,63,0.18)] transition hover:bg-[#963d34] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f] focus-visible:ring-offset-2">
+          {disabled ? '오늘 신청이 마감됐어요' : '세 활동 순위 정하러 가기'}
+          <ArrowRight className="h-5 w-5" aria-hidden />
+        </button>
+        <div className="mt-3 space-y-1 text-xs font-semibold leading-5 text-[#665c58]">
+          <p>둘러보기만으로는 신청되지 않아요</p>
+          <p>다음 단계에서 1·2·3순위와 동의를 확인해요</p>
+        </div>
+      </div>
+      </div>
+    </section>
+  )
+}

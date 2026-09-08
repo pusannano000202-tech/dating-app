@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { RequestGuardError, requestGuardErrorResponse, requireRequestAccess } from '@/lib/auth/server-guards'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
-export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  try {
+    await requireRequestAccess(request, {
+      allowedRoles: ['super_admin'],
+      requireRecentAuth: true,
+    })
+  } catch (error) {
+    if (error instanceof RequestGuardError) return requestGuardErrorResponse(error)
+    return requestGuardErrorResponse(error)
+  }
+
+  const params = await props.params
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await readJson(req)
+  const body = await readJson(request)
   const score = typeof body.score === 'number' ? body.score : null
   if (score === null || score < 0 || score > 100) {
     return NextResponse.json({ error: 'invalid_score' }, { status: 400 })
@@ -16,24 +26,31 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
   const { data, error } = await supabase.rpc('admin_set_appearance_override', {
     p_user_id: params.id,
     p_score: score,
-    p_reason: typeof body.reason === 'string' ? body.reason : null,
+    p_reason: null,
   })
-  if (error) return NextResponse.json({ error: error.message || 'override_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'override_failed') }, { status: 400 })
   return NextResponse.json({ effective_score: data })
 }
 
-export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  try {
+    await requireRequestAccess(request, {
+      allowedRoles: ['super_admin'],
+      requireRecentAuth: true,
+    })
+  } catch (error) {
+    if (error instanceof RequestGuardError) return requestGuardErrorResponse(error)
+    return requestGuardErrorResponse(error)
+  }
 
-  const body = await readJson(req)
+  const params = await props.params
+  const supabase = await createSupabaseServerClient()
+
   const { data, error } = await supabase.rpc('admin_clear_appearance_override', {
     p_user_id: params.id,
-    p_reason: typeof body.reason === 'string' ? body.reason : null,
+    p_reason: null,
   })
-  if (error) return NextResponse.json({ error: error.message || 'clear_failed' }, { status: 400 })
+  if (error) return NextResponse.json({ error: toPublicErrorCode(error.message, 'clear_failed') }, { status: 400 })
   return NextResponse.json({ effective_score: data })
 }
 

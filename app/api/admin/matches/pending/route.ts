@@ -1,12 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import {
+  RequestGuardError,
+  requestGuardErrorResponse,
+  requireRequestAccess,
+} from '@/lib/auth/server-guards'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { privateJson, tonightRpcErrorResponse } from '@/lib/server/tonight/api-contract'
 
-export async function GET(_req: NextRequest) {
+export async function GET(request: NextRequest) {
+  try {
+    await requireRequestAccess(request, {
+      allowedRoles: ['super_admin'],
+      requireRecentAuth: true,
+    })
+  } catch (error) {
+    if (error instanceof RequestGuardError) return requestGuardErrorResponse(error)
+    return requestGuardErrorResponse(error)
+  }
+
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const { data, error } = await supabase.rpc('admin_list_pending_matches')
-  if (error) return NextResponse.json({ error: error.message || 'lookup_failed' }, { status: 400 })
-  return NextResponse.json({ matches: data ?? [] })
+  if (error) return tonightRpcErrorResponse(error)
+  return privateJson({ matches: data ?? [] })
 }

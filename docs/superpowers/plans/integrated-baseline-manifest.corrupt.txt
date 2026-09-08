@@ -1,0 +1,1810 @@
+Warning: truncated output (original token count: 35959)
+Total output lines: 2193
+
+[
+  {
+    "path": ".env.example",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\.env.example",
+    "sha256": "286DD07E2B5AEFC14BAE88F82F3488B409E2A37A67A3BAD0B3168660A9C21FD6",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": ".env.local.example",
+    "excluded": true,
+    "reason": "Generated or prior evidence/document; not implementation baseline"
+  },
+  {
+    "path": "app/(auth)/login/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\(auth)\\login\\page.tsx",
+    "sha256": "4285D8060D1402BB617811B52612218E83D80AFD465EE1FED86C24CD31EDB382",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\layout.tsx",
+    "sha256": "7475AAC9C3905FD4769A3315A474F4F73C602A20079236BFC667854651A8D07F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/users/[id]/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\users\\[id]\\page.tsx",
+    "sha256": "6E19F5B0785393120942569AC1458DEBB620997DF0CA9D817C5BE0C8DC7FBA74",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/config/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\config\\route.ts",
+    "sha256": "A63CAE47D0458DDBD8CA21977B4241996A99F16F9B5B8E4C56BCC996418B875B",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/matches/[id]/review/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\matches\\[id]\\review\\route.ts",
+    "sha256": "4EB4794BB76353BDAB5EDA648C366385C7742EB9CC9903B93D7F78CF9E52B292",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/matches/[id]/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\matches\\[id]\\route.ts",
+    "sha256": "5E9A052860F0728431DCC0A1EE916302211F2BDC28423E0E59A0FFD84DA2CA1F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/matches/create/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\matches\\create\\route.ts",
+    "sha256": "6C04907F608ED94EE5D281ACC0AC0C3F2FB0710B4CF5CE7F3E65783DBB1430AA",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/matches/pending/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\matches\\pending\\route.ts",
+    "sha256": "D0A7E4F537301F3631D97EA9C3CA96835E4F5B4F201443E0FE549A78EBCBBBFC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/users/[id]/appearance-override/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\users\\[id]\\appearance-override\\route.ts",
+    "sha256": "09DCEAACBB53B6853A027BF79E91EB2C19A2D2C4D268ED7F7534DAC1A4893752",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/users/[id]/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\users\\[id]\\route.ts",
+    "sha256": "943891D921986D930D3CF75E9C658C7CF64005D22CD1DD8AB00505E174326999",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/auth/callback/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\auth\\callback\\route.ts",
+    "sha256": "7AC4AD50B8D12389D45D7EA51852C487D0F7103E6823C63913979A8841A8355A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/notifications/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\notifications\\page.tsx",
+    "sha256": "FE1EE22B1ACAF09473C7B7D18B488848FE80D8D9228F07844047373A5A2994CB",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/campus-eats/CampusEatsPilot.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\campus-eats\\CampusEatsPilot.tsx",
+    "sha256": "4D969871D05856D0CFE492B178519E62F8D64CBDDE0CEC30561DE87D5ACA3F9C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/campus-eats/NaverCampusMap.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\campus-eats\\NaverCampusMap.tsx",
+    "sha256": "C096FD40DB063726DBC42AA3B928F4882B5733911666A6996DF6A348D2B5C9CC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/home/QuantumHomeLead.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\home\\QuantumHomeLead.tsx",
+    "sha256": "D89317E414D7E960D77A29C53A0FD270FAB4C326B9861E6D88C930D3895502B3",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/matching/QuantumMatchDiscovery.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\matching\\QuantumMatchDiscovery.tsx",
+    "sha256": "C76883045CA434B844BB56068C977AC8A3D59C7786FFA3E212B0C8DCBBE5EA09",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/meetups/MeetupHub.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\meetups\\MeetupHub.tsx",
+    "sha256": "F0ACA32DAA327ED5302E55421BAB5399BB052CFCBA70FC5370B60B170FF8C237",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/navigation/AppBottomNav.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\navigation\\AppBottomNav.tsx",
+    "sha256": "322B4C399B3E27AEC4D18648A6B21F341A42D09238E64182A7C90579E3669480",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/profile/BasicInfoForm.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\profile\\BasicInfoForm.tsx",
+    "sha256": "6C8256D84A724F2294ECCE697A556C8543F5C5CEF9B72FA7C3B5040B721437E5",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/profile/DepartmentPicker.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\profile\\DepartmentPicker.tsx",
+    "sha256": "C962DF621C34A8AFAEF15174E900D70C713334638483D64BA732652C9C4CDC7A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "lib/auth/oauth-login.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\lib\\auth\\oauth-login.ts",
+    "sha256": "3C3EB1853FC4EA2DA98077D39305663A2072EB6FF21C476496AECC59F7FE3E62",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "lib/auth/redirect.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\lib\\auth\\redirect.ts",
+    "sha256": "3F8B9529304AFD8F89CA38E5AA2F5CE55FCAA6001314F265D9E367A06FA3C2FB",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "lib/campus-eats/fixtures/pnu-restaurants.generated.json",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\lib\\campus-eats\\fixtures\\pnu-restaurants.generated.json",
+    "sha256": "B48DE774121EBD072991F17715E3A265F363C561CF98BADD9DC075832E2FF154",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "lib/campus-eats/url-state.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\lib\\campus-eats\\url-state.ts",
+    "sha256": "F99A70CEC27D378794F98CA016AC607B4D39099C36169477A583AE9116154313",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "lib/school-theme.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\lib\\school-theme.ts",
+    "sha256": "714A82BD09D1FCEDF3824EDCD1B49DA7D6CE05F166BCC550BF0C6F0C5F4DEBA4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "lib/utils.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\lib\\utils.ts",
+    "sha256": "9C5BD85C83F05DAEFF9D35030C6F4D5649F3AEA7F79EA37E0E6971225BB3145F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "middleware.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\middleware.ts",
+    "sha256": "BFB9CFEDF00B4042B3DF4278BEC0A3C29A027DFCDB7E8F35A269A10457BCAC9D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "next-env.d.ts",
+    "excluded": true,
+    "reason": "Generated or prior evidence/document; not implementation baseline"
+  },
+  {
+    "path": "next.config.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\next.config.mjs",
+    "sha256": "C351C21F651DB19ABB0FB128DCC8ECD73CCE1E04EA4850D601A662BED525C2B8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "package-lock.json",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\package-lock.json",
+    "sha256": "1D3B73CF86C3FBD965F29A5E6FABF01DBC6E33CFA9431F42F0E89482F31A5693",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "package.json",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\package.json",
+    "sha256": "68FAB453DFD5D9E410A78B0A9383438AFC6B7B6DB103487C3E23FC576851C403",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "scripts/check-deploy-readiness.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\scripts\\check-deploy-readiness.mjs",
+    "sha256": "66AF70D000EA5DD0107F5355E44DEB0EDF3E51CA17EEA414726B9E0A6109A3C7",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "scripts/check-local-routes.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\scripts\\check-local-routes.mjs",
+    "sha256": "59E1F13389A382B9148BE2B417C03BF894E4341EA4D0F812797039BB70C2AC08",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "scripts/check-secret-leaks.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\scripts\\check-secret-leaks.mjs",
+    "sha256": "CCB88B500B6E7345197B3D6892E0C148D219854A226C74B8BCF0269EA1598275",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "scripts/deploy-readiness-env.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\scripts\\deploy-readiness-env.mjs",
+    "sha256": "01E1B1E9D6981A0203E9B09E8403DFE2230CE012A901D6C5E08E0ADEE18C9D50",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "scripts/verify-migrations.py",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\scripts\\verify-migrations.py",
+    "sha256": "B9B0837CB7EACE8DE04FA43631F09E8763D55BFA0C979317D9D27F19756C4F5D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/oauth-callback.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\oauth-callback.test.ts",
+    "sha256": "3E1B683AAADCA9A3D26165A28ACD6E1F21B7A81F7E6C9183ABAE038F8162F57E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/oauth-login.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\oauth-login.test.ts",
+    "sha256": "9E57B37105A760ECBA804AE90F4FB7C278037BF3DF7E8AADEEA834B1AF31A871",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/onboarding-default-route.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\onboarding-default-route.test.ts",
+    "sha256": "98D4E7210B068EF8E0A0ECD62CB833464E198D6D20869AB1236AC2A5F0EFB2A4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/redirect-policy.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\redirect-policy.test.ts",
+    "sha256": "8F7739917D251D97C9668647A86D33ABDECD3EBEFE28C4C014D096E9600DB7B4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/booting-branding.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\booting-branding.test.ts",
+    "sha256": "16A4277B26C99D32568F1DD323BBDBB17554329598EEAE42A8226D5F7B1810DD",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/campus-eats-frontend.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\campus-eats-frontend.test.ts",
+    "sha256": "7D4AE928BEFC1E31BB48F95BCBA1A281593AE7FF33E8D58FFF02DE5C01DE5657",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/deposit-payment-routes.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\deposit-payment-routes.test.ts",
+    "sha256": "66DF3A9904B0A3B68C75A8F948F0BF98C9490EBF562C5CEDCAB0D7BBA472E78C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/quantum-campus-signal.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\quantum-campus-signal.test.ts",
+    "sha256": "38038E49976B6031DD8CF1ECE5F74DFE7C15FDCCD7292EC0E7DC1E596C9783EA",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/security-headers.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\security-headers.test.ts",
+    "sha256": "F411B25EC73135E15B59588E34EFF053986E6512512D0FA73C99EDC634BA7C73",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/supabase-config.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\supabase-config.test.ts",
+    "sha256": "614C85568F38D7E0AC040C08E52720AE57D413E9AFBC1A88AA721CAF367493D1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/admin-match-private-orchestration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\admin-match-private-orchestration.test.ts",
+    "sha256": "D752585F48B452F7D5470AED866F6ACFF7312C22A0FB9A7E51F6CA992B047C12",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/campus-eats-api-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\campus-eats-api-contract.test.ts",
+    "sha256": "2D4B2A78061D82C48E3DC1DE0084261F7BEBCBECF43CC4E7EE70134A70F36CA4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/frontend-flow-polish.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\frontend-flow-polish.test.ts",
+    "sha256": "67545D3FD1D37528BB2956A59770EF9CCE18D8B730AB972D658FDEAE33554A69",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/profile/appearance-score-failure-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\profile\\appearance-score-failure-contract.test.ts",
+    "sha256": "90F7EBAB496F0E7BA5B3281899CD61429183F4045ED812B8B5327C5F13317C50",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/tooling/test_verify_migrations_cli.py",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\tooling\\test_verify_migrations_cli.py",
+    "sha256": "98D92AE2F84ED8532E72399B46E60EABF5A5710365F2CB815B570101AAF88709",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tsconfig.config-tests.json",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tsconfig.config-tests.json",
+    "sha256": "722368DAA2E029189C827A0142F6A9B654D43BE1A1A73748DC193A0088C16AF4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tsconfig.json",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tsconfig.json",
+    "sha256": "828AE43463DADD8011DBDFBA3B6855D56953146EB77B9E9AD4A25CC44E31DE53",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "vercel.json",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\vercel.json",
+    "sha256": "192ECFA4245A06E342E9CB13C2DFDF283BA37785F1557B9B8E547FDE603948CA",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/SuperAdminOnlyBoundary.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\SuperAdminOnlyBoundary.tsx",
+    "sha256": "5C419A38C94657E0F7401199DBD20D21A7E1BDD45DA959090D69B41923A8F1CB",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/matches/[id]/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\matches\\[id]\\layout.tsx",
+    "sha256": "D7A6D4360BF44E4F5488C82404949ECE770EB5819911EDB74168E9B4E25510DC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/matches/review/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\matches\\review\\layout.tsx",
+    "sha256": "D35005A308A08E37F7C16CA918221BC9DB2464727AB4599AB70DF6C13CCCDA1F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/super-admin/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\super-admin\\layout.tsx",
+    "sha256": "11A0E520B0CB1B7FA28ADD9832C64D7AD119790C961C3D0221898D3CF858264C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/super-admin/tonight/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\super-admin\\tonight\\page.tsx",
+    "sha256": "1AB2C2D94B14A78E0EBBB0AF313353185525D48D43C464DB9F120D2595D86728",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/tonight/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\tonight\\page.tsx",
+    "sha256": "927E448E25EED9869A0475F70897A8FF123880BAE22D1B47AFC3BECE08CA003F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/admin/users/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\admin\\users\\layout.tsx",
+    "sha256": "EA82423E6B7D2637D38BA2B57AD6E4E5A3871D55BB3CC4A3E81D90F0AA1D3C0D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/access/context/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\access\\context\\route.ts",
+    "sha256": "456686D4C8848471F64A65E813226D2C7B12BF6F6317B83C904E232AF8E0D50A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/access/admin/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\access\\admin\\route.ts",
+    "sha256": "87052283F96FB9E9CE1E76A7EB369C668B9939C28C6905611C5A787841BA5608",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/access/market/detail/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\access\\market\\detail\\route.ts",
+    "sha256": "52337B419A828793948280D7C7830F37234F7ADAEF3C5F61516DF56CA2F6B268",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/access/market/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\access\\market\\route.ts",
+    "sha256": "D1451C6D1CDA63665E6F134480EF56F6C712F1AF63332269CB9BC2797A0403B6",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/access/partner/detail/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\access\\partner\\detail\\route.ts",
+    "sha256": "F6A570A6DAE6E95755C8D8138F310FFFC8FD5D110A873CF5090CF3D79D6B8E5B",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/access/partner/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\access\\partner\\route.ts",
+    "sha256": "DB495AEE2E4F2E383F9D64163F00E43BBCEF96C5DE6D24C74F5516A1828ADA93",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/appearance/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\appearance\\route.ts",
+    "sha256": "171A370F4EC4B8D931B923BAD90EAB6DD8423DC9FB42D73247B7EDE1FF29F1A4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/attendance/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\attendance\\route.ts",
+    "sha256": "53F976D50F38A884CE709FC2CF5B9786BA46FBEBA4A54BA2488DF269931FCBE1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/audit/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\audit\\route.ts",
+    "sha256": "A59771200E27F248F045F5B307485B02C59B75F3611C7D662A37B3E13408A569",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/bundles/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\bundles\\route.ts",
+    "sha256": "1A134CC06524AF57215AECBFF97E464FC6140C9909676BC1726B3E96C4F1CB98",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/deposits/manual-review/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\deposits\\manual-review\\route.ts",
+    "sha256": "CE06ADDE441A6E25349AB7EBBE2E3116AB4300D4A0CB3568D8EC47EE1748044E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/diagnostics/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\diagnostics\\route.ts",
+    "sha256": "8FA673F7568816290B79B6231FE4B8D193A516C2B994FA13469C4AD65E9DCC91",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/directory/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\directory\\route.ts",
+    "sha256": "0685211193E0F30DFE87A24841115BAF3604FAD648473F615B15238E3C518D4B",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/financial-jobs/retry/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\financial-jobs\\retry\\route.ts",
+    "sha256": "DBA705599E91392A019FA8E757004EC9C56C2D9B27F4B31CD5ABC081C66BCED0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/market-requests/[requestId]/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\market-requests\\[requestId]\\route.ts",
+    "sha256": "1C17C1AF64A4D069D2EF1B5DDC7F0E1569A2F9771E05BA3C4C4FC3CD97758111",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/market-requests/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\market-requests\\route.ts",
+    "sha256": "744523AF3CB53A20E406811F9F2BB2794A998940F559DA8491E599E09FEF5104",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/notifications/failures/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\notifications\\failures\\route.ts",
+    "sha256": "65E082E2EF9B98081B66163148AC62D672780E7351FB24AA23033D209245E961",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/notifications/retry/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\notifications\\retry\\route.ts",
+    "sha256": "B8A613088961766B2BF8B952775AD33EEA9065D4C9C8D8CA7DAD12D65883BC68",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/partner-invites/[inviteId]/approve/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\partner-invites\\[inviteId]\\approve\\route.ts",
+    "sha256": "98674B6B3F0A66A1DC10DF1D4FFE8EFD8380E9714277EFA7299054BD71502709",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/partner-invites/[inviteId]/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\partner-invites\\[inviteId]\\route.ts",
+    "sha256": "11E53CA4EC14E901A0B78D910CDBE365BA37E471CF83F263FC98C298BA152B22",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/partner-invites/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\partner-invites\\route.ts",
+    "sha256": "104885C5B79E7D7A72AF06D60BBBC78D60CDE2596FFE71126D6D40D303D66DB0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/profile/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\profile\\route.ts",
+    "sha256": "E0DA699ED4A8607065BAC4F3F744E9C2162CDB54560FF4126989DC06E1C2686E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/reconciliations/retry/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\reconciliations\\retry\\route.ts",
+    "sha256": "FA38864916A6B17E6B4A0513AE93CF603F93A0982EF6FC8061312E2BB6812C8D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/reconciliations/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\reconciliations\\route.ts",
+    "sha256": "84FAD50B549DAAC981DE8FB12A76DA741ADD5A4861541122C871123CA12243F7",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/refunds/retry/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\refunds\\retry\\route.ts",
+    "sha256": "C0B171093E9EC961D8C943DC42E86E49730B99B95A722B9966AF28F635D0A4E4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/service-recovery/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\service-recovery\\route.ts",
+    "sha256": "6573A08D6A8F9EBF6126FE4895BD820044338A06D8E5D03BE35957CC4FC17E05",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/swap/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\swap\\route.ts",
+    "sha256": "18ED25BBA0F90E563784DB1D8F8198862B63D508C7A4901D2F98D997D35EECE8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/super-admin/tonight/venues/snapshot/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\super-admin\\tonight\\venues\\snapshot\\route.ts",
+    "sha256": "29097C0B5700E197080D6BC796DA466D4456184CC7E8A6EA6C32DCD266B4693F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/allocation-failures/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\allocation-failures\\route.ts",
+    "sha256": "626C41525C13D20265C189DA2189EC25469DA2217F07B21920BC35C6A5A11380",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/arrival-help/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\arrival-help\\route.ts",
+    "sha256": "CFA838739F6EEB1790A6CE4B04FB512E03350A74C97D357AE2B5E85461849C29",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/calls/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\calls\\route.ts",
+    "sha256": "A19E8AB31DBEEDA80440290512FA453C4C43C0E540ECFB3CDCFB908D750AAC5B",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/exceptions/detail/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\exceptions\\detail\\route.ts",
+    "sha256": "3015BFE8072ABDE50B50425037D92F65106E785C0938705553E72BCB6578D8BC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/exceptions/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\exceptions\\route.ts",
+    "sha256": "8D1C3662D9CD135F9CA193B38A0570BDD64EC107191D3BAF30E229AFC6545CF4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/financial-health/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\financial-health\\route.ts",
+    "sha256": "8F39FE285622C08C6007CF569F750B94550039E1C7A77F7F88BA0D1F7D0A3F7A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/rounds/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\rounds\\route.ts",
+    "sha256": "066A8BAC765EC6E104F97775A521FB4D8058A2FE8DD132E0EB814C06F53A9543",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/admin/tonight/summary/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\admin\\tonight\\summary\\route.ts",
+    "sha256": "6F7802BCFB693FCD151AEDC8E957F23D29BBCFABD1C5C992B607AFA7CED9F0F1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/allocate/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\allocate\\route.ts",
+    "sha256": "F4614D5227B1A006FF4A24D34FE4D8F3EAFECBB8D653531AF8731EBA2A0DD8F7",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/deposit-gate/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\deposit-gate\\route.ts",
+    "sha256": "EC509176CDBEC8D06686E3589BAA6811B14AB6067FE89D01E7CB19B69714492A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/deposits/finalize/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\deposits\\finalize\\route.ts",
+    "sha256": "B2175BC159D0809503EE2CD06FB122C85A7870D72F635D57E9063D668C805173",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/deposits/reconcile/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\deposits\\reconcile\\route.ts",
+    "sha256": "72DA2F45AE541E39574FB3BD28BA1B0B0FD69AA04640B19C2BB330F53A04B93D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/notifications/dispatch/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\notifications\\dispatch\\route.ts",
+    "sha256": "1BFA498A504E58D71B48508915808098BB3E77AA5AF0BE2E4D01465B62060748",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/partner-acceptance-gate/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\partner-acceptance-gate\\route.ts",
+    "sha256": "8B5327F9EAC3FD28D32881AAEC296E5DA358554ED2F497AF9286D473B19FA848",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/prepare/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\prepare\\route.ts",
+    "sha256": "AB4E525E2126F587B73987B944082C992F1C8E06F66E8E8F26F15D5AB541B267",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/refunds/process/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\refunds\\process\\route.ts",
+    "sha256": "527662B28D9B9AA86BEDE013CF437582B09A04560EF5E9AE17FD93B7585F1F8C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/internal/tonight/settlements/process/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\internal\\tonight\\settlements\\process\\route.ts",
+    "sha256": "C61940778DAB13F2A2BFA537157FE2C43C13AEC53DD10F812DE2FD704AD8FC43",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/onboarding/[token]/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\onboarding\\[token]\\route.ts",
+    "sha256": "AEE5703B5662FB6316B128083C0C39FA2C4EC12C1CEBF526E33EFECB07CB1B4E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/tonight/accept/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\tonight\\accept\\route.ts",
+    "sha256": "306CADFD5A257CE54BFB3ADC4E19F5B3D0D5FC93702684D2B0E48177A9A92D14",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/tonight/arrival-help/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\tonight\\arrival-help\\route.ts",
+    "sha256": "62EA992A2C0DB12DDDB8526407997103B59B0BA7D8E52212D5C22603D746190A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/tonight/capacity/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\tonight\\capacity\\route.ts",
+    "sha256": "CF22EE19E253C1861E62903C0CD899CF244B4CC3574370D8CC6A016454D8686E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/tonight/dashboard/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\tonight\\dashboard\\route.ts",
+    "sha256": "28991CBD320F4A015228B5A9AFD6D58F9C849B337C08F85C4475BB817F67C7E8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/tonight/service/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\tonight\\service\\route.ts",
+    "sha256": "062FC56600F6016C64C9DFFC004627EE51D1204ED35764B962E9A432EFD94E2E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/partner/tonight/setup/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\partner\\tonight\\setup\\route.ts",
+    "sha256": "2221EBD8BDDCA55DCCC340C46C347C5E952FBCFF1D7ABC4AC836E610C7C4E0A1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/payments/tonight-deposit/cancel/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\payments\\tonight-deposit\\cancel\\route.ts",
+    "sha256": "D30C31FC291CA3CD00AD38C07C42E67F334660CE8A1538AC28ABC995BF6BF152",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/payments/tonight-deposit/confirm/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\payments\\tonight-deposit\\confirm\\route.ts",
+    "sha256": "6E09CB8F1D0CC6A69952ED067DDDA71E9D0E224B9733FB080FD6D982B2C43364",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/payments/tonight-deposit/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\payments\\tonight-deposit\\route.ts",
+    "sha256": "3A6DCD0708F3F83D27DC68D9216BA8D1FE968E9A95D5EC4C9232DAD259F63F2A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/apply/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\apply\\route.ts",
+    "sha256": "D61FFF9D87BF1E60CDC011FE7BC4BEA8BDCF69869F70BBF27CD60D40573C6F04",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/arrival-help/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\arrival-help\\route.ts",
+    "sha256": "D559B238F950D7332F47FC9AB1851975C775B5D177EE0E128B0549E57A202F44",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/arrival/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\arrival\\route.ts",
+    "sha256": "9CFFBF1E2895078EFD8FBB1E2C288FDE41CED59F30B6B69647636927169756FF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/friend-invites/[token]/accept/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\friend-invites\\[token]\\accept\\route.ts",
+    "sha256": "2DD4FB374D0F9250D4545F09E473508E0C6227A2466B036C593D92D285388811",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/friend-invites/[token]/decline/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\friend-invites\\[token]\\decline\\route.ts",
+    "sha256": "6E5147353AD02363A9CE931B5F5FBBCB3CC0B27E3CECAE7B418D52C35FB44051",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/friend-invites/[token]/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\friend-invites\\[token]\\route.ts",
+    "sha256": "27108D0446643C14B11F40E3C53E60B5353B35903BE70B8372DD1471EA0B7D42",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/friend-invites/by-id/[inviteId]/cancel/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\friend-invites\\by-id\\[inviteId]\\cancel\\route.ts",
+    "sha256": "35A3AFAF92D508E4E9AE8FA73157A2302913062464F2EFB80A018833463D7D78",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/friend-invites/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\friend-invites\\route.ts",
+    "sha256": "2E86DC10973C24DAF44D5D50D816078F3BEF44EC153942A3A798498DA71F831B",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/journey/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\journey\\route.ts",
+    "sha256": "EBA6E601ABF752218F636C4DB4C32AEB05F31FCD53C4FCC0E0E2DB07876990D4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/market-membership-request/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\market-membership-request\\route.ts",
+    "sha256": "BBCAC3E2D685A31F2048F9B1201DBDF37BB5047B71D43FD5EA27BF12F17F37E8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/notifications/push/config/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\notifications\\push\\config\\route.ts",
+    "sha256": "C268E8117903D824FF0BB2536786049AF4B8B4C7CC3054CAB016B6D2FDD0ED75",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/notifications/push/subscriptions/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\notifications\\push\\subscriptions\\route.ts",
+    "sha256": "580178A5B30220DDB24DFA75CF2FCE50B8A0F2D95CEA0C8E535CCFBC226C2C39",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/refund/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\refund\\route.ts",
+    "sha256": "8D9ED4CEF0F780FA1326EC20E115156F097E0824A88FCB35CD6D58969FC5BF31",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/report/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\report\\route.ts",
+    "sha256": "3EDAF7391EB29711EB830B8D5E008CCE7A7E69A3C8DD03641A246635ACC75D6A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/api/tonight/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\api\\tonight\\route.ts",
+    "sha256": "0F9E3BB4B0533D21D42725064396270751061A8E564E94494AD1733E23B4CA1C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/auth/continue/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\auth\\continue\\route.ts",
+    "sha256": "84A15542BF633274C108397BF8B9077157D12D36EDA9B91756EB7E482F7C2452",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/auth/unavailable/route.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\auth\\unavailable\\route.ts",
+    "sha256": "2FEE1D4736FADC2767AE2C47297CE552D2AFF0851F25324AED57261699893E58",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/dev/tonight-release-rehearsal/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\dev\\tonight-release-rehearsal\\page.tsx",
+    "sha256": "69C9A59D3F1989889C13D9F0E293F77B34B8FD6A6735F6413C73F01079DEE5C0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/onboarding/partner/[token]/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\onboarding\\partner\\[token]\\page.tsx",
+    "sha256": "B97EC125979B75513AB506F0A72F824F89C9FC94E9811A3E5A8891974F45343F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/onboarding/partner/resume/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\onboarding\\partner\\resume\\page.tsx",
+    "sha256": "BC05712F421F7FEF0F068646CE539141F7E5A039C9031E638DEAE8DB25388624",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/partner/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\partner\\layout.tsx",
+    "sha256": "90B2CD885D17F8DD96FF87F2CF9119490ADB11468DF2F960AD04EB1EDDC9B3D9",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/partner/tonight/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\partner\\tonight\\page.tsx",
+    "sha256": "610079A1519FD9C5D4C4BA3B90681BDC3A6DA3E1040FAEF99B4A16F320AC3C85",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/tonight/(protected)/access-request/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\tonight\\(protected)\\access-request\\page.tsx",
+    "sha256": "5327FE4C31597476463DE10E7867A5FFAFA7BDA3FB8E42ECF40CAB67D67B0F1D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/tonight/(protected)/invite/resume/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\tonight\\(protected)\\invite\\resume\\page.tsx",
+    "sha256": "0FF3A86A1D8116BE10025B44A91297ECBF8411203DE55AF675D292F58E72F221",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/tonight/(protected)/layout.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\tonight\\(protected)\\layout.tsx",
+    "sha256": "94221A7111D3978CBB772E2525BD4D6EDA45B5E60015033292690416B30773D8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/tonight/(protected)/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\tonight\\(protected)\\page.tsx",
+    "sha256": "A15F338DE89AE4ECFD2412B7D96A48BE813542593AA9D8ECC529CEF9EAABE5EE",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "app/tonight/invite/[token]/page.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\app\\tonight\\invite\\[token]\\page.tsx",
+    "sha256": "C25B0598D1571C11D3F987C34A6CE2DBFFD60AD6D4E2323F151D143B4FDEAD1C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/places/PlaceLinks.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\places\\PlaceLinks.tsx",
+    "sha256": "8FC032A4EB8BEA4CDBEC547A24E460814CB38C0867A5D8AADDA9088B38194A85",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/places/PlaceMap.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\places\\PlaceMap.tsx",
+    "sha256": "7333D0DD040570FAAC313A2D19184E9C111905D198849C876C94ACA6AEFED55C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/ActivityRanker.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\ActivityRanker.tsx",
+    "sha256": "4D3EF3D6D6698C2AA0CA4706E700AA0CF912D5E86D9E0F5137B6F2DBCDEE16E0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/AdminTonightConsole.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\AdminTonightConsole.tsx",
+    "sha256": "F5956068AAC7F4A818BD21CD46E7C71CA1558FA7570415498F0B9B4D14476865",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/FriendInviteExperience.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\FriendInviteExperience.tsx",
+    "sha256": "EE0C4E565AE08EAB418A330D5F1C5B55CDCEC2A909329B468AE19AF16E11976D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/FriendInviteSharePanel.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\FriendInviteSharePanel.tsx",
+    "sha256": "3E142FE5B458EEED6215F2CFFDD8220A3597E7585954D059EBE48177E30CBFB6",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/PartnerInviteExperience.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\PartnerInviteExperience.tsx",
+    "sha256": "7178833BD18C422BC70EF94AFF513B414827A8DA2EC9858320F3749447F33A16",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/PartnerTonightConsole.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\PartnerTonightConsole.tsx",
+    "sha256": "4A5E7B89A8861CECABFCD629072DAEB81CEB49FC6DA7EA3D24836A29991BDA21",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/SuperAdminAccessOnboarding.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\SuperAdminAccessOnboarding.tsx",
+    "sha256": "2E295DD520E6E68BAC8E0D96AA1865C50F218B69B291B6D66C03C313CD004675",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/SuperAdminTonightConsole.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\SuperAdminTonightConsole.tsx",
+    "sha256": "BD289379BF73ABDDECEF2A9E4D843F0526D68F4C130016DA43FAB25795B79CF0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/TonightActivityExplorer.tsx",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\components\\tonight\\TonightActivityExplorer.tsx",
+    "sha256": "3EA959F080F1803D14D583C1A530B13967D0AEEE293A6E38E89569CF6F7B9EC5",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "components/tonight/TonightMarketAccessRequest.tsx",
+    "source": "C:\\Users\\82108\\.config\\su…5959 tokens truncated…",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\scripts\\qa\\tonight-local-verify.mjs",
+    "sha256": "2C824815DC42966408756126CB32A1CC725A36890A284F5DE4FFAFCBB2ECA0F7",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260902201243_venue_partner_rbac.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260902201243_venue_partner_rbac.sql",
+    "sha256": "969CE7568F8BA27B85F2861D05B9199F812B5381084062E3D23F779BBF0FD920",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260902201244_immutable_venue_snapshots.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260902201244_immutable_venue_snapshots.sql",
+    "sha256": "F7A092F00C517B59A6F8D64CC2EA9D6D65139AACF42CB64FEF0C23F402B81591",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260902201245_super_admin_sensitive_boundary.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260902201245_super_admin_sensitive_boundary.sql",
+    "sha256": "3E68AE4D79658AED918D264CC55114C10F8C7A00A0A695387FF316DC1F0F69E4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260902201246_tonight_ledger_schema.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260902201246_tonight_ledger_schema.sql",
+    "sha256": "89B9FE34F731B931D8064EB5F5E6A39E29FB067210336A4515C55B2EF412C303",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260902201247_tonight_lifecycle_rpcs.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260902201247_tonight_lifecycle_rpcs.sql",
+    "sha256": "D878BB98DA40B9FEA247C2BCBBE97D594BDA6B6A8FE9114B6B9A985B6E7DCDCE",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000000_tonight_refund_dead_letter.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000000_tonight_refund_dead_letter.sql",
+    "sha256": "43A24E46820EE3B28992D95190D28783E5A79E744CE4542E30059FE49AE683D8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000001_admin_role_history_hardening.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000001_admin_role_history_hardening.sql",
+    "sha256": "72BC611675824F82D06E264746C976F06184992F84F9F78BE95A1BCEB0A81FCE",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000002_partner_revoke_obligation_guard.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000002_partner_revoke_obligation_guard.sql",
+    "sha256": "873798A296B2DD54B4E96A68F4C9C27A162022EB6EA8E8FB158EEE14E4D56045",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000100_tonight_settlement_automation.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000100_tonight_settlement_automation.sql",
+    "sha256": "CA2D14581A21C18F54D5DACC8F596DEF8A3955F05A99F5158FF5449C8C4C7C8A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000200_tonight_deposit_terminal_automation.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000200_tonight_deposit_terminal_automation.sql",
+    "sha256": "98C238D2FC18116C45A197A69776B3722BE5B7E01D4BF6FB3526BF28402A4B30",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000300_tonight_deposit_reconciliation_worker.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000300_tonight_deposit_reconciliation_worker.sql",
+    "sha256": "1BC1EEC9B7777F954024BE14E208A2853F3E48C62764B3F0163159D941CA4E29",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000400_tonight_recent_owned_round.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000400_tonight_recent_owned_round.sql",
+    "sha256": "D2A126F68FED1DAA544AE2C66341C372DC79E38C9E79832C175E3652113C4EFE",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000500_tonight_financial_recovery_hardening.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000500_tonight_financial_recovery_hardening.sql",
+    "sha256": "90E0A85BDFAC2D3723B5B74474819E24B563FED08C8E8452F5971DB6A8FCBA3D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000600_tonight_ranked_activity_capacity_fallback.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000600_tonight_ranked_activity_capacity_fallback.sql",
+    "sha256": "FA27E7E3ABC5EC9E587FD39CEE7BF04F41F332449ABBA8CD0C9EFBC207BA715E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000700_tonight_venue_activity_compatibility.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000700_tonight_venue_activity_compatibility.sql",
+    "sha256": "E15AF4F77D0B44C24669F5F4B7BF81EC6CB566B63EA80181A1A4A2155D95D95C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000800_tonight_never_authorized_reconciliation.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000800_tonight_never_authorized_reconciliation.sql",
+    "sha256": "7EF032421DE2C44BEEC5C2613526787C469409141C78370AA5CB57DC16D93394",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903000900_tonight_service_confirmation_recovery.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903000900_tonight_service_confirmation_recovery.sql",
+    "sha256": "52CA7B7EAA81A071CB69867CD9AA62520E869F1B39BC819A7F68479A327D4A0D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903001000_tonight_manual_deposit_resolution.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903001000_tonight_manual_deposit_resolution.sql",
+    "sha256": "3E16D68E1ACEF5262CCA5829483DFE34F1A490B28DB38F99EFF66B9DAF522663",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903001100_legacy_super_admin_mutation_boundary.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903001100_legacy_super_admin_mutation_boundary.sql",
+    "sha256": "2770232624FA5105A28C9BB27D48F9C59D8C100228F0586E4AFBC9B6A85D0060",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903001200_tonight_exception_pagination.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903001200_tonight_exception_pagination.sql",
+    "sha256": "B62BD298F38EF3191240C6A27E450C31CA92AE56D20A852C6296AA22459AA67E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903001300_tonight_market_membership_pagination.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903001300_tonight_market_membership_pagination.sql",
+    "sha256": "F593A1DD56FFF5A9BEE67B6355B0F6A50AAE7CE0822FB8A1AB50AF65F432693F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903001500_tonight_deposit_policy_consent.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903001500_tonight_deposit_policy_consent.sql",
+    "sha256": "EA365F903AEAB50F7AC697F4F58943BF07E89F0FBA5129D845B793009B604F92",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903001600_tonight_sensitive_read_guard.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903001600_tonight_sensitive_read_guard.sql",
+    "sha256": "76EBD9B0A9A938597AD84C0DEA849452E5F24DD50EEDD5F2E72F4EEEF6D073EB",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903012223_tonight_notification_outbox.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903012223_tonight_notification_outbox.sql",
+    "sha256": "3A9BFE2C1F99FEFDA5E331C6A0799537650A94B9E6EC9289CDA7A5C7A437CBE2",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903012300_tonight_financial_worker_claims.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903012300_tonight_financial_worker_claims.sql",
+    "sha256": "7468AA4CECEEC7E0C15A945F63D2372AE5EDC774226CD96D6292BDB4DCC672E8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903012500_tonight_terminal_worker_recovery.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903012500_tonight_terminal_worker_recovery.sql",
+    "sha256": "5F9E3F11255FF67F5D79A3C30035B5462B241DC54D9285622774DEAC77E4904E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903015847_tonight_rounds_pagination.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903015847_tonight_rounds_pagination.sql",
+    "sha256": "1365FDF6D0BDD18D4F8ACDCB07BD234D3933883B4DCB8F967E45E94C044740E3",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903021152_tonight_notification_terminal_recovery.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903021152_tonight_notification_terminal_recovery.sql",
+    "sha256": "5A6AE3B4EE221A44498E76DBC84E12A46AA3A6298EE6810F711FA00CACD7363D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903030240_tonight_audit_pagination.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903030240_tonight_audit_pagination.sql",
+    "sha256": "9D446F0E6C5DF6B6829B772C3A7E9754B8CD0B1A437802324030D79578C9A03C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903033000_tonight_retire_manual_deposit_bulk_read.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903033000_tonight_retire_manual_deposit_bulk_read.sql",
+    "sha256": "70B08C95C7ABC6FF3C161062F28C421F59818C0A18F954CDE0E79C6C0F5C251D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903035000_tonight_authoritative_activation_gate.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903035000_tonight_authoritative_activation_gate.sql",
+    "sha256": "75D1B6B61316808E35AC50C4081FD383E6A62FFF1F8D574F1E4144B95690066A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903040909_tonight_allocator_failure_ledger.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903040909_tonight_allocator_failure_ledger.sql",
+    "sha256": "5C0D1B017B6192D8D3DE0F1FBA5E130FCC201EA7C5D92FFBB0DFC5B3B8E39B22",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903042000_tonight_audit_round_projection.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903042000_tonight_audit_round_projection.sql",
+    "sha256": "3483F98E780A065E3A207622201C68D33E1CEDBD5987885F9A2284E63EC00CC8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903043000_tonight_sensitive_read_atomic_enforcement.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903043000_tonight_sensitive_read_atomic_enforcement.sql",
+    "sha256": "86C7CE3FE8A85DBCC4029AEDEA10CE506C96C41B415CFBF2FAEE9474750A7566",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903043100_tonight_audit_state_redaction.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903043100_tonight_audit_state_redaction.sql",
+    "sha256": "F09B86D3BC708B089173B76A159D42EAD8A99E07C1837B2D15FC51D0D1AE0CAF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903043200_tonight_notification_revision_aba.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903043200_tonight_notification_revision_aba.sql",
+    "sha256": "9C35FDFE8C5F511169C90B357629B2DAB7324863D258ACDA3BA48FC1A724F1E0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903054620_tonight_partner_service_availability.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903054620_tonight_partner_service_availability.sql",
+    "sha256": "4E4AD12A4554C77C98C20AE492F5C00CE0764C6AF4AC170824A6FE89AFA06E45",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903065029_venue_partner_revision_aba.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903065029_venue_partner_revision_aba.sql",
+    "sha256": "9F54D2A41E76952A0C875B366427F1E99A62409E3AD00C9853C9A35A4AA9A762",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903102000_tonight_friend_invites.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903102000_tonight_friend_invites.sql",
+    "sha256": "0E4064FA211D303CF101C351E3D77D1CB682225BCD4C6D1A2DA050285B8D5D0D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903102500_tonight_roster_profiles.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903102500_tonight_roster_profiles.sql",
+    "sha256": "29AA33B5E1870C095042153F1F1FF291EC962EF105C20432E976DE69433FEDC3",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903103000_tonight_arrival_help.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903103000_tonight_arrival_help.sql",
+    "sha256": "535311B50CE2C872850B393C66DC237958FA924856FC31643D0D6CEB0374FBC8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903104000_tonight_account_onboarding.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903104000_tonight_account_onboarding.sql",
+    "sha256": "7D6B25172E5FFE3436C53DBB55D1EDFF4DA982337E25380E5710F0FF1F35CE43",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260903105000_tonight_atomic_super_admin_directory.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260903105000_tonight_atomic_super_admin_directory.sql",
+    "sha256": "37164CB3DDB9CE1F6DCC69F00D5EF91EA4090B0E77A7A5B8B022240C724B7A2F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "supabase/migrations/20260905044012_tonight_partner_setup_schedule.sql",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\supabase\\migrations\\20260905044012_tonight_partner_setup_schedule.sql",
+    "sha256": "2C93EB8F1B664816F3FD504C561F8E71A9106864D1D0C82A392CA401FD4DFA20",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/access-context.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\access-context.test.ts",
+    "sha256": "EB519B386D4A5B9E0F638085F6F326571B0C8FB440B1C780FB7206C27BB354C0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/admin-role-history-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\admin-role-history-migration.test.ts",
+    "sha256": "C7CC30578F035CDB21A7375D5AC184DE21ADA8263D4D35AC16D1CC36B6A5EDE6",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/legacy-super-admin-surface.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\legacy-super-admin-surface.test.ts",
+    "sha256": "4F7E347736BF023A89B1E5145173C7C3174E68B3DCF6214445EAE1B874504EB8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/role-route-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\role-route-contract.test.ts",
+    "sha256": "B309B5FB6646A1A108B13147FDAC5F281D38A495DE9FB57548DE68F57209DBBD",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/server-guards.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\server-guards.test.ts",
+    "sha256": "3C76B706571B9CF3EA8999B08F1415C0C92A5A72F42F14EA38537CC1BF87AAF1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/super-admin-recent-auth-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\super-admin-recent-auth-migration.test.ts",
+    "sha256": "FB2D41772B5F7B9A83E6CB4C8FD7E8F257CFC5ADBF22BCE6522021A5ECDCB416",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/tonight-account-onboarding-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\tonight-account-onboarding-migration.test.ts",
+    "sha256": "0CD8B19DDED0A53C987293ECA664D1C86C959C0564BF9A890A27C7D053F0F11D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/tonight-audit-state-redaction.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\tonight-audit-state-redaction.test.ts",
+    "sha256": "DD09B3B96E22EC20CAD4994DB7059AA600053D0FB93AF58B8ADE4E0FE03997CF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/tonight-security-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\tonight-security-migration.test.ts",
+    "sha256": "53674168F3ADFFFB902BFCE257931F5D1A8CF1AD10D2D5A74127A9D7E2016906",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/tonight-sensitive-read-atomic-enforcement.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\tonight-sensitive-read-atomic-enforcement.test.ts",
+    "sha256": "D4F2FDDA7E0A7F782511774A8B681242B054E52C2EADF8850731A4E9C7F163CC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/tonight-sensitive-read-guard.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\tonight-sensitive-read-guard.test.ts",
+    "sha256": "CBC388EA79AA56BFD9D177FA59455E01228317BCFF79BE99A08F7E38BA8AFC38",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/trusted-origin.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\trusted-origin.test.ts",
+    "sha256": "79D78E43EAA0605F7606C5F7611157CB3B1FFE98D87A0E263781F808D7CF0F87",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/venue-partner-rbac-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\venue-partner-rbac-migration.test.ts",
+    "sha256": "49278EFEFEE043A0AE3E24414052C5C52FF0363672EF9C9530363A435EABFA7D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/auth/venue-partner-revision-aba.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\auth\\venue-partner-revision-aba.test.ts",
+    "sha256": "CD4E181D1F2EBC4B65704CFD7A9A7897E211E890E54711086F2A1F5191A8FDE1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/campus-eats-map-trust.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\campus-eats-map-trust.test.ts",
+    "sha256": "D492047D208525466AB7D70EB11D8F530694FB1E43D6061E3F7A6E1450D48CC3",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/local-origin-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\local-origin-contract.test.ts",
+    "sha256": "FFAA3F7BD5259C523442D0F69088BA15BC7727055201B56715D68AFED66A2B73",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/meetup-map-links.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\meetup-map-links.test.ts",
+    "sha256": "EB3CAF716B624E69D9ED6DC7F4238E6874271E9D76CD18A480DC3009AA68C50D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/naver-maps-sdk.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\naver-maps-sdk.test.ts",
+    "sha256": "F05BD9993D48B97296E0E2AE4A536C9CDDAE5EFC27130760F9C7CBAC7862C1FE",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/place-links-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\place-links-ui.test.ts",
+    "sha256": "E79CC9B109DB604116A7209C7318233B114B6D3A7DA2B93044AFE162703CC16A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/pnu-signup-scope.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\pnu-signup-scope.test.ts",
+    "sha256": "EB4AEC84544046AC607D343622DAD23B2854E406C90833DA082C3040D43E1C42",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/secret-leak-scanner-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\secret-leak-scanner-contract.test.ts",
+    "sha256": "2C690CC446BD370DD4AE191B7CC8091FCF6CFF00D2EDACC6BF38BCB86A244E6B",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-account-onboarding-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-account-onboarding-ui.test.ts",
+    "sha256": "EC962A512C0CA1263B3383F54DA3C509830F27790E5A6F12956DA56AA8355FAF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-activity-explorer.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-activity-explorer.test.ts",
+    "sha256": "8933E646CC36C7895EA7E74A8AE3110D9154818A3D5200E95D6E743897F2199C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-allocation-failure-ledger.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-allocation-failure-ledger.test.ts",
+    "sha256": "83565D3AE05BEE71B4EC228512711F9A32F22E6202499B54FEE7D44D0AA4B8E6",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-api-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-api-contract.test.ts",
+    "sha256": "0BD36E55F3CD3374AE7ED74BA634AEF66C04987A4C8417A1B953D78CB1E90E1C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-application-gate-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-application-gate-ui.test.ts",
+    "sha256": "FEC27DF6C9FE5345FAC41D65EF8BBBFD66B77BD2B432A23123754A40BC6AD3F7",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-arrival-help-api.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-arrival-help-api.test.ts",
+    "sha256": "CD6BB4CD1E38B8F36F660CB4C2F380A04CE898358B140D49D9577B5280FC919A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-arrival-help-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-arrival-help-ui.test.ts",
+    "sha256": "EECC685A8085F806B9C62FB9A6103DDB7158F01A56DCC4193FC11DDEEE86D9F2",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-audit-pagination-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-audit-pagination-ui.test.ts",
+    "sha256": "0731D2F4A77666ACB1918EF62A5BCD114F704AE4223920C970D26E6D74C73B18",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-audit-pagination.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-audit-pagination.test.ts",
+    "sha256": "75ACF4667E8F2108EEC0C483167269398203881494C6CF4372B26ADA289840C9",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-automation-activation-gate.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-automation-activation-gate.test.ts",
+    "sha256": "095E3DD44B3FD8BC04039A2AB343543DBCE8BE9C5BF3618DE10EF224575376E7",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-cron-catchup.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-cron-catchup.test.ts",
+    "sha256": "CB20F68C40832C4C035431CB06086C571E42F6C7F2E71E1201500899A40FFF7A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-deposit-policy-consent.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-deposit-policy-consent.test.ts",
+    "sha256": "96DC76689D199D1AD45D964B06BAE8219896ABAA0A67981CEF5FCB342134CB67",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-entry-route.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-entry-route.test.ts",
+    "sha256": "F54E93C104FED18D7878938C9A607664CFBD28107C4D34A6C265D38471A3E63E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-exception-pagination-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-exception-pagination-ui.test.ts",
+    "sha256": "86789CB50B725B78E2FBC452E647BEB776F318D70D016284723DAE6FC1AF0754",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-final-p1-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-final-p1-ui.test.ts",
+    "sha256": "4D5285E28056E242243241F50D064479DE01434E07DC5361FBF94BB519E625D8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-friend-invite-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-friend-invite-contract.test.ts",
+    "sha256": "EEE5ACA791EA228849DD3A9E0F3F5035D55521538DF37AED64ABF5CC9E2F0832",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-manual-deposit-resolution.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-manual-deposit-resolution.test.ts",
+    "sha256": "A6CF55A612F799D12978B07FE1082020439B0C77D91B878194F01DCD6954FE2F",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-market-access-scale.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-market-access-scale.test.ts",
+    "sha256": "FA683849D8462A5D16D444D8D4A8A11C00E001705F844B5D9B8D90AF3EE666A5",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-migration-syntax.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-migration-syntax.test.ts",
+    "sha256": "07DC2DD7AA8CA9E443C18D65808E6E08C1F1C88CCBD9E23ED8F5E764907C9667",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-notification-delivery.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-notification-delivery.test.ts",
+    "sha256": "573F7F2F4A3723D58F0232BB350D38C42BBA1B33779386DEACEC1D53F2A383A6",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-notification-terminal-recovery-api.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-notification-terminal-recovery-api.test.ts",
+    "sha256": "AA4B1FC1DD9938A4F93E6A66E7BAC13180ACFA0ACBB3BDE7A6F300FF42A39DA4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-partner-capacity-profile.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-partner-capacity-profile.test.ts",
+    "sha256": "0899744E9A372CED48487E525B87A8E8968660693D6BA48D8226E441467AA496",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-partner-revision-aba.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-partner-revision-aba.test.ts",
+    "sha256": "7E8C238686C6A58081DDA253AB65851625A67AC68BD3B944888AE702F93D09D0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-payment-return-state.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-payment-return-state.test.ts",
+    "sha256": "C9ACFFE2073C125A1D0A287116FBB3995E27E371DF7A3AD3F83BA4A0633313AF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-reconciliation.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-reconciliation.test.ts",
+    "sha256": "9D562C8E6BB49CC8F9245ADF0EEA650DAAAAC9BD8B9E2B290B574DFE41C27A31",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-refund-worker.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-refund-worker.test.ts",
+    "sha256": "C3B1D1294DCBE8EC70DC5FCF463ADF686E218BF8F93712B23EF173F3BC991012",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-role-ui-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-role-ui-contract.test.ts",
+    "sha256": "60C0069EAC736A87EFB20583FF64D35500E088729D209C30CC194B5E1C3A128D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-roster-ui-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-roster-ui-contract.test.ts",
+    "sha256": "74E5035B07F683625815AC37D11813133B6E5A766C13F9E96E4820CF36EA78CE",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-rounds-pagination.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-rounds-pagination.test.ts",
+    "sha256": "C54459D0AAD491C56C851DB566383FC78A240BC980EB8B7BB44B4C44EECB77C2",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-runtime-flags.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-runtime-flags.test.ts",
+    "sha256": "73C9DA463F7DEB96D5138F76C2618AAD82F7AAD518E0B9174AA2C178E4A22A58",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-service-recovery-ui.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-service-recovery-ui.test.ts",
+    "sha256": "062EB11A01C6053D89C1A34EE63137C7CF285390129423E2E16ABF045E6CBBA4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-terminal-worker-recovery.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-terminal-worker-recovery.test.ts",
+    "sha256": "BE53EE8384A87B267F153B2972DA109CC80C1312CB74578288264241BC08F44E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/tonight-worker-pool.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\tonight-worker-pool.test.ts",
+    "sha256": "FC955B0535A27DB9724F0D08C7C335B10D2B61395A481E10E27861A840A3DDC1",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/config/venue-snapshots-security.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\config\\venue-snapshots-security.test.ts",
+    "sha256": "83C6444E707FADD0EDBC93EA6093638375D9B1B4571C5B6D908F158EAD27969E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/campus-eats-map-coverage.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\campus-eats-map-coverage.test.ts",
+    "sha256": "D03C6639313DFB9DF8EA37BD4B5D0740C4451EBA6D800DB542D7876BC5E04231",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/campus-eats-map-runtime.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\campus-eats-map-runtime.test.ts",
+    "sha256": "7982F29F03AEAFA7964350D0F7C2D006029E83BB4F5FD6A2AC667F76324EA735",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/campus-eats-place-adapter.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\campus-eats-place-adapter.test.ts",
+    "sha256": "52BA7C8C4F21065FC87EF5B11F80BE6840C7ED21927B5EAFEDC95F8282309EC8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/place-public-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\place-public-contract.test.ts",
+    "sha256": "F8524EA41098B7A6BB3F774070F040D2CB0625B68D10A24BE3E5063DD74C5B14",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/super-admin-sensitive-boundary.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\super-admin-sensitive-boundary.test.ts",
+    "sha256": "0FE8C68113545F524F518FCA303221645F83C1D80271B508757A930057FCF741",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-activity-catalog.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-activity-catalog.test.ts",
+    "sha256": "F252C2B1C6ACEF014F7F0CC6FAEB7E684D893AF10B7ABEEE1E33F10D63EED6B2",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-arrival-help-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-arrival-help-migration.test.ts",
+    "sha256": "6C837AD14BB47D84352426A614E69651B5031B52D69A4D45343A7A9EF944FCD4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-atomic-super-admin-directory.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-atomic-super-admin-directory.test.ts",
+    "sha256": "C17AB2C6DD60BD9DC0963C57604DA7606159FCEDBE15156A034EF89A93BACE17",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-audit-pagination-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-audit-pagination-migration.test.ts",
+    "sha256": "601D896EAB7E576F2664F4EF5B9FAA684B63174FE647F685AB8B1570D95F30E2",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-audit-round-projection.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-audit-round-projection.test.ts",
+    "sha256": "2909F8F2C2B18CA056E0D9C587BEA1019C22BA6644A81F17E065B1FC23EE32C0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-authoritative-activation-gate.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-authoritative-activation-gate.test.ts",
+    "sha256": "52C6A7EA0A8F0147BE8A8D35956A96CD3975FF3A90C395C601511D40C8828339",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-automation-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-automation-contract.test.ts",
+    "sha256": "69C455BD757524782F04E3265912F199722EEE2550A2E7CC7C992668F044DE5E",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-default-schedule.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-default-schedule.test.ts",
+    "sha256": "C0803795C53BFC848F84FA1CE7DC31B3B84DE5BEF98983BA52B089F61D378D54",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-deposit-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-deposit-contract.test.ts",
+    "sha256": "09C3CA16D18596BF53DEB973FD8AF513ECE5B5B70C06AF71A5E18C2660809655",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-deposit-policy-consent-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-deposit-policy-consent-migration.test.ts",
+    "sha256": "C28EA57E6B90C51E78434F1B888003CB910949C6C9CD27DC1E9E115CABFC6DCD",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-deposit-terminal-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-deposit-terminal-migration.test.ts",
+    "sha256": "307E4A16A1AF6B61B0C763F8134E5F15C4ABD03740545F960529DDF21D4DE9FC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-exception-pagination-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-exception-pagination-migration.test.ts",
+    "sha256": "CD36C22F5AC33A861ECCB7285ED20A04BA79308CB6159FD26C2430365A634824",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-financial-worker-claim-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-financial-worker-claim-migration.test.ts",
+    "sha256": "30E1D90E0F56D8A4839A2192DCC4070DA0ED7F92633F5433A5D5C65595054003",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-idempotency-serialization.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-idempotency-serialization.test.ts",
+    "sha256": "D1E06767671A6E5372D30C4D9E791943126DA2D1D861DA0A368D427698E8C8DF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-ledger-schema-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-ledger-schema-migration.test.ts",
+    "sha256": "E5E338DBBDDB2245A1D1D4FB44DBCBA14CD6B68950977CDDDEA8F752AF4713E0",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-lifecycle-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-lifecycle-migration.test.ts",
+    "sha256": "134CDB705A1C37E832BF8AF275EFE27AFDED9920E8E5E035FFBE41EA8D9AC632",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-manual-deposit-resolution-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-manual-deposit-resolution-migration.test.ts",
+    "sha256": "9C8C23636D99EDF7AFE8791FD99B47FC54FF7B23DDFA8D4872C92268A20D438C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-market-membership-pagination.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-market-membership-pagination.test.ts",
+    "sha256": "D6C3F106C6B42F17FC859875C00A6067A44C6C03D612BF45A0D3562F769D6893",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-notification-outbox-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-notification-outbox-migration.test.ts",
+    "sha256": "3E2830101B6B4BED02137A767BAEF804948013A96DF434412F2724714DD83011",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-notification-revision-aba.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-notification-revision-aba.test.ts",
+    "sha256": "CCB4022499E1383A7E79F10A26E1A60CA90DAEB1014548BB35E54C4BB0C32662",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-notification-terminal-recovery.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-notification-terminal-recovery.test.ts",
+    "sha256": "ADD7C69542E830EED4F442C8761335B3D457C6493D579DACE06AB558296DF07D",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-partner-revoke-concurrency.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-partner-revoke-concurrency.test.ts",
+    "sha256": "4FA107C0BE8C15F97B8C181EA5606A5100562DD27D78960D70745BE42DCAC163",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-partner-setup-schedule.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-partner-setup-schedule.test.ts",
+    "sha256": "8EB8050A6C548CF42EB066DFA33F5CFF605636FC2CD80FDFE4355C147DD5D629",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-ranked-team-allocation-boundary.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-ranked-team-allocation-boundary.test.ts",
+    "sha256": "AA18973948F64890DB1CCA426C16ADE5EAE8ACB45C51EE58406482006FFEE0AD",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-ranked-team-allocation.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-ranked-team-allocation.test.ts",
+    "sha256": "8DCC28FE164F16AA6ADD5229884A25570638C61718FE4661AD97797CB32DA5EB",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-ranked-team-roster-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-ranked-team-roster-contract.test.ts",
+    "sha256": "DF2ED8396EAA246AD3620F3D2DF151CCFA41BD0BE88D9C04DFAACF6615EC5957",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-recent-owned-round-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-recent-owned-round-migration.test.ts",
+    "sha256": "76EBEAA24E719C1077FF5418593CD8A30BFECFC7AA30CC199514DBCF07593D84",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-reconciliation-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-reconciliation-migration.test.ts",
+    "sha256": "26A5FF01B7F32894A9976C01BD2A42266E65C45719F71A1D4723B7954EB440DF",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-refund-dead-letter-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-refund-dead-letter-migration.test.ts",
+    "sha256": "2CFF049A95BA07C72DF42AE8ACE1DEE00843E591F4B750C83CE1D4CF203CC384",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-retire-manual-deposit-bulk-read.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-retire-manual-deposit-bulk-read.test.ts",
+    "sha256": "643E4FD400BA85E7AA69A27BDBECF69666ABF1C15C40C16D2C7AF1D37033F0D5",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-roster-profile-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-roster-profile-migration.test.ts",
+    "sha256": "E4B9A882E1953078612E44390AD1F8599CDE2EEBF6C193F4EF5FF4967F3F9C95",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-rounds-pagination-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-rounds-pagination-migration.test.ts",
+    "sha256": "2A097AFD4134C0FE517A119163B5739FC69AE152EFD8472B9781A57DAC67E2EB",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-service-confirmation-recovery.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-service-confirmation-recovery.test.ts",
+    "sha256": "79E5696D5955073A2B9267559EBD21E32A05D4A51131C94C5F2FDF829F67C11A",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-settlement-automation-migration.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-settlement-automation-migration.test.ts",
+    "sha256": "6CE862EADC3AF989F2BEC056362F959610EF6FD3AED92B831CD90BA2AFED7256",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-terminal-worker-recovery.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-terminal-worker-recovery.test.ts",
+    "sha256": "A7C0A17712AECCE40382E3EBF65E180F13DAE963A4CA22A103A59F0EF6BA1706",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-venue-category-contract.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-venue-category-contract.test.ts",
+    "sha256": "C228706DC89C5355DCB28499FB3916899322297372E3CC338C18C8E7F48D7D8C",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/matching/tonight-web-push.test.ts",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\matching\\tonight-web-push.test.ts",
+    "sha256": "C28D45D584612A7A11F5DBF40F67EAF370A3632C708CC4FDD46DEC206D91FDBC",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/tooling/tonight-local-safety.test.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\tooling\\tonight-local-safety.test.mjs",
+    "sha256": "A5C035BC3FBD58A6451C92107FBFBAFE33BCA85258C038F6F35CD35180F917A8",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/tooling/tonight-local-seed.test.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\tooling\\tonight-local-seed.test.mjs",
+    "sha256": "FEF3DCA71EC83CDB4F394E401E0E4219CF360460A607393D7EA11AB1039CFDD4",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  },
+  {
+    "path": "tests/tooling/tonight-local-verify.test.mjs",
+    "source": "C:\\Users\\82108\\.config\\superpowers\\worktrees\\데이팅앱만들기\\engagement-g1-20260905\\tests\\tooling\\tonight-local-verify.test.mjs",
+    "sha256": "668CD204A1788889DB0D28331B3D408024B538A6AF1D41E3D35C504F264FDB41",
+    "reason": "G1 baseline runtime, dependency or verification closure"
+  }
+]

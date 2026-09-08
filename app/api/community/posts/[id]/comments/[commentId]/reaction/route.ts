@@ -1,0 +1,54 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+import { mapCommunityApiError } from '@/lib/community/api-errors'
+import { validateCommunityReactionInput } from '@/lib/community/contracts'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
+
+export async function POST(
+  req: NextRequest,
+  props: { params: Promise<{ id: string; commentId: string }> },
+) {
+  const params = await props.params
+  const supabase = createSupabaseRequestClient(req)
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return jsonError('Unauthorized', 401)
+  if (!isUuid(params.id)) return jsonError('invalid_post_id', 400)
+  if (!isUuid(params.commentId)) return jsonError('invalid_comment_id', 400)
+
+  const parsed = validateCommunityReactionInput(await readJson(req))
+  if (!parsed.ok) return jsonError(parsed.error, 400)
+
+  const { data, error } = await supabase.rpc('toggle_community_comment_reaction', {
+    p_post_id: params.id,
+    p_comment_id: params.commentId,
+    p_reaction: parsed.value.reaction,
+  })
+  if (error) {
+    const mapped = mapCommunityApiError(error)
+    return jsonError(mapped.error, mapped.status)
+  }
+
+  return NextResponse.json(data, { headers: privateHeaders })
+}
+
+async function readJson(req: NextRequest): Promise<unknown> {
+  try {
+    return await req.json()
+  } catch {
+    return null
+  }
+}
+
+function jsonError(error: string, status: number) {
+  return NextResponse.json({ error }, { status, headers: privateHeaders })
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+const privateHeaders = {
+  'Cache-Control': 'private, no-store',
+  Vary: 'Cookie, Authorization',
+}

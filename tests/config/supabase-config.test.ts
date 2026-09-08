@@ -89,10 +89,21 @@ test('isSupabaseConfigured accepts real Supabase URL and publishable key', () =>
   assert.equal(getSupabasePublicKey(), 'sb_publishable_abc123')
 })
 
-test('getPublicAppOrigin returns configured public app origin', () => {
-  process.env.NEXT_PUBLIC_APP_ORIGIN = 'http://localhost:3003/'
+test('getPublicAppOrigin returns only an exact configured public app origin', () => {
+  process.env.NEXT_PUBLIC_APP_ORIGIN = 'http://localhost:3003'
 
   assert.equal(getPublicAppOrigin(), 'http://localhost:3003')
+
+  for (const invalid of [
+    'http://localhost:3003/',
+    'http://localhost:3003/path',
+    'http://localhost:3003?next=/tonight',
+    'http://localhost:3003#fragment',
+    'http://user@localhost:3003',
+  ]) {
+    process.env.NEXT_PUBLIC_APP_ORIGIN = invalid
+    assert.equal(getPublicAppOrigin(), '', `${invalid} must not be normalized into an origin`)
+  }
 })
 
 test('getPublicAppOrigin rejects placeholders and invalid values', () => {

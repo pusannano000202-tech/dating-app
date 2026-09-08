@@ -79,6 +79,9 @@ export const SCHOOL_THEMES: SchoolTheme[] = [
 ]
 
 export const DEFAULT_SCHOOL_THEME_ID = 'pnu'
+export const PILOT_SIGNUP_SCHOOL_THEMES = SCHOOL_THEMES.filter(
+  (school) => school.id === DEFAULT_SCHOOL_THEME_ID,
+)
 let currentSchoolTheme: SchoolTheme | null = null
 
 export function getDefaultSchoolTheme(): SchoolTheme {
@@ -204,16 +207,6 @@ function setCssVariable(name: string, value: string): void {
 export function applySchoolThemeToDocument(school: SchoolTheme): void {
   if (typeof document === 'undefined') return
 
-  setCssVariable('--boot-canvas-rgb', hexToRgbTriplet(school.canvas))
-  setCssVariable('--boot-surface-rgb', '255 253 248')
-  setCssVariable('--boot-soft-rgb', hexToRgbTriplet(school.soft))
-  setCssVariable('--boot-primary-rgb', hexToRgbTriplet(school.primary))
-  setCssVariable('--boot-coral-rgb', hexToRgbTriplet(school.coral))
-  setCssVariable('--boot-amber-rgb', hexToRgbTriplet(school.amber))
-  setCssVariable('--boot-ink-rgb', '23 20 18')
-  setCssVariable('--boot-body-rgb', '75 67 61')
-  setCssVariable('--boot-muted-rgb', '113 105 98')
-  setCssVariable('--boot-hairline-rgb', '232 222 212')
   setCssVariable('--boot-preview-school', `"${school.shortName}"`)
 }
 

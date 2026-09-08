@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ChevronLeft, Loader2, RotateCcw } from 'lucide-react'
 
@@ -30,7 +29,6 @@ export default function AdminUserPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [scoreInput, setScoreInput] = useState('')
-  const [reason, setReason] = useState('')
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -56,9 +54,9 @@ export default function AdminUserPage() {
       const res = await fetch(`/api/admin/users/${encodeURIComponent(id)}/appearance-override`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score, reason: reason || null }),
+        body: JSON.stringify({ score }),
       })
-      if (res.ok) { setReason(''); await refresh() }
+      if (res.ok) { await refresh() }
       else setError('보정에 실패했어요.')
     } finally {
       setBusy(false)
@@ -71,10 +69,8 @@ export default function AdminUserPage() {
     try {
       const res = await fetch(`/api/admin/users/${encodeURIComponent(id)}/appearance-override`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: reason || null }),
       })
-      if (res.ok) { setReason(''); await refresh() }
+      if (res.ok) { await refresh() }
       else setError('해제에 실패했어요.')
     } finally {
       setBusy(false)
@@ -136,15 +132,7 @@ export default function AdminUserPage() {
                 className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-3 py-2 text-sm mb-3"
                 placeholder="0~100"
               />
-              <label className="block text-xs text-gray-400 mb-1">사유 (선택)</label>
-              <input
-                type="text" value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="w-full rounded-xl bg-white/[0.05] border border-white/10 px-3 py-2 text-sm mb-4"
-                placeholder="예: GPT 과소평가 보정"
-              />
-
-              <div className="grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-2">
                 <button type="button" onClick={saveOverride} disabled={busy}
                   className="btn-gradient py-2.5 rounded-2xl text-sm font-bold disabled:opacity-40">
                   보정 적용

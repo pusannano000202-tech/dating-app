@@ -86,14 +86,14 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
     <div className="flex flex-col gap-6">
       <div className="glass rounded-2xl p-4 border border-violet-500/20">
         <p className="text-xs text-violet-300 font-medium leading-relaxed">
-          📸 사진은 매칭 확정 후에만 상대방에게 공개돼. 지금은 AI가 점수만 매겨.
+          📸 사진을 프로필에 저장해요. AI 분석은 매칭 찾기를 시작할 때만 진행해요.
         </p>
       </div>
 
       {/* 사진 슬롯 3개 */}
       <div className="grid grid-cols-3 gap-3">
         {slots.map((slot, idx) => (
-          <div key={idx} className="aspect-[3/4] relative">
+          <div key={idx} className="relative aspect-[3/4] lg:h-[360px] lg:aspect-auto">
             {slot ? (
               <div
                 className="relative w-full h-full rounded-2xl overflow-hidden"
@@ -185,7 +185,7 @@ export default function PhotoUpload({ onComplete, saving }: Props) {
         disabled={saving || filledCount === 0}
         className="btn-gradient w-full py-4 rounded-2xl font-bold text-base shadow-lg shadow-violet-900/30 disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {saving ? 'AI 분석 중...' : '다음'}
+        {saving ? '사진 저장 중...' : '다음'}
       </button>
     </div>
   )

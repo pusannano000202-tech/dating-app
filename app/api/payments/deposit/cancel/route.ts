@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createSupabaseServiceClient } from '@supabase/supabase-js'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
+import { isAuthorizedInternalRequest } from '@/lib/auth/internal-request'
 import {
   getDepositPaymentReadiness,
   normalizeDepositReturnPath,
@@ -77,9 +78,10 @@ async function cancelPaidDeposit(
     return NextResponse.json({ error: 'payment_internal_secret_not_configured' }, { status: 503 })
   }
 
-  const providedSecret = req.headers.get('x-payment-internal-secret')
-    ?? readBearerToken(req.headers.get('authorization'))
-  if (providedSecret !== internalSecret) {
+  const legacySecretHeader = req.headers.get('x-payment-internal-secret')
+  const authorizationHeader = req.headers.get('authorization')
+    ?? (legacySecretHeader ? `Bearer ${legacySecretHeader}` : null)
+  if (!isAuthorizedInternalRequest(authorizationHeader, internalSecret)) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
 
@@ -278,12 +280,6 @@ function readNumber(value: unknown) {
   if (typeof value === 'number') return value
   if (typeof value === 'string' && value.trim()) return Number(value)
   return null
-}
-
-function readBearerToken(value: string | null) {
-  if (!value?.startsWith('Bearer ')) return null
-  const token = value.slice('Bearer '.length).trim()
-  return token || null
 }
 
 function sumSuccessfulCancelAmount(cancels: Array<{

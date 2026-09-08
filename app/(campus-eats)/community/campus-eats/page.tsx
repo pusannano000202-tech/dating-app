@@ -1,15 +1,14 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
-import CampusEatsPilot from '@/components/campus-eats/CampusEatsPilot'
-
-function isCampusEatsPilotEnabled(): boolean {
-  if (process.env.NODE_ENV !== 'production') return true
-
-  return process.env.NEXT_PUBLIC_COMMUNITY_ENABLED === 'true'
-    && process.env.NEXT_PUBLIC_CAMPUS_EATS_ENABLED === 'true'
-}
+import CampusEatsEntry from '@/components/campus-eats/CampusEatsEntry'
+import { isCampusEatsFeatureEnabled } from '@/lib/community-feature'
 
 export default function CampusEatsPage() {
-  if (!isCampusEatsPilotEnabled()) notFound()
+  if (!isCampusEatsFeatureEnabled()) notFound()
 
-  return <CampusEatsPilot />
+  return (
+    <Suspense fallback={null}>
+      <CampusEatsEntry />
+    </Suspense>
+  )
 }

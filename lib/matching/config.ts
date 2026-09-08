@@ -52,10 +52,10 @@ export const HARD_FILTER_CONFIG = {
 
   /**
    * 외모 백분위 점수대 stratification 폭.
-   * 사용자 점수 70 → 풀 후보: 점수 (70 - WIDTH) ~ (70 + WIDTH)
+   * 정규화 점수 0.70 → 풀 후보: 점수 (0.70 - WIDTH) ~ (0.70 + WIDTH)
    * 결정 8-5.
    */
-  SCORE_BAND_WIDTH: 15,
+  SCORE_BAND_WIDTH: 0.15,
 } as const
 
 // ─────────────────────────────────────────────
@@ -143,8 +143,8 @@ export const THRESHOLD_CONFIG = {
 export const FORCED_MATCH_CONFIG = {
   /** Forced Match 의 페어 점수 최소 기준. 결정 8-8: 0.30. */
   PAIR_SCORE_MIN: 0.30,
-  /** Forced Match 의 점수대 폭 확장. 결정 8-8: ±25. */
-  SCORE_BAND_WIDTH: 25,
+  /** Forced Match 의 정규화 점수대 폭 확장. 결정 8-8: ±0.25. */
+  SCORE_BAND_WIDTH: 0.25,
   /** 양방향 페널티는 일반 매칭과 동일 유지. */
   ASYMMETRY_PENALTY: 0.3,
 } as const
@@ -239,7 +239,13 @@ export const MATCHING_CONFIG = {
   ageFit: AGE_FIT_CONFIG,
 } as const
 
-export type MatchingConfig = typeof MATCHING_CONFIG
+type WidenNumericLiterals<T> =
+  T extends number ? number
+    : T extends readonly (infer U)[] ? readonly WidenNumericLiterals<U>[]
+      : T extends object ? { [K in keyof T]: WidenNumericLiterals<T[K]> }
+        : T
+
+export type MatchingConfig = WidenNumericLiterals<typeof MATCHING_CONFIG>
 
 /**
  * 시뮬레이션용 config 생성 헬퍼.
@@ -247,7 +253,7 @@ export type MatchingConfig = typeof MATCHING_CONFIG
  * @example
  *   const looseConfig = makeSimConfig({
  *     threshold: { PAIR_SCORE_MIN: 0.30 },
- *     hardFilter: { SCORE_BAND_WIDTH: 25 },
+ *     hardFilter: { SCORE_BAND_WIDTH: 0.25 },
  *   })
  */
 export function makeSimConfig(overrides: DeepPartial<MatchingConfig>): MatchingConfig {

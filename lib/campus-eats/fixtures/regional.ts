@@ -37,6 +37,7 @@ function buildLegacyDonkatsuCategory(school: (typeof regionalData.schools)[numbe
   const candidates = school.candidates.map((candidate, index): CampusEatsCandidate => {
     const normalized = {
       ...candidate,
+      canonicalStoreId: candidate.id,
       categoryId: 'donkatsu' as const,
       candidateNumber: index + 1,
       neighborhood: candidate.district,
@@ -45,6 +46,8 @@ function buildLegacyDonkatsuCategory(school: (typeof regionalData.schools)[numbe
       coordinateStatus: 'not_collected' as const,
       imageSrc: previewImages[index % previewImages.length],
       imageAlt: '시안용 돈까스 이미지',
+      imageSourceUrl: '',
+      sourceSha256: '',
     }
     return {
       ...normalized,

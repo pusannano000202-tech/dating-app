@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { AlertTriangle, MessageCircleMore, RefreshCw } from 'lucide-react'
 
 export default function ProfileError({
   error,
@@ -10,40 +11,40 @@ export default function ProfileError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const router = useRouter()
-
   useEffect(() => {
     console.error('[ProfileError]', error)
   }, [error])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-5">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-20%] w-[400px] h-[400px] rounded-full bg-violet-600/20 blur-[100px]" />
-        <div className="absolute bottom-[-10%] right-[-20%] w-[300px] h-[300px] rounded-full bg-rose-600/10 blur-[80px]" />
-      </div>
+    <main className="grid min-h-screen place-items-center booting-paper px-5 pb-28 pt-10 text-boot-ink">
+      <section aria-labelledby="profile-error-title" className="w-full max-w-md rounded-[28px] border border-boot-hairline bg-white p-6 shadow-[0_22px_60px_rgba(95,54,40,0.12)]">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF0ED] text-boot-coral">
+          <AlertTriangle size={24} aria-hidden="true" />
+        </span>
+        <p className="mt-5 text-xs font-black text-boot-coral">프로필 화면 오류</p>
+        <h1 id="profile-error-title" className="mt-2 text-2xl font-black">프로필 화면을 불러오지 못했어요</h1>
+        <p className="mt-4 text-sm font-bold leading-6 text-boot-body">
+          저장이 끝난 항목은 다시 연결한 뒤 확인할 수 있어요. 이 화면에서 아직 저장하지 않은 내용은 남지 않았을 수 있어요.
+        </p>
+        <p className="mt-2 text-xs font-bold leading-5 text-boot-muted">연결을 확인한 뒤 다시 시도해 주세요.</p>
 
-      <div className="relative text-center max-w-xs w-full">
-        <p className="text-5xl mb-4">😵</p>
-        <h1 className="text-xl font-black mb-2">프로필 입력 중 오류가 생겼어</h1>
-        <p className="text-gray-500 text-sm mb-1">입력한 내용은 자동 저장됐을 수 있어.</p>
-        <p className="text-gray-600 text-xs mb-8">네트워크 연결을 확인하고 다시 시도해봐.</p>
-
-        <div className="flex flex-col gap-3">
+        <div className="mt-7 flex flex-col gap-3">
           <button
             onClick={reset}
-            className="btn-gradient w-full py-4 rounded-2xl font-bold text-sm shadow-lg shadow-violet-900/30"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-boot-primary px-4 text-sm font-black text-white shadow-sm"
           >
+            <RefreshCw size={17} aria-hidden="true" />
             다시 시도
           </button>
-          <button
-            onClick={() => router.push('/profile/edit')}
-            className="w-full py-3 rounded-2xl glass text-sm text-gray-400 hover:text-gray-200 border border-white/5 transition-colors"
+          <Link
+            href="/community"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-boot-hairline bg-white px-4 text-sm font-black text-boot-ink"
           >
-            프로필 편집으로 이동
-          </button>
+            <MessageCircleMore size={17} aria-hidden="true" />
+            커뮤니티로 이동
+          </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }

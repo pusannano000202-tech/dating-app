@@ -1,70 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
-import { getDepositPaymentReadiness } from '@/lib/payments/deposit'
 import { createPaymentServiceClient } from '@/lib/payments/deposit-server'
 import {
-  buildTossRefundRequestKey,
-  cancelTossPayment,
-  getTossPayment,
-  TossPaymentError,
-  verifyTossRefundEvidence,
-  type TossPaymentObject,
-} from '@/lib/payments/toss'
-import { appFeeToRefundAmount, normalizeAppFeeAmount } from '@/lib/refund/fee-flow'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
-
-interface PreparedRefundResult {
-  refund_request_id: string
-  deposit_id: string
-  requested_refund_amount: number
-  deposit_amount: number
-  app_revenue: number
-  request_status: 'pending' | 'processed' | 'cancelled'
-  settlement_version: number
-  settlement_provider: string | null
-  settlement_provider_status: string | null
-  settled_refund_amount: number | null
-}
-
-interface RefundDepositRow {
-  id: string
-  match_id: string
-  user_id: string
-  amount: number
-  status: string
-  toss_payment_key: string | null
-  toss_order_id: string | null
-}
-
-type ProviderSettlement = {
-  provider: 'toss' | 'mock' | 'not_required'
-  status: string
-  reference: string
-  requestKey: string
-  paymentKey: string | null
-  orderId: string | null
-  settledAmount: number
-  paymentStatus?: string
-}
+  settleRefundWithProvider,
+  type PreparedRefundResult,
+  type RefundDepositRow,
+} from '@/lib/payments/refund-settlement'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const supabase = await createSupabaseServerClient()
+  const params = await props.params
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await readJson(req)
-  const appFeeAmount = typeof body.app_fee_amount === 'number'
-    ? normalizeAppFeeAmount(body.app_fee_amount, DEPOSIT_AMOUNT)
+  const refundAmount = typeof body.refund_amount === 'number'
+    ? Math.floor(body.refund_amount)
     : null
-  const refundAmount = appFeeAmount !== null
-    ? appFeeToRefundAmount(appFeeAmount, DEPOSIT_AMOUNT)
-    : typeof body.refund_amount === 'number' && body.refund_amount >= 0
-      ? Math.floor(body.refund_amount)
-      : null
 
-  if (refundAmount === null || refundAmount > DEPOSIT_AMOUNT) {
-    return NextResponse.json({ error: 'invalid_refund_amount' }, { status: 400 })
+  if (refundAmount !== DEPOSIT_AMOUNT) {
+    return NextResponse.json({ error: 'full_refund_required' }, { status: 400 })
   }
 
   const service = createPaymentServiceClient()
@@ -72,17 +28,12 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json({ error: 'server_settlement_not_configured' }, { status: 503 })
   }
 
-  const zeroReasons = Array.isArray(body.zero_refund_reasons)
-    ? body.zero_refund_reasons.filter((value): value is string => typeof value === 'string')
-    : null
-  const zeroComment = typeof body.zero_refund_comment === 'string' ? body.zero_refund_comment : null
-
   const prepared = await supabase
     .rpc('prepare_refund_request', {
       p_match_id: params.id,
       p_refund_amount: refundAmount,
-      p_zero_refund_reasons: zeroReasons,
-      p_zero_refund_comment: zeroComment,
+      p_zero_refund_reasons: null,
+      p_zero_refund_comment: null,
     })
     .maybeSingle()
 
@@ -153,136 +104,6 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
       payment_status: settlement.value.paymentStatus ?? settlement.value.status,
     },
   })
-}
-
-async function settleRefundWithProvider(params: {
-  request: PreparedRefundResult
-  deposit: RefundDepositRow
-}): Promise<
-  | { ok: true; value: ProviderSettlement }
-  | { ok: false; error: string; status: number }
-> {
-  if (params.request.requested_refund_amount === 0) {
-    return {
-      ok: true,
-      value: {
-        provider: 'not_required',
-        status: 'NOT_REQUIRED',
-        reference: `refund_${params.request.refund_request_id}_v${params.request.settlement_version}_0`,
-        requestKey: `refund_${params.request.refund_request_id}_v${params.request.settlement_version}_0`,
-        paymentKey: null,
-        orderId: null,
-        settledAmount: 0,
-      },
-    }
-  }
-
-  const paymentKey = params.deposit.toss_payment_key?.trim() ?? ''
-  if (paymentKey.toUpperCase().startsWith('MOCK_')) {
-    return {
-      ok: true,
-      value: {
-        provider: 'mock',
-        status: 'MOCK',
-        reference: params.deposit.toss_order_id ?? params.deposit.id,
-        requestKey: `refund_${params.request.refund_request_id}_v${params.request.settlement_version}_mock`,
-        paymentKey: params.deposit.toss_payment_key,
-        orderId: params.deposit.toss_order_id,
-        settledAmount: params.request.requested_refund_amount,
-      },
-    }
-  }
-  if (!paymentKey) {
-    return { ok: false, error: 'payment_key_missing', status: 409 }
-  }
-
-  const readiness = getDepositPaymentReadiness('toss')
-  if (!readiness.ok) {
-    return { ok: false, error: 'pending_provider_configuration', status: 503 }
-  }
-
-  try {
-    const settlementKey = buildTossRefundRequestKey({
-      refundRequestId: params.request.refund_request_id,
-      settlementVersion: params.request.settlement_version,
-      refundAmount: params.request.requested_refund_amount,
-    })
-    const currentPayment = await getTossPayment(paymentKey)
-    const recoveredSettlement = buildVerifiedTossSettlement({
-      payment: currentPayment,
-      deposit: params.deposit,
-      request: params.request,
-      requestKey: settlementKey,
-    })
-    if (recoveredSettlement) {
-      return { ok: true, value: recoveredSettlement }
-    }
-    if (
-      currentPayment.paymentKey !== params.deposit.toss_payment_key
-      || currentPayment.orderId !== params.deposit.toss_order_id
-      || currentPayment.totalAmount !== params.deposit.amount
-      || currentPayment.status !== 'DONE'
-      || (currentPayment.cancels ?? []).some((cancel) => cancel.cancelStatus === 'DONE')
-    ) {
-      return { ok: false, error: 'provider_settlement_requires_reconciliation', status: 409 }
-    }
-
-    const payment = await cancelTossPayment({
-      paymentKey,
-      cancelReason: '정상 만남 후 보증금 환불',
-      cancelAmount: params.request.requested_refund_amount,
-      idempotencyKey: settlementKey,
-    })
-
-    const settlement = buildVerifiedTossSettlement({
-      payment,
-      deposit: params.deposit,
-      request: params.request,
-      requestKey: settlementKey,
-    })
-    if (!settlement) {
-      return { ok: false, error: 'provider_settlement_mismatch', status: 502 }
-    }
-    return { ok: true, value: settlement }
-  } catch (error) {
-    if (error instanceof TossPaymentError) {
-      return { ok: false, error: error.code, status: error.status }
-    }
-    return { ok: false, error: 'cancel_failed', status: 502 }
-  }
-}
-
-function buildVerifiedTossSettlement(params: {
-  payment: TossPaymentObject
-  deposit: RefundDepositRow
-  request: PreparedRefundResult
-  requestKey: string
-}): ProviderSettlement | null {
-  if (
-    params.payment.paymentKey !== params.deposit.toss_payment_key
-    || params.payment.orderId !== params.deposit.toss_order_id
-  ) {
-    return null
-  }
-
-  const evidence = verifyTossRefundEvidence(params.payment, {
-    requestedRefundAmount: params.request.requested_refund_amount,
-    depositAmount: params.deposit.amount,
-  })
-  if (!evidence.ok) {
-    return null
-  }
-
-  return {
-    provider: 'toss',
-    status: params.payment.status,
-    reference: evidence.transactionKey,
-    requestKey: params.requestKey,
-    paymentKey: params.payment.paymentKey,
-    orderId: params.payment.orderId,
-    settledAmount: params.request.requested_refund_amount,
-    paymentStatus: params.payment.status,
-  }
 }
 
 function refundSettlementPending(

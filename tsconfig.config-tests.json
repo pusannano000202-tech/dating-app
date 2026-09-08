@@ -1,9 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "resolveJsonModule": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -14,10 +20,16 @@
   },
   "include": [
     "app/api/debug-env/route.ts",
+    "app/api/campus-eats/**/*.ts",
     "lib/dev-auth.ts",
     "lib/utils.ts",
     "lib/payments/**/*.ts",
     "lib/refund/**/*.ts",
+    "lib/campus-eats/repository.ts",
+    "lib/campus-eats/fixtures/pnu-categories.ts",
+    "lib/community/**/*.ts",
+    "lib/places/**/*.ts",
+    "lib/server/tonight/**/*.ts",
     "tests/config/**/*.ts"
   ]
 }

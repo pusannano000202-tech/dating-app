@@ -138,19 +138,21 @@ export default function PreferencesPage() {
         return
       }
 
-      const { error: dbErr } = await supabase
+      const { data: updatedProfile, error: dbErr } = await supabase
         .from('profiles')
-        .upsert(
+        .update(
           {
-            user_id: user.id,
             preference_weights: weights,
             preferred_age_min: ageMin,
             preferred_age_max: ageMax,
           },
-          { onConflict: 'user_id' }
         )
+        .eq('user_id', user.id)
+        .select('user_id')
+        .maybeSingle()
 
       if (dbErr) throw dbErr
+      if (!updatedProfile) throw new Error('profile_record_missing')
       router.push(getSequentialMatchStartRedirect('/profile/match-card', '/'))
     } catch {
       setError('저장 중 오류가 발생했어요. 다시 시도해주세요.')

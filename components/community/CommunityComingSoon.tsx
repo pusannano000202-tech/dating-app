@@ -20,7 +20,7 @@ export default function CommunityComingSoon({ kind }: CommunityComingSoonProps) 
           <BootingLogo size="md" />
         </header>
 
-        <section className="overflow-hidden rounded-[28px] border border-boot-primary/15 bg-white shadow-[0_18px_44px_rgba(23,20,18,0.08)]">
+        <section className="overflow-hidden rounded-[8px] border border-boot-primary/15 bg-white shadow-[0_18px_44px_rgba(23,20,18,0.08)]">
           <div className="grid grid-cols-[minmax(0,1fr)_112px] items-end gap-3 bg-boot-soft px-5 py-6">
             <div className="min-w-0">
               <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">
@@ -32,12 +32,12 @@ export default function CommunityComingSoon({ kind }: CommunityComingSoonProps) 
             <SchoolMascot
               pose="guide"
               size="lg"
-              className="h-28 w-28 rounded-[24px] border border-white/80 bg-white/90 shadow-[0_14px_28px_rgba(23,20,18,0.1)]"
+              className="h-28 w-28 rounded-[8px] border border-white/80 bg-white/90 shadow-[0_14px_28px_rgba(23,20,18,0.1)]"
             />
           </div>
 
           <div className="px-5 py-5">
-            <div className="flex items-start gap-3 rounded-2xl border border-boot-hairline bg-white px-4 py-3">
+            <div className="flex items-start gap-3 rounded-[8px] border border-boot-hairline bg-white px-4 py-3">
               <ShieldCheck aria-hidden="true" className="mt-0.5 shrink-0 text-boot-primary" size={19} />
               <p className="text-xs font-bold leading-5 text-boot-muted">
                 실제 참여 데이터와 운영 안전장치가 준비되기 전에는 신청이나 통계가 노출되지 않아요.
@@ -48,7 +48,7 @@ export default function CommunityComingSoon({ kind }: CommunityComingSoonProps) 
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/match"
-              className="mt-4 flex h-12 items-center justify-center gap-2 rounded-2xl bg-boot-ink px-4 text-sm font-black text-white"
+              className="mt-4 flex h-12 items-center justify-center gap-2 rounded-[8px] bg-boot-ink px-4 text-sm font-black text-white"
             >
               매칭으로 돌아가기
               <ArrowRight aria-hidden="true" size={16} />

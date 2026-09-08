@@ -8,14 +8,6 @@ import { createClient } from '@/lib/supabase'
 import { isDevAuthBypassEnabled } from '@/lib/dev-auth'
 import { isSupabaseConfigured } from '@/lib/utils'
 
-const STORAGE_BUCKET = 'photos'
-
-interface ScoreApiResponse {
-  status?: string
-  self_appearance_score_persisted?: boolean
-  self_appearance_score_persist_error?: string
-}
-
 export default function PhotosPage() {
   const router = useRouter()
   const [existingPhotos, setExistingPhotos] = useState<string[]>([])
@@ -25,21 +17,33 @@ export default function PhotosPage() {
 
   useEffect(() => {
     if (!isSupabaseConfigured()) { setPhotosLoaded(true); return }
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { setPhotosLoaded(true); return }
-      supabase
-        .from('photos')
-        .select('public_url')
-        .eq('user_id', user.id)
-        .order('sort_order')
-        .then(({ data }) => {
-          if (data && data.length > 0) {
-            setExistingPhotos(data.map((p) => p.public_url as string))
-          }
-          setPhotosLoaded(true)
+
+    let cancelled = false
+    async function loadExistingPhotos() {
+      try {
+        const response = await fetch('/api/profile/photos', {
+          method: 'GET',
+          cache: 'no-store',
         })
-    })
+        if (!response.ok) {
+          if (response.status !== 401 && !cancelled) {
+            setError('기존 사진을 불러오지 못했어요. 다시 시도해줘.')
+          }
+          return
+        }
+
+        const payload: unknown = await response.json()
+        if (!isSignedPhotoResponse(payload)) throw new Error('invalid_photo_response')
+        if (!cancelled) setExistingPhotos(payload.photos)
+      } catch {
+        if (!cancelled) setError('기존 사진을 불러오지 못했어요. 다시 시도해줘.')
+      } finally {
+        if (!cancelled) setPhotosLoaded(true)
+      }
+    }
+
+    void loadExistingPhotos()
+    return () => { cancelled = true }
   }, [])
 
   async function handleComplete({ publicUrls: localPreviews }: PhotoUploadResult) {
@@ -56,57 +60,28 @@ export default function PhotosPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
 
-      let uploadedUrls: string[] = localPreviews
-
       if (isSupabaseConfigured()) {
-        // 실제 Supabase Storage 업로드
-        const uploads = await Promise.all(
-          localPreviews.map(async (previewUrl, idx) => {
-            const res = await fetch(previewUrl)
-            const blob = await res.blob()
-            const ext = blob.type.split('/')[1] ?? 'jpg'
-            const storagePath = `${user.id}/photo_${idx}.${ext}`
+        const formData = new FormData()
+        await Promise.all(localPreviews.map(async (previewUrl, index) => {
+          const response = await fetch(previewUrl)
+          if (!response.ok) throw new Error('photo_preview_unavailable')
+          const blob = await response.blob()
+          const extension = blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg'
+          formData.append('photos', blob, `profile-${index + 1}.${extension}`)
+        }))
 
-            const { error: upErr } = await supabase.storage
-              .from(STORAGE_BUCKET)
-              .upload(storagePath, blob, { upsert: true, contentType: blob.type })
-            if (upErr) throw upErr
+        const uploadResponse = await fetch('/api/profile/photos', {
+          method: 'PUT',
+          body: formData,
+        })
+        if (!uploadResponse.ok) throw new Error('photo_upload_failed')
 
-            const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath)
-            return { publicUrl: data.publicUrl, storagePath }
-          })
-        )
-
-        // 기존 레코드 삭제 후 새 레코드 insert (Storage는 upsert라 파일 손실 없음)
-        await supabase.from('photos').delete().eq('user_id', user.id)
-        const { error: insertErr } = await supabase.from('photos').insert(
-          uploads.map(({ publicUrl, storagePath }, idx) => ({
-            user_id: user.id,
-            storage_path: storagePath,
-            public_url: publicUrl,
-            sort_order: idx,
-          }))
-        )
-        if (insertErr) throw insertErr
-
-        uploadedUrls = uploads.map(({ publicUrl }) => publicUrl)
-
-        // Block progression until the internal matching score is persisted.
-        await requestScorePersistence(uploadedUrls)
-
-        const { error: profileErr } = await supabase
-          .from('profiles')
-          .upsert({ user_id: user.id, is_profile_complete: true }, { onConflict: 'user_id' })
-        if (profileErr) throw profileErr
+        router.push('/profile/complete')
+        return
       }
 
       router.push('/profile/complete')
     } catch (err) {
-      if (err instanceof Error && err.message === 'score_failed') {
-        setError('사진 분석 점수 저장에 실패했어요. 다시 시도해줘.')
-        setSaving(false)
-        return
-      }
       setError('사진 업로드 중 오류가 발생했어요. 다시 시도해줘.')
       setSaving(false)
     }
@@ -123,31 +98,25 @@ export default function PhotosPage() {
         return
       }
 
-      await requestScorePersistence(existingPhotos)
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
-      const { error: profileErr } = await supabase
-        .from('profiles')
-        .upsert({ user_id: user.id, is_profile_complete: true }, { onConflict: 'user_id' })
-      if (profileErr) throw profileErr
+      const completeResponse = await fetch('/api/profile/photos', { method: 'POST' })
+      if (!completeResponse.ok) throw new Error('profile_completion_failed')
       router.push('/profile/complete')
     } catch (err) {
-      if (err instanceof Error && err.message === 'score_failed') {
-        setError('사진 분석 점수 저장에 실패했어요. 다시 시도해줘.')
-        setSaving(false)
-        return
-      }
-      setError('사진 분석 중 오류가 발생했어요. 다시 시도해줘.')
+      setError('사진 저장 상태를 확인하지 못했어요. 다시 시도해줘.')
       setSaving(false)
     }
   }
 
   return (
-    <div className="flex flex-col min-h-screen px-5 pb-10">
+    <div className="flex flex-col min-h-screen px-5 pb-28">
       <div className="mb-7">
         <h1 className="text-2xl font-black gradient-fate-text">사진 등록</h1>
-        <p className="text-sm text-gray-500 mt-1">AI가 사진으로 외모를 분석해. 얼굴이 잘 보이는 사진으로 올려줘.</p>
+        <p className="text-sm text-gray-500 mt-1">
+          얼굴이 잘 보이는 사진을 저장해 주세요. 분석은 매칭 찾기를 시작할 때만 진행해요.
+        </p>
       </div>
 
       {/* 기존 사진 로딩 스켈레톤 */}
@@ -188,27 +157,8 @@ export default function PhotosPage() {
   )
 }
 
-async function parseScoreResponse(response: Response): Promise<ScoreApiResponse | null> {
-  try {
-    return await response.json() as ScoreApiResponse
-  } catch {
-    return null
-  }
-}
-
-async function requestScorePersistence(photoUrls: string[]): Promise<void> {
-  const scoreRes = await fetch('/api/score', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ photo_urls: photoUrls }),
-  })
-  const scoreData = await parseScoreResponse(scoreRes)
-
-  if (
-    !scoreRes.ok ||
-    scoreData?.status === 'error' ||
-    scoreData?.self_appearance_score_persisted !== true
-  ) {
-    throw new Error('score_failed')
-  }
+function isSignedPhotoResponse(value: unknown): value is { photos: string[] } {
+  if (typeof value !== 'object' || value === null || !('photos' in value)) return false
+  const photos = (value as { photos?: unknown }).photos
+  return Array.isArray(photos) && photos.length <= 3 && photos.every((url) => typeof url === 'string')
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { toPublicErrorCode } from '@/lib/api/public-error'
 
 interface SummaryRow {
   user_id: string
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase.rpc('get_group_deposit_summary', { p_group_id: groupId })
 
   if (error) {
-    return NextResponse.json({ error: error.message || 'summary_failed' }, { status: 400 })
+    return NextResponse.json({ error: toPublicErrorCode(error.message, 'summary_failed') }, { status: 400 })
   }
 
   const rows = (data ?? []) as SummaryRow[]

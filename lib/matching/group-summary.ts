@@ -19,7 +19,7 @@ export function summarizeGroup(input: GroupSummaryInput): GroupSummary {
     gender: input.gender,
     size: input.size,
     departmentCodes: input.departmentCodes,
-    avgSelfAppearanceScore: mean(input.members.map((member) => member.selfAppearanceScore)),
+    avgAppearanceScoreNormalized: mean(input.members.map((member) => member.appearanceScoreNormalized)),
     avgAppearanceVector: meanNumericVector(input.members.map((member) => member.appearanceVector)),
     avgPreferredAppearanceVector: meanNumericVector(input.members.map((member) => member.preferredAxisZVector)),
     avgPreferredAxisZVector: meanNumericVector(input.members.map((member) => member.preferredAxisZVector)),

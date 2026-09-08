@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "rootDir": "../..",
+    "outDir": "../../.tmp/account-tests",
+    "types": ["node"],
+    "noEmit": false
+  },
+  "include": [
+    "../../lib/account/deletion-contract.ts",
+    "../../lib/account/legal-disclosure.ts",
+    "../../lib/account/retention-worker.ts",
+    "../../components/account/AccountDeletionStatus.tsx",
+    "../../tests/account/**/*.ts"
+  ]
+}

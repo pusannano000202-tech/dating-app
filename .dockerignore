@@ -1,0 +1,9 @@
+**
+!python/
+!python/appearance/
+!python/appearance/Dockerfile
+!python/appearance/*.py
+!python/appearance/requirements-runtime.txt
+!data/
+!data/appearance-calibration-v2/
+!data/appearance-calibration-v2/approved-anchors.json

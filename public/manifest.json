@@ -4,8 +4,8 @@
   "description": "과팅, 모임, 캠퍼스 생활을 자연스럽게 이어주는 대학생 연결 앱",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F4F6F5",
-  "theme_color": "#1D5C8B",
+  "background_color": "#FFF9F6",
+  "theme_color": "#B94B3F",
   "orientation": "portrait",
   "icons": [
     {

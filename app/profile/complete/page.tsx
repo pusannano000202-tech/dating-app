@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Brain, Camera, Check, ClipboardList, Crosshair, Home, Search } from 'lucide-react'
+import { Camera, Check, ClipboardList, Crosshair, Home, Search } from 'lucide-react'
 import BootingLogo from '@/components/BootingLogo'
 
 const AUTO_REDIRECT_SECS = 5
@@ -11,7 +11,6 @@ const AUTO_REDIRECT_SECS = 5
 const COMPLETED_STEPS = [
   { label: '기본 정보', Icon: ClipboardList, color: 'text-sky-600' },
   { label: '이상형 월드컵', Icon: Crosshair, color: 'text-boot-primary' },
-  { label: '성향 질문', Icon: Brain, color: 'text-emerald-700' },
   { label: '사진 업로드', Icon: Camera, color: 'text-boot-coral' },
 ]
 
@@ -40,7 +39,7 @@ export default function ProfileCompletePage() {
 
         <h1 className="mb-1 text-3xl font-black text-boot-ink">프로필 준비 완료</h1>
         <p className="mb-6 mt-1 text-sm leading-6 text-boot-muted">
-          이제 홈에서 친구를 추가하거나 매칭찾기를 시작할 수 있어요.
+          이제 홈에서 친구를 추가하거나 매칭찾기를 시작할 수 있어요. 외모 분석은 매칭을 찾을 때만 진행합니다.
         </p>
 
         <div className="glass-card mb-6 space-y-2.5 rounded-2xl border border-boot-hairline p-4 text-left">
