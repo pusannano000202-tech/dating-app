@@ -1,6 +1,7 @@
 'use client'
 
 import PhotoSceneCarousel from '@/components/social/PhotoSceneCarousel'
+import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
 
 const challengeScenes = [
   {
@@ -11,7 +12,7 @@ const challengeScenes = [
     image: '/images/meetups/meetup-gaming.webp',
     imageAlt: '학생들이 PC 게임을 함께 즐기는 학과 게임 대항 분위기 예시',
     actionLabel: '게임 대항 시작',
-    href: '/community/department?category=gaming',
+    href: '/meetups/league?category=gaming',
     note: '팀 초대와 친구 관계는 별도예요. 자동으로 학과 친구가 생기지 않아요.',
   },
   {
@@ -22,17 +23,19 @@ const challengeScenes = [
     image: '/social-scenes/football.png',
     imageAlt: '관중이 있는 축구장에서 경기를 준비하는 학과 축구 대항 분위기 예시',
     actionLabel: '축구 대항 시작',
-    href: '/community/department?category=soccer',
+    href: '/meetups/league?category=soccer',
     note: '사진은 장소나 예약을 보장하지 않으며 일정은 양쪽 주장이 확인해요.',
   },
 ] as const
 
 export default function DepartmentChallengeEntry() {
+  const { t } = useQuantumLocale()
+  const scenes = challengeScenes.map(scene => ({...scene, eyebrow:t('challenge.myDept'), title:t(scene.id === 'gaming' ? 'challenge.lol' : 'challenge.soccer'), description:t(scene.id === 'gaming' ? 'challenge.lolNote' : 'challenge.soccerNote'), imageAlt:t(scene.id === 'gaming' ? 'challenge.lolIntro' : 'challenge.soccerIntro'), actionLabel:t('challenge.findTeams'), note:t('challenge.friendChoice')}))
   return <section className="mt-5" aria-labelledby="department-challenge-entry-title">
     <div className="mb-3 flex items-end justify-between gap-3">
-      <div><p className="text-xs font-black text-[#B94B3F]">친구와 팀부터</p><h2 id="department-challenge-entry-title" className="mt-1 text-xl font-black">학과 대항 한 장면 고르기</h2></div>
-      <span className="text-[11px] font-bold text-boot-muted">자발적 참여</span>
+      <div><p className="text-xs font-black text-[#B94B3F]">{t('challenge.myDept')}</p><h2 id="department-challenge-entry-title" className="mt-1 text-xl font-black">{t('challenge.chooseScene')}</h2></div>
+      <span className="text-[11px] font-bold text-boot-muted">{t('challenge.voluntary')}</span>
     </div>
-    <PhotoSceneCarousel label="학과 대항 종목" items={challengeScenes} />
+    <PhotoSceneCarousel label={t('challenge.chooseScene')} items={scenes} />
   </section>
 }

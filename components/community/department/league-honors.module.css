@@ -1,0 +1,403 @@
+.honors {
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid #dfe4d7;
+  border-radius: 18px;
+  background: #fffdf7;
+  color: #29362b;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 12px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.4;
+  letter-spacing: -.035em;
+}
+
+.header p {
+  margin: 0;
+  color: #65705f;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.group {
+  --rank-color: #806428;
+  --rank-surface: #f8f2df;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #e2e5d9;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.group[data-rank='1'] {
+  --rank-color: #f0d18e;
+  --rank-surface: #3d5140;
+  border-color: #c5a766;
+  background: #263e2d;
+  color: #fff9ec;
+}
+
+.group[data-rank='1'] .points {
+  color: #f0d18e;
+}
+
+.group[data-rank='1'] .meta {
+  color: #c6d2c2;
+}
+
+.group[data-rank='1'] .myDepartment {
+  background: #e8d397;
+  color: #314331;
+}
+
+.group[data-rank='1'] .tied summary {
+  color: #f0d18e;
+}
+
+.group[data-rank='1'] .tied summary:focus-visible {
+  outline-color: #f0d18e;
+}
+
+.group[data-rank='2'] {
+  --rank-color: #596574;
+  --rank-surface: #edf0f3;
+  background: #f4f6f8;
+  border-color: #cdd4db;
+}
+
+.group[data-rank='3'] {
+  --rank-color: #926045;
+  --rank-surface: #f6ece5;
+  background: #fcf3ed;
+  border-color: #e1c9b8;
+}
+
+.rankLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--rank-color);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.icon {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  border-radius: 7px;
+  background: var(--rank-surface);
+  color: var(--rank-color);
+  stroke-width: 1.8;
+}
+
+.names {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.names li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 5px;
+  min-width: 0;
+  line-height: 1.45;
+}
+
+.department {
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.myDepartment {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: #edf3e7;
+  color: #42603c;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.points {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px;
+  margin: 5px 0 0;
+  color: #385c36;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.points strong {
+  min-width: 0;
+  font-size: 23px;
+  font-weight: 850;
+  letter-spacing: -.04em;
+}
+
+.points span {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tied {
+  min-width: 0;
+  margin-top: 2px;
+}
+
+.tied summary {
+  min-height: 44px;
+  padding: 10px 0;
+  color: #435b3d;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.7;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.tied summary::marker {
+  color: #71816a;
+}
+
+.tied[open] .names {
+  margin: 0 0 7px;
+  padding-left: 4px;
+}
+
+.meta {
+  margin: 3px 0 0;
+  color: #687360;
+  font-size: 10px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: 10px;
+}
+
+.join {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 9px 14px;
+  border: 1px solid #345a38;
+  border-radius: 10px;
+  background: #345a38;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: center;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.join svg {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+}
+
+.join:hover {
+  background: #294b2d;
+}
+
+.join:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.join:focus-visible,
+.tied summary:focus-visible {
+  outline: 3px solid #517349;
+  outline-offset: 3px;
+}
+
+.footer small {
+  min-width: 0;
+  color: #697362;
+  font-size: 10px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 10px;
+  padding: 15px 12px;
+  border: 1px dashed #d4ddc9;
+  border-radius: 13px;
+  background: #f7f8f0;
+}
+
+.empty > svg {
+  grid-row: 1 / 3;
+  width: 28px;
+  height: 28px;
+  color: #728364;
+  stroke-width: 1.5;
+}
+
+.empty h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.empty p {
+  grid-column: 2;
+  margin: 0;
+  color: #65725b;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 540px) {
+  .honors {
+    padding: 14px 12px;
+    border-radius: 15px;
+  }
+
+  .header {
+    gap: 3px 10px;
+    margin-bottom: 9px;
+  }
+
+  .header h2 {
+    font-size: 17px;
+  }
+
+  .groups {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .group {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1px 8px;
+    padding: 7px 9px;
+    border-radius: 10px;
+  }
+
+  .rankLine {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .group > .names,
+  .tied {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .department {
+    font-size: 12px;
+  }
+
+  .points {
+    grid-column: 3;
+    grid-row: 1;
+    justify-content: flex-end;
+    max-width: 76px;
+    margin: 0;
+  }
+
+  .points strong {
+    font-size: 19px;
+  }
+
+  .points span {
+    font-size: 9px;
+  }
+
+  .meta {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    margin: 0;
+    font-size: 9px;
+  }
+
+  .tied summary {
+    padding: 10px 0;
+    font-size: 11px;
+  }
+
+  .tied[open] .names {
+    padding-left: 0;
+  }
+
+  .footer {
+    gap: 5px 10px;
+    margin-top: 8px;
+  }
+
+  .join {
+    padding: 8px 11px;
+    font-size: 11px;
+  }
+}

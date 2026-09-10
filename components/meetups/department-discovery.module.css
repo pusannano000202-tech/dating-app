@@ -1,0 +1,109 @@
+.page{min-height:100dvh;background:#fffaf7;color:#292321;padding:20px 20px 112px;word-break:keep-all;overflow-wrap:anywhere}
+.shell{width:100%;max-width:740px;margin:0 auto}
+.back{display:inline-flex;align-items:center;gap:7px;min-height:44px;color:#776960;font-size:13px;font-weight:700}
+.header{padding:17px 0 23px}
+.eyebrow{font-size:12px;font-weight:800;color:#b94b3f;line-height:1.6}
+.header h1{font-size:34px;letter-spacing:-.055em;font-weight:850;line-height:1.2;margin:7px 0 11px}
+.header>p:last-child{font-size:14px;line-height:1.8;color:#82736b}
+.introPhoto{position:relative;aspect-ratio:2.15;min-height:156px;overflow:hidden;border-radius:18px;background:#ece2da}
+.introPhoto img{object-fit:cover;object-position:center 47%}
+.introPhoto>span{position:absolute;bottom:12px;left:12px;right:12px;width:fit-content;max-width:calc(100% - 24px);background:#fffaf7ed;color:#69564a;border-radius:20px;padding:8px 12px;font-size:11px;font-weight:750;line-height:1.5}
+.continueLink{display:flex;gap:12px;align-items:center;min-height:76px;margin-top:15px;padding:15px 16px;border:1px solid #ead9d2;background:#fff;border-radius:14px;color:#b94b3f}
+.continueLink>span{flex:1;font-size:13px;font-weight:800}
+.continueLink small{display:block;color:#82736b;font-size:11px;line-height:1.6;margin-top:4px;font-weight:500}
+.continueLink>svg{flex-shrink:0}
+.activityChoices{display:grid;gap:14px}
+.activityChoice{position:relative;display:block;aspect-ratio:1.85;border-radius:19px;overflow:hidden;background:#ece2da;isolation:isolate}
+.activityChoice>img{object-fit:cover;object-position:center 42%;transition:transform .25s ease}
+.activityChoice:hover>img{transform:scale(1.025)}
+.activityCaption{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;padding:17px 18px;background:#292321b8;color:#fff}
+.activityCaption>span:first-child{flex:1;min-width:0}
+.activityCaption strong{display:block;font-size:23px;line-height:1.35;letter-spacing:-.045em;font-weight:850}
+.activityCaption small{display:block;margin-top:4px;font-size:12px;line-height:1.6;color:#fff6ed}
+.activityArrow{display:grid;place-items:center;flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fffaf6;color:#49392f}
+.homeNote{padding:21px 8px 0;text-align:center;font-size:12px;line-height:1.9;color:#82736b}
+.mentoringStart{margin-top:20px;border:1px solid #ead9d2;border-radius:17px;background:#fff;padding:20px}
+.mentoringStart>strong{font-size:17px;line-height:1.5;font-weight:800}
+.mentoringStart>p{font-size:12px;line-height:1.8;color:#82736b;margin-top:7px}
+.mentoringStart>div{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}
+.mentoringStart a{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:48px;padding:10px 12px;border-radius:11px;border:1px solid #ead9d2;color:#a84d3d;background:#fffaf7;font-size:12px;font-weight:750}
+.mentoringStart a>svg{flex-shrink:0}
+.section{margin-top:30px}
+.sectionHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sectionHeading h2,.nextTime h2,.howTo h2{font-size:21px;line-height:1.4;font-weight:850;letter-spacing:-.035em;margin-top:4px}
+.iconButton{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;border:1px solid #ead9d2;border-radius:50%;background:#fff;color:#8e6555}
+.iconButton:disabled{opacity:.5}
+.status{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:25px 22px;border:1px solid #ead9d2;border-radius:17px;background:#fff;line-height:1.8;color:#82736b;font-size:13px}
+.status strong{font-size:16px;font-weight:800;color:#49392f}
+.status p{line-height:1.8}
+.primary,.secondary{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:46px;margin-top:8px;padding:11px 15px;border-radius:11px;font-size:12px;font-weight:800;text-align:center}
+.primary{background:#b94b3f;color:#fff}
+.primary:hover{background:#9e3e34}
+.secondary{background:#fffaf7;color:#a04437;border:1px solid #e4cec4}
+.joinedList{display:grid;gap:8px;margin-bottom:14px}
+.joinedLink{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#f2ebe5;border-radius:12px;color:#766052}
+.joinedLink>span{flex:1;min-width:0}
+.joinedLink>svg{flex-shrink:0}
+.joinedLink small{display:block;font-size:10px;line-height:1.7;color:#956a53}
+.joinedLink strong{display:block;font-size:13px;line-height:1.6;font-weight:800}
+.sectionNote{font-size:12px;line-height:1.8;color:#82736b;margin:0 0 13px}
+.meetupList{display:grid;gap:12px}
+.meetupCard{display:grid;grid-template-columns:110px minmax(0,1fr);background:#fff;border:1px solid #ead9d2;border-radius:15px;overflow:hidden}
+.meetupPhoto{position:relative;min-height:165px;background:#e9ded5}
+.meetupPhoto img{object-fit:cover}
+.meetupBody{min-width:0;padding:14px}
+.cardTags{display:flex;flex-wrap:wrap;gap:5px;color:#a34738;font-size:10px;font-weight:750;line-height:1.5}
+.cardTags span+span{color:#82736b}
+.cardTags span+span:before{content:'·';margin-right:5px}
+.meetupBody h3{font-size:17px;line-height:1.45;letter-spacing:-.025em;font-weight:800;margin:6px 0 10px}
+.cardMeta{display:flex;align-items:flex-start;gap:5px;font-size:10px;line-height:1.7;color:#82736b;margin-top:4px}
+.cardMeta svg{flex-shrink:0;margin-top:1px}
+.cardBottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:14px;font-size:10px;line-height:1.7;color:#876851}
+.cardBottom span{display:inline-flex;align-items:center;gap:4px}
+.cardBottom span:last-child{color:#b94b3f;font-weight:800}
+.cardBottom svg{flex-shrink:0}
+.featured{grid-template-columns:1fr}
+.featured .meetupPhoto{aspect-ratio:1.85;min-height:0}
+.featured .meetupBody{padding:18px 19px}
+.featured .meetupBody h3{font-size:22px;margin-top:7px}
+.featured .cardMeta{font-size:12px}
+.featured .cardBottom{font-size:12px;border-top:1px solid #f0e3dc;padding-top:12px}
+.showAll{display:flex;align-items:center;justify-content:center;gap:7px;min-height:46px;width:100%;padding:11px 14px;margin-top:12px;border:1px solid #ead9d2;border-radius:11px;background:transparent;font-size:12px;font-weight:750;color:#806254}
+.chevronOpen{transform:rotate(180deg)}
+.finePrint{font-size:10px;color:#928278;line-height:1.8;margin-top:10px}
+.nextTime{margin-top:28px;background:#f5eee8;border-radius:17px;padding:20px 21px}
+.nextTime h2{font-size:18px}
+.nextTime>p:last-child{font-size:12px;color:#82736b;line-height:1.85;margin-top:9px}
+.secondaryRoute{display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:1px solid #ead9d2;margin-top:23px;padding-top:22px}
+.secondaryRoute strong{font-size:12px;font-weight:750;color:#756155}
+.secondaryRoute p{font-size:10px;color:#928278;line-height:1.8;margin-top:4px}
+.secondaryRoute a{display:inline-flex;align-items:center;gap:5px;min-height:44px;font-size:11px;color:#a84d3d;font-weight:750;flex-shrink:0}
+.sportList{display:grid;gap:17px}
+.sportCard{border:1px solid #ead9d2;border-radius:20px;overflow:hidden;background:#fff}
+.sportPhoto{position:relative;aspect-ratio:1.7;background:#e9ded5}
+.sportPhoto img{object-fit:cover;object-position:center 43%}
+.sportBody{padding:20px 21px}
+.sportBody h2{font-size:26px;letter-spacing:-.05em;line-height:1.3;font-weight:850;margin:5px 0 10px}
+.sportBody>p:not(.eyebrow){color:#82736b;font-size:13px;line-height:1.8}
+.sportCapacity{display:flex;align-items:flex-start;gap:7px;color:#82736b;font-size:11px;line-height:1.8;margin-top:13px}
+.sportCapacity svg{flex-shrink:0;margin-top:2px}
+.sportAction{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;background:#b94b3f;color:white;border-radius:11px;padding:12px 15px;margin-top:19px;font-size:13px;font-weight:800}
+.sportAction svg{flex-shrink:0}
+.howTo{margin-top:31px;padding:0 1px}
+.howTo ol{display:grid;gap:18px;list-style:none;margin:21px 0 0;padding:0}
+.howTo li{display:flex;align-items:flex-start;gap:12px}
+.howTo li>span{display:grid;place-items:center;flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#f1e2d8;color:#a64c3d;font-size:12px;font-weight:800}
+.howTo li strong{display:block;font-size:13px;line-height:1.8;font-weight:800}
+.howTo li p{font-size:12px;line-height:1.8;color:#82736b;margin-top:3px}
+.consentNote{display:flex;align-items:flex-start;gap:7px;margin:20px 0 0;padding:13px 14px;background:#f6eee7;border-radius:11px;font-size:11px;line-height:1.8;color:#8e6950}
+.consentNote svg{flex-shrink:0;margin-top:1px}
+.bottomLink{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;font-size:11px;font-weight:700;line-height:1.8;color:#a04b3d;margin-top:17px;padding:8px}
+.page a:focus-visible,.page button:focus-visible{outline:3px solid #b94b3f;outline-offset:4px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:580px){.page{padding-top:25px}.header h1{font-size:38px}.introPhoto{aspect-ratio:2.65}.featured{grid-template-columns:42% minmax(0,1fr)}.featured .meetupPhoto{aspect-ratio:auto;min-height:230px}.featured .meetupBody{display:flex;flex-direction:column;justify-content:center}.sportCard{display:grid;grid-template-columns:44% minmax(0,1fr)}.sportPhoto{aspect-ratio:auto;min-height:275px}.sportBody{padding:25px}.sportBody h2{font-size:28px}.sportAction{margin-top:22px}.meetupCard:not(.featured){grid-template-columns:140px minmax(0,1fr)}}
+@media(max-width:380px){.page{padding-left:14px;padding-right:14px}.header h1{font-size:31px}.meetupCard{grid-template-columns:87px minmax(0,1fr)}.meetupBody{padding:12px}.meetupBody h3{font-size:15px}.featured .meetupBody h3{font-size:21px}.secondaryRoute{flex-direction:column;align-items:flex-start;gap:2px}.sportBody{padding:18px}.sportBody h2{font-size:24px}.status{padding:21px 17px}}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+@media(min-width:580px){.activityChoice{aspect-ratio:2.5}.activityCaption{padding:18px 23px}.activityCaption strong{font-size:26px}.activityCaption small{font-size:13px}}
+@media(max-width:380px){.activityCaption{padding:14px}.activityCaption strong{font-size:21px}.activityCaption small{font-size:11px}.mentoringStart{padding:17px}.mentoringStart>div{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.activityChoice>img{transition:none}.activityChoice:hover>img{transform:none}}

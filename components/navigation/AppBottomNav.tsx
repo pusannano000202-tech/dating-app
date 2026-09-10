@@ -1,5 +1,7 @@
 'use client'
 
+import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
+import { isAppTabActive } from '@/lib/navigation/app-tabs'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, MessageCircle, MessageCircleMore, UserRound, UsersRound, Zap } from 'lucide-react'
@@ -22,16 +24,8 @@ function shouldHide(pathname: string): boolean {
   return false
 }
 
-function isActive(pathname: string, href: string): boolean {
-  if (href === '/') return pathname === '/'
-  if (href === '/match') return pathname === '/match' || pathname.startsWith('/match/') || pathname === '/tonight' || pathname.startsWith('/tonight/') || pathname === '/calendar'
-  if (href === '/meetups') return pathname === '/meetups' || pathname.startsWith('/meetups/')
-  if (href === '/community') return pathname === '/community' || pathname.startsWith('/community/')
-  if (href === '/profile/edit') return pathname === '/profile/edit' || pathname.startsWith('/profile/')
-  return pathname === href || pathname.startsWith(`${href}/`)
-}
-
 export default function AppBottomNav() {
+  const { t } = useQuantumLocale()
   const pathname = usePathname() || '/'
 
   if (shouldHide(pathname)) return null
@@ -43,7 +37,7 @@ export default function AppBottomNav() {
         style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
       >
         {tabs.map(({ href, label, Icon }) => {
-          const active = isActive(pathname, href)
+          const active = isAppTabActive(pathname, href)
           const className = [
             'relative flex min-h-16 flex-col items-center justify-center px-1 text-[10px] font-black transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-boot-primary',
             active
@@ -54,7 +48,7 @@ export default function AppBottomNav() {
             <>
               {active && <span className="absolute inset-x-4 top-0 h-0.5 bg-boot-primary" />}
               <Icon size={20} strokeWidth={active ? 2.8 : 2.1} />
-              <span className="mt-1 leading-none">{label}</span>
+              <span className="mt-1 leading-none">{t(({홈:'nav.home',매칭:'nav.match',모임:'nav.meetups',커뮤니티:'nav.community',채팅:'nav.chat',마이:'nav.profile'} as Record<string,string>)[label])}</span>
             </>
           )
 

@@ -1,0 +1,92 @@
+.directory,.formPage{--recruit-ink:var(--boot-ink,#292321);--recruit-body:var(--boot-body,#665c58);--recruit-coral:var(--boot-primary,#b94b3f);--recruit-line:var(--boot-hairline,#ead9d2);display:grid;gap:16px;max-width:980px;min-width:0;color:var(--recruit-ink)}
+.directory button,.formPage button{transition:background-color .15s,color .15s,border-color .15s}
+.directory button:focus-visible,.formPage button:focus-visible,.directory input:focus-visible,.formPage input:focus-visible,.formPage textarea:focus-visible{outline:3px solid var(--recruit-coral);outline-offset:3px}
+.directory button:disabled,.formPage button:disabled{opacity:.45;cursor:not-allowed}
+.srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.back{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:40px;font-size:12px;font-weight:600;color:var(--recruit-body)}
+.back:hover,.refresh:hover{color:var(--recruit-coral)}
+.directoryHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.directoryHeading>span{font-size:13px;color:var(--recruit-body);text-align:right;line-height:1.5}
+.sportBanner{position:relative;height:156px;border-radius:16px;overflow:hidden;background:#324b38;color:#fff}
+.sportBanner>img{object-fit:cover;object-position:center 48%}
+.sportBanner>div{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:7px;padding:22px 24px;background:#11150d45;text-shadow:0 1px 5px #0008}
+.sportBanner strong{font-size:26px;line-height:1.3;letter-spacing:-.045em;font-weight:850;max-width:320px;word-break:keep-all;text-wrap:balance}
+.sportBanner span{font-size:13px;font-weight:500}
+.sportBanner>small{position:absolute;right:10px;top:9px;padding:3px 6px;background:#172219a6;border-radius:4px;color:#fff;font-size:9px;line-height:1.4}
+.tabs{display:flex;border-bottom:1px solid var(--recruit-line);gap:8px}
+.tabs button{position:relative;flex:1;min-height:49px;padding:12px 8px;font-size:15px;font-weight:700;color:var(--recruit-body)}
+.tabs button[aria-pressed=true]{color:var(--recruit-coral)}
+.tabs button[aria-pressed=true]::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:3px;border-radius:3px;background:var(--recruit-coral)}
+.tools{display:flex;align-items:stretch;gap:10px;min-width:0}
+.searchField{display:flex;align-items:center;gap:9px;min-width:0;flex:1;padding:0 13px;border:1px solid var(--recruit-line);border-radius:12px;background:#fffefd;color:var(--recruit-body)}
+.searchField>svg{flex-shrink:0}
+.searchField input{width:100%;min-width:0;height:46px;background:transparent;color:var(--recruit-ink);font-size:13px;border:0;outline-offset:0}
+.searchField input::placeholder{color:#817772}
+.createButton{display:flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0;min-height:46px;padding:9px 14px;border:1px solid var(--recruit-line);border-radius:12px;background:#fffdf9;color:#345739;font-size:13px;font-weight:750;white-space:nowrap}
+.createButton:hover{background:#f2f4ea}
+.directoryMeta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:-8px}
+.note{color:var(--recruit-body);font-size:12px;line-height:1.6;margin:0;word-break:keep-all}
+.refresh{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex-shrink:0;min-height:40px;padding:5px 0;font-size:11px;color:var(--recruit-body);white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.card{display:flex;flex-direction:column;gap:15px;min-width:0;border:1px solid #e5e0da;border-radius:17px;background:#fffefd;padding:20px;box-shadow:0 2px 8px #46302803}
+.teamIdentity{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start}
+.teamIdentity>div{min-width:0}
+.teamIdentity h3,.teamIdentity strong{display:block;font-size:21px;line-height:1.35;letter-spacing:-.035em;font-weight:850;overflow-wrap:anywhere;word-break:keep-all;margin:1px 0 4px}
+.teamIdentity p{font-size:12px;line-height:1.6;color:var(--recruit-body);margin:0;overflow-wrap:anywhere}
+.teamSymbol{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:49px;height:49px;border-radius:50%;background:#315738;color:#fff;font-size:23px;font-weight:800;line-height:1}
+.card[data-featured=true] .teamSymbol,.noticeIdentity .teamSymbol,.summary .teamSymbol{background:var(--recruit-coral)}
+.count{display:inline-flex;padding:6px 9px;white-space:nowrap;background:#eef2e9;border-radius:20px;color:#35543a;font-size:12px;line-height:1.4;font-weight:750}
+.vacancy{display:grid;gap:5px;min-width:0}
+.vacancy>strong{font-size:20px;line-height:1.3;font-weight:850;letter-spacing:-.03em;color:var(--recruit-coral)}
+.vacancy>p{display:flex;flex-wrap:wrap;gap:5px 12px;margin:0;font-size:14px;font-weight:650;color:var(--recruit-ink);line-height:1.6;overflow-wrap:anywhere}
+.vacancy>p>span{max-width:100%}
+.reserved{display:grid;gap:2px;margin:0;padding:9px 11px;border:1px dashed #d7b684;border-radius:9px;background:#fff8e9;color:#725021;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.reserved>span{font-size:11px;color:#735e3f}
+.unavailable{margin:0;font-size:13px;color:var(--recruit-body);line-height:1.7}
+.primary,.secondary,.cardLink{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;border-radius:10px;padding:11px 15px;font-size:14px;font-weight:750;line-height:1.4}
+.primary{background:var(--recruit-coral);color:#fff;border:1px solid var(--recruit-coral)}
+.primary:hover{background:var(--boot-primary-dark,#963d34);border-color:var(--boot-primary-dark,#963d34)}
+.secondary{border:1px solid var(--recruit-line);background:#fffdf9;color:var(--recruit-body)}
+.cardLink{background:#f5f2ed;border:1px solid #e3dcd5;color:var(--recruit-ink)}
+.cardLink:hover,.secondary:hover{background:#f0ebe5;border-color:#cfbfb5}
+.card>.primary,.card>.cardLink{margin-top:auto}
+.cardTop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cardTop>small{font-size:11px;color:var(--recruit-body)}
+.noticeStatus{padding:4px 9px;border-radius:7px;background:#f0ece7;color:#675d54;font-size:12px;font-weight:700;line-height:1.5}
+.noticeStatus[data-notice-status=open]{background:#fce7e1;color:#a43d34}
+.noticeStatus[data-notice-status=filled]{background:#f4ecd9;color:#75501f}
+.noticeHeadline{font-size:22px;line-height:1.5;font-weight:850;letter-spacing:-.035em;overflow-wrap:anywhere;word-break:keep-all;margin:0}
+.noticeIdentity{display:flex;align-items:center;gap:9px;min-width:0}
+.noticeIdentity .teamSymbol{width:31px;height:31px;font-size:15px}
+.noticeIdentity>div{min-width:0;display:grid;gap:2px}
+.noticeIdentity strong{font-size:14px;font-weight:750;line-height:1.4;overflow-wrap:anywhere}
+.noticeIdentity small{font-size:11px;color:var(--recruit-body)}
+.noticeFacts{display:grid;gap:10px;padding:14px 0;border-top:1px solid #ede7df;border-bottom:1px solid #ede7df}
+.noticeFacts>p{display:flex;align-items:flex-start;gap:9px;font-size:13px;line-height:1.6;color:#4f4842;margin:0}
+.noticeFacts svg{flex-shrink:0;margin-top:1px}
+.noticeFacts time{display:block;font-weight:650}
+.noticeFacts time small{display:block;font-size:10px;font-weight:400;color:var(--recruit-body)}
+.noticeCard .vacancy>strong{font-size:17px}
+.noticeCard .vacancy>p{font-size:13px;font-weight:500}
+.empty{grid-column:1/-1;text-align:center;font-size:14px;color:var(--recruit-body);padding:38px 18px;line-height:1.8;border:1px dashed #d5c8bd;border-radius:14px;background:#fffdf8}
+.error{font-size:13px;line-height:1.7;background:#fff0e6;border:1px solid #e6c3af;color:#8d4930;padding:14px;border-radius:12px;margin:0}
+.formPage{max-width:650px;gap:20px}
+.heading{display:grid;gap:8px}
+.heading>small{font-size:12px;color:var(--recruit-body)}
+.heading h2{font-size:27px;line-height:1.35;letter-spacing:-.04em;font-weight:850;margin:0;word-break:keep-all}
+.heading>p{font-size:14px;line-height:1.6;margin:0;color:var(--recruit-body)}
+.summary{display:grid;gap:15px;padding:21px;background:#fffdf9;border:1px solid #e4dcd2;border-radius:16px}
+.summary>.teamIdentity{grid-template-columns:auto minmax(0,1fr)}
+.summary>small{font-size:11px;color:var(--recruit-body)}
+.formPage form{display:grid;gap:23px;border:1px solid #e4dcd2;background:#fffefd;border-radius:16px;padding:23px}
+.formPage label{display:grid;gap:9px;font-size:14px;font-weight:700}
+.formPage label>span{display:flex;gap:7px;align-items:center}
+.formPage label>small{font-size:11px;font-weight:400;color:var(--recruit-body);text-align:right}
+.formPage input,.formPage textarea{border:1px solid #ded3c9;border-radius:10px;background:#fffdfa;color:var(--recruit-ink);padding:12px;font-size:16px;line-height:1.6;min-width:0;width:100%}
+.formPage textarea{resize:vertical;min-height:110px}
+.formPage input:disabled,.formPage textarea:disabled{opacity:.5}
+.formNote{display:flex;align-items:flex-start;gap:8px;margin:0;font-size:12px;line-height:1.75;color:var(--recruit-body)}
+.formNote svg{flex-shrink:0;margin-top:2px}
+.formActions{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+@media(max-width:650px){.directory{gap:12px}.directoryHeading{gap:8px}.directoryHeading>span{font-size:12px}.sportBanner{height:132px;border-radius:13px}.sportBanner>div{padding:17px 19px;gap:6px}.sportBanner strong{font-size:24px;max-width:270px}.sportBanner span{font-size:11px}.tabs button{font-size:14px;min-height:47px}.tools{gap:8px}.searchField{padding:0 10px;gap:7px}.searchField input{font-size:12px}.createButton{padding:9px 11px;font-size:12px;gap:4px}.directoryMeta{gap:9px;margin-top:-5px}.note{font-size:11px}.refresh{font-size:10px;gap:4px}.cards{grid-template-columns:1fr;gap:12px}.card{padding:17px;gap:13px}.teamIdentity{gap:9px}.teamSymbol{width:44px;height:44px;font-size:21px}.teamIdentity h3,.teamIdentity strong{font-size:19px;line-height:1.35}.teamIdentity p{font-size:11px}.count{font-size:11px;padding:5px 7px}.vacancy>strong{font-size:19px}.vacancy>p{font-size:13px;gap:4px 10px}.noticeHeadline{font-size:21px}.noticeFacts>p{font-size:12px}.heading h2{font-size:24px}.formPage{gap:16px}.formPage form,.summary{padding:18px}.formPage form{gap:20px}}
+@media(prefers-reduced-motion:reduce){.directory button,.formPage button{transition:none}}

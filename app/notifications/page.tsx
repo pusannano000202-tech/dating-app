@@ -22,6 +22,7 @@ import {
 import { isDevPreviewClientSession } from '@/lib/dev-match-setup'
 import { syncDailyCardsThenLoadNotifications } from '@/lib/notifications/load-notifications'
 import { continuationNotificationPresentation } from '@/lib/notifications/continuation-presentation'
+import { leagueInviteNotificationPresentation } from '@/lib/notifications/league-invite-presentation'
 import DevPreviewNotice from '@/components/dev/DevPreviewNotice'
 
 interface NotificationRow {
@@ -197,7 +198,7 @@ export default function NotificationsPage() {
           </Link>
           <div className="flex-1">
             <h1 className="text-2xl font-black">알림</h1>
-            <p className="text-xs text-gray-500 mt-0.5">매칭 진행 상황을 한눈에.</p>
+            <p className="text-xs text-gray-500 mt-0.5">매칭 소식과 모임 초대를 한눈에.</p>
           </div>
           {items.some((n) => !n.read_at) && (
             <button
@@ -342,6 +343,7 @@ function KindIcon({ kind }: { kind: string }) {
     case 'review_request': return <MessageSquareText size={18} />
     case 'friend_request_received': return <Heart size={18} />
     case 'quantum_event_room_invite': return <Users size={18} />
+    case 'department_league_invite': return <Users size={18} />
     case 'meeting_reminder': return <Bell size={18} />
     case 'campus_seven_guide': return <Sparkles size={18} />
     case 'tonight_journey': return <BellRing size={18} />
@@ -354,6 +356,8 @@ function KindIcon({ kind }: { kind: string }) {
 }
 
 function kindLabel(kind: string, payload: Record<string, unknown>, isSolo = false): string {
+  const leagueInvite = leagueInviteNotificationPresentation(kind, payload)
+  if (leagueInvite) return leagueInvite.title
   if (kind === 'community_voice') return '참여한 보이스방의 일정이 바뀌었어요'
   const continuation = continuationNotificationPresentation(kind, payload)
   if (continuation) return continuation.title
@@ -396,6 +400,8 @@ function kindLabel(kind: string, payload: Record<string, unknown>, isSolo = fals
 }
 
 function kindSummary(kind: string, payload: Record<string, unknown>): string {
+  const leagueInvite = leagueInviteNotificationPresentation(kind, payload)
+  if (leagueInvite) return leagueInvite.summary
   if (kind === 'community_voice') return '변경된 시간과 모집 상태를 확인해 주세요. 새 일정에는 직접 다시 참여해야 해요.'
   const continuation = continuationNotificationPresentation(kind, payload)
   if (continuation) return continuation.summary
@@ -474,6 +480,8 @@ function kindSummary(kind: string, payload: Record<string, unknown>): string {
 }
 
 function getNotificationHref(kind: string, matchId: string | null, payload: Record<string, unknown>) {
+  const leagueInvite = leagueInviteNotificationPresentation(kind, payload)
+  if (leagueInvite) return leagueInvite.href
   if (kind === 'community_voice') {
     const id = typeof payload.roomId === 'string' ? payload.roomId : ''
     return /^[0-9a-f-]{36}$/i.test(id) ? `/community/voice/rooms/${id}` : '/community/voice'
