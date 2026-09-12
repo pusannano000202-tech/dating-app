@@ -1,44 +1,11 @@
 'use client'
-
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Bell } from 'lucide-react'
-
-export default function NotificationBell() {
-  const [count, setCount] = useState<number>(0)
-
-  useEffect(() => {
-    let mounted = true
-    const load = async () => {
-      try {
-        const res = await fetch('/api/notifications/unread-count')
-        if (!res.ok) return
-        const data = await res.json() as { count: number }
-        if (mounted) setCount(data.count ?? 0)
-      } catch {
-        // ignore
-      }
-    }
-    load()
-    const id = setInterval(load, 30_000)
-    return () => {
-      mounted = false
-      clearInterval(id)
-    }
-  }, [])
-
-  return (
-    <Link
-      href="/notifications"
-      className="relative p-2 glass rounded-xl border border-boot-hairline text-boot-body hover:border-boot-primary/30 hover:text-boot-primary"
-      aria-label="알림"
-    >
-      <Bell size={18} />
-      {count > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center">
-          {count > 99 ? '99+' : count}
-        </span>
-      )}
-    </Link>
-  )
+import {Bell} from 'lucide-react'
+import {useNotifications} from '@/components/notifications/NotificationsProvider'
+export default function NotificationBell(){
+ const {unread,status}=useNotifications()
+ return <Link href="/notifications" className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-boot-hairline bg-white text-boot-body" aria-label={status==='unavailable'?'알림 연결 확인 필요':unread===null?'알림':`알림 ${unread}개 안 읽음`}>
+  <Bell size={18}/>
+  {unread!==null&&unread>0?<span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-[#B94B3F] px-1 text-[10px] font-bold leading-4 text-white">{unread>99?'99+':unread}</span>:status==='unavailable'?<span aria-hidden="true" className="absolute -right-1 -top-1 rounded-full bg-[#71655C] px-1.5 text-[10px] text-white">!</span>:null}
+ </Link>
 }

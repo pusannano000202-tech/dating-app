@@ -1,4 +1,5 @@
-// 부산대학교 학부 단과대/학과 목록. 프로필의 profiles.department에 저장되는 후보 source다.
+// 부산대학교 학부/학부 진입 과정 후보. 기존 재학생 학과명은 유지한다.
+// This registry is a selector source, never school/department authorization.
 export interface PnuDepartmentGroup {
   college: string
   departments: string[]
@@ -74,6 +75,13 @@ export const PNU_DEPARTMENT_GROUPS: PnuDepartmentGroup[] = [
       '첨단모빌리티자율전공',
       '첨단소재자율전공',
       '스마트시티전공',
+      'X-모빌리티융합학부',
+      '스마트가전공학과',
+      '에너지시스템전공',
+      '기계시스템설계전공',
+      '지능형제조시스템전공',
+      '제어자동화시스템전공',
+      '원자력시스템전공',
     ],
   },
   {
@@ -108,7 +116,7 @@ export const PNU_DEPARTMENT_GROUPS: PnuDepartmentGroup[] = [
   },
   {
     college: '약학대학',
-    departments: ['약학전공', '제약학전공'],
+    departments: ['약학전공', '제약학전공', '약학부'],
   },
   {
     college: '생활과학대학',
@@ -148,7 +156,7 @@ export const PNU_DEPARTMENT_GROUPS: PnuDepartmentGroup[] = [
   },
   {
     college: '정보의생명공학대학',
-    departments: ['정보컴퓨터공학부', '컴퓨터공학전공', '인공지능전공', '디자인테크놀로지전공', '의생명융합공학부', '정보의생명공학자율전공'],
+    departments: ['정보컴퓨터공학부', '컴퓨터공학전공', '인공지능전공', '디자인테크놀로지전공', '의생명융합공학부', '정보의생명공학자율전공', '의생명공학전공', '데이터사이언스전공'],
   },
   {
     college: '학부대학',
@@ -165,9 +173,22 @@ export const PNU_DEPARTMENT_GROUPS: PnuDepartmentGroup[] = [
       '글로벌자유전공학부',
     ],
   },
+  // 2026 모집요강의 모집단위명. 치과대학 본과 전환 완료를 뜻하지 않는다.
+  { college: '치과대학', departments: ['치의예과'] },
+  { college: '한의학전문대학원', departments: ['한의학전문대학원 학·석사통합과정'] },
 ]
 
 export const PNU_DEPARTMENTS: string[] = PNU_DEPARTMENT_GROUPS.flatMap((group) => group.departments)
+
+export const PNU_DEPARTMENT_REGISTRY = Object.freeze({
+  retrievedAt: '2026-09-10',
+  title: '부산대학교 대학·학부 안내',
+  url: 'https://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN298',
+  admissionsUrl: 'https://go.pusan.ac.kr/down/mojib/RF%280%29_250829173120.pdf',
+  majorsUrl: 'https://international.pusan.ac.kr/bbs/international/2622/980601/download.do',
+  integratedProgramUrl: 'https://bce.pusan.ac.kr/bbs/bce/220/1438667/artclView.do',
+  coverageNote: '공식 대학·학부 안내와 2026 모집단위를 바탕으로 전체 캠퍼스의 학과를 찾아요. 재학생 기존 학과명과 학부 진입 통합과정을 포함하며, 일반 대학원 전체 목록이나 모든 학과의 교육과정이 연결된 것은 아니에요.',
+})
 
 function normalizeDepartmentSearchText(value: string): string {
   return value.replace(/\s+/g, '').toLowerCase()

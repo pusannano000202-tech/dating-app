@@ -3,6 +3,9 @@ import { Suspense } from 'react'
 import './globals.css'
 import SchoolThemeProvider from '@/components/theme/SchoolThemeProvider'
 import AppBottomNav from '@/components/navigation/AppBottomNav'
+import QuantumLocaleProvider from '@/components/i18n/QuantumLocaleProvider'
+import NotificationsProvider from '@/components/notifications/NotificationsProvider'
+import { NotificationArrival } from '@/components/notifications/NotificationSurfaces'
 
 export const metadata: Metadata = {
   title: 'Quantum — 대학생 연결',
@@ -31,8 +34,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={null}>
           <SchoolThemeProvider />
         </Suspense>
-        {children}
-        <AppBottomNav />
+        <QuantumLocaleProvider>
+        <NotificationsProvider>
+          {children}
+          <AppBottomNav />
+          <NotificationArrival />
+        </NotificationsProvider>
+        </QuantumLocaleProvider>
       </body>
     </html>
   )

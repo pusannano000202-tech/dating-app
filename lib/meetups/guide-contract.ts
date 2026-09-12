@@ -26,7 +26,7 @@ export type MeetupGuideViewInput = Readonly<{
   mode: 'preview' | 'actual'
   lifecycleStatus: MeetupLifecycleStatus
   serverNow: string
-  scheduledAt: string
+  scheduledAt: string | null
   endsAt: string | null
   sharedStep: ActiveMeetupGuideSceneId | null
   personalAcknowledgedStep: ActiveMeetupGuideSceneId | null
@@ -52,6 +52,7 @@ export function resolveMeetupGuideView(input: MeetupGuideViewInput): MeetupGuide
 
   if (input.lifecycleStatus === 'cancelled') return terminalView('cancelled', input.personalAcknowledgedStep)
   if (input.lifecycleStatus === 'completed') return terminalView('next', input.personalAcknowledgedStep)
+  if (input.scheduledAt === null) return { currentSceneId: 'prepare', personalAcknowledgedStep: null, source: 'lifecycle', mayMutateSharedState: false }
   if (input.sharedStep) {
     return {
       currentSceneId: input.sharedStep,
@@ -97,4 +98,3 @@ function timestamp(value: string) {
   if (!Number.isFinite(parsed)) throw new TypeError('invalid_meetup_guide_timestamp')
   return parsed
 }
-

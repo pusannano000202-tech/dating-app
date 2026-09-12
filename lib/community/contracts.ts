@@ -32,8 +32,9 @@ export type MeetupCreateInput = {
   genderMode: MeetupGenderMode
   title: string
   description: string
-  placeName: string
-  scheduledAt: string
+  placeName: string | null
+  scheduledAt: string | null
+  scheduleStatus: 'confirmed' | 'schedule_pending'
   capacity: number
 }
 
@@ -96,19 +97,22 @@ export function validateMeetupCreateInput(
   const capacity = typeof input.capacity === 'number' ? input.capacity : Number(input.capacity)
   const scheduledAt = cleanText(input.scheduled_at)
   const scheduledDate = new Date(scheduledAt)
+  const scheduleStatus = input.schedule_status === undefined ? 'confirmed' : input.schedule_status
+  if (scheduleStatus !== 'confirmed' && scheduleStatus !== 'schedule_pending') return { ok: false, error: 'invalid_schedule_status' }
 
   if (!isMeetupCategory(category)) return { ok: false, error: 'invalid_category' }
   if (!isMeetupGenderMode(genderMode)) return { ok: false, error: 'invalid_gender_mode' }
   if (title.length < 4 || title.length > 60) return { ok: false, error: 'invalid_title' }
   if (description.length > 500) return { ok: false, error: 'invalid_description' }
-  if (placeName.length < 2 || placeName.length > 80) return { ok: false, error: 'invalid_place' }
+  if (scheduleStatus === 'confirmed' && (placeName.length < 2 || placeName.length > 80)) return { ok: false, error: 'invalid_place' }
+  if (scheduleStatus === 'schedule_pending' && (input.place_name != null || input.scheduled_at != null || input.ends_at != null)) return { ok: false, error: 'invalid_pending_schedule' }
   if (!Number.isInteger(capacity) || capacity < 2 || capacity > 20) {
     return { ok: false, error: 'invalid_capacity' }
   }
-  if (!scheduledAt || Number.isNaN(scheduledDate.getTime())) {
+  if (scheduleStatus === 'confirmed' && (!scheduledAt || Number.isNaN(scheduledDate.getTime()))) {
     return { ok: false, error: 'invalid_schedule' }
   }
-  if (scheduledDate.getTime() < now.getTime() + 30 * 60 * 1000) {
+  if (scheduleStatus === 'confirmed' && scheduledDate.getTime() < now.getTime() + 30 * 60 * 1000) {
     return { ok: false, error: 'schedule_too_soon' }
   }
 
@@ -119,8 +123,9 @@ export function validateMeetupCreateInput(
       genderMode,
       title,
       description,
-      placeName,
-      scheduledAt: scheduledDate.toISOString(),
+      placeName: scheduleStatus === 'schedule_pending' ? null : placeName,
+      scheduledAt: scheduleStatus === 'schedule_pending' ? null : scheduledDate.toISOString(),
+      scheduleStatus,
       capacity,
     },
   }

@@ -2,6 +2,7 @@
 
 import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
 import { isAppTabActive } from '@/lib/navigation/app-tabs'
+import { useNotifications } from '@/components/notifications/NotificationsProvider'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, MessageCircle, MessageCircleMore, UserRound, UsersRound, Zap } from 'lucide-react'
@@ -27,6 +28,7 @@ function shouldHide(pathname: string): boolean {
 export default function AppBottomNav() {
   const { t } = useQuantumLocale()
   const pathname = usePathname() || '/'
+  const { unread } = useNotifications()
 
   if (shouldHide(pathname)) return null
 
@@ -48,6 +50,7 @@ export default function AppBottomNav() {
             <>
               {active && <span className="absolute inset-x-4 top-0 h-0.5 bg-boot-primary" />}
               <Icon size={20} strokeWidth={active ? 2.8 : 2.1} />
+              {href === '/chat' && unread !== null && unread > 0 ? <span className="absolute left-1/2 top-2 ml-1 min-w-4 rounded-full bg-[#B94B3F] px-1 text-center text-[9px] leading-4 text-white" aria-label={`새 안내 ${unread}개`}>{unread > 99 ? '99+' : unread}</span> : null}
               <span className="mt-1 leading-none">{t(({홈:'nav.home',매칭:'nav.match',모임:'nav.meetups',커뮤니티:'nav.community',채팅:'nav.chat',마이:'nav.profile'} as Record<string,string>)[label])}</span>
             </>
           )

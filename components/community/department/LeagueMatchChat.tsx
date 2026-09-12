@@ -7,14 +7,16 @@ import ChatComposerActions from '@/components/chat-polls/ChatComposerActions'
 import {createChatPollOfflineTransport} from '@/lib/chat-polls/offline-fixture'
 import {parseLeagueChatState,parseLeagueChatMessage,type LeagueChatMessage as Message,type LeagueChatState as Page} from '@/lib/meetups/league-lobby'
 import s from './league-match-chat.module.css'
+import {useSocialChatRead} from '@/lib/chat/useSocialChatRead'
 
 const merge=(first:Message[],second:Message[])=>Array.from(new Map([...first,...second].map(m=>[m.id,m])).values()).sort((a,b)=>a.created_at.localeCompare(b.created_at)||a.id.localeCompare(b.id))
 
-export default function LeagueMatchChat({challengeId,demo,schedule,scheduled,onRefresh,teamNames=[]}:{teamNames?:string[];challengeId:string;demo:boolean;schedule:ReactNode;scheduled:boolean;onRefresh:()=>Promise<unknown>}){
+export default function LeagueMatchChat({challengeId,demo,schedule,scheduled,onRefresh,teamNames=[]}:{teamNames?:string[];challengeId:string;demo:boolean;schedule:ReactNode;scheduled?:boolean;onRefresh:()=>Promise<unknown>}){
  const [page,setPage]=useState<Page|null>(demo?{challenge_id:challengeId,messages:[],has_more:false,next_cursor:null,writable:true}:null),[error,setError]=useState(''),[body,setBody]=useState(''),[busy,setBusy]=useState(false),[pollRequest,setPollRequest]=useState(0)
  const [fixture]=useState(()=>demo?createChatPollOfflineTransport({empty:true}):null)
  const generation=useRef(0),mutation=useRef(false),pending=useRef<{body:string;key:string}|null>(null),log=useRef<HTMLDivElement>(null),nearBottom=useRef(true),history=useRef(false)
  const invalidateLoad=useCallback(()=>{++generation.current},[])
+ useSocialChatRead('league_match',challengeId,page?.messages??[],{root:log,enabled:!demo&&!!page&&!error})
  const load=useCallback(async(before?:string)=>{
   if(demo)return
   const version=++generation.current
@@ -35,12 +37,12 @@ export default function LeagueMatchChat({challengeId,demo,schedule,scheduled,onR
  }
  return <section className={s.chat} aria-label="양 팀 경기 채팅" data-league-match-chat={demo?'rehearsal':'live'}>
   <header className={s.header}><div><span>{teamNames.length?teamNames.join(' vs '):'양 팀 참가자만 함께하는'}</span><h2>경기 채팅</h2></div><button type="button" aria-label="경기 채팅 새로고침" disabled={busy} onClick={()=>{void load();void onRefresh()}}><RefreshCw size={18}/></button></header>
-  <details className={s.schedule}><summary><span>{scheduled?'확정된 경기 약속':'날짜·장소 아직 미정'}</span><b>약속 {scheduled?'보기':'제안·확인'} ＋</b></summary><div className={s.scheduleBody}>{schedule}</div></details>
+  <details className={s.schedule}><summary><span>{scheduled===undefined?'경기 지도에서 약속 확인':scheduled?'확정된 경기 약속':'날짜·장소 아직 미정'}</span><b>약속 {scheduled===undefined||scheduled?'보기':'제안·확인'} ＋</b></summary><div className={s.scheduleBody}>{schedule}</div></details>
   <p className={s.caption}>채팅으로 날짜와 장소를 상의해요. 약속은 양 팀 주장이 같은 내용을 확인해야 확정돼요.</p>
   {error?<div className={s.error} role="alert">{error}<button type="button" disabled={busy} onClick={()=>void load()}>다시 연결</button></div>:null}
   {page?<>
    {page.has_more&&page.next_cursor?<button type="button" className={s.older} disabled={busy} onClick={()=>{nearBottom.current=false;void load(page.next_cursor!)}}>이전 대화 보기</button>:null}
-   <div className={s.messages} ref={log} role="log" aria-label="경기 대화" aria-live="polite" tabIndex={0} onScroll={()=>{const element=log.current;if(element)nearBottom.current=element.scrollHeight-element.scrollTop-element.clientHeight<80}}>{page.messages.length?page.messages.map(message=><article key={message.id} className={message.is_me?s.mine:s.message}><small>{message.is_me?'나':message.alias}</small><p>{message.body}</p><time dateTime={message.created_at}>{new Date(message.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}</time></article>):<div className={s.empty}><strong>서로 인사하며 경기 약속을 잡아요</strong><p>“안녕하세요! 이번 주 언제가 편하세요?”</p></div>}</div>
+   <div className={s.messages} ref={log} role="log" aria-label="경기 대화" aria-live="polite" tabIndex={0} onScroll={()=>{const element=log.current;if(element)nearBottom.current=element.scrollHeight-element.scrollTop-element.clientHeight<80}}>{page.messages.length?page.messages.map(message=><article key={message.id} data-social-message-id={message.id} className={message.is_me?s.mine:s.message}><small>{message.is_me?'나':message.alias}</small><p>{message.body}</p><time dateTime={message.created_at}>{new Date(message.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}</time></article>):<div className={s.empty}><strong>서로 인사하며 경기 약속을 잡아요</strong><p>“안녕하세요! 이번 주 언제가 편하세요?”</p></div>}</div>
    <ActivityRoomPolls roomId={fixture?.roomId??challengeId} roomKind="department-challenges" transport={fixture?.transport} composerRequest={pollRequest}/>
    <form className={s.composer} onSubmit={event=>{event.preventDefault();void send()}}><ChatComposerActions disabled={busy||!page.writable} onCreatePoll={()=>setPollRequest(value=>value+1)}/><textarea aria-label="경기 메시지 입력" rows={1} maxLength={1000} value={body} disabled={busy||!page.writable} onChange={event=>setBody(event.target.value)} placeholder="날짜와 장소를 함께 정해요" onKeyDown={event=>{if(event.key==='Enter'&&!event.shiftKey&&!event.nativeEvent.isComposing){event.preventDefault();void send()}}}/><button type="submit" aria-label="경기 메시지 보내기" disabled={busy||!page.writable||!body.trim()}><Send size={19}/></button></form>
    {!page.writable?<p className={s.caption}>이 경기는 읽기만 가능해요.</p>:null}

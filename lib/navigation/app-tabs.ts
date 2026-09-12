@@ -1,5 +1,7 @@
 /** Navigation belongs to a product section, not always its historical URL prefix. */
 export function isAppTabActive(pathname: string, href: string): boolean {
+  // A conversation keeps its source affiliation in its header, but lives in Chat.
+  if (/^\/(?:friends|match)\/[^/]+\/chat(?:\/|$)/.test(pathname)) return href === '/chat'
   if (pathname === '/community/department' || pathname.startsWith('/community/department/')) return href === '/meetups'
   if (href === '/') return pathname === '/'
   if (href === '/match') return pathname === '/match' || pathname.startsWith('/match/') || pathname === '/tonight' || pathname.startsWith('/tonight/') || pathname === '/calendar'

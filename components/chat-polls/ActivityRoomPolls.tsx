@@ -40,7 +40,7 @@ type StatusConfirmation = {
   action: 'close' | 'cancel'
   title: string
 }
-export type ChatPollRoomKind = 'activity-rooms' | 'meetups' | 'friends' | 'department-challenges'
+export type ChatPollRoomKind = 'activity-rooms' | 'meetups' | 'friends' | 'department-challenges' | 'league-teams'
 export type ChatPollTransport = (path: string, init?: RequestInit) => Promise<{
   ok: boolean
   status: number
@@ -78,11 +78,13 @@ export default function ActivityRoomPolls({
   roomKind = 'activity-rooms',
   transport,
   composerRequest = 0,
+  readOnly = false,
 }: {
   roomId: string
   roomKind?: ChatPollRoomKind
   transport?: ChatPollTransport
   composerRequest?: number
+  readOnly?: boolean
 }) {
   const [expanded, setExpanded] = useState(false)
   const handledComposerRequest = useRef(0)
@@ -291,6 +293,7 @@ export default function ActivityRoomPolls({
   }, [statusConfirmation])
 
   async function post(path: string, body: Record<string, unknown>, key: string) {
+    if(readOnly)return false
     const scope = activeScope.current
     if (scope === null || busyRef.current) return false
     const token = coordinator.current.beginMutation(scope)
@@ -466,11 +469,12 @@ export default function ActivityRoomPolls({
   const currentAgreementPoll = board?.polls.find(poll => poll.agreement) ?? null
 
   useEffect(() => {
+    if(readOnly){setComposerOpen(false);setStatusConfirmation(null);return}
     if (!composerRequest || composerRequest === handledComposerRequest.current) return
     if (!board) { setExpanded(true); return }
     handledComposerRequest.current = composerRequest
     setStatusConfirmation(null); setComposerOpen(true); setPreview(false); setDraftError('')
-  }, [composerRequest, board])
+  }, [composerRequest, board, readOnly])
 
   return <section ref={sectionRef} className={styles.section} aria-labelledby="activity-room-polls-title">
     <div className={styles.heading}>
@@ -479,7 +483,7 @@ export default function ActivityRoomPolls({
         <span><strong id="activity-room-polls-title">대화 속 투표</strong><small>{loading ? '불러오는 중' : loadError ? '연결 확인이 필요해요' : board?.polls.length ? `${board.polls.filter(poll => poll.status === 'open').length}개 진행 중 · 모두 보기` : '우리끼리 직접 만들어요'}</small></span>
         <ChevronDown size={17} className={expanded ? styles.chevronOpen : ''} />
       </button>
-      {board ? <button type="button" className={styles.quickCreate} aria-label="채팅방에 투표 올리기" onClick={() => { setStatusConfirmation(null); setComposerOpen(true); setPreview(false); setDraftError('') }}><Plus size={18} /><span>만들기</span></button> : null}
+      {board ? <button type="button" disabled={readOnly} className={styles.quickCreate} aria-label="채팅방에 투표 올리기" onClick={() => { setStatusConfirmation(null); setComposerOpen(true); setPreview(false); setDraftError('') }}><Plus size={18} /><span>만들기</span></button> : null}
     </div>
 
     {expanded ? <div className={styles.boardBody}>
@@ -491,7 +495,7 @@ export default function ActivityRoomPolls({
       <p className={styles.meta}>{currentAgreementPoll.agreement.confirmationCount}/{currentAgreementPoll.agreement.requiredCount}명 확인 · {currentAgreementPoll.agreement.status === 'confirmed' ? '전원 확인 완료' : '확인 진행 중'}</p>
       {!currentAgreementPoll.agreement.membershipCurrent ? <p className={styles.warning}>멤버가 바뀌어 새 버전이 필요해요. 이 버전은 자동으로 현재 약속이 되지 않아요.</p> : null}
       {currentAgreementPoll.agreement.status === 'proposal' && currentAgreementPoll.agreement.membershipCurrent && !currentAgreementPoll.agreement.confirmedByMe
-        ? <button type="button" className={styles.primary} disabled={!!busy} onClick={() => void confirmAgreement(currentAgreementPoll)}>이 버전 확인하기</button> : null}
+        ? <button type="button" className={styles.primary} disabled={readOnly || !!busy} onClick={() => void confirmAgreement(currentAgreementPoll)}>이 버전 확인하기</button> : null}
       {currentAgreementPoll.agreement.confirmedByMe && currentAgreementPoll.agreement.status === 'proposal' ? <p className={styles.confirmedMine}><Check size={15} />나는 이 버전을 확인했어요. 다른 멤버의 확인을 기다려요.</p> : null}
     </aside> : null}
 
@@ -509,7 +513,7 @@ export default function ActivityRoomPolls({
         <div className={styles.pollTop}><span className={styles.pollAuthor}><BarChart3 size={15}/>{poll.creatorAlias}의 투표</span><span className={`${styles.status} ${styles[poll.status]}`}>{poll.status === 'open' ? '진행 중' : poll.status === 'closed' ? '마감됨' : '취소됨'}</span></div>
         <h3>{poll.title}</h3>
         <p className={styles.meta}>{purposeLabels[poll.purpose]} · {poll.selectionMode === 'single' ? '한 개 선택' : '여러 개 선택'} · {poll.ballotCount}명 참여</p>
-        <fieldset className={styles.options} disabled={poll.status !== 'open' || !!busy}>
+        <fieldset className={styles.options} disabled={readOnly || poll.status !== 'open' || !!busy}>
           <legend className={styles.srOnly}>{poll.title}</legend>
           {poll.options.map(option => {
             const active = chosen.includes(option.id)
@@ -521,19 +525,19 @@ export default function ActivityRoomPolls({
           })}
         </fieldset>
         {poll.status === 'open' ? <div className={styles.actions}>
-          <button type="button" className={styles.primary} disabled={!!busy || chosen.length === 0} onClick={() => void vote(poll)}>{busy === `vote:${poll.id}` ? '저장 중…' : hasVoted ? '선택 바꾸기' : '투표하기'}</button>
-          {poll.isCreator ? <details className={styles.manage}><summary>내 투표 관리</summary><div><button type="button" className={styles.secondary} disabled={!!busy} onClick={() => changeStatus(poll, 'close')}>투표 마감</button><button type="button" className={styles.danger} disabled={!!busy} onClick={() => changeStatus(poll, 'cancel')}>투표 취소</button></div></details> : null}
+          <button type="button" className={styles.primary} disabled={readOnly || !!busy || chosen.length === 0} onClick={() => void vote(poll)}>{busy === `vote:${poll.id}` ? '저장 중…' : hasVoted ? '선택 바꾸기' : '투표하기'}</button>
+          {poll.isCreator ? <details className={styles.manage}><summary>내 투표 관리</summary><div><button type="button" className={styles.secondary} disabled={readOnly || !!busy} onClick={() => changeStatus(poll, 'close')}>투표 마감</button><button type="button" className={styles.danger} disabled={readOnly || !!busy} onClick={() => changeStatus(poll, 'cancel')}>투표 취소</button></div></details> : null}
         </div> : null}
         {poll.status === 'closed' ? <div className={styles.outcome}>
           {outcome.kind === 'empty' ? <p>응답이 없어 합의로 확인하지 않아요.</p> : outcome.kind === 'tied' ? <p>동률이라 합의로 확인하지 않아요. 대화를 더 나눠 주세요.</p> : <p><strong>{outcome.option?.label}</strong>이 가장 많은 표를 받았어요. 이 결과 자체는 아직 약속이 아니에요.</p>}
           {poll.isCreator && outcome.kind === 'winner' ? agreementTarget === poll.id
-            ? <div className={styles.agreementForm}><label>고정할 합의 제안<input value={agreementSummary} maxLength={160} onChange={event => { setAgreementSummary(event.target.value); pendingAgreement.current = null }} /></label><div className={styles.actions}><button type="button" className={styles.primary} disabled={!!busy || agreementSummary.trim().length < 2} onClick={() => void proposeAgreement(poll)}>합의 제안으로 고정</button><button type="button" className={styles.secondary} disabled={!!busy} onClick={() => setAgreementTarget(null)}>취소</button></div></div>
-            : <button type="button" className={styles.secondary} disabled={!!busy} onClick={() => startAgreement(poll)}>{poll.agreement ? '새 합의 버전 제안' : '합의 제안으로 고정'}</button> : null}
+            ? <div className={styles.agreementForm}><label>고정할 합의 제안<input value={agreementSummary} maxLength={160} onChange={event => { setAgreementSummary(event.target.value); pendingAgreement.current = null }} /></label><div className={styles.actions}><button type="button" className={styles.primary} disabled={readOnly || !!busy || agreementSummary.trim().length < 2} onClick={() => void proposeAgreement(poll)}>합의 제안으로 고정</button><button type="button" className={styles.secondary} disabled={readOnly || !!busy} onClick={() => setAgreementTarget(null)}>취소</button></div></div>
+            : <button type="button" className={styles.secondary} disabled={readOnly || !!busy} onClick={() => startAgreement(poll)}>{poll.agreement ? '새 합의 버전 제안' : '합의 제안으로 고정'}</button> : null}
         </div> : null}
       </article>
     })}</div> : null}
 
-    {board ? <button type="button" className={styles.openComposer} onClick={() => { setStatusConfirmation(null); setComposerOpen(true); setPreview(false); setDraftError('') }}><Plus size={18} />채팅방에 투표 올리기</button> : null}
+    {board ? <button type="button" disabled={readOnly} className={styles.openComposer} onClick={() => { setStatusConfirmation(null); setComposerOpen(true); setPreview(false); setDraftError('') }}><Plus size={18} />채팅방에 투표 올리기</button> : null}
     <details className={styles.advisory}><summary>투표 이용 안내</summary><p><strong>결과는 제안이에요.</strong> 질문과 선택지는 멤버가 직접 작성합니다. 투표만으로 일정·장소·역할, 매칭이나 결제가 자동으로 바뀌지 않아요.</p></details>
     </div> : null}
 
@@ -542,7 +546,7 @@ export default function ActivityRoomPolls({
         <div className={styles.sheetHeading}><div><p className={styles.eyebrow}>{statusConfirmation.action === 'close' ? '선택 결과를 그대로 남겨요' : '이 투표를 더 진행하지 않아요'}</p><h2 id="poll-status-confirmation-title">{statusConfirmation.action === 'close' ? '투표를 마감할까요?' : '투표를 취소할까요?'}</h2></div><button type="button" className={styles.close} aria-label="상태 변경 확인 닫기" disabled={!!busy} onClick={closeStatusConfirmation}><X size={20} /></button></div>
         <p className={styles.confirmationTitle}>{statusConfirmation.title}</p>
         <p id="poll-status-confirmation-description" className={styles.confirmationCopy}>{statusConfirmation.action === 'close' ? '마감 뒤에는 멤버가 표를 바꿀 수 없어요. 가장 많은 표도 자동 확정이 아닌 제안으로만 남아요.' : '취소된 투표는 다시 열 수 없고, 기존 표는 취소 상태로 남아요.'}</p>
-        <div className={styles.sheetActions}><button ref={statusConfirmationCancel} type="button" className={styles.secondary} disabled={!!busy} onClick={closeStatusConfirmation}>계속 투표하기</button><button type="button" className={statusConfirmation.action === 'cancel' ? styles.dangerConfirm : styles.primary} disabled={!!busy} onClick={() => void confirmStatusChange()}>{busy === `${statusConfirmation.action}:${statusConfirmation.pollId}` ? '처리 중…' : statusConfirmation.action === 'close' ? '투표 마감하기' : '투표 취소하기'}</button></div>
+        <div className={styles.sheetActions}><button ref={statusConfirmationCancel} type="button" className={styles.secondary} disabled={readOnly || !!busy} onClick={closeStatusConfirmation}>계속 투표하기</button><button type="button" className={statusConfirmation.action === 'cancel' ? styles.dangerConfirm : styles.primary} disabled={readOnly || !!busy} onClick={() => void confirmStatusChange()}>{busy === `${statusConfirmation.action}:${statusConfirmation.pollId}` ? '처리 중…' : statusConfirmation.action === 'close' ? '투표 마감하기' : '투표 취소하기'}</button></div>
       </div>
     </div> : null}
 
@@ -558,7 +562,7 @@ export default function ActivityRoomPolls({
         </div>}
         {draftError ? <p className={styles.formError} role="alert">{draftError}</p> : null}
         {actionError && composerOpen ? <p className={styles.formError} role="alert">{chatPollErrorMessage(actionError)} 다시 시도해도 작성 내용은 유지돼요.</p> : null}
-        <div className={styles.sheetActions}>{preview ? <><button type="button" className={styles.secondary} disabled={!!busy} onClick={() => setPreview(false)}>수정하기</button><button type="button" className={styles.primary} disabled={!!busy} onClick={() => void publish()}>{busy === 'create' ? '게시 중…' : '투표 게시하기'}</button></> : <button type="button" className={styles.primary} onClick={showPreview}>미리보기</button>}</div>
+        <div className={styles.sheetActions}>{preview ? <><button type="button" className={styles.secondary} disabled={readOnly || !!busy} onClick={() => setPreview(false)}>수정하기</button><button type="button" className={styles.primary} disabled={readOnly || !!busy} onClick={() => void publish()}>{busy === 'create' ? '게시 중…' : '투표 게시하기'}</button></> : <button type="button" className={styles.primary} onClick={showPreview}>미리보기</button>}</div>
       </div>
     </div> : null}
   </section>

@@ -13,12 +13,13 @@ const roomKinds = {
   meetups: 'meetup',
   friends: 'friend',
   'department-challenges': 'department_challenge',
+  'league-teams': 'league_team',
 } as const
 
 type Context = { params: Promise<{ roomKind: string; roomId: string; action?: string[] }> }
 
 function resolveRoomKind(value: string) {
-  return value in roomKinds ? roomKinds[value as keyof typeof roomKinds] : null
+  return Object.hasOwn(roomKinds,value) ? roomKinds[value as keyof typeof roomKinds] : null
 }
 
 export async function GET(request: Request, context: Context) {

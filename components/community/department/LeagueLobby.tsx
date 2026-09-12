@@ -7,6 +7,7 @@ import {LOL_TIERS,SOCCER_LEVELS,isCompatible} from '@/lib/meetups/challenge-leag
 import {leagueDemoLobby,type LeagueDemoAction} from '@/lib/meetups/challenge-journey-demo'
 import {parseLeagueLobbyState,type LeagueLobbyState,type LeagueLobbyTeam} from '@/lib/meetups/league-lobby'
 import s from './league-lobby.module.css'
+import {LeagueTierBadge} from './LeagueTier'
 
 const endpoint='/api/community/department/league/lobby'
 const scores={...LOL_TIERS,...SOCCER_LEVELS}
@@ -79,7 +80,7 @@ export default function LeagueLobby({sport,state,own,revision,demo,onDemo,onRost
    <p className={s.note}>우리 팀을 모으는 동안에도 상대 명단을 둘러볼 수 있어요. 정원이 찬 팀의 주장이 상대를 골라 제안해요.</p>
    {own?.is_captain&&own.ready&&!demo?<button type="button" className={own.waiting?s.secondary:s.primary} disabled={busy} onClick={()=>void queue(!own.waiting)}>{own.waiting?'대기 등록 취소':'우리 팀 대기 등록'}</button>:null}
    {delegation}
-   {!snapshot&&!error?<p className={s.notice} role="status">대기 팀을 확인하고 있어요.</p>:snapshot&&candidates.length===0?<div className={s.card}><h2>아직 대기 중인 상대 팀이 없어요</h2><p>팀을 모으거나 나중에 다시 확인해 주세요.</p></div>:<div className={s.teams}>{candidates.map(team=><button type="button" className={s.teamRow} key={team.team_id} onClick={()=>selectTeam(team)}><div><small>{team.incoming?'받은 제안':team.outgoing?'상대 수락 대기':`${team.accepted_count}/${team.capacity}명 · 준비 완료`}</small><strong>{leagueTeamName(team,team.title)}</strong><small>{team.department}</small><span>{team.players.map(player=>`${player.slot.toUpperCase()} ${t(`challenge.${player.tier}`)}`).join(' · ')}</span></div><div className={s.teamPoints}><small>팀 합계</small><b>{team.score_sum.toLocaleString()}</b><span>명단 보기 →</span></div></button>)}</div>}
+   {!snapshot&&!error?<p className={s.notice} role="status">대기 팀을 확인하고 있어요.</p>:snapshot&&candidates.length===0?<div className={s.card}><h2>아직 대기 중인 상대 팀이 없어요</h2><p>팀을 모으거나 나중에 다시 확인해 주세요.</p></div>:<div className={s.teams}>{candidates.map(team=><button type="button" className={s.teamRow} key={team.team_id} onClick={()=>selectTeam(team)}><div><small>{team.incoming?'받은 제안':team.outgoing?'상대 수락 대기':`${team.accepted_count}/${team.capacity}명 · 준비 완료`}</small><strong>{leagueTeamName(team,team.title)}</strong><small>{team.department}</small>{sport==='lol'?<span className={s.rosterTiers}>{team.players.map(player=><span className={s.rosterTier} key={player.roster_id} aria-label={`${player.slot.toUpperCase()} · ${t(`challenge.${player.tier}`)}`}><small>{player.slot.toUpperCase()}</small><LeagueTierBadge tier={player.tier} label={t(`challenge.${player.tier}`)} size="map" showLabel={false}/></span>)}</span>:<span>{team.players.map(player=>`${player.slot.toUpperCase()} ${t(`challenge.${player.tier}`)}`).join(' · ')}</span>}</div><div className={s.teamPoints}><small>팀 합계</small><b>{team.score_sum.toLocaleString()}</b><span>명단 보기 →</span></div></button>)}</div>}
    {snapshot?.next_cursor?<button type="button" className={s.secondary} onClick={()=>void load(snapshot.next_cursor!)}>대기 팀 더 보기</button>:null}
   </>}
  </section>

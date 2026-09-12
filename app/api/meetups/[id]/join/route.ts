@@ -33,10 +33,14 @@ async function changeMembership(
 
 async function applyMembership(request: NextRequest, meetupId: string, rpcName: 'join_activity_meetup' | 'leave_activity_meetup') {
   const supabase = createSupabaseRequestClient(request)
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
+  if (authError) return NextResponse.json({ error: 'community_unavailable' }, { status: 503, headers })
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers })
   if (!isUuid(meetupId)) return NextResponse.json({ error: 'invalid_meetup_id' }, { status: 400, headers })
+  // The old immediate-join endpoint must not silently bypass the new application.
+  // DB execute rights are revoked by the companion migration, separately applied.
+  if (rpcName === 'join_activity_meetup') return NextResponse.json({ error: 'meetup_application_required' }, { status: 409, headers })
 
   const { data, error } = await supabase.rpc(rpcName, { p_meetup_id: meetupId })
   if (error) return meetupRpcErrorResponse(error)

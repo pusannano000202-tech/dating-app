@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict'
+import {readFile} from 'node:fs/promises'
+import test from 'node:test'
+import ts from 'typescript'
+const id='10000000-0000-4000-8000-000000000001',app='20000000-0000-4000-8000-000000000001'
+async function load(path,deps={}){const code=ts.transpileModule(await readFile(new URL('../../'+path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,exports={};new Function('exports','require',code)(exports,name=>{assert.ok(Object.hasOwn(deps,name),name);return deps[name]});return exports}
+const contract=await load('lib/meetups/admission-contract.ts')
+class ServerError extends Error{constructor(code,status){super(code);this.code=code;this.status=status}}
+const server={AdmissionServerError:ServerError}
+const lifecycle=await load('lib/meetups/admission-lifecycle.ts',{'./admission-contract':contract,'./admission-server':server})
+async function harness(options={}){
+ const state={configured:true,user:{id},authError:null,result:{id:app,admission:'accepted',payment:'held',amountKrw:17000,revision:1,chatHref:`/chat/rooms/meetup/${id}`},...options},calls=[]
+ const json={meetupJson:(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'private, no-store'}}),meetupInputErrorResponse:error=>Response.json({error:error.code??'request_not_allowed'},{status:error.status??403})}
+ const http=await load('lib/meetups/admission-http.ts',{'@/lib/auth/trusted-origin':{assertTrustedMutationOrigin:request=>{if(request.method!=='GET'&&request.headers.get('origin')!=='https://quantum.example')throw new ServerError('request_not_allowed',403)}},'./admission-contract':contract,'./admission-server':server,'./http':json,'@/lib/utils':{isSupabaseConfigured:()=>state.configured},'@/lib/supabase-request':{createSupabaseRequestClient:()=>({auth:{getUser:async()=>({data:{user:state.user},error:state.authError})},rpc:async(name,args)=>{calls.push([name,args]);return{data:state.result,error:null}}})}})
+ const deps={'@/lib/meetups/admission-http':http,'@/lib/meetups/admission-lifecycle':lifecycle,'@/lib/meetups/http':json}
+ return{calls,route:await load('app/api/meetups/[id]/applications/route.ts',deps),status:await load('app/api/meetups/[id]/application/status/route.ts',deps),cancel:await load('app/api/meetups/[id]/application/cancel/route.ts',deps)}
+}
+const context={params:Promise.resolve({id})},request=(body,origin='https://quantum.example',method='PATCH')=>new Request(`https://quantum.example/api/meetups/${id}/applications`,{method,headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(body)})
+test('host decision route sends only strict application reference with room binding and private cache',async()=>{const{route,calls}=await harness();const response=await route.PATCH(request({applicationId:app,action:'approve',revision:0}),context);assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'private, no-store');assert.deepEqual(calls,[['decide_activity_meetup_admission',{p_meetup_id:id,p_application_id:app,p_action:'approve',p_revision:0}]])})
+test('forged money, actor, unsupported action and cross-origin writes never reach RPC',async()=>{for(const[patch,origin]of[[{paid:true}],[{amountKrw:1}],[{userId:id}],[{action:'force'}],[{},'https://evil.example']]){const{route,calls}=await harness();const response=await route.PATCH(request({applicationId:app,action:'approve',revision:0,...patch},origin),context);assert.ok([400,403].includes(response.status));assert.equal(calls.length,0)}})
+test('auth errors and missing runtime are errors, never empty request success',async()=>{for(const[options,status]of[[{user:null},401],[{authError:{}},503],[{configured:false},503]]){const{route,calls}=await harness(options);assert.equal((await route.PATCH(request({applicationId:app,action:'approve',revision:0}),context)).status,status);assert.equal(calls.length,0)}})
+test('oversized and invalid requests are rejected before a decision',async()=>{const{route,calls}=await harness();assert.equal((await route.PATCH(request({applicationId:app,action:'approve',revision:0,intro:'a'.repeat(2000)}),context)).status,413);assert.equal(calls.length,0)})
+test('status is account fenced and cancellation has no provider or refund-success path',async()=>{const{status}=await harness({result:{application:null}});const response=await status.GET(new Request('https://quantum.example'),context);assert.deepEqual(await response.json(),{accountKey:id,application:null})
+ const{cancel,calls}=await harness({result:{id:app,admission:'cancelled',payment:'refund_due',amountKrw:17000,revision:1,chatHref:null}});const cancelled=await cancel.POST(request({applicationId:app,revision:0},undefined,'POST'),context);assert.equal((await cancelled.json()).payment,'refund_due');assert.equal(calls[0][0],'cancel_my_activity_meetup_admission')})

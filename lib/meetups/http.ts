@@ -17,13 +17,13 @@ export function meetupRpcErrorResponse(error: unknown): Response {
   const message = rpcMessage(error)
   if (/not_authenticated|unauthorized/.test(message)) return meetupJson({ error: 'Unauthorized' }, 401)
   if (/(_not_found|not found)/.test(message)) return meetupJson({ error: normalized(message, 'not_found') }, 404)
-  if (/wrong_school|department_restricted|membership_required|host_required|captain_required|forbidden/.test(message)) {
+  if (/wrong_school|department_restricted|meetup_gender_restricted|membership_required|host_required|captain_required|forbidden/.test(message)) {
     return meetupJson({ error: normalized(message, 'forbidden') }, 403)
   }
   if (/profile_required|department_identity_required/.test(message)) {
     return meetupJson({ error: normalized(message, 'profile_required') }, 409)
   }
-  if (/stale_revision|idempotency_key_reused|_closed|_full|_conflict|already_|result_mismatch|schedule_mismatch|not_available|not_active|not_pending|not_started|cannot_leave|identity_changed/.test(message)) {
+  if (/stale_revision|idempotency_key_reused|_closed|_full|_conflict|already_|result_mismatch|schedule_mismatch|schedule_pending|not_available|not_active|not_pending|not_started|cannot_leave|identity_changed/.test(message)) {
     return meetupJson({ error: normalized(message, 'conflict') }, 409)
   }
   if (/community_schema_unavailable|does not exist|schema cache|undefined_(?:table|function)|42p01|42883/.test(message)) {

@@ -1,0 +1,102 @@
+{
+  "iron": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 192,
+      "top": 406,
+      "width": 632,
+      "height": 380
+    }
+  },
+  "bronze": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 106,
+      "top": 308,
+      "width": 801,
+      "height": 520
+    }
+  },
+  "silver": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 56,
+      "top": 226,
+      "width": 897,
+      "height": 606
+    }
+  },
+  "gold": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 74,
+      "top": 96,
+      "width": 848,
+      "height": 772
+    }
+  },
+  "platinum": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 42,
+      "top": 87,
+      "width": 932,
+      "height": 753
+    }
+  },
+  "emerald": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 0,
+      "top": 98,
+      "width": 1000,
+      "height": 730
+    }
+  },
+  "diamond": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 0,
+      "top": 196,
+      "width": 1000,
+      "height": 660
+    }
+  },
+  "master": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 0,
+      "top": 73,
+      "width": 1000,
+      "height": 803
+    }
+  },
+  "grandmaster": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 0,
+      "top": 94,
+      "width": 1000,
+      "height": 862
+    }
+  },
+  "challenger": {
+    "width": 1000,
+    "height": 1000,
+    "bounds": {
+      "left": 0,
+      "top": 21,
+      "width": 1000,
+      "height": 810
+    }
+  }
+}

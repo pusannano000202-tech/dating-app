@@ -1,41 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseRequestClient } from '@/lib/supabase-request'
-import { toPublicErrorCode } from '@/lib/api/public-error'
+import {NextRequest,NextResponse} from 'next/server'
+import {createSupabaseRequestClient} from '@/lib/supabase-request'
+import {assertTrustedMutationOrigin,TrustedOriginError} from '@/lib/auth/trusted-origin'
+import {parseReadRequest} from '@/lib/notifications/common-contract'
 
-// POST /api/notifications/read
-// body: { notification_id: string } → 개별 읽음
-// body: {} (or { all: true }) → 전체 읽음
-export async function POST(req: NextRequest) {
-  const supabase = createSupabaseRequestClient(req)
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const body = await readJson(req)
-  const notificationId = typeof body.notification_id === 'string' ? body.notification_id : null
-
-  if (notificationId) {
-    const { data, error } = await supabase
-      .rpc('mark_notification_read', { p_notification_id: notificationId })
-      .maybeSingle()
-    if (error) {
-      return NextResponse.json({ error: toPublicErrorCode(error.message, 'mark_read_failed') }, { status: 400 })
-    }
-    return NextResponse.json({ ok: data === true })
-  }
-
-  const { data, error } = await supabase.rpc('mark_all_notifications_read').maybeSingle()
-  if (error) {
-    return NextResponse.json({ error: toPublicErrorCode(error.message, 'mark_all_failed') }, { status: 400 })
-  }
-  return NextResponse.json({ ok: true, updated: data ?? 0 })
-}
-
-async function readJson(req: NextRequest): Promise<Record<string, unknown>> {
-  try {
-    return await req.json() as Record<string, unknown>
-  } catch {
-    return {}
-  }
+const reply=(body:unknown,status=200)=>NextResponse.json(body,{status,headers:{'Cache-Control':'private, no-store'}})
+/** Reading is acknowledgement, not approval of an application. Explicit target only. */
+export async function POST(req:NextRequest){
+ try {
+  assertTrustedMutationOrigin(req)
+  const body=parseReadRequest(await req.json().catch(()=>null))
+  if(!body)return reply({error:'invalid_read_request'},400)
+  const supabase=createSupabaseRequestClient(req)
+  const {data:{user},error:authError}=await supabase.auth.getUser()
+  if(authError||!user)return reply({error:'auth_required'},401)
+  const {data,error}='notification_id' in body
+   ?await supabase.rpc('mark_notification_read',{p_notification_id:body.notification_id})
+   :await supabase.rpc('mark_all_notifications_read')
+  if(error)return reply({error:'notification_read_unavailable'},503)
+  if('notification_id' in body&&data!==true)return reply({error:'notification_not_found'},404)
+  return reply({ok:true,...('all' in body?{updated:data}:{})})
+ }catch(error){return reply({error:error instanceof TrustedOriginError?'request_not_allowed':'notification_read_unavailable'},error instanceof TrustedOriginError?error.status:503)}
 }

@@ -4,6 +4,7 @@ import { isMeetupCategory, parseCommunityListLimit } from '@/lib/community/contr
 import { parseMeetupScope } from '@/lib/community/department-rooms'
 import { isMeetupGenderMode } from '@/lib/community/meetup-gender'
 import { validateMeetupCreateV3Input } from '@/lib/meetups/contracts'
+import { isMeetupListCursor, presentMeetupPage } from '@/lib/meetups/list-page'
 import { meetupRpcErrorResponse } from '@/lib/meetups/http'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
 import { assertTrustedMutationOrigin, TrustedOriginError } from '@/lib/auth/trusted-origin'
@@ -28,6 +29,8 @@ async function listMeetups(req: NextRequest) {
   const genderModeParam = req.nextUrl.searchParams.get('gender_mode')
   const scopeParam = req.nextUrl.searchParams.get('scope_type')
   const limit = parseCommunityListLimit(req.nextUrl.searchParams.get('limit'))
+  const cursor = req.nextUrl.searchParams.get('cursor')
+  if (cursor !== null && !isMeetupListCursor(cursor)) return jsonError('invalid_cursor', 400)
   if (categoryParam && !isMeetupCategory(categoryParam)) {
     return jsonError('invalid_category', 400)
   }
@@ -38,18 +41,21 @@ async function listMeetups(req: NextRequest) {
     return jsonError('invalid_scope_type', 400)
   }
 
-  const { data, error } = await supabase.rpc('list_activity_meetups_v3', {
+  const { data, error } = await supabase.rpc('list_activity_meetups_v4', {
     p_category: categoryParam || null,
-    p_limit: limit,
+    p_limit: limit + 1,
     p_gender_mode: genderModeParam,
     p_scope_type: scopeParam,
+    p_cursor: cursor,
   })
 
   if (error) {
     return meetupRpcErrorResponse(error)
   }
 
-  return NextResponse.json({ meetups: data ?? [], availability: 'ready' }, { headers })
+  const page = presentMeetupPage(data, limit)
+  if (!page) return jsonError('community_unavailable', 503)
+  return NextResponse.json(page, { headers })
 }
 
 export async function POST(req: NextRequest) {
@@ -69,7 +75,7 @@ async function createMeetup(req: NextRequest) {
   const parsed = validateMeetupCreateV3Input(body)
   if (!parsed.ok) return jsonError(parsed.error, 400)
 
-  const { data, error } = await supabase.rpc('create_activity_meetup_v3', {
+  const { data, error } = await supabase.rpc('create_activity_meetup_v4', {
     p_category: parsed.value.category,
     p_title: parsed.value.title,
     p_description: parsed.value.description,
@@ -81,6 +87,7 @@ async function createMeetup(req: NextRequest) {
     p_scope_type: parsed.value.scopeType,
     p_activity_key: parsed.value.activityKey,
     p_idempotency_key: parsed.value.idempotencyKey,
+    p_schedule_status: parsed.value.scheduleStatus,
   })
 
   if (error) {

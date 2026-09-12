@@ -1,8 +1,9 @@
 import {LEAGUE_SPORTS,leagueTeamName,type LeagueSport,type JourneyState} from './challenge-journey'
 import {makeLeagueDemo,advanceLeagueDemo} from './challenge-journey-demo'
+import {LOL_TIERS,SOCCER_LEVELS,teamCompatibility} from './challenge-league'
 import type {LeagueRecruitmentNotice,LeagueRecruitmentTeam,LeagueRecruitmentDetail} from './league-recruitment'
 export type LeagueRecruitmentDemo={notices:LeagueRecruitmentNotice[];captainChallengeId:string|null;originalCaptain:boolean}
-export type LeagueRecruitmentDemoAction={type:'view_captain'|'view_member'|'approve'|'reject'|'cancel_request';challengeId:string}|{type:'publish';challengeId:string;preferredAt:string;summary:string}|{type:'close';challengeId:string}
+export type LeagueRecruitmentDemoAction={type:'view_captain'|'view_member'|'cancel_request';challengeId:string}|{type:'approve'|'reject';challengeId:string;rosterId?:string}|{type:'publish';challengeId:string;preferredAt:string;summary:string}|{type:'close';challengeId:string}
 const uuid=(index:number)=>`94000000-0000-4000-8000-${String(index).padStart(12,'0')}`
 export function emptyRecruitmentDemo():LeagueRecruitmentDemo{return{notices:[],captainChallengeId:null,originalCaptain:false}}
 export function makeLeagueRecruitmentDemo(sport:LeagueSport):{journey:JourneyState;recruitment:LeagueRecruitmentDemo}{
@@ -38,16 +39,20 @@ export function recruitmentDemoDetail(journey:JourneyState,recruitment:LeagueRec
 export function advanceRecruitmentDemo(journey:JourneyState,recruitment:LeagueRecruitmentDemo,action:LeagueRecruitmentDemoAction):{journey:JourneyState;recruitment:LeagueRecruitmentDemo}{
  let next=structuredClone(journey);const state=structuredClone(recruitment),challenge=next.challenges.find(c=>c.id===action.challengeId),team=challenge?.teams.find(t=>t.department===next.my_department)
  if(!challenge||!team)throw new Error('recruitment_team_unavailable')
- if(action.type==='view_captain'){state.captainChallengeId=challenge.id;state.originalCaptain=team.is_captain;team.is_captain=true;return{journey:next,recruitment:state}}
- if(action.type==='view_member'){if(state.captainChallengeId){const previous=next.challenges.find(c=>c.id===state.captainChallengeId)?.teams.find(t=>t.department===next.my_department);if(previous)previous.is_captain=state.originalCaptain}state.captainChallengeId=null;return{journey:next,recruitment:state}}
+ function restoreMemberView(){if(state.captainChallengeId){const previous=next.challenges.find(c=>c.id===state.captainChallengeId)?.teams.find(t=>t.department===next.my_department);if(previous){previous.is_captain=state.originalCaptain;previous.is_mine=state.originalCaptain||previous.players.some(player=>player.is_me);previous.may_join=!previous.is_mine&&previous.players.filter(player=>player.status==='accepted').length<LEAGUE_SPORTS[next.sport].capacity}}state.captainChallengeId=null}
+ if(action.type==='view_captain'){if(state.captainChallengeId!==challenge.id){restoreMemberView();state.captainChallengeId=challenge.id;state.originalCaptain=team.is_captain;team.is_captain=true}return{journey:next,recruitment:state}}
+ if(action.type==='view_member'){restoreMemberView();return{journey:next,recruitment:state}}
  if(action.type==='cancel_request'||action.type==='reject'){
-  if(action.type==='reject'&&(!team.is_captain||state.captainChallengeId!==challenge.id))throw new Error('captain_required')
+  if(action.type==='reject'&&(!team.is_captain||challenge.status!=='recruiting'))throw new Error('captain_required')
   if(action.type==='cancel_request'&&state.captainChallengeId)throw new Error('member_required')
-  const requested=team.players.find(p=>p.is_me&&p.status==='requested');if(!requested)throw new Error('request_required')
-  team.players=team.players.filter(p=>p!==requested);team.is_mine=false;team.may_join=true;challenge.revision++
+  const requested=team.players.find(p=>p.status==='requested'&&(action.type==='reject'&&action.rosterId?p.id===action.rosterId:p.is_me));if(!requested)throw new Error('request_required')
+  team.players=team.players.filter(p=>p!==requested);team.is_mine=team.is_captain||team.players.some(p=>p.is_me);team.may_join=!team.is_mine&&team.players.filter(p=>p.status==='accepted').length<LEAGUE_SPORTS[next.sport].capacity;challenge.revision++
  }else if(action.type==='approve'){
-  if(!team.is_captain||state.captainChallengeId!==challenge.id)throw new Error('captain_required')
-  next=advanceLeagueDemo(next,{type:'approve'},challenge.id)
+  if(!team.is_captain||challenge.status!=='recruiting')throw new Error('captain_required')
+  const requested=team.players.find(p=>p.status==='requested'&&(action.rosterId?p.id===action.rosterId:p.is_me));if(!requested)throw new Error('request_required')
+  const accepted=team.players.filter(p=>p.status==='accepted');if(accepted.length>=LEAGUE_SPORTS[next.sport].capacity||accepted.some(p=>p.slot===requested.slot))throw new Error('slot_occupied')
+  if(requested.is_me)next=advanceLeagueDemo(next,{type:'approve'},challenge.id)
+  else{requested.status='accepted';team.ready=accepted.length+1===LEAGUE_SPORTS[next.sport].capacity;if(team.ready){const scores:Record<string,number>={...LOL_TIERS,...SOCCER_LEVELS};team.score=teamCompatibility(team.players.filter(p=>p.status==='accepted').map(p=>scores[p.tier??'']))}challenge.revision++}
   if(next.challenges.find(c=>c.id===challenge.id)?.teams[0].ready){const notice=state.notices.find(n=>n.team_id===team.id);if(notice)notice.status='filled'}
  }else{
   if(!team.is_captain||challenge.status!=='recruiting')throw new Error('captain_required')

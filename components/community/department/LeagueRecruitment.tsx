@@ -21,7 +21,15 @@ export async function leagueRecruitmentCommand(action:'publish'|'close'|'reject'
  if(!response.ok||!result||typeof result.challenge_id!=='string'||result.team_id!==args.team_id||!Number.isSafeInteger(result.revision))throw new Error(body?.error??'recruitment_write_failed')
  return result as {team_id:string;challenge_id:string;revision:number;notice:LeagueRecruitmentNotice|null;replayed:boolean}
 }
+export type LeagueRecruitmentBrowseState={tab:'teams'|'notices';search:string;scrollY?:number;loadedPages?:number}
+export function recruitmentDirectoryState({demo,loading,error,hasPage}:{demo:boolean;loading:boolean;error:string;hasPage:boolean}):'error'|'loading'|'ready'{if(!demo&&error&&!hasPage)return 'error';if(!demo&&!hasPage)return 'loading';return 'ready'}
 type Page={sport:LeagueSport;my_department:string;total_count:number;next_cursor:string|null;teams?:LeagueRecruitmentTeam[];notices?:LeagueRecruitmentNotice[]}
+type LoadedDirectory={scope:string;page:Page;count:number}
+const pageCount=(value:number|undefined)=>typeof value==='number'&&Number.isSafeInteger(value)&&value>0?value:1
+function mergeDirectoryPages(previous:Page|null,next:Page):Page{
+ if(!previous)return next
+ return{...next,teams:next.teams?[...(previous.teams??[]),...next.teams.filter(team=>!previous.teams?.some(old=>old.team_id===team.team_id))]:undefined,notices:next.notices?[...(previous.notices??[]),...next.notices.filter(notice=>!previous.notices?.some(old=>old.id===notice.id))]:undefined}
+}
 const slotLabels=(sport:LeagueSport,slots:readonly string[])=>slots.map(key=>LEAGUE_SPORTS[sport].slots.find(slot=>slot.key===key)?.label??key).join(' · ')
 export function recruitmentNoticeLabel(notice:LeagueRecruitmentNotice){return notice.status==='filled'&&notice.accepted_count<notice.capacity?'빈자리 모두 초대 중':({open:'모집 중',filled:'충원 마감',expired:'시간 마감',closed:'모집 마감',matched:'대전 확정'})[notice.status]}
 export function formatRecruitmentPreferredAt(value:string){
@@ -55,15 +63,55 @@ export function LeagueRecruitmentNoticeCard({sport,notice,onSelect}:{sport:Leagu
   <button type="button" className={notice.status==='open'?s.primary:s.cardLink} onClick={()=>onSelect(notice.challenge_id,true,notice.status==='open'&&notice.empty_slots.length===1?notice.empty_slots[0]:undefined)}>{notice.status==='open'?'빈자리 지도 보기':'마감된 소식 확인'}<ArrowRight size={17} aria-hidden="true"/></button>
  </article>
 }
-export default function LeagueRecruitment({sport,demo,journey,recruitment,reservations,onSelect,onCreate,onBack}:{sport:LeagueSport;demo:boolean;journey:JourneyState;recruitment:LeagueRecruitmentDemo;reservations:{team_id:string;slot:string}[];onSelect:(id:string,fromNotice?:boolean,slot?:string)=>void;onCreate:()=>void;onBack:()=>void}){
- const [tab,setTab]=useState<'teams'|'notices'>('teams'),[search,setSearch]=useState(''),[page,setPage]=useState<Page|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false)
- const generation=useRef(0),invalidate=useCallback(()=>{++generation.current},[])
+export default function LeagueRecruitment({sport,demo,journey,recruitment,reservations,onSelect,onCreate,onBack,browseState,onBrowseStateChange}:{browseState?:LeagueRecruitmentBrowseState;onBrowseStateChange?:(view:LeagueRecruitmentBrowseState)=>void;sport:LeagueSport;demo:boolean;journey:JourneyState;recruitment:LeagueRecruitmentDemo;reservations:{team_id:string;slot:string}[];onSelect:(id:string,fromNotice?:boolean,slot?:string)=>void;onCreate:()=>void;onBack:()=>void}){
+ const [localView,setLocalView]=useState<LeagueRecruitmentBrowseState>({tab:'teams',search:'',loadedPages:1}),[loaded,setLoaded]=useState<LoadedDirectory|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false)
+ const view=browseState??localView,{tab,search}=view
+ const department=journey.my_department,scope=JSON.stringify([sport,tab,department]),scopeRef=useRef(scope);scopeRef.current=scope
+ const page=loaded?.scope===scope?loaded.page:null,loadedRef=useRef(loaded);loadedRef.current=loaded?.scope===scope?loaded:null
+ const viewRef=useRef(view);viewRef.current=view
+ const updateView=(next:LeagueRecruitmentBrowseState)=>{viewRef.current=next;setLocalView(next);onBrowseStateChange?.(next)}
+ const rememberView=useRef(updateView);rememberView.current=updateView
+ const restoreScroll=useRef(browseState?.scrollY??0)
+ const generation=useRef(0),controller=useRef<AbortController|null>(null)
+ const invalidate=useCallback(()=>{++generation.current;controller.current?.abort();controller.current=null},[])
+ const setTab=(nextTab:'teams'|'notices')=>{if(nextTab===tab)return;invalidate();restoreScroll.current=0;updateView({...view,tab:nextTab,scrollY:0,loadedPages:1})}
+ const setSearch=(search:string)=>{restoreScroll.current=0;updateView({...view,search,scrollY:0})}
+ const select:SelectRecruitment=(...args)=>{updateView({...view,loadedPages:loadedRef.current?.count??1,scrollY:window.scrollY});onSelect(...args)}
+ useEffect(()=>{if(!loading&&!error&&(demo||page)&&restoreScroll.current>0){const top=restoreScroll.current;const frame=requestAnimationFrame(()=>{window.scrollTo({top,behavior:'instant'});restoreScroll.current=0});return()=>cancelAnimationFrame(frame)}},[demo,page,loading,error])
+ const directoryState=recruitmentDirectoryState({demo,loading,error,hasPage:!!page})
  const load=useCallback(async(cursor?:string)=>{
-  if(demo)return;const version=++generation.current;setLoading(true);setError('')
-  try{const query=new URLSearchParams({sport,...(tab==='notices'?{action:'notices'}:{}),...(cursor?{cursor}:{})}),response=await fetch(`${endpoint}?${query}`,{cache:'no-store'}),body=await response.json().catch(()=>null),parsed=tab==='teams'?parseLeagueRecruitmentBrowse(body?.recruitment):parseLeagueRecruitmentNotices(body?.recruitment);if(!response.ok||!parsed||parsed.sport!==sport)throw new Error(body?.error??'recruitment_read_failed');if(version!==generation.current)return;setPage(previous=>{if(!cursor||!previous)return parsed;const next=parsed as Page;return{...next,teams:next.teams?[...(previous.teams??[]),...next.teams.filter(team=>!previous.teams?.some(old=>old.team_id===team.team_id))]:undefined,notices:next.notices?[...(previous.notices??[]),...next.notices.filter(notice=>!previous.notices?.some(old=>old.id===notice.id))]:undefined}})}
-  catch(failure){if(version===generation.current){setError(recruitmentError(failure));if(!cursor)setPage(null)}}finally{if(version===generation.current)setLoading(false)}
- },[demo,sport,tab])
- useEffect(()=>{setPage(null);setSearch('');void load();return invalidate},[load,invalidate])
+  if(demo)return
+  const prior=cursor?loadedRef.current:null
+  if(cursor&&(!prior||prior.page.next_cursor!==cursor))return
+  invalidate();const version=generation.current,abort=new AbortController();controller.current=abort
+  // Navigation invalidates the generation; a timeout keeps the current
+  // generation and must surface an error instead of leaving an empty loader.
+  const current=()=>version===generation.current&&scopeRef.current===scope
+  const target=cursor?(prior!.count+1):pageCount(viewRef.current.loadedPages)
+  let merged=prior?.page??null,count=prior?.count??0,nextCursor=cursor
+  const seen=new Set<string>();setLoading(true);setError('');if(!cursor)setLoaded(null)
+  try{
+   // Remember only depth. Returning always walks the server's new cursor chain,
+   // publishing no partial rows until the requested range is restored.
+   do{
+    if(nextCursor){if(seen.has(nextCursor))throw new Error('recruitment_read_failed');seen.add(nextCursor)}
+    const timeout=window.setTimeout(()=>abort.abort(),12000)
+    let response:Response,body:unknown
+    try{const query=new URLSearchParams({sport,...(tab==='notices'?{action:'notices'}:{}),...(nextCursor?{cursor:nextCursor}:{})});response=await fetch(`${endpoint}?${query}`,{cache:'no-store',signal:abort.signal});body=await response.json()}finally{window.clearTimeout(timeout)}
+    if(!current())return
+    if(abort.signal.aborted)throw new Error('recruitment_read_timeout')
+    const payload=body as {recruitment?:unknown;error?:string}|null,parsed=tab==='teams'?parseLeagueRecruitmentBrowse(payload?.recruitment):parseLeagueRecruitmentNotices(payload?.recruitment)
+    if(!response.ok||!parsed||parsed.sport!==sport||parsed.my_department!==department||merged&&merged.my_department!==parsed.my_department)throw new Error(payload?.error??'recruitment_read_failed')
+    merged=mergeDirectoryPages(merged,parsed);count+=1;nextCursor=parsed.next_cursor??undefined
+   }while(count<target&&nextCursor)
+   if(!current()||!merged)return
+   const result={scope,page:merged,count};loadedRef.current=result;setLoaded(result)
+   rememberView.current({...viewRef.current,loadedPages:count})
+  }catch(failure){if(version===generation.current&&scopeRef.current===scope){loadedRef.current=null;setLoaded(null);setError(recruitmentError(failure))}}
+  finally{if(version===generation.current&&scopeRef.current===scope){controller.current=null;setLoading(false)}}
+ },[demo,sport,tab,department,scope,invalidate])
+ const priorScope=useRef(scope)
+ useEffect(()=>{if(priorScope.current!==scope){restoreScroll.current=0;rememberView.current({...viewRef.current,loadedPages:1,scrollY:0});priorScope.current=scope}setLoaded(null);void load();return invalidate},[scope,load,invalidate])
  const sample=demo?recruitmentDemoRows(journey,recruitment,reservations):null
  const teams=(sample?.teams??page?.teams??[]).filter(team=>`${team.team_name} ${team.title}`.includes(search)),notices=(sample?.notices??page?.notices??[]).filter(notice=>`${notice.team_name} ${notice.summary}`.includes(search))
  return <section className={s.directory} aria-label="우리 과 팀 찾기">
@@ -73,7 +121,7 @@ export default function LeagueRecruitment({sport,demo,journey,recruitment,reserv
   <div className={s.tools}><label className={s.searchField}><Search size={18} aria-hidden="true"/><input aria-label="불러온 목록에서 검색" placeholder={tab==='teams'?'불러온 팀 이름 검색':'불러온 팀·모집 내용 검색'} value={search} onChange={event=>setSearch(event.target.value)}/></label><button type="button" className={s.createButton} onClick={onCreate}>팀 만들기<Plus size={16} aria-hidden="true"/></button></div>
   <div className={s.directoryMeta}><p className={s.note}>{tab==='notices'?'학생이 직접 올린 모집 소식 · 학교·학과 공식 공지 아님':'빈자리에 신청하면 주장이 승인 후 팀원을 확정해요.'}</p><button type="button" className={s.refresh} disabled={loading} onClick={()=>void load()}><RefreshCw size={14} aria-hidden="true"/>새로고침</button></div>
   {error?<p role="alert" className={s.error}>{error}</p>:null}
-  {loading&&!page&&!demo?<p role="status" className={s.empty}>우리 과 팀을 확인하고 있어요.</p>:tab==='teams'?<div className={s.cards}>{teams.length?teams.map((team,index)=><LeagueRecruitmentTeamCard key={team.team_id} sport={sport} team={team} onSelect={onSelect} featured={index===0}/>):<p className={s.empty}>{search?'검색에 맞는 팀이 없어요.':'아직 우리 과 모집팀이 없어요. 첫 팀을 만들어 보세요.'}</p>}</div>:<div className={s.cards}>{notices.length?notices.map(notice=><LeagueRecruitmentNoticeCard key={notice.id} sport={sport} notice={notice} onSelect={onSelect}/>):<p className={s.empty}>{search?'검색에 맞는 모집 소식이 없어요.':'아직 우리 과 학생 모집 소식이 없어요.'}</p>}</div>}
+  {directoryState==='error'?null:directoryState==='loading'?<p role="status" className={s.empty}>우리 과 팀을 확인하고 있어요.</p>:tab==='teams'?<div className={s.cards}>{teams.length?teams.map((team,index)=><LeagueRecruitmentTeamCard key={team.team_id} sport={sport} team={team} onSelect={select} featured={index===0}/>):<p className={s.empty}>{search?'검색에 맞는 팀이 없어요.':'아직 우리 과 모집팀이 없어요. 첫 팀을 만들어 보세요.'}</p>}</div>:<div className={s.cards}>{notices.length?notices.map(notice=><LeagueRecruitmentNoticeCard key={notice.id} sport={sport} notice={notice} onSelect={select}/>):<p className={s.empty}>{search?'검색에 맞는 모집 소식이 없어요.':'아직 우리 과 학생 모집 소식이 없어요.'}</p>}</div>}
   {!demo&&page?.next_cursor?<button type="button" className={s.secondary} disabled={loading} onClick={()=>void load(page.next_cursor!)}>{loading?'불러오는 중…':'다음 목록 더 보기'}</button>:null}
  </section>
 }

@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { NotificationsScreen } from '@/components/notifications/NotificationSurfaces'
+import { useNotifications } from '@/components/notifications/NotificationsProvider'
 import Link from 'next/link'
 import {
   Bell,
@@ -108,6 +110,15 @@ const DEV_NOTIFICATIONS: NotificationRow[] = [
 ]
 
 export default function NotificationsPage() {
+  const { refresh } = useNotifications()
+  useEffect(() => {
+    if (isDevPreviewClientSession()) return
+    void syncDailyCardsThenLoadNotifications(fetch).then(() => refresh()).catch(() => {})
+  }, [refresh])
+  return isDevPreviewClientSession() ? <LegacyPreviewNotificationsPage /> : <NotificationsScreen />
+}
+
+function LegacyPreviewNotificationsPage() {
   const isDevPreview = isDevPreviewClientSession()
   const [previewNoticeReady, setPreviewNoticeReady] = useState(false)
   const [items, setItems] = useState<NotificationRow[]>([])
@@ -164,7 +175,7 @@ export default function NotificationsPage() {
       await fetch('/api/notifications/read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ all: true }),
       })
       await refresh()
     } finally {

@@ -1,16 +1,13 @@
-import { NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
-
-export async function GET() {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ count: 0 })
-  }
-
-  const { data, error } = await supabase.rpc('count_unread_notifications').maybeSingle()
-  if (error) {
-    return NextResponse.json({ count: 0 })
-  }
-  return NextResponse.json({ count: typeof data === 'number' ? data : 0 })
+import {NextRequest,NextResponse} from 'next/server'
+import {createSupabaseRequestClient} from '@/lib/supabase-request'
+const reply=(body:unknown,status=200)=>NextResponse.json(body,{status,headers:{'Cache-Control':'private, no-store'}})
+export async function GET(req:NextRequest){
+ try {
+  const supabase=createSupabaseRequestClient(req)
+  const {data:{user},error:authError}=await supabase.auth.getUser()
+  if(authError||!user)return reply({error:'auth_required'},401)
+  const {data,error}=await supabase.rpc('count_unread_notifications')
+  if(error||typeof data!=='number'||!Number.isSafeInteger(data)||data<0)return reply({error:'notification_count_unavailable'},503)
+  return reply({count:data,owner_id:user.id})
+ }catch{return reply({error:'notification_count_unavailable'},503)}
 }

@@ -3,7 +3,7 @@ import { validateMeetupCreateInput, type MeetupCreateInput } from '../community/
 import { parseMeetupScope, type MeetupScope } from '../community/department-rooms'
 
 export type MeetupCreateV3Input = MeetupCreateInput & {
-  endsAt: string
+  endsAt: string | null
   scopeType: MeetupScope
   activityKey: string | null
   idempotencyKey: string
@@ -30,9 +30,9 @@ export function validateMeetupCreateV3Input(input: unknown, now = new Date()): V
 
   const endsAtValue = typeof record.ends_at === 'string' ? record.ends_at.trim() : ''
   const endsAt = new Date(endsAtValue)
-  const startsAt = new Date(base.value.scheduledAt)
+  const startsAt = new Date(base.value.scheduledAt ?? '')
   const duration = endsAt.getTime() - startsAt.getTime()
-  if (!endsAtValue || Number.isNaN(endsAt.getTime()) || duration < 30 * 60 * 1000 || duration > 24 * 60 * 60 * 1000) {
+  if (base.value.scheduleStatus === 'confirmed' && (!endsAtValue || Number.isNaN(endsAt.getTime()) || duration < 30 * 60 * 1000 || duration > 24 * 60 * 60 * 1000)) {
     return { ok: false, error: 'invalid_end_time' }
   }
 
@@ -43,7 +43,7 @@ export function validateMeetupCreateV3Input(input: unknown, now = new Date()): V
     ok: true,
     value: {
       ...base.value,
-      endsAt: endsAt.toISOString(),
+      endsAt: base.value.scheduleStatus === 'schedule_pending' ? null : endsAt.toISOString(),
       scopeType,
       activityKey,
       idempotencyKey,
@@ -52,4 +52,3 @@ export function validateMeetupCreateV3Input(input: unknown, now = new Date()): V
 }
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-

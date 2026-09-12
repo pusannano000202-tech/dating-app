@@ -37,6 +37,8 @@ import {
   type MeetupGenderMode,
 } from '@/lib/community/meetup-gender'
 import { projectLegacyMeetupPlace } from '@/lib/community/meetup-place'
+import { buildMeetupExploreHref } from '@/lib/meetups/discovery-navigation'
+import { parseMeetupPagination } from '@/lib/meetups/list-page'
 import {
   getNextSocialRailIndex,
   getSocialRailScrollBehavior,
@@ -53,8 +55,9 @@ type MeetupRecord = {
   category: MeetupCategory
   title: string
   description: string
-  place_name: string
-  scheduled_at: string
+  place_name: string | null
+  scheduled_at: string | null
+  schedule_status?: 'confirmed' | 'schedule_pending'
   capacity: number
   status: 'open' | 'full'
   member_count: number
@@ -76,17 +79,24 @@ type MeetupCategoryFilter = MeetupCategory | 'all'
 type StudyTopicFilter = StudyTopicGroupId | 'all'
 type MeetupGenderFilter = MeetupGenderMode | 'any'
 
-export default function MeetupHub() {
+export default function MeetupHub({ compact = false }: { compact?: boolean }) {
   const [socialLane, setSocialLane] = useState<SocialMeetupDiscoveryId>('mixed-social')
   const [discoveryScope, setDiscoveryScope] = useState<MeetupDiscoveryScope>('all')
   const [category, setCategory] = useState<MeetupCategoryFilter>('all')
   const [studyTopic, setStudyTopic] = useState<StudyTopicFilter>('all')
   const [genderFilter, setGenderFilter] = useState<MeetupGenderFilter>('any')
+  const [memberScope, setMemberScope] = useState<'school' | 'department'>('school')
   const [meetups, setMeetups] = useState<MeetupRecord[]>([])
   const [loadState, setLoadState] = useState<LoadState>('loading')
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
   const [reloadToken, setReloadToken] = useState(0)
+  const [pageRequest, setPageRequest] = useState<{scope:string;cursor:string}|null>(null)
+  const [nextCursor, setNextCursor] = useState<string|null>(null)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [pageError, setPageError] = useState(false)
+  const listScope = `${category}:${genderFilter}:${reloadToken}:${compact}:${memberScope}`
+  const pageCursor = pageRequest?.scope === listScope ? pageRequest.cursor : null
   const membershipRequestInFlight = useRef(false)
   const socialRailRef = useRef<HTMLDivElement | null>(null)
   const socialRailPointerStart = useRef<{ x: number; y: number } | null>(null)
@@ -98,9 +108,16 @@ export default function MeetupHub() {
     const savedCategory = params.get('category')
     const savedTopic = params.get('topic')
     const savedGenderMode = params.get('gender_mode')
+    if (params.get('scope_type') === 'department') setMemberScope('department')
     if (meetupDiscoveryGroups.some((group) => group.id === savedScope)) setDiscoveryScope(savedScope as MeetupDiscoveryGroupId)
     const validCategories = meetupDiscoveryGroups.flatMap((group) => getMeetupDiscoveryCategories(group.id))
-    if (validCategories.includes(savedCategory as MeetupCategory)) setCategory(savedCategory as MeetupCategory)
+    if (validCategories.includes(savedCategory as MeetupCategory)) {
+      setCategory(savedCategory as MeetupCategory)
+      if (!meetupDiscoveryGroups.some((group) => group.id === savedScope)) {
+        const categoryGroup = meetupDiscoveryGroups.find((group) => getMeetupDiscoveryCategories(group.id).includes(savedCategory as MeetupCategory))
+        if (categoryGroup) setDiscoveryScope(categoryGroup.id)
+      }
+    }
     if (studyTopicGroups.some((group) => group.id === savedTopic)) setStudyTopic(savedTopic as StudyTopicGroupId)
     if (isMeetupGenderMode(savedGenderMode)) setGenderFilter(savedGenderMode)
   }, [])
@@ -154,20 +171,30 @@ export default function MeetupHub() {
     window.history.replaceState(null, '', url)
   }
 
+  useEffect(() => { setPageRequest(null) }, [listScope])
+
   useEffect(() => {
     let active = true
-    const params = new URLSearchParams()
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 12000)
+      const params = new URLSearchParams()
+      if (compact) params.set('scope_type', memberScope)
     if (category !== 'all') params.set('category', category)
     if (genderFilter !== 'any') params.set('gender_mode', genderFilter)
+    if (pageCursor) params.set('cursor', pageCursor)
     const query = params.size ? `?${params.toString()}` : ''
 
-    setLoadState('loading')
-    fetch(`/api/meetups${query}`, { cache: 'no-store' })
+    setPageError(false)
+    setLoadingMore(!!pageCursor)
+    if (!pageCursor) { setMeetups([]); setNextCursor(null); setLoadState('loading') }
+    fetch(`/api/meetups${query}`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({})) as {
           meetups?: MeetupRecord[]
           error?: string
           availability?: 'ready' | 'auth_required' | 'schema_unavailable'
+          has_more?: boolean
+          next_cursor?: string | null
         }
         if (!active) return
         if (response.ok) {
@@ -181,20 +208,27 @@ export default function MeetupHub() {
             setLoadState('unavailable')
             return
           }
-          setMeetups(payload.meetups ?? [])
+          const pagination = parseMeetupPagination(payload)
+          if (!pagination || !Array.isArray(payload.meetups)) throw new Error('invalid_page')
+          setMeetups(previous => Array.from(new Map([...(pageCursor ? previous : []), ...payload.meetups!].map(item => [item.id,item])).values()))
+          setNextCursor(pagination.nextCursor)
           setLoadState('ready')
           return
         }
-        if (response.status === 401) setLoadState('unauthorized')
+        if (response.status === 401) { setMeetups([]); setLoadState('unauthorized') }
+        else if (pageCursor) setPageError(true)
         else if (response.status === 503) setLoadState('unavailable')
         else setLoadState('error')
       })
-      .catch(() => active && setLoadState('error'))
+      .catch(() => { if (active) { if (pageCursor) setPageError(true); else setLoadState('error') } })
+      .finally(() => { window.clearTimeout(timeout); if (active) setLoadingMore(false) })
 
     return () => {
       active = false
+      controller.abort()
+      window.clearTimeout(timeout)
     }
-  }, [category, genderFilter, reloadToken])
+  }, [category, genderFilter, reloadToken, compact, memberScope, pageCursor, pageRequest])
 
   const activeCategories = useMemo(
     () => (discoveryScope === 'all' ? null : getMeetupDiscoveryCategories(discoveryScope)),
@@ -227,14 +261,14 @@ export default function MeetupHub() {
   }, [category, activeCategories, meetups])
 
   async function toggleMembership(meetup: MeetupRecord) {
-    if (meetup.is_host || membershipRequestInFlight.current) return
+    if (meetup.is_host || !meetup.joined || membershipRequestInFlight.current) return
     membershipRequestInFlight.current = true
     setBusyId(meetup.id)
     setNotice('')
 
     try {
       const response = await fetch(`/api/meetups/${meetup.id}/join`, {
-        method: meetup.joined ? 'DELETE' : 'POST',
+        method: 'DELETE',
       }).catch(() => null)
 
       if (!response) {
@@ -253,7 +287,7 @@ export default function MeetupHub() {
       setMeetups([])
       setLoadState('loading')
       setReloadToken((value) => value + 1)
-      setNotice(meetup.joined ? '참여 취소 처리되었습니다.' : '참여 등록했습니다.')
+      setNotice('참여 취소 처리되었습니다.')
     } finally {
       membershipRequestInFlight.current = false
       setBusyId(null)
@@ -319,26 +353,45 @@ export default function MeetupHub() {
     chooseSocialLaneAt(nextIndex)
   }
 
+  const browseBackHref = buildMeetupExploreHref({
+    intent: discoveryScope === 'study' ? 'achieve' : 'play',
+    group: discoveryScope === 'study' ? (studyTopic === 'all' ? null : studyTopic) : (discoveryScope === 'all' ? null : discoveryScope),
+    genderMode: genderFilter === 'any' ? 'all' : genderFilter,
+  })
+  const createParams = new URLSearchParams()
+  if (category !== 'all') createParams.set('category', category)
+  if (compact) createParams.set('scope', memberScope)
+  if (genderFilter !== 'any') createParams.set('gender_mode', genderFilter)
+  const createHref = '/meetups/create' + (createParams.size ? '?' + createParams : '')
+  const returnParams = new URLSearchParams()
+  if (compact) returnParams.set('scope_type', memberScope)
+  if (discoveryScope !== 'all') returnParams.set('scope', discoveryScope)
+  if (category !== 'all') returnParams.set('category', category)
+  if (studyTopic !== 'all') returnParams.set('topic', studyTopic)
+  if (genderFilter !== 'any') returnParams.set('gender_mode', genderFilter)
+  const returnTo = `${compact ? '/meetups/browse' : '/meetups'}${returnParams.size ? `?${returnParams}` : ''}`
+
   return (
     <main className="min-h-screen bg-boot-canvas pb-28 text-boot-ink">
-      <div className="mx-auto w-full max-w-6xl px-4 pt-5 sm:px-6 sm:pt-7">
+      <div className={`mx-auto w-full px-4 pt-5 sm:px-6 sm:pt-7 ${compact ? 'max-w-3xl' : 'max-w-6xl'}`}>
+        <Link href={compact ? browseBackHref : '/meetups'} className="mb-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-boot-muted"><ArrowLeft size={17} />{compact ? '활동 고르기' : '모임 첫 화면'}</Link>
         <header className="flex items-end justify-between gap-4 border-b border-boot-hairline pb-4">
           <div>
             <p className="text-xs font-black text-boot-primary">Quantum 모임</p>
-            <h1 className="mt-1 text-2xl font-black sm:text-3xl">지금 같이할 사람을 찾아요</h1>
+            <h1 className="mt-1 text-2xl font-black sm:text-3xl">{compact ? `${category === 'all' ? '함께할' : getMeetupCategoryLabel(category)} 모임` : '지금 같이할 사람을 찾아요'}</h1>
             <p className="mt-2 max-w-xl text-sm font-bold leading-6 text-boot-muted">
-              운동, 게임, 스터디처럼 하고 싶은 일을 고르고 바로 참여하거나 직접 열 수 있어요.
+              {compact ? '열려 있는 모집에서 시간과 장소를 확인하고 참여해요.' : '운동, 게임, 스터디처럼 하고 싶은 일을 고르고 바로 참여하거나 직접 열 수 있어요.'}
             </p>
           </div>
           <div className="hidden shrink-0 gap-2 sm:flex">
-            <Link href="/community/department" className="flex min-h-11 items-center rounded-[8px] border border-boot-primary/25 bg-white px-4 py-3 text-sm font-black text-boot-primary">학과 대항</Link>
+            {!compact ? <Link href="/meetups/league" className="flex min-h-11 items-center rounded-[8px] border border-boot-primary/25 bg-white px-4 py-3 text-sm font-black text-boot-primary">학과 대항</Link> : null}
             {/* Full document navigation preserves auth redirect query parameters through middleware. */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/meetups/create" className="flex min-h-11 items-center gap-2 rounded-[8px] bg-boot-primary px-4 py-3 text-sm font-black text-white"><Plus size={18} />모임 만들기</a>
+            <a href={createHref} className="flex min-h-11 items-center gap-2 rounded-[8px] bg-boot-primary px-4 py-3 text-sm font-black text-white"><Plus size={18} />모임 만들기</a>
           </div>
         </header>
 
-        <DepartmentChallengeEntry />
+        {!compact ? <DepartmentChallengeEntry /> : null}
 
         <section className="py-4" aria-label="모임 찾아보기">
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="모임 카테고리 필터">
@@ -479,13 +532,13 @@ export default function MeetupHub() {
             </div>
             {/* Full document navigation preserves auth redirect query parameters through middleware. */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a href="/meetups/create" className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-primary sm:hidden">
+            <a href={createHref} className="flex min-h-11 items-center gap-1 text-xs font-black text-boot-primary sm:hidden">
               <Plus size={16} /> 모임 만들기
             </a>
           </div>
 
           {notice ? <p className="mt-3 rounded-[8px] bg-white px-3 py-2 text-xs font-bold text-boot-primary" role="status">{notice}</p> : null}
-          <MeetupListState state={loadState} onRetry={() => setReloadToken((value) => value + 1)} />
+          <MeetupListState state={loadState} compact={compact} loginHref={`/login?redirect=${encodeURIComponent(returnTo)}`} onRetry={() => setReloadToken((value) => value + 1)} />
           {loadState === 'ready' && visibleMeetups.length === 0 ? <StatusBox text="아직 모집 중인 모임이 없어요. 다른 활동을 고르거나 첫 모임을 열어보세요." /> : null}
 
           {loadState === 'ready' && visibleMeetups.length > 0 ? (
@@ -513,18 +566,18 @@ export default function MeetupHub() {
                   {!meetup.joined && genderNotice ? <p className="mt-2 text-xs font-bold leading-5 text-boot-coral">{genderNotice}</p> : null}
                   <dl className="mt-3 grid gap-2 text-xs font-bold text-boot-muted">
                     <div className="flex items-center gap-2"><CalendarDays size={15} /><span>{formatDate(meetup.scheduled_at)}</span></div>
-                    <div className="flex items-center gap-2"><MapPin size={15} /><span className="break-words">{meetup.place_name}</span></div>
+                    <div className="flex items-center gap-2"><MapPin size={15} /><span className="break-words">{meetup.place_name??'채팅에서 함께 정하기'}</span></div>
                     <div className="flex items-center gap-2"><UsersRound size={15} /><span>{meetup.member_count}/{meetup.capacity}명</span></div>
                   </dl>
-                  <PlaceLinks
+                  {meetup.place_name ? <PlaceLinks
                     place={projectLegacyMeetupPlace({
                       meetupId: meetup.id,
                       placeName: meetup.place_name,
                       category: meetup.category,
                     })}
                     className="mt-3"
-                  />
-                  <button
+                  /> : null}
+                  {!meetup.is_host && !meetup.joined && meetup.status !== 'full' && genderEligibility === 'eligible' ? <Link href={`/meetups/${encodeURIComponent(meetup.id)}/apply`} className="mt-4 flex min-h-11 w-full items-center justify-center rounded-xl bg-boot-primary px-4 text-sm font-black text-white">보증금 확인·신청</Link> : <button
                     type="button"
                     disabled={busyId !== null || meetup.is_host || (!meetup.joined && (meetup.status === 'full' || genderEligibility !== 'eligible'))}
                     onClick={() => toggleMembership(meetup)}
@@ -543,16 +596,18 @@ export default function MeetupHub() {
                           : meetup.status === 'full'
                             ? '참여 마감'
                             : '참여하기'}
-                  </button>
+                  </button>}
                   <Link href={`/meetups/${meetup.id}`} className="mt-2 flex min-h-11 w-full items-center justify-center rounded-[8px] border border-boot-primary/25 bg-white px-4 text-sm font-black text-boot-primary">상세·채팅·진행 안내</Link>
                 </article>
                 )
               })}
             </div>
           ) : null}
+          {pageError ? <p role="status" className="mt-3 text-sm text-boot-muted">다음 모임을 불러오지 못했어요. 더 보기로 다시 확인해 주세요.</p> : null}
+          {loadState === 'ready' && nextCursor ? <button type="button" disabled={loadingMore} onClick={() => setPageRequest({scope:listScope,cursor:nextCursor})} className="mt-4 min-h-11 w-full rounded-[8px] border border-boot-hairline bg-white px-4 text-sm font-black disabled:opacity-50">{loadingMore ? '모임을 불러오는 중…' : '모임 더 보기'}</button> : null}
         </section>
 
-        <section className="py-5" aria-labelledby="meetup-ideas-heading">
+        {!compact ? <section className="py-5" aria-labelledby="meetup-ideas-heading">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 id="meetup-ideas-heading" className="text-lg font-black">새로운 모임 아이디어</h2>
@@ -700,7 +755,7 @@ export default function MeetupHub() {
             /* Full document navigation preserves the selected category through the auth redirect. */
             /* eslint-disable-next-line @next/next/no-html-link-for-pages */
             <a
-              href={category === 'all' ? '/meetups/create' : `/meetups/create?category=${category}`}
+              href={createHref}
               className="mt-4 flex min-h-20 items-center justify-between rounded-[8px] border border-boot-hairline bg-white px-4"
             >
               <span>
@@ -712,13 +767,13 @@ export default function MeetupHub() {
               <ArrowRight size={18} className="text-boot-primary" />
             </a>
           )}
-        </section>
+        </section> : null}
       </div>
     </main>
   )
 }
 
-function MeetupListState({ state, onRetry }: { state: LoadState; onRetry: () => void }) {
+function MeetupListState({ state, onRetry, compact = false, loginHref }: { state: LoadState; onRetry: () => void; compact?: boolean; loginHref: string }) {
   if (state === 'loading') {
     return <p className="mt-4 flex min-h-20 items-center gap-2 text-sm font-bold text-boot-muted"><Clock3 size={17} /> 모임 목록을 불러오는 중이에요.</p>
   }
@@ -726,12 +781,12 @@ function MeetupListState({ state, onRetry }: { state: LoadState; onRetry: () => 
     return (
       <div className="mt-4 flex min-h-24 items-center justify-between gap-4 rounded-[8px] border border-boot-hairline bg-white p-4">
         <p className="text-sm font-bold leading-6 text-boot-muted">모임에 참여하려면 다시 로그인해 주세요.</p>
-        <Link href="/login?redirect=%2Fmeetups" className="shrink-0 text-sm font-black text-boot-primary">로그인</Link>
+        <Link href={loginHref} className="shrink-0 text-sm font-black text-boot-primary">로그인</Link>
       </div>
     )
   }
   if (state === 'unavailable') {
-    return <StatusBox text="지금은 모임 목록을 연결하지 못했어요. 다시 확인하거나 아래에서 활동 아이디어를 둘러보세요." onRetry={onRetry} />
+    return <StatusBox text={compact ? '지금은 모임 목록에 연결하지 못했어요. 다시 확인하거나 활동 고르기로 돌아가 주세요.' : '지금은 모임 목록을 연결하지 못했어요. 다시 확인하거나 아래에서 활동 아이디어를 둘러보세요.'} onRetry={onRetry} />
   }
   if (state === 'error') {
     return <StatusBox text="모임 목록을 가져오지 못했어요. 연결 상태를 확인한 뒤 다시 시도해 주세요." onRetry={onRetry} />
@@ -751,7 +806,8 @@ function StatusBox({ text, onRetry }: { text: string; onRetry?: () => void }) {
   )
 }
 
-function formatDate(value: string): string {
+function formatDate(value: string | null): string {
+  if (!value) return '채팅에서 함께 정하기'
   return new Intl.DateTimeFormat('ko-KR', {
     month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit',
   }).format(new Date(value))
