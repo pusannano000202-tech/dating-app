@@ -1,6 +1,7 @@
 import { RequestGuardError, requestGuardErrorResponse, requireRequestAccess } from '@/lib/auth/server-guards'
 import { createTonightFriendInviteToken, tonightFriendInviteRpcErrorResponse } from '@/lib/server/tonight/friend-invites'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 import {
   TonightApiInputError,
   asIdempotencyKey,
@@ -34,6 +35,8 @@ export async function POST(request: Request) {
     const idempotencyKey = asIdempotencyKey(body.idempotency_key)
     const { rawToken, tokenHash } = createTonightFriendInviteToken()
     const supabase = createSupabaseRequestClient(request)
+    const admissionFailure = await datingAdmissionFailure(supabase)
+    if (admissionFailure) return privateJson({ error: admissionFailure.error }, admissionFailure.status)
     const { data, error } = await supabase.rpc('create_tonight_friend_invite', {
       p_round_id: roundId,
       p_invited_user_id: invitedUserId,

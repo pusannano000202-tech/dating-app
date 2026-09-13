@@ -26,6 +26,12 @@ export function commonPushConfig(env: Readonly<Record<string,string|undefined>>)
 export function commonPushPayload(id: string) {
  return {title:'Quantum',body:'새 알림이 도착했어요. 앱에서 확인해 주세요.',url:'/notifications',notificationId:/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id)?id:'quantum-notification'}
 }
+/** Configuration is not evidence that a scheduler ran or that a phone displayed a push. */
+export function commonPushReadiness(env:Readonly<Record<string,string|undefined>>,adminReady=Boolean(env.SUPABASE_SERVICE_ROLE_KEY?.trim()||env.SUPABASE_SECRET_KEY?.trim())){
+ const providerReady=commonPushConfig(env).ready
+ const dispatcherConfigured=Boolean(env.CRON_SECRET&&env.CRON_SECRET.length>=32&&adminReady)
+ return {available:providerReady&&dispatcherConfigured,providerReady,dispatcherConfigured,schedulerVerified:false,phoneDeliveryVerified:false}
+}
 export function classifyCommonPushFailure(error: unknown): {code:string;revoke:boolean;retry:boolean} {
  const status=object(error)&&typeof error.statusCode==='number'?error.statusCode:null
  if(status===404||status===410)return {code:'endpoint_expired',revoke:true,retry:false}

@@ -74,3 +74,18 @@ export function presentDepartmentMeetups(meetups: readonly DepartmentMeetup[], n
   })
   return { joined, available, recommended: available.filter(meetup => isOpenDepartmentMeetup(meetup, now)).slice(0, 3) }
 }
+
+/** Keep viewer membership and the room's recruitment state independent. */
+export function getDepartmentMeetupCardState(meetup: DepartmentMeetup, now: number) {
+  const own = meetup.is_host || meetup.joined
+  const started = meetup.scheduled_at !== null && Date.parse(meetup.scheduled_at) <= now
+  const full = meetup.status === 'full' || meetup.member_count >= meetup.capacity
+  return {
+    roleLabel: meetup.is_host ? '내가 연 모임' : meetup.joined ? '참여 중' : null,
+    statusLabel: started ? '활동 시작' : full ? '모집 마감' : '모집 중',
+    remaining: started || full ? 0 : Math.max(0, meetup.capacity - meetup.member_count),
+    primaryHref: own ? `/chat/rooms/meetup/${meetup.id}` : `/meetups/${meetup.id}`,
+    primaryLabel: own ? '채팅 열기' : '모임 살펴보기',
+    applicationsHref: meetup.is_host ? `/meetups/${meetup.id}/applications` : null,
+  }
+}

@@ -1,5 +1,7 @@
 'use client'
 
+import { socialChatHref } from '@/lib/chat/social-room-presentation'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -9,6 +11,7 @@ import { MEETUP_GENDER_LABELS, type MeetupGenderMode } from '@/lib/community/mee
 import { activityRoomErrorMessage, getActivityRoomDefinition, isActivityRoomId, parseActivityRoomLobby, type ActivityRoomLobby as Lobby } from '@/lib/meetups/activity-room-contract'
 import styles from './activity-rooms.module.css'
 import { fetchActivityRoom } from '@/lib/meetups/activity-room-client'
+import { buildMeetupDiscoveryReturnHref } from '@/lib/meetups/discovery-navigation'
 
 export default function ActivityRoomLobby({ activityKey, genderMode }: { activityKey: string; genderMode: MeetupGenderMode }) {
   const router = useRouter()
@@ -58,8 +61,8 @@ export default function ActivityRoomLobby({ activityKey, genderMode }: { activit
     ++sequence.current
     try {
       const { ok, payload } = await fetchActivityRoom(`/api/meetups/rooms/${roomId}/join`, { method: 'POST' })
-      if (!ok || !isActivityRoomId(payload?.data?.room_id)) throw new Error(payload?.error ?? 'invalid_response')
-      router.push(`/meetups/rooms/${payload.data.room_id}`)
+      if (!ok || !isActivityRoomId(payload?.data?.room_id) || payload.data.room_id !== roomId) throw new Error(payload?.error ?? 'invalid_response')
+      router.push((socialChatHref({kind: 'activity_room', id: payload.data.room_id}) ?? '/chat'))
     } catch (failure) {
       await load(false)
       setError(failure instanceof Error ? failure.message : 'unavailable')
@@ -69,7 +72,7 @@ export default function ActivityRoomLobby({ activityKey, genderMode }: { activit
   const alreadyInRoom = lobby?.rooms.some(room => room.joined) ?? false
   return <main className={styles.page}>
     <div className={styles.shell}>
-      <Link href={`/meetups?category=${definition.category}&gender_mode=${genderMode}`} className={styles.back}><ArrowLeft size={18} />활동 고르기</Link>
+      <Link href={buildMeetupDiscoveryReturnHref(activityKey, genderMode)} className={styles.back}><ArrowLeft size={18} />활동 고르기</Link>
       <section className={styles.hero}>
         <div className={styles.photo}><Image src={definition.imageSrc} alt={definition.imageAlt} fill sizes="(max-width: 700px) 100vw, 720px" className="object-contain" priority /></div>
         <div className={styles.heroCopy}>
@@ -91,7 +94,7 @@ export default function ActivityRoomLobby({ activityKey, genderMode }: { activit
           <div className={styles.roomTop}><span className={styles.roomNumber}>{room.room_number}번 방</span><span className={room.joined ? styles.mine : room.status === 'full' || !room.joinable ? styles.full : styles.open}>{room.joined ? '내가 참여한 방' : room.status === 'full' ? '정원 마감' : room.joinable ? '모집 중' : alreadyInRoom ? '다른 방 참여 중' : '참여 불가'}</span></div>
           <div className={styles.occupancy}><div className={styles.seats} aria-hidden="true">{Array.from({ length: room.capacity }, (_, index) => <span className={index < room.member_count ? styles.seatFilled : styles.seat} key={index}><UsersRound size={18} /></span>)}</div><strong>{room.member_count}<small> / {room.capacity}명</small></strong></div>
           <p className={styles.roomNote}>{room.joined ? '시간과 장소는 방에서 함께 정해요.' : room.status === 'full' ? '모집이 완료됐어요. 다음 방에서 함께해요.' : !room.joinable ? alreadyInRoom ? '한 번에 한 방만 참여해요. 내 방에서 먼저 나와 주세요.' : '현재 참여 조건으로는 이 방에 들어갈 수 없어요.' : room.member_count === 0 ? '첫 친구를 기다리는 방이에요.' : `한 팀까지 ${room.capacity - room.member_count}명 남았어요.`}</p>
-          {room.joined ? <Link href={`/meetups/rooms/${room.id}`} className={styles.primary}>내 방 채팅으로 <ArrowRight size={18} /></Link> : <button className={styles.primary} disabled={!!busyRoom || !room.joinable || !!error} onClick={() => void join(room.id)}>{busyRoom === room.id ? '참여 확인 중…' : room.status === 'full' ? '모집 완료' : !room.joinable ? alreadyInRoom ? '이미 참여 중인 방이 있어요' : '참여할 수 없는 방' : '이 방에 참여하기'}<ArrowRight size={18} /></button>}
+          {room.joined ? <Link href={(socialChatHref({kind: 'activity_room', id: room.id}) ?? '/chat')} className={styles.primary}>내 방 채팅으로 <ArrowRight size={18} /></Link> : <button className={styles.primary} disabled={!!busyRoom || !room.joinable || !!error} onClick={() => void join(room.id)}>{busyRoom === room.id ? '참여 확인 중…' : room.status === 'full' ? '모집 완료' : !room.joinable ? alreadyInRoom ? '이미 참여 중인 방이 있어요' : '참여할 수 없는 방' : '이 방에 참여하기'}<ArrowRight size={18} /></button>}
         </article>)}
           {lobby.rooms.length === 0 ? <div className={styles.status}>모집방을 아직 준비하지 못했어요. 새로고침으로 다시 확인해 주세요.</div> : null}
         </div> : null}

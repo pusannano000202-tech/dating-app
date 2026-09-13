@@ -64,6 +64,9 @@
 .secondary:disabled { opacity: .6; cursor: not-allowed; }
 .reassurance { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; line-height: 1.6; margin: 12px 0 0; color: #81746b; }
 .reassurance svg { flex-shrink: 0; }
+.startStatus { font-size: 12px; line-height: 1.5; color: #76584c; }
+.startStatus p { margin: 0 0 5px; }
+.startStatus .secondary { width: auto; min-height: 40px; padding: 6px 12px; font-size: 12px; margin-top: 7px; }
 .commandError { font-size: 13px; line-height: 1.65; border-left: 3px solid #b34c3e; padding: 9px 12px; background: #fff0e9; color: #9a4034; }
 .waiting { padding: 30px 20px; text-align: center; background: #f5e7db; border: 1px solid #e9cfbd; border-radius: 14px; margin-bottom: 18px; }
 .waiting > svg { color: #a54c3b; margin: 0 auto 16px; }

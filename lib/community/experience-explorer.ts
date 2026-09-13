@@ -20,16 +20,6 @@ export const COMMUNITY_EXPERIENCES = [
     accent:'rose', photoPosition:'center 42%',
   },
   {
-    id:'delivery', label:'배달 월드컵', shortLabel:'배달', eyebrow:'집에서 즐기는 한 끼',
-    title:'오늘 배달,\n뭐가 제일 맛있을까?',
-    description:'오늘은 편하게 시켜 먹고 싶을 때. 가게와 대표 1인 메뉴 후보를 비교해요.',
-    cta:'배달 메뉴 후보 둘러보기', href:'/community/campus-eats/delivery',
-    image:'/social-scenes/delivery.png', imageAlt:'안전하게 정차한 배달 라이더와 오토바이의 연출 사진',
-    imageNote:'배달 연출 이미지 · 실제 배달 업체와 무관해요',
-    notice:'최소 주문·배달비·혜택은 확인된 조건만 · 특정 플랫폼 공식 서비스가 아니에요.',
-    accent:'olive', photoPosition:'center',
-  },
-  {
     id:'places', label:'장소 월드컵', shortLabel:'장소', eyebrow:'우리 학교 주변, 같이 가고 싶은 곳',
     title:'놀고, 운동하고.\n어디가 제일 좋았나요?',
     description:'PC방부터 헬스장, 보드게임방까지. 다녀온 공간에서 우리 학교 취향을 찾아봐요.',

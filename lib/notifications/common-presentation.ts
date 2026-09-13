@@ -19,6 +19,8 @@ export function notificationPresentation(row:NotificationRow){
    return {context:null,title:'합류 대기 소식이 도착했어요',summary:'현재 합류 대기 상태를 확인해 주세요.',label:'합류 대기판',action:'현재 상태 확인',href:null,requiresAction:false}
   }
   if(p.entity_type==='candidate_invite')return {context:null,title:event==='invitation_received'?'함께하자는 초대가 왔어요':event==='invitation_accepted'?'초대의 진행 상태가 바뀌었어요':event==='invitation_declined'?'초대 응답이 도착했어요':'합류 대기 소식이 도착했어요',summary:'합류 대기판에서 현재 초대와 참여 상태를 확인해 주세요.',label:'합류 대기판',action:event==='invitation_received'?'초대 확인하기':'현재 상태 확인',href:null,requiresAction:event==='invitation_received'}
+  if(event==='application_notice'&&p.domain==='league')return {context:null,title:'우리 팀에 새 신청이 왔어요',summary:'팀 채팅에서 모집 소식을 확인해 주세요. 참가 수락은 주장이 결정해요.',label:'우리 학교 리그',action:'우리 팀 채팅으로',href:null,requiresAction:false}
+  if(event==='application_accepted'&&p.domain==='league')return {context:null,title:'참가 신청이 승인됐어요',summary:'우리 팀 채팅에서 첫인사를 나눠보세요.',label:'우리 학교 리그',action:'우리 팀 채팅으로',href:null,requiresAction:false}
   if(event==='application_notice')return {context:null,title:'우리 모임에 새 신청이 왔어요',summary:'모임 채팅에서 모집 소식을 확인해 주세요. 참가 수락은 방장이 결정해요.',label:'모임',action:'모임 채팅으로',href:null,requiresAction:false}
   return {context:typeof p.context_label==='string'?p.context_label.replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,80):null,title:eventTitles[event]??'모임 소식이 도착했어요',summary:typeof p.body==='string'?p.body.slice(0,300):'현재 참여 상태를 확인해 주세요.',label:domainLabels[String(p.domain)]??'모임 안내',action:event==='application_received'?'신청 검토하기':event==='invitation_received'?'초대 확인하기':'현재 상태 확인',href:null,requiresAction:['application_received','invitation_received'].includes(event)}
  }

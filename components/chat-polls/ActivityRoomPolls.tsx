@@ -40,7 +40,7 @@ type StatusConfirmation = {
   action: 'close' | 'cancel'
   title: string
 }
-export type ChatPollRoomKind = 'activity-rooms' | 'meetups' | 'friends' | 'department-challenges' | 'league-teams'
+export type ChatPollRoomKind = 'activity-rooms' | 'meetups' | 'friends' | 'department-challenges' | 'league-teams' | 'study-rooms' | 'mentoring-rooms'
 export type ChatPollTransport = (path: string, init?: RequestInit) => Promise<{
   ok: boolean
   status: number

@@ -1,0 +1,5 @@
+{
+ "extends":"../../tsconfig.json",
+ "compilerOptions":{"incremental":false,"noEmit":true},
+ "include":["../../next-env.d.ts","../../components/meetups/MeetupApplicationExperience.tsx","../../components/meetups/NativeApplicationExperience.tsx","../../components/meetups/MeetupPaymentReturn.tsx","../../components/chat/LeagueRecruitmentNotices.tsx","../../app/api/meetups/admission/checkout/**/*.ts","../../app/api/chat/league-team/notices/route.ts","../../app/api/notifications/push/config/route.ts"]
+}

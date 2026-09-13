@@ -47,7 +47,8 @@ test('a search-verified Campus Eats address never becomes provider coordinates',
     verifiedAt: null,
   })
   assert.equal(place.coordinates, null)
-  assert.equal(place.providerLinks.naver?.kind, 'search')
+  assert.equal(place.providerLinks.naver?.kind, 'place')
+  assert.equal(place.providerLinks.naver?.url, 'https://map.naver.com/p/entry/place/2035526670')
   assert.equal(place.providerLinks.kakao?.kind, 'search')
   assert.equal(new URL(place.providerLinks.naver!.url).hostname, 'map.naver.com')
   assert.equal(new URL(place.providerLinks.kakao!.url).hostname, 'map.kakao.com')
@@ -59,6 +60,7 @@ test('missing address stays null while honest provider search links remain avail
     ...source,
     roadAddress: '',
     coordinateStatus: 'not_collected',
+    imageSourceUrl: '',
   }
 
   const place = toCampusEatsPublicPlace(candidate)
@@ -69,6 +71,34 @@ test('missing address stays null while honest provider search links remain avail
   assert.equal(place.providerLinks.kakao?.kind, 'search')
   assert.match(decodeURIComponent(place.providerLinks.naver!.url), new RegExp(candidate.name))
   assert.doesNotMatch(decodeURIComponent(place.providerLinks.naver!.url), /undefined|null/)
+})
+
+test('location links preserve each restaurant source ID without turning another provider or a search into an exact place', () => {
+  const source = findCandidate('pnu:store:001', 'donkatsu')
+  for (const category of PNU_CAMPUS_EATS_CATEGORIES.filter(item => item.id === 'donkatsu' || item.id === 'pizza')) {
+    for (const candidate of category.candidates) {
+      const place = toCampusEatsPublicPlace(candidate)
+      const sourceUrl = new URL(candidate.imageSourceUrl)
+      const placeId = sourceUrl.hostname === 'pcmap.place.naver.com' ? sourceUrl.pathname.match(/^\/(?:restaurant|place|cafe)\/(\d+)(?:\/|$)/)?.[1] : null
+      assert.equal(place.providerLinks.naver?.kind, placeId ? 'place' : 'search', candidate.name)
+      if (placeId) assert.equal(place.providerLinks.naver?.url, `https://map.naver.com/p/entry/place/${placeId}`, candidate.name)
+      assert.equal(place.coordinates, null, 'an ID is not coordinate evidence')
+    }
+  }
+  for (const imageSourceUrl of [
+    'https://pcmap.place.naver.com.evil.example/restaurant/2035526670/photo',
+    'https://pcmap.place.naver.com@evil.example/restaurant/2035526670',
+    'http://pcmap.place.naver.com/restaurant/2035526670',
+    'https://pcmap.place.naver.com:8443/restaurant/2035526670',
+    'https://map.naver.com/p/search/무쿠',
+    'https://pcmap.place.naver.com/restaurant/not-a-place-id/photo',
+    '',
+  ]) {
+    const place = toCampusEatsPublicPlace({ ...source, imageSourceUrl })
+    assert.equal(place.providerLinks.naver?.kind, 'search', imageSourceUrl)
+    assert.match(decodeURIComponent(place.providerLinks.naver!.url), new RegExp(source.name))
+    assert.match(decodeURIComponent(place.providerLinks.naver!.url), new RegExp(source.roadAddress))
+  }
 })
 
 test('a real non-PNU candidate keeps its school name in provider searches when its address is missing', () => {

@@ -1,5 +1,6 @@
 import type { MeetupCategory } from '../community/contracts'
 import { featuredMeetupIdeas } from '../community/catalog'
+import { getActivityContent } from './activity-content'
 
 import type { MeetupGuideActionKind, ActiveMeetupGuideSceneId } from './guide-contract'
 
@@ -92,6 +93,7 @@ function buildTemplate({
   activityArtwork: { src: string; alt: string }
   usesDalmutiRules: boolean
 }): MeetupGuideTemplate {
+  const content = getActivityContent(activityKey, category)
   return {
     id,
     activityKey,
@@ -100,12 +102,12 @@ function buildTemplate({
     usesDalmutiRules,
     professionalRulesClaimed: false,
     scenes: [
-      scene('prepare', '모임 전 준비', '최신 시간과 장소, 준비물을 확인해요.', introArtwork, 'acknowledge'),
+      scene('prepare', '모임 전 준비', content.prepare, introArtwork, 'acknowledge'),
       scene('gather', '공개 장소에 모이기', '도착이 늦으면 혼자 뛰지 말고 모임에 알려요.', arrivalArtwork, 'open_map'),
       scene('greet', '한 문장으로 인사', '말하고 싶은 만큼만 소개하고 불편한 질문은 넘겨요.', introArtwork, 'acknowledge'),
-      scene('start', `${title} 시작`, '참가자 모두 준비됐는지 확인한 뒤 활동을 시작해요.', activityArtwork, 'open_activity'),
-      scene('activity', '지금 활동 이어가기', '전문 경기 규칙이 아니라 이 모임의 안전한 공통 진행 안내예요.', activityArtwork, 'open_activity'),
-      scene('wrap', '함께 마무리', '주변을 정리하고 각자 안전한 귀가 방법을 확인해요.', conversationArtwork, 'acknowledge'),
+      scene('start', `${title} 시작`, content.start, activityArtwork, 'open_activity'),
+      scene('activity', '지금 활동 이어가기', content.activity, activityArtwork, 'open_activity'),
+      scene('wrap', '함께 마무리', content.wrap, conversationArtwork, 'acknowledge'),
       scene('next', '모임을 마쳤어요', '주최자 종료와 개인 나가기는 서로 다른 기록으로 남아요.', closingArtwork, 'acknowledge'),
     ],
   }

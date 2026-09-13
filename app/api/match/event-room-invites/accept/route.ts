@@ -3,11 +3,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { isQuantumEventLifecycle } from '@/lib/matching/quantum-event-lifecycle'
 import { isQuantumRoomInviteToken } from '@/lib/matching/quantum-event-rooms'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseRequestClient(request)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return jsonError('Unauthorized', 401)
+  const admissionFailure = await datingAdmissionFailure(supabase)
+  if (admissionFailure) return jsonError(admissionFailure.error, admissionFailure.status)
 
   const body = await readJson(request)
   const token = isRecord(body) ? body.token : null
@@ -30,6 +33,7 @@ function mapAcceptError(error: { message?: string }) {
   const message = error.message?.toLowerCase() ?? ''
   if (message.includes('invite_not_found')) return { error: 'invite_not_found', status: 404 }
   for (const code of [
+    'dating_participation_unavailable',
     'pre_match_card_required',
     'invite_expired',
     'application_closed',

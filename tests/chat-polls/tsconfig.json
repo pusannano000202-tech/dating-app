@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "../../.tmp/chat-polls-tests",
+    "rootDir": "../..",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "incremental": false
+  },
+  "include": [
+    "../../app/api/chat-polls/**/*.ts",
+    "../../lib/chat-polls/**/*.ts",
+    "./**/*.test.ts"
+  ]
+}

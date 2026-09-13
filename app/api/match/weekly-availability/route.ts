@@ -4,6 +4,7 @@ import { continuationRouteErrorResponse } from '@/app/api/match/continuation-rou
 import { continuationJson, continuationRpcErrorResponse } from '@/lib/matching/continuation-api'
 import { getSeoulWeekKey, mapWeeklyAvailabilityRpcError, parseWeeklyApplicationInput } from '@/lib/matching/weekly-availability'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 import { TonightApiInputError, asInteger, asUuid, readStrictJson } from '@/lib/server/tonight/api-contract'
 
 function weekKeyFrom(request: Request) {
@@ -39,6 +40,8 @@ export async function POST(request: Request) {
     const parsed = parseWeeklyApplicationInput(body)
     if (!parsed.ok) throw new TonightApiInputError('invalid_field', parsed.error)
     const supabase = createSupabaseRequestClient(request)
+    const admissionFailure = await datingAdmissionFailure(supabase)
+    if (admissionFailure) return continuationJson({ error: admissionFailure.error }, admissionFailure.status)
     const { data, error } = await supabase.rpc('apply_to_my_weekly_activity_v2', {
       p_activity_id: parsed.value.activityId,
       p_week_key: parsed.value.weekKey,

@@ -19,8 +19,10 @@ export type MeetupApplicationFlowProps = {
   quote: AdmissionDepositQuote | null
   policy: { summary: string; conditions: readonly string[]; href?: string } | null
   carryover?: { eligible: boolean; availableKrw: number | null }
+  newDepositAmountKrw?: number
   onSubmit?: (input: AdmissionApplicationInput, options: { signal: AbortSignal }) => Promise<MeetupApplicationResult>
   onRefreshStatus?: (options: { signal: AbortSignal }) => Promise<MeetupApplicationResult>
+  onResumeCheckout?: (options: { signal: AbortSignal }) => Promise<MeetupApplicationResult>
   onCancel: () => void
   onOpenChat?: (result: MeetupApplicationResult) => void
   application?: MeetupApplicationResult | null
@@ -28,7 +30,7 @@ export type MeetupApplicationFlowProps = {
 
 const paymentLabels: Record<AdmissionPaymentState, string> = {
   unconfigured: '납부 준비 전', unpaid: '미납', pending: '결제 확인 중', held: '보증금 납부 확인',
-  refund_pending: '반환 처리 중', refunded: '반환 확인', failed: '결제 실패', reconciliation_required: '결제 상태 재확인 필요',
+  refund_due: '반환 필요 · 아직 미반환', refund_pending: '반환 처리 중', refunded: '반환 확인', failed: '결제 실패', reconciliation_required: '결제 상태 재확인 필요',
 }
 const admissionLabels: Record<AdmissionState, string> = {
   draft: '접수 전', submitted: '접수 확인 · 개설자 승인 대기', accepted: '개설자 승인 확인', declined: '개설자 미승인', withdrawn: '신청 철회', expired: '신청 만료',
@@ -52,7 +54,7 @@ function errorCopy(error: unknown): string {
 }
 
 /** Parent supplies authenticated quotes and real API callbacks. No demo or payment authority lives here. */
-export default function MeetupApplicationFlow({ room, meetup, accountKey, quote: rawQuote, policy, carryover, onSubmit, onRefreshStatus, onCancel, onOpenChat, application }: MeetupApplicationFlowProps) {
+export default function MeetupApplicationFlow({ room, meetup, accountKey, quote: rawQuote, policy, carryover, newDepositAmountKrw, onSubmit, onRefreshStatus, onResumeCheckout, onCancel, onOpenChat, application }: MeetupApplicationFlowProps) {
   const identityKey = JSON.stringify([accountKey, room.kind, room.id])
   const [draftOwner, setDraftOwner] = useState(identityKey)
   const [step, setStep] = useState<0 | 1 | 2>(0)
@@ -80,13 +82,14 @@ export default function MeetupApplicationFlow({ room, meetup, accountKey, quote:
   currentContext.current = contextKey
   const quoteMatches = Boolean(quote && quote.room.kind === room.kind && quote.room.id === room.id && Date.parse(quote.expiresAt) > Date.now() && !expired)
   const policyReady = Boolean(policy?.summary.trim() && policy.conditions.length && policy.conditions.every(condition => condition.trim()))
-  const amount = quote ? `${quote.amountKrw.toLocaleString('ko-KR')}원` : '확인 필요'
+  const amount = quote ? `${quote.amountKrw.toLocaleString('ko-KR')}원` : newDepositAmountKrw!==undefined ? `${newDepositAmountKrw.toLocaleString('ko-KR')}원` : '확인 필요'
   const balance = carryover?.availableKrw
   const carryoverAllowed = Boolean(quoteMatches && quote?.paymentMethods.includes('carryover') && carryover?.eligible && typeof balance === 'number' && Number.isSafeInteger(balance) && balance >= quote.amountKrw)
   const methodAllowed = paymentMethod === 'new' ? Boolean(quoteMatches && quote?.paymentMethods.includes('new')) : carryoverAllowed
   const hiddenControls = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/
   const introValid = intro.trim().length > 0 && [...intro].length <= 80 && [...strength].length <= 120 && !hiddenControls.test(intro) && !hiddenControls.test(strength.replace(/\n/g, ''))
-  const canSubmit = Boolean(accountKey && onSubmit && introValid && quoteMatches && policyReady && methodAllowed && policyRead && consent && !busy)
+  const amountPolicyMatches = newDepositAmountKrw === undefined || quote?.amountKrw === newDepositAmountKrw
+  const canSubmit = Boolean(accountKey && onSubmit && introValid && quoteMatches && amountPolicyMatches && policyReady && methodAllowed && policyRead && consent && !busy)
   const accepted = result?.admission === 'accepted' && result.payment === 'held'
   const submitted = result?.admission === 'submitted' && result.payment === 'held'
   const recoverable = result?.admission === 'draft' && ['failed', 'unpaid', 'unconfigured'].includes(result.payment)
@@ -99,7 +102,7 @@ export default function MeetupApplicationFlow({ room, meetup, accountKey, quote:
               : result?.payment === 'unconfigured' ? '아직 신청할 수 없어요'
                 : result?.payment === 'held' ? '신청 접수를 확인하고 있어요'
                   : result?.payment === 'failed' ? '결제가 완료되지 않았어요'
-                    : ['refund_pending', 'refunded'].includes(result?.payment ?? '') ? '보증금 반환 상태예요' : '결제 확인 중이에요'
+                    : ['refund_due', 'refund_pending', 'refunded'].includes(result?.payment ?? '') ? '보증금 반환 상태예요' : '결제 확인 중이에요'
 
   useEffect(() => {
     request.current?.controller.abort(); request.current = null
@@ -124,12 +127,13 @@ export default function MeetupApplicationFlow({ room, meetup, accountKey, quote:
   useEffect(() => { heading.current?.focus() }, [step])
   useEffect(() => () => { request.current?.controller.abort(); request.current = null }, [])
 
-  async function perform(refresh = false) {
+  async function perform(refresh = false, resume = false) {
     if (request.current || !accountKey) return
-    if (!refresh && !canSubmit) return
+    if (resume&&!onResumeCheckout)return
+    if (!refresh && !resume && !canSubmit) return
     if (refresh && !onRefreshStatus) return
     let input: AdmissionApplicationInput | undefined
-    if (!refresh) {
+    if (!refresh&&!resume) {
       const fingerprint = JSON.stringify([contextKey, intro, strength, paymentMethod])
       if (attempt.current?.fingerprint !== fingerprint) attempt.current = { fingerprint, id: crypto.randomUUID() }
       const validated = validateAdmissionApplication({ intro, strength, paymentMethod, consent, policyVersion: quote?.policyVersion, quoteId: quote?.id, idempotencyKey: attempt.current!.id }, { room, quote, nowMs: Date.now() })
@@ -139,7 +143,7 @@ export default function MeetupApplicationFlow({ room, meetup, accountKey, quote:
     const active = { controller: new AbortController(), key: contextKey }
     request.current = active; setBusy(true); setError(null)
     try {
-      const next = refresh ? await onRefreshStatus!({ signal: active.controller.signal }) : await onSubmit!(input!, { signal: active.controller.signal })
+      const next = resume ? await onResumeCheckout!({signal:active.controller.signal}) : refresh ? await onRefreshStatus!({ signal: active.controller.signal }) : await onSubmit!(input!, { signal: active.controller.signal })
       if (active.controller.signal.aborted || request.current !== active || currentContext.current !== active.key) return
       if (!confirmedResult(next)) throw new Error('invalid_application_response')
       setResult(next); setUncertain(false); setStep(2)
@@ -182,7 +186,7 @@ export default function MeetupApplicationFlow({ room, meetup, accountKey, quote:
       </section> : step === 1 ? <section className={styles.stage} aria-labelledby={`${ids}-heading`}>
         <div className={styles.depositHeading}><p className={styles.eyebrow}>서로의 시간을 소중히</p><h1 id={`${ids}-heading`} ref={heading} tabIndex={-1}>보증금을 확인해요</h1><p className={styles.description}>납부 확인 후 신청을 접수해요.<br />참가 확정은 개설자 승인 다음이에요.</p></div>
         <div className={styles.amountCard}><div><span>{meetup.activityLabel} · 참가 보증금</span><strong className={!quote ? styles.unknownAmount : undefined}>{amount}</strong><small>{meetup.title}</small></div><div className={styles.depositPhoto}><Image src={meetup.imageSrc} alt="" fill sizes="88px" /></div></div>
-        {!quoteMatches || !policyReady || !onSubmit ? <p className={styles.notice} role="status">{expired ? '보증금 확인 시간이 지났어요. 최신 조건을 다시 불러와 주세요.' : '보증금 금액·정책과 납부 연결을 준비 중이에요. 지금은 결제·신청할 수 없어요.'}</p> : null}
+        {!quoteMatches || !policyReady || !onSubmit || !amountPolicyMatches ? <p className={styles.notice} role="status">{quote&&!amountPolicyMatches ? `새 참가 신청 보증금은 ${newDepositAmountKrw?.toLocaleString('ko-KR')}원이에요. 표시된 이전 견적으로 결제하지 않고 최신 정책을 다시 확인해야 해요.` : expired ? '보증금 확인 시간이 지났어요. 최신 조건을 다시 불러와 주세요.' : '이 방의 반환·취소 정책 또는 결제 연결이 아직 준비되지 않았어요. 지금은 결제·신청할 수 없어요.'}</p> : null}
         <fieldset className={styles.methods} disabled={busy}><legend>어떻게 납부할까요?</legend><label data-selected={paymentMethod === 'new'}><input type="radio" name="paymentMethod" value="new" checked={paymentMethod === 'new'} disabled={!quoteMatches || !quote?.paymentMethods.includes('new')} onChange={() => setPaymentMethod('new')} /><CreditCard size={22} /><span><strong>새로 결제</strong><small>확인된 보증금을 납부해요</small></span></label><label data-selected={paymentMethod === 'carryover'} data-disabled={!carryoverAllowed}><input type="radio" name="paymentMethod" value="carryover" checked={paymentMethod === 'carryover'} disabled={!carryoverAllowed} onChange={() => { if (carryoverAllowed) setPaymentMethod('carryover') }} /><Wallet size={22} /><span><strong>반환 가능한 보증금 이월</strong><small>{carryoverAllowed ? `사용 가능 ${balance!.toLocaleString('ko-KR')}원` : typeof balance === 'number' && quote && balance < quote.amountKrw ? '이월할 수 있는 잔액이 부족해요' : '현재 이 모임에 이월할 수 없어요'}</small></span></label></fieldset>
         <details className={styles.policy} key={quoteKey} onToggle={event => { if (event.currentTarget.open && policyReady) setPolicyRead(true) }}><summary><ShieldCheck size={19} /><span>반환·취소 조건 읽기</span><ChevronDown size={18} /></summary>{policyReady && policy ? <div><p>{policy.summary}</p><ul>{policy.conditions.map((condition, index) => <li key={index}>{condition}</li>)}</ul>{policy.href && /^https:\/\//.test(policy.href) ? <a href={policy.href} target="_blank" rel="noreferrer">정책 전문 열기 ↗</a> : null}<small>적용 정책: {quote?.policyVersion ?? '확인 전'}</small></div> : <p>확정된 정책이 아직 준비되지 않았어요.</p>}</details>
         <label className={styles.consent}><input type="checkbox" name="consent" checked={consent} disabled={!policyRead || !policyReady || !quoteMatches || busy} onChange={event => setConsent(event.target.checked)} /><span>보증금 금액과 반환·취소 조건을<br />읽었으며 동의해요. <strong>필수</strong></span></label>
@@ -195,6 +199,8 @@ export default function MeetupApplicationFlow({ room, meetup, accountKey, quote:
       </section>}
 
       {error ? <p className={styles.error} role="alert">{error}</p> : null}
+      {step===2&&onResumeCheckout?<button type="button" className={styles.quietButton} disabled={busy} onClick={()=>void perform(false,true)}>이전 소개와 조건으로 결제 이어가기</button>:null}
+      {step===0&&newDepositAmountKrw!==undefined?<p className={styles.notice}>새 참가 신청 보증금은 {newDepositAmountKrw.toLocaleString('ko-KR')}원이에요. 다음 단계에서 이 방의 반환 조건과 결제 연결을 확인해요.</p>:null}
       <div className={styles.actions} aria-busy={busy}>
         {step === 0 ? <><p>다음 단계에서 보증금과 반환 조건을 확인해요.</p><button type="button" className={styles.primary} disabled={!introValid} onClick={() => { setStep(1); setError(null) }}>보증금 확인하기<ArrowRight size={19} /></button></> : step === 1 ? <><p>{busy ? '확인 요청 중 · 아직 결제·신청 완료가 아니에요.' : !policyRead ? '반환·취소 조건을 먼저 열어 확인해 주세요.' : '납부 확인 → 신청 접수 → 개설자 승인'}</p><div className={styles.actionRow}><button type="button" className={styles.previous} onClick={back} disabled={busy}>이전</button><button type="button" className={styles.primary} disabled={!canSubmit} onClick={() => void perform()}>{busy ? <><Loader2 size={20} className={styles.spin} />확인 요청 중</> : <>{paymentMethod === 'carryover' ? '동의하고 이월·신청' : '동의하고 결제·신청'}<ArrowRight size={18} /></>}</button></div>{busy ? <button type="button" className={styles.quietButton} onClick={stopWaiting}>결과 확인 중단</button> : null}</> : <>{accepted ? <button type="button" className={styles.primary} disabled={!onOpenChat || busy} onClick={() => { if (result && accepted) onOpenChat?.(result) }}>채팅방 들어가기<MessageCircle size={19} /></button> : onRefreshStatus ? <button type="button" className={styles.primary} disabled={busy} onClick={() => void perform(true)}>{busy ? <Loader2 size={20} className={styles.spin} /> : null}상태 다시 확인</button> : <button type="button" className={styles.primary} onClick={onCancel}>모임으로 돌아가기<ArrowRight size={19} /></button>}{recoverable ? <button type="button" className={styles.quietButton} onClick={() => { setStep(1); setError(null) }}>입력한 내용으로 돌아가기</button> : null}{accepted || onRefreshStatus ? <button type="button" className={styles.quietButton} onClick={onCancel} disabled={busy}>모임으로 돌아가기</button> : null}</>}
         <span className={styles.srOnly} role="status" aria-live="polite">{busy ? '서버 응답을 기다리고 있어요.' : result ? `${paymentLabels[result.payment]}. ${admissionLabels[result.admission]}.` : ''}</span>

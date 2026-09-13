@@ -6,25 +6,15 @@ import {
   parseCreateChatPollInput,
   parseExpectedRevision,
   parseVoteOptionIds,
+  resolveChatPollRoomKind,
 } from '@/lib/chat-polls/contract'
 import { chatPollJson, chatPollMutation, chatPollRpc, withChatPollMutation } from '@/lib/chat-polls/server'
 
-const roomKinds = {
-  meetups: 'meetup',
-  friends: 'friend',
-  'department-challenges': 'department_challenge',
-  'league-teams': 'league_team',
-} as const
-
 type Context = { params: Promise<{ roomKind: string; roomId: string; action?: string[] }> }
-
-function resolveRoomKind(value: string) {
-  return Object.hasOwn(roomKinds,value) ? roomKinds[value as keyof typeof roomKinds] : null
-}
 
 export async function GET(request: Request, context: Context) {
   const { roomKind, roomId, action = [] } = await context.params
-  const kind = resolveRoomKind(roomKind)
+  const kind = resolveChatPollRoomKind(roomKind)
   if (!kind || !isChatPollId(roomId) || action.length !== 0) {
     return chatPollJson({ error: 'invalid_request' }, 400)
   }
@@ -35,7 +25,7 @@ export async function GET(request: Request, context: Context) {
 
 export async function POST(request: Request, context: Context) {
   const { roomKind, roomId, action = [] } = await context.params
-  const kind = resolveRoomKind(roomKind)
+  const kind = resolveChatPollRoomKind(roomKind)
   if (!kind || !isChatPollId(roomId)) return chatPollJson({ error: 'invalid_request' }, 400)
   return withChatPollMutation(request, (mutation) => {
     const envelope = parseChatPollMutationEnvelope(mutation.body)

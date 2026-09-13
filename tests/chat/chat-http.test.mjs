@@ -71,10 +71,16 @@ test('membership and rate failures remain actionable instead of looking like emp
   const h=await harness({rpcError:{message},data:null});const res=await h.league.POST(post({team_id:id,body:'대화',idempotency_key:other}));assert.equal(res.status,status,message);assert.ok((await res.json()).error)
  }
 })
-test('activity keys are replaced with existing catalog labels and stripped from API output',async()=>{
+test('activity labels are canonical and the validated catalog key remains for the approved room photo',async()=>{
  const h=await harness({data:{...list,rooms:[{...room,kind:'activity_room',activity_key:'campus-walk',room_number:2}]}})
  const response=await h.rooms.GET(new Request(base+'social-rooms'));const result=await response.json()
- assert.equal(result.rooms[0].title,'캠퍼스 산책 · 2번 방');assert.equal(result.rooms[0].affiliation,'캠퍼스 산책');assert.equal('activity_key'in result.rooms[0],false)
+ assert.equal(result.rooms[0].title,'캠퍼스 산책 · 2번 방');assert.equal(result.rooms[0].affiliation,'캠퍼스 산책');assert.equal(result.rooms[0].activity_key,'campus-walk');assert.equal('room_number'in result.rooms[0],false)
+ // This is a bounded catalog key, not an arbitrary URL or private room field.
+ for(const activity_key of ['https://other.example/photo','../private','x'.repeat(121)]){
+  h.state.data={...list,rooms:[{...room,kind:'activity_room',activity_key,room_number:2}]}
+  const denied=await h.rooms.GET(new Request(base+'social-rooms'))
+  assert.equal(denied.status,503);assert.equal('rooms'in await denied.json(),false)
+ }
 })
 test('league navigation metadata preserves exact sport and challenge while accepting older payloads',async()=>{
  assert.ok(social.parseSocialRoomsResponse(list,id))

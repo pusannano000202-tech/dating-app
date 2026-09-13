@@ -12,8 +12,14 @@ test('places has a real category destination and never presents unverified place
   const source=readFileSync('components/community/PlaceExperienceExplorer.tsx','utf8')
   for(const label of ['PC방','헬스장','보드게임방']) assert.ok(source.includes(label))
   assert.match(source,/PhotoSceneCarousel/)
-  assert.match(source,/후보.*확인 중/)
-  assert.match(source,/rel="noopener noreferrer"/)
+  assert.match(source,/PlaceWorldcupExperience category=/)
+  const experience=readFileSync('components/place-worldcup/PlaceWorldcupExperience.tsx','utf8')
+  assert.match(experience,/catalog.state === 'ready'/)
+  assert.match(experience,/under_review:/)
+  assert.match(experience,/stale:/)
+  assert.match(experience,/insufficient:/)
+  assert.match(experience,/후보 연결에 실패했어요/)
+  assert.match(experience,/rel="noopener noreferrer"/)
 })
 
 test('public matching discovery no longer reveals upcoming continuation days', () => {

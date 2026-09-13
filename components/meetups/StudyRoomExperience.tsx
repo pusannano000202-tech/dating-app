@@ -158,6 +158,11 @@ function ExistingStudyRoomExperience({ fixedRoomId, chatOnly = false, readOnly =
 
   const guide = getStudyGuide({ kind: course?.guideKind ?? 'major-general', level, sessionNumber: 1 })
   const own = rooms.find(item => item.joined)
+  if(chatOnly&&room&&room.id===roomId&&!notice)return <StudySessionPanel key={room.id} room={room} busy={busy} chatOnly readOnly={readOnly}
+    readTrackingEnabled={status==='ready'&&!error} error={error?studyRoomErrorMessage(error):undefined} onRetry={()=>void load(true)}
+    notice={room.admission_mode==='hosted'?<MeetupApplications meetupId={room.id} kind="study" noticesOnly/>:null}
+    managementExtra={room.admission_mode==='hosted'&&room.is_host?<Link className={s.secondary} href={`/meetups/participation/study/${room.id}/applications`}>참가 신청 관리</Link>:null}
+    onAction={action} onLeave={leave} onOlderMessages={older}/>
   const Container = chatOnly ? 'section' : 'main'
   return <Container className={chatOnly ? undefined : s.page}><div className={s.container}>
     {!chatOnly ? <Link href="/meetups/department/courses" className={s.back}><ArrowLeft size={18} />내 수업 같이 공부하기</Link> : null}

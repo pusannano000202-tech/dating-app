@@ -1,6 +1,6 @@
 import type { CampusEatsCandidate } from './fixtures/pnu-categories'
 import type { PublicPlaceCategory, PublicPlaceDto } from '../places/contracts'
-import { buildProviderSearchLinks } from '../places/provider-links'
+import { buildProviderSearchLinks, createProviderLink } from '../places/provider-links'
 import { projectPublicPlace } from '../places/public-projection'
 
 export const CAMPUS_EATS_PLACE_FIXTURE_REVISION = 'campus-eats-place-fixture-v1'
@@ -192,11 +192,27 @@ function searchQuery(candidate: CampusEatsCandidate, context: CampusEatsPlaceCon
     .join(' ')
 }
 
+function naverPlaceUrlFromSource(source: string): string | null {
+  try {
+    const url = new URL(source)
+    if (url.protocol !== 'https:' || url.username || url.password
+      || (url.port && url.port !== '443')
+      || !['pcmap.place.naver.com', 'm.place.naver.com', 'place.naver.com'].includes(url.hostname)) return null
+    const placeId = url.pathname.match(/^\/(?:restaurant|place|cafe)\/([1-9]\d*)(?:\/|$)/)?.[1]
+    return placeId ? `https://map.naver.com/p/entry/place/${placeId}` : null
+  } catch {
+    return null
+  }
+}
+
 export function toCampusEatsPublicPlace(
   candidate: CampusEatsCandidate,
   context: CampusEatsPlaceContext = {},
 ): PublicPlaceDto {
   const roadAddress = candidate.roadAddress.trim()
+  const searchLinks = buildProviderSearchLinks(searchQuery(candidate, context))
+  // The retained restaurant source identifies a place; it does not verify current coordinates or opening hours.
+  const naverPlaceUrl = naverPlaceUrlFromSource(candidate.imageSourceUrl)
 
   return projectPublicPlace({
     placeRef: candidate.canonicalStoreId,
@@ -212,6 +228,9 @@ export function toCampusEatsPublicPlace(
         }
       : null,
     coordinates: null,
-    providerLinks: buildProviderSearchLinks(searchQuery(candidate, context)),
+    providerLinks: {
+      ...searchLinks,
+      naver: naverPlaceUrl ? createProviderLink('naver', naverPlaceUrl, 'place') : searchLinks.naver,
+    },
   })
 }

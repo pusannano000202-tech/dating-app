@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { guardDepositMutation } from '@/lib/payments/request-guard'
 import { DEPOSIT_AMOUNT } from '@/lib/constants'
 import { createPaymentServiceClient } from '@/lib/payments/deposit-server'
 import {
@@ -9,14 +10,16 @@ import {
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const blocked = guardDepositMutation(req)
+  if (blocked) return blocked
   const params = await props.params
   const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await readJson(req)
-  const refundAmount = typeof body.refund_amount === 'number'
-    ? Math.floor(body.refund_amount)
+  const refundAmount = typeof body.refund_amount === 'number' && Number.isSafeInteger(body.refund_amount)
+    ? body.refund_amount
     : null
 
   if (refundAmount !== DEPOSIT_AMOUNT) {
@@ -138,7 +141,8 @@ function translateRefundError(message = '') {
 
 async function readJson(req: NextRequest): Promise<Record<string, unknown>> {
   try {
-    return await req.json() as Record<string, unknown>
+    const body: unknown = await req.json()
+    return body && typeof body === 'object' && !Array.isArray(body) ? body as Record<string, unknown> : {}
   } catch {
     return {}
   }

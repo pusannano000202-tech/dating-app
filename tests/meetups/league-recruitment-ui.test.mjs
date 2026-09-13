@@ -56,9 +56,9 @@ test('accepting a match switches detail refresh to the server returned canonical
  const transition=journey.match(/onPaired=\{(id=>\{[^\n]*?\})\} onRefresh=/)?.[1]
  assert.ok(transition)
  const active={current:'old-receiver-challenge'},ids=[],loads=[],stages=[]
- const onPaired=new Function('activeDetail','setSelectedId','demo','load','setNotice','setStage',compile('const onPaired='+transition)+';return onPaired')(active,id=>ids.push(id),false,()=>{loads.push(active.current)},()=>{},stage=>stages.push(stage))
+ const onPaired=new Function('activeDetail','setSelectedId','demo','load','setNotice','go',compile('const onPaired='+transition)+';return onPaired')(active,id=>ids.push(id),false,()=>{loads.push(active.current)},()=>{},(stage,id)=>stages.push([stage,id]))
  onPaired('server-paired-challenge')
- assert.equal(active.current,'server-paired-challenge');assert.deepEqual(ids,['server-paired-challenge']);assert.deepEqual(loads,['server-paired-challenge']);assert.deepEqual(stages,['match'])
+ assert.equal(active.current,'server-paired-challenge');assert.deepEqual(ids,['server-paired-challenge']);assert.deepEqual(loads,['server-paired-challenge']);assert.deepEqual(stages,[['match','server-paired-challenge']])
 })
 
 test('a notice that expires while its map is open cannot submit, while ordinary team application remains allowed',async()=>{

@@ -7,7 +7,8 @@ import {
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
 import { createPaymentServiceClient, payMockDepositForMatch } from '@/lib/payments/deposit-server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { guardDepositMutation } from '@/lib/payments/request-guard'
 import { getPublicAppOrigin } from '@/lib/utils'
 
 interface DepositPaymentRow {
@@ -18,7 +19,9 @@ interface DepositPaymentRow {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServerClient()
+  const blocked = guardDepositMutation(req)
+  if (blocked) return blocked
+  const supabase = createSupabaseRequestClient(req)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -225,7 +228,7 @@ interface DepositMatchRow {
 }
 
 async function validateDepositMatchContext(
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  supabase: ReturnType<typeof createSupabaseRequestClient>,
   params: { matchId: string; groupId: string; userId: string },
 ): Promise<DepositMatchValidation> {
   const matchLookup = await supabase

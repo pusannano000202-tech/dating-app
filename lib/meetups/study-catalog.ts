@@ -81,6 +81,16 @@ function departmentKind(department: string): 'energy' | 'common' | null {
   return null
 }
 
+/** An ambiguous faculty is a chooser, never silently assigned to one major.
+ * Current CSE curriculum source lists these two programmes separately.
+ * This changes recommendations only; profile membership and room pools stay intact.
+ */
+export function getDepartmentStudyOptions(department: string): readonly string[] {
+  const value = normalizeQuery(department)
+  if (['컴퓨터공학부', '정보컴퓨터공학부'].includes(value)) return ['컴퓨터공학전공', '인공지능전공']
+  return []
+}
+
 /** Suggestions only: this must never be used as enrollment or room authorization. */
 export function getDepartmentCourseSuggestions(context: StudyCourseContext): readonly StudyCourseSuggestion[] {
   const kind = departmentKind(context.department)
@@ -119,10 +129,10 @@ export function getStudyCatalogCoverage() {
 
 /** Editorial subject photos, not photos of actual courses, students or live rooms. */
 export function getStudyCoursePhoto(title: string): Readonly<{ src: string; description: string }> {
-  if (/미적분|수학|대수|통계|확률/.test(title)) return { src: '/social-scenes/course-calculus.png', description: '수식과 풀이 노트 · 과목 활동 예시' }
+  if (/미적분|수학|대수|통계|확률|해석학|기하학|방정식|집합론|정수론|조합론|함수론|벡터해석/.test(title)) return { src: '/social-scenes/course-calculus.png', description: '수식과 풀이 노트 · 과목 활동 예시' }
   if (/화학|재료/.test(title)) return { src: '/social-scenes/course-chemistry.png', description: '화학·재료 탐구 · 과목 활동 예시' }
   if (/물리|역학|전자기|광학|회로/.test(title)) return { src: '/social-scenes/course-physics.png', description: '물리·회로 실험 · 과목 활동 예시' }
-  if (/프로그래밍|자료구조|컴퓨터|인공지능|데이터|인터넷|AI/.test(title)) return { src: '/social-scenes/course-programming.png', description: '코드와 컴퓨터 · 과목 활동 예시' }
+  if (/프로그래밍|자료구조|컴퓨터|인공지능|데이터|인터넷|AI|머신러닝|딥러닝|소프트웨어|운영체제|알고리즘|컴파일러|유닉스|네트워크|보안|클라우드|IoT|블록체인|자연어|가상현실|멀티미디어|프로그래밍언어|시각컴퓨팅|생성모델|강화학습|임베디드/.test(title)) return { src: '/social-scenes/course-programming.png', description: '코드와 컴퓨터 · 과목 활동 예시' }
   if (/경영|경제|회계|재무|마케팅|투자|매니지먼트|인적자원/.test(title)) return { src: '/social-scenes/course-business.png', description: '경영 노트와 차트 · 과목 활동 예시' }
   return { src: '/images/meetups/meetup-study.webp', description: '함께 공부하는 활동 예시' }
 }

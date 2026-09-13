@@ -29,6 +29,8 @@ export type DepartmentChallenge = {
   is_captain: boolean
   teams: DepartmentChallengeTeam[]
   result: { first_score: number; second_score: number } | null
+  fair_league?: boolean
+  paired_challenge_id?: string | null
 }
 
 export type DepartmentRosterSlot = Readonly<{
@@ -85,6 +87,8 @@ export function parseDepartmentChallenges(value: unknown): DepartmentChallenge[]
       is_captain: row.is_captain,
       teams,
       result,
+      fair_league: row.fair_league === true,
+      paired_challenge_id: validUuid(row.paired_challenge_id) ? row.paired_challenge_id : null,
     })
   }
   return challenges

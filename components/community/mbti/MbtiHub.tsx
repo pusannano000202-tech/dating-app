@@ -40,8 +40,8 @@ function createSessionId(): string {
   return `mbti:survey:${suffix}`
 }
 
-export default function MbtiHub() {
-  const [screen, setScreen] = useState<Screen>('self')
+export default function MbtiHub({ initialView = 'self' }: { initialView?: 'self' | 'manage' }) {
+  const [screen, setScreen] = useState<Screen>(initialView)
   useEffect(() => { window.scrollTo(0, 0) }, [screen])
   const [ownerState, setOwnerState] = useState<MbtiOwnerStateDto>(EMPTY_STATE)
   const [authenticated, setAuthenticated] = useState<boolean | null>(null)
@@ -250,6 +250,16 @@ export default function MbtiHub() {
     catch { setServiceError('서비스 연결을 확인하지 못했어요. 잠시 후 다시 시도해 주세요.'); setError('서비스에 연결하지 못했어요. 입력은 이 화면에 유지돼요. 잠시 후 다시 확인해 주세요.') }
   }
   const guarded = (content: ReactNode) => <MbtiDraftNavigationGuard active={hasUnsavedDraft}>{content}</MbtiDraftNavigationGuard>
+  if (screen === 'manage' && (authenticated !== true || !ownerState.participant)) return <section className="mx-auto max-w-2xl px-5 pb-28 pt-8">
+    <Link href="/community/mbti" className="inline-flex min-h-11 items-center gap-2 text-sm"><ArrowLeft size={18} />MBTI 이야기로 돌아가기</Link>
+    <h1 className="mt-5 text-3xl font-black">내 MBTI 응답 관리</h1>
+    <div className="mt-5 rounded-2xl border border-boot-hairline bg-white p-5">
+      {serviceError ? <><p role="alert">응답을 불러오지 못했어요. 응답이 없다는 뜻은 아니에요.</p><button onClick={() => void retryService()} className="mt-3 min-h-11 underline">다시 확인하기</button></>
+        : authenticated === null ? <p role="status">내 응답을 확인하고 있어요…</p>
+        : authenticated === false ? <><p>본인의 응답만 관리할 수 있어요.</p><Link href="/login?next=%2Fcommunity%2Fmbti%3Fview%3Dmanage" className="mt-3 inline-flex min-h-11 items-center font-bold text-boot-primary">로그인하고 돌아오기 →</Link></>
+        : <><p>아직 저장한 내 응답이 없어요.</p><button onClick={() => setScreen('self')} className="mt-3 min-h-11 font-bold text-boot-primary">내 경험 입력하기 →</button></>}
+    </div>
+  </section>
   if (screen === 'stats') return guarded(<MbtiStats onBack={() => setScreen(statsReturn)} onBackLabel={statsReturn === 'experiences' ? '경험 선택으로 돌아가기' : '내 유형 선택으로 돌아가기'} onManage={() => setScreen('manage')} canManage={authenticated === true && ownerState.participant !== null} />)
   if (screen === 'manage') return guarded(<MbtiResponseManager state={ownerState} onBack={() => setScreen('stats')} onRefresh={() => loadOwnerState(!hasUnsavedDraft)} onLoadMore={loadMoreExperiences} onWithdrawn={() => { setOwnerState(EMPTY_STATE); setSelfMbti(null); setCounts({}); setDrafts([]); setConsent(false); setHasUnsavedDraft(false); setScreen('self') }} />)
   if (screen === 'experiences') return guarded(<MbtiExperienceEditor counts={counts} onIncrement={(type) => changeCount(type, 1)} onDecrement={(type) => changeCount(type, -1)} onBack={() => setScreen('self')} onReview={() => beginReview(false)} onNoExperience={() => beginReview(true)} onStats={() => showStats('experiences')} />)

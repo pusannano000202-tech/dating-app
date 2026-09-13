@@ -116,6 +116,27 @@ export async function voiceSceneRpc(
   }
   return data as Record<string, unknown>
 }
+export async function voiceRuntimeRpc(
+  request: Request,
+  operation: string,
+  payload: Record<string, unknown> = {},
+) {
+  if (!isCommunityFeatureEnabled()) throw new Error('provider_unavailable')
+  await requireRequestAccess(request, {
+    checkMutationOrigin: request.method !== 'GET',
+  })
+  const client = createSupabaseRequestClient(request)
+  const { data, error } = await client.rpc('community_voice_runtime_command', {
+    p_operation: operation,
+    p_payload: payload,
+  })
+  if (error) {
+    const code = typeof error === 'object' && 'code' in error ? String(error.code) : ''
+    if (code === 'PGRST202' || code === '42883') throw new Error('voice_scene_unavailable')
+    throw error
+  }
+  return data as Record<string, unknown>
+}
 export function requireVoiceProvider() {
   const config = voiceProviderConfig(process.env)
   if (!config) throw new Error('provider_unavailable')

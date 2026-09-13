@@ -7,14 +7,17 @@
     "build": "next build",
     "start": "next start --hostname localhost --port 3004",
     "lint": "next lint",
-    "test": "npm run test:auth && npm run test:config && npm run test:matching && npm run test:profile && npm run test:community-social",
+    "test": "npm run test:auth && npm run test:config && npm run test:matching && npm run test:profile && npm run test:community-social && npm run test:content-journey",
+    "test:content-journey": "tsc -p tests/daily-identity/tsconfig.json && tsc -p tests/chat-polls/tsconfig.json && tsc -p tests/place-worldcup/tsconfig.json && node --test --test-concurrency=1 .tmp/daily-identity-tests/tests/daily-identity/*.test.js .tmp/chat-polls-tests/tests/chat-polls/*.test.js .tmp/place-worldcup-tests/tests/place-worldcup/*.test.js tests/content-history/*.test.mjs tests/daily-identity/*.test.mjs tests/chat-polls/*.test.mjs tests/place-worldcup/*.test.mjs tests/tooling/content*.test.mjs",
     "test:community-social": "npm run test:friends && npm run test:account && npm run test:voice && npm run test:social-ledgers",
     "test:friends": "tsc -p tests/friends/tsconfig.json && node --test .tmp/friends-tests/tests/friends/*.test.js",
     "test:account": "tsc -p tests/account/tsconfig.json && node --test .tmp/account-tests/tests/account/*.test.js",
     "test:voice": "tsc -p tsconfig.voice-tests.json && node --test .tmp/voice-tests/tests/voice/*.test.js tests/voice/voice-security-headers.test.mjs",
     "test:social-ledgers": "node --test --test-concurrency=1 tests/voice/*.test.mjs tests/friends/*ledger.test.mjs tests/account/*.test.mjs tests/meetups/*ledger.test.mjs tests/matching/*ledger.test.mjs",
     "test:auth": "node -e \"require('fs').rmSync('.tmp/auth-tests',{recursive:true,force:true})\" && tsc -p tsconfig.auth-tests.json && node --test .tmp/auth-tests/tests/auth/*.test.js",
-    "test:config": "node -e \"require('fs').rmSync('.tmp/config-tests',{recursive:true,force:true})\" && tsc -p tsconfig.config-tests.json && node --test .tmp/config-tests/tests/config/*.test.js",
+    "test:config": "node -e \"require('fs').rmSync('.tmp/config-tests',{recursive:true,force:true})\" && tsc -p tsconfig.config-tests.json && node --test .tmp/config-tests/tests/config/*.test.js tests/config/*.test.mjs",
+    "test:deposit-security": "node --test --test-concurrency=1 tests/meetups/admission-*.test.mjs tests/meetups/native-admission-*.test.mjs tests/meetups/candidate-deposit-*.test.mjs",
+    "test:ui-cohesion": "node --test --test-concurrency=1 tests/auth/shared-meetup-return.test.mjs tests/chat/*.test.mjs tests/home/*.test.mjs tests/meetups/share-*.test.mjs",
     "test:matching": "node -e \"require('fs').rmSync('.tmp/matching-tests',{recursive:true,force:true})\" && tsc -p tsconfig.matching-tests.json && node --test .tmp/matching-tests/tests/matching/*.test.js",
     "test:profile": "node -e \"require('fs').rmSync('.tmp/profile-tests',{recursive:true,force:true})\" && tsc -p tsconfig.profile-tests.json && node --test .tmp/profile-tests/tests/profile/*.test.js",
     "check:payment-env": "node scripts/check-payment-env.mjs",
@@ -35,7 +38,7 @@
     "livekit-client": "2.22.2",
     "livekit-server-sdk": "2.18.0",
     "lucide-react": "^1.16.0",
-    "next": "15.5.23",
+    "next": "15.5.24",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "web-push": "^3.6.7"
@@ -48,7 +51,7 @@
     "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.0.1",
     "eslint": "9.39.5",
-    "eslint-config-next": "15.5.23",
+    "eslint-config-next": "15.5.24",
     "postcss": "8.5.26",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
@@ -58,6 +61,7 @@
     "nanoid": "3.3.18",
     "postcss": "$postcss",
     "postcss-selector-parser": "6.1.3",
-    "sharp": "0.35.3"
+    "sharp": "0.35.4",
+    "js-yaml": "4.3.2"
   }
 }

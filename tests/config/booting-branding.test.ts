@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { parseSharedMeetupReturn, sharedMeetupProfileHref } from '../../lib/auth/shared-meetup-return'
 
 const ROOT = process.cwd()
 
@@ -308,7 +309,17 @@ test('minimum signup requires live auth while later legacy onboarding previews s
 
   assert.doesNotMatch(basic, /isDevPreviewClientSession|DEV_BASIC_PROFILE_STORAGE_KEY/)
   assert.match(basic, /fetch\('\/api\/profile\/basic'/)
-  assert.match(basic, /response\.status === 401[\s\S]*router\.replace\('\/login\?redirect=%2Fprofile%2Fbasic'\)/)
+  assert.equal(basic.match(/if \(response\.status === 401\) \{ router\.replace\(loginPath\); return \}/g)?.length, 2, 'both loading and saving require live authentication')
+  const loginBuilder = basic.match(/const sharedRoom = parseSharedMeetupReturn[\s\S]*?const loginPath = [^\r\n]+/)?.[0]
+  assert.ok(loginBuilder, 'signup login must preserve only a validated shared-room return')
+  const loginHref = new Function('params', 'parseSharedMeetupReturn', 'sharedMeetupProfileHref', `${loginBuilder}\nreturn loginPath`) as (params: URLSearchParams, parse: typeof parseSharedMeetupReturn, profileHref: typeof sharedMeetupProfileHref) => string
+  const room = '/meetups/11111111-1111-4111-8111-111111111111'
+  for (const next of [null, room, '/admin', 'https://evil.example/path', '//evil.example/path']) {
+    const params = new URLSearchParams(next ? { next } : {})
+    const location = new URL(loginHref(params, parseSharedMeetupReturn, sharedMeetupProfileHref), 'https://quantum.example')
+    assert.equal(location.pathname, '/login')
+    assert.equal(location.searchParams.get('redirect'), next === room ? sharedMeetupProfileHref(room) : '/profile/basic')
+  }
 
   for (const source of [worldcup, survey, personalityPreference, schedule, preferences]) {
     assert.match(source, /isDevPreviewClientSession/)

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "noEmit": true, "incremental": false, "allowImportingTsExtensions": true },
+  "include": [
+    "../../next-env.d.ts", "../../lib/relationship/**/*.ts", "../../components/relationship/**/*.tsx",
+    "../../lib/i18n/relationship-messages.ts", "../../app/api/profile/relationship/route.ts",
+    "../../app/profile/relationship/page.tsx", "../../app/api/tonight/apply/route.ts", "../../app/api/internal/tonight/allocate/route.ts",
+    "../../app/api/tonight/friend-invites/**/*.ts", "../../app/api/match/weekly-availability/**/*.ts",
+    "../../app/api/match/event-participation/route.ts", "../../app/api/match/event-room-invites/accept/route.ts",
+    "../../app/api/match-pool/enter/route.ts", "../../components/tonight/TonightContinuationEntry.tsx",
+    "../../components/matching/FiveMeetingPostFlow.tsx", "./*.test.ts"
+  ],
+  "exclude": ["../../node_modules"]
+}

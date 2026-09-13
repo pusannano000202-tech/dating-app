@@ -2,9 +2,55 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { NextRequest, NextResponse } from 'next/server'
+import ts from 'typescript'
+
+import * as accountAccess from '../../lib/auth/account-access'
+import * as redirectPolicy from '../../lib/auth/redirect'
+import * as serviceRecovery from '../../lib/auth/service-unavailable'
+import * as devAuth from '../../lib/dev-auth'
 
 const ROOT = process.cwd()
 const source = (path: string) => readFileSync(join(ROOT, path), 'utf8')
+
+function authenticatedMiddlewareFixture() {
+  let accessChecks = 0
+  const exports: { middleware?: (request: NextRequest) => Promise<NextResponse> } = {}
+  const dependencies: Record<string, unknown> = {
+    'next/server': { NextResponse },
+    './lib/auth/redirect': redirectPolicy,
+    './lib/auth/service-unavailable': serviceRecovery,
+    './lib/dev-auth': { ...devAuth, isDevAuthBypassEnabled: () => false, shouldIssueDevAuthCookie: () => false },
+    './lib/auth/account-access': {
+      ...accountAccess,
+      checkAccountAccess: async () => { accessChecks += 1; return 'allowed' },
+    },
+    './lib/supabase-request': { createSupabaseRequestClient: () => assert.fail('login must use cookie auth') },
+    './lib/utils': {
+      getPublicAppOrigin: () => 'https://quantum.example',
+      getSupabasePublicKey: () => 'fixture-public-key',
+      getSupabaseUrl: () => 'https://fixture.supabase.invalid',
+      isSupabaseConfigured: () => true,
+    },
+    '@supabase/ssr': {
+      createServerClient: (_url: string, _key: string, options: {
+        cookies: { setAll: (cookies: { name: string; value: string }[]) => void }
+      }) => ({ auth: { getUser: async () => {
+        options.cookies.setAll([{ name: 'refreshed-session', value: 'fixture-cookie' }])
+        return { data: { user: { id: '11111111-1111-4111-8111-111111111111' } }, error: null }
+      } } }),
+    },
+  }
+  const code = ts.transpileModule(source('middleware.ts'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText
+  new Function('exports', 'require', code)(exports, (specifier: string) => {
+    assert.ok(Object.hasOwn(dependencies, specifier), `unexpected dependency: ${specifier}`)
+    return dependencies[specifier]
+  })
+  assert.equal(typeof exports.middleware, 'function')
+  return { middleware: exports.middleware!, accessChecks: () => accessChecks }
+}
 
 test('continue route resolves a live database role with private no-store responses', () => {
   assert.equal(existsSync(join(ROOT, 'app/auth/continue/route.ts')), true)
@@ -82,11 +128,47 @@ test('middleware protects exact route segments and keeps dev fixture auth inside
   )
   assert.match(
     middleware,
-    /preserveResponseCookies\(NextResponse\.redirect\(new URL\(['"]\/auth\/continue['"], appOrigin\)\), response\)/,
+    /const destination = getPostLoginDestination\(\{ requestedRedirect: request\.nextUrl\.searchParams\.get\('redirect'\) \?\? request\.nextUrl\.searchParams\.get\('next'\) \}\)/,
   )
+  assert.match(middleware, /preserveResponseCookies\(NextResponse\.redirect\(new URL\(destination, appOrigin\)\), response\)/)
   assert.match(middleware, /const appOrigin = getPublicAppOrigin\(\)/)
   assert.doesNotMatch(middleware, /NextResponse\.redirect\(new URL\(['"]\/(?:login|auth\/continue)['"], request\.url\)\)/)
   assert.doesNotMatch(middleware, /const isProtected = PROTECTED_PREFIXES\.some\(\(p\) => pathname\.startsWith\(p\)\)/)
+})
+
+test('actual authenticated login responses always enter the role resolver with safe next and refreshed cookies', async () => {
+  const room = '/meetups/11111111-1111-4111-8111-111111111111'
+  for (const [query, expectedNext] of [
+    ['', null],
+    [new URLSearchParams({ next: room }).toString(), room],
+    [new URLSearchParams({ redirect: room, next: '/admin' }).toString(), room],
+    [new URLSearchParams({ next: 'https://evil.example/path' }).toString(), null],
+    [new URLSearchParams({ next: '/admin/super-admin/tonight' }).toString(), '/admin/super-admin/tonight'],
+  ] as const) {
+    const fixture = authenticatedMiddlewareFixture()
+    const response = await fixture.middleware(new NextRequest(`https://untrusted-host.invalid/login?${query}`))
+    const location = new URL(response.headers.get('location')!)
+    assert.equal(response.status, 307)
+    assert.equal(location.origin, 'https://quantum.example')
+    assert.equal(location.pathname, '/auth/continue')
+    assert.equal(location.searchParams.get('next'), expectedNext)
+    assert.equal(response.cookies.get('refreshed-session')?.value, 'fixture-cookie')
+    assert.equal(response.headers.get('cache-control'), 'private, no-store')
+    assert.equal(response.headers.get('vary'), 'Cookie, Authorization')
+    assert.equal(fixture.accessChecks(), 1)
+    if (expectedNext?.startsWith('/admin')) {
+      assert.equal(redirectPolicy.getRoleDestination('user', expectedNext), '/')
+    }
+  }
+})
+
+test('actual authenticated reauthentication requests stay on login for the recent-auth challenge', async () => {
+  const fixture = authenticatedMiddlewareFixture()
+  const response = await fixture.middleware(new NextRequest('https://quantum.example/login?reauth=1&next=%2Fadmin'))
+  assert.equal(response.headers.get('location'), null)
+  assert.equal(response.headers.get('x-middleware-next'), '1')
+  assert.equal(response.cookies.get('refreshed-session')?.value, 'fixture-cookie')
+  assert.equal(fixture.accessChecks(), 0)
 })
 
 test('authenticated super-admins can complete an explicit recent-auth challenge', () => {

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { ArrowLeft, RefreshCw, Settings2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -113,6 +114,12 @@ export default function MbtiStats({ onBack, onBackLabel, onManage, canManage }: 
         )}
       </article>}
       <p className="mt-4 text-xs font-bold leading-5 text-boot-muted">{aggregate?.limitations.join(' ') ?? '선택 참여한 자기보고 응답은 과학적 궁합이나 미래 관계 성공률을 뜻하지 않아요.'}</p>
+      <div className="mt-6 rounded-2xl border border-boot-hairline bg-white p-5">
+        <p className="font-black">유형보다, 우리가 편했던 순간</p>
+        <p className="mt-2 text-sm leading-6 text-boot-muted">처음 만났을 때 편했던 대화는 무엇이었나요?</p>
+        <Link href="/community/relationship-advice?starter=first-hello" className="mt-3 flex min-h-11 items-center text-sm font-black text-boot-primary">내 이야기 초안 열기 →</Link>
+        <p className="mt-1 text-xs leading-5 text-boot-muted">내 MBTI 응답이나 상대 정보는 옮겨지지 않아요. 직접 쓴 뒤 게시 여부를 선택해요.</p>
+      </div>
     </section>
   )
 }

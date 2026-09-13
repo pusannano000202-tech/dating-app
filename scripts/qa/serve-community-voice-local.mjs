@@ -1,6 +1,7 @@
 import { execFileSync, spawn } from 'node:child_process'
 import { access, readFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import { resolveIntegratedUiPort } from './integrated-ui-config.mjs'
 
 import {
   COMMUNITY_VOICE_LOCAL,
@@ -17,7 +18,7 @@ import {
   validateIntegratedLocalAuthEnvironment,
 } from './integrated-runtime-environment.mjs'
 
-if (process.argv.length !== 2) throw new Error('Usage: node scripts/qa/serve-community-voice-local.mjs')
+const port = resolveIntegratedUiPort(process.argv.slice(2))
 
 const { workspaceRoot, runtimeRoot } = resolveCommunityVoiceLocalRoots(process.cwd())
 const configPath = join(runtimeRoot, 'supabase', 'config.toml')
@@ -141,7 +142,8 @@ try {
   const migrationBoundary = describeMigrationBoundary(workspaceMigrationNames, sourceManifest)
 
   console.log(JSON.stringify({
-    application: COMMUNITY_VOICE_LOCAL.appOrigin,
+    application: `http://localhost:${port}`,
+    configuredAuthCallbackOrigin: COMMUNITY_VOICE_LOCAL.appOrigin,
     localAuth: COMMUNITY_VOICE_LOCAL.apiUrl,
     sourceRuntimeFilesReadOnly: true,
     databaseReadOnly: false,
@@ -157,7 +159,7 @@ try {
     console.warn(`주의: ${migrationBoundary.workspaceOnlyMigrations.join(', ')}은 기존 로컬 스택 snapshot에 없습니다. 이 런처는 migration을 적용하지 않으며 새 기능 전체 완료를 증명하지 않습니다.`)
   }
 
-  const child = spawn(process.execPath, ['scripts/qa/start-integrated-ui.mjs', '--live-local'], {
+  const child = spawn(process.execPath, ['scripts/qa/start-integrated-ui.mjs', '--live-local', '--port', port], {
     cwd: workspaceRoot,
     env: childEnv,
     stdio: 'inherit',

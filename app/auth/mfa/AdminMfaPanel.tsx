@@ -4,6 +4,7 @@ import { FormEvent, useRef, useState } from 'react'
 import { KeyRound, LogOut, ShieldCheck } from 'lucide-react'
 
 import BootingLogo from '@/components/BootingLogo'
+import { requestVoiceCleanupBeforeSignOut } from '@/components/voice/VoiceGlobalProvider'
 import { createClient } from '@/lib/supabase'
 
 export interface AdminMfaFactor {
@@ -115,6 +116,7 @@ export default function AdminMfaPanel({
     if (!beginRequest()) return
     try {
       const supabase = createClient()
+      await requestVoiceCleanupBeforeSignOut()
       const result = await supabase.auth.signOut()
       if (result.error) throw result.error
       window.location.assign('/login')

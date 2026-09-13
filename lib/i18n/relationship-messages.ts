@@ -1,5 +1,9 @@
 import type { MessageSet } from './messages'
 export const relationshipMessages: MessageSet = {
+  'relationship.summaryUnknown': {ko:'연애 상태 확인 필요',en:'Status needs checking',ja:'恋愛状況の確認が必要です',zh:'需要确认恋爱状态'},
+  'relationship.summaryRetry': {ko:'확인 전에는 싱글로 표시하지 않아요. 다시 확인해 주세요.',en:'We do not assume you are single. Please retry.',ja:'未確認の状態をシングルとは表示しません。再確認してください。',zh:'确认前不会显示为单身，请重试。'},
+  'relationship.summaryChecking': {ko:'본인에게만 보이는 상태를 확인하고 있어요.',en:'Checking your private status.',ja:'自分だけに見える状態を確認しています。',zh:'正在确认仅自己可见的状态。'},
+  'relationship.summarySingle': {ko:'연애 상태에 따른 새 매칭 제한이 없어요. 다른 참가 조건은 신청할 때 확인해요.',en:'No relationship-status restriction. Other requirements are checked when you apply.',ja:'恋愛状況による新規申請の制限はありません。他の条件は申請時に確認します。',zh:'恋爱状态不限制新配对，其他条件将在申请时确认。'},
   'relationship.title': {ko:'나의 연애 상태',en:'My relationship status',ja:'自分の恋愛状況',zh:'我的恋爱状态'},
   'relationship.private': {ko:'나에게만 보이는 설정',en:'A setting only you can see',ja:'自分だけに見える設定',zh:'仅自己可见的设置'},
   'relationship.intro': {ko:'지금의 나에게 맞게, 만남의 속도를 정해요.',en:'Choose the pace that feels right for you.',ja:'今の自分に合う出会いのペースを。',zh:'按照现在的心情，选择相遇的节奏。'},

@@ -1,0 +1,2061 @@
+{
+  "retrievedAt": "2026-09-13",
+  "cse": [
+    {
+      "major": "computer",
+      "url": "https://cse.pusan.ac.kr/cse/14274/subview.do",
+      "rows": [
+        {
+          "code": "CB1501027",
+          "title": "이산수학(I)",
+          "rawTitle": "이산수학(I)(Discrete Mathematics(I))",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "전 공",
+            "전공기초",
+            "CB1501027",
+            "이산수학(I)(Discrete Mathematics(I))",
+            "3-3-0",
+            "1-1",
+            "※전공기초 중 부전공은 ◎과목만 인정"
+          ]
+        },
+        {
+          "code": "CB1501005",
+          "title": "일반물리학(I)",
+          "rawTitle": "일반물리학(I)(General Physics(I))",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501005",
+            "일반물리학(I)(General Physics(I))",
+            "3-3-0",
+            "1-1"
+          ]
+        },
+        {
+          "code": "CB1501007",
+          "title": "컴퓨터및프로그래밍입문",
+          "rawTitle": "◎컴퓨터및프로그래밍입문(Introduction to Computers and Programming)",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501007",
+            "◎컴퓨터및프로그래밍입문(Introduction to Computers and Programming)",
+            "4-4-0",
+            "1-1"
+          ]
+        },
+        {
+          "code": "CB1501008",
+          "title": "어드벤처디자인",
+          "rawTitle": "어드벤처디자인(Adventure Design)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501008",
+            "어드벤처디자인(Adventure Design)",
+            "2-0-4",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CB1501009",
+          "title": "일반물리학(II)",
+          "rawTitle": "일반물리학(II)(General Physics(II))",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501009",
+            "일반물리학(II)(General Physics(II))",
+            "3-3-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CB1501010",
+          "title": "전기전자공학개론",
+          "rawTitle": "전기전자공학개론(Introduction to Electric and Electronic Engineering)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501010",
+            "전기전자공학개론(Introduction to Electric and Electronic Engineering)",
+            "3-3-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CB1501011",
+          "title": "프로그래밍원리와실습",
+          "rawTitle": "◎프로그래밍원리와실습(Programming Principles and Practice)",
+          "year": 1,
+          "semesters": [
+            1,
+            2
+          ],
+          "cells": [
+            "CB1501011",
+            "◎프로그래밍원리와실습(Programming Principles and Practice)",
+            "4-4-0",
+            "1-1,2"
+          ]
+        },
+        {
+          "code": "CB1501012",
+          "title": "확률통계",
+          "rawTitle": "확률통계(Probabilities and Statistics)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501012",
+            "확률통계(Probabilities and Statistics)",
+            "3-3-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CB1501013",
+          "title": "인터넷과웹기초",
+          "rawTitle": "♤◎인터넷과웹기초(Introduction to Internet and Web)",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "전공필수",
+            "CB1501013",
+            "♤◎인터넷과웹기초(Introduction to Internet and Web)",
+            "3-3-0",
+            "1-1",
+            "※최소(복수)전공: 전공기초 전부, 전공필수 ♤과목 포함 33학점 (전공기초 25학점, 전공필수 33학점) ※심화전공: 전공기초 및 전공필수 전부, 전공선택 40학점 (전공기초 25학점, 전공필수 37학점, 전공선택 40학점) ※부전공: ◎과목 필수이수, 전공필수 ♤과목 중에서 추가 이수하여 총 21학점"
+          ]
+        },
+        {
+          "code": "CB1501014",
+          "title": "C++프로그래밍과실습",
+          "rawTitle": "♤C++프로그래밍과실습(C++ Programming and Practice)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501014",
+            "♤C++프로그래밍과실습(C++ Programming and Practice)",
+            "4-4-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CB1501015",
+          "title": "공학선형대수학",
+          "rawTitle": "♤공학선형대수학(Engineering Linear Algebra)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501015",
+            "♤공학선형대수학(Engineering Linear Algebra)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CB1501016",
+          "title": "논리회로및설계",
+          "rawTitle": "♤논리회로및설계(Logic Circuit Design)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501016",
+            "♤논리회로및설계(Logic Circuit Design)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CB1501017",
+          "title": "데이터과학입문",
+          "rawTitle": "♤데이터과학입문(Introduction to Data Science)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501017",
+            "♤데이터과학입문(Introduction to Data Science)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CB1501018",
+          "title": "논리회로설계및실험",
+          "rawTitle": "♤논리회로설계및실험(Logic Circuit design & Lab)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501018",
+            "♤논리회로설계및실험(Logic Circuit design & Lab)",
+            "2-0-4",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB1501019",
+          "title": "자료구조",
+          "rawTitle": "♤자료구조(Data Structures)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501019",
+            "♤자료구조(Data Structures)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB1501022",
+          "title": "컴퓨터구조",
+          "rawTitle": "♤컴퓨터구조(Computer Architecture)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501022",
+            "♤컴퓨터구조(Computer Architecture)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB1501020",
+          "title": "소프트웨어설계및실험",
+          "rawTitle": "소프트웨어설계및실험(Computer Software Design & Lab)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501020",
+            "소프트웨어설계및실험(Computer Software Design & Lab)",
+            "2-0-4",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB1501021",
+          "title": "운영체제",
+          "rawTitle": "♤운영체제(Operating Systems)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501021",
+            "♤운영체제(Operating Systems)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB1501023",
+          "title": "컴퓨터알고리즘",
+          "rawTitle": "♤컴퓨터알고리즘(Computer Algorithms)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501023",
+            "♤컴퓨터알고리즘(Computer Algorithms)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB1501025",
+          "title": "임베디드시스템설계및실험",
+          "rawTitle": "임베디드시스템설계및실험(Embedded System Design & Lab)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501025",
+            "임베디드시스템설계및실험(Embedded System Design & Lab)",
+            "2-0-4",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001125",
+          "title": "캡스톤디자인",
+          "rawTitle": "♤캡스톤디자인(Capstone Design)",
+          "year": 4,
+          "semesters": [
+            1,
+            2
+          ],
+          "cells": [
+            "CB2001125",
+            "♤캡스톤디자인(Capstone Design)",
+            "3-3-0",
+            "4-1,2"
+          ]
+        },
+        {
+          "code": "CB2001101",
+          "title": "시스템소프트웨어",
+          "rawTitle": "시스템소프트웨어(System Software)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "전공선택",
+            "CB2001101",
+            "시스템소프트웨어(System Software)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CB2001102",
+          "title": "유닉스기초",
+          "rawTitle": "유닉스기초(Introduction to Unix Programming)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001102",
+            "유닉스기초(Introduction to Unix Programming)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CB2001103",
+          "title": "AI프로그래밍",
+          "rawTitle": "AI프로그래밍(AI Programming)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001103",
+            "AI프로그래밍(AI Programming)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB2001104",
+          "title": "이산수학(II)",
+          "rawTitle": "이산수학(II)(Discrete Mathematics(II))",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001104",
+            "이산수학(II)(Discrete Mathematics(II))",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB2001105",
+          "title": "웹응용프로그래밍",
+          "rawTitle": "웹응용프로그래밍(Web Application Programming)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001105",
+            "웹응용프로그래밍(Web Application Programming)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB2001106",
+          "title": "플랫폼기반프로그래밍",
+          "rawTitle": "플랫폼기반프로그래밍(Platform-based Programming)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001106",
+            "플랫폼기반프로그래밍(Platform-based Programming)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CB2001108",
+          "title": "데이터통신",
+          "rawTitle": "데이터통신(Data Communications)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001108",
+            "데이터통신(Data Communications)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB2001109",
+          "title": "유닉스응용프로그래밍",
+          "rawTitle": "유닉스응용프로그래밍(Advanced UNIX Programming)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001109",
+            "유닉스응용프로그래밍(Advanced UNIX Programming)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB2001113",
+          "title": "임베디드시스템",
+          "rawTitle": "임베디드시스템(Embedded Systems)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001113",
+            "임베디드시스템(Embedded Systems)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB2001122",
+          "title": "정보보안",
+          "rawTitle": "정보보안(Information Security)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001122",
+            "정보보안(Information Security)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB2001110",
+          "title": "파일구조",
+          "rawTitle": "파일구조(File Structures)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001110",
+            "파일구조(File Structures)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB1501026",
+          "title": "프로그래밍언어론",
+          "rawTitle": "프로그래밍언어론(Programming Language principles)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB1501026",
+            "프로그래밍언어론(Programming Language principles)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CB2001126",
+          "title": "네트워크보안",
+          "rawTitle": "네트워크보안(Network Security)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001126",
+            "네트워크보안(Network Security)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001111",
+          "title": "데이터베이스",
+          "rawTitle": "데이터베이스(Databases)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001111",
+            "데이터베이스(Databases)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001610",
+          "title": "딥러닝프로그래밍",
+          "rawTitle": "딥러닝프로그래밍(Programming for Deep Learning)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001610",
+            "딥러닝프로그래밍(Programming for Deep Learning)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB1501024",
+          "title": "소프트웨어공학",
+          "rawTitle": "소프트웨어공학(Software Engineering)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB1501024",
+            "소프트웨어공학(Software Engineering)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001625",
+          "title": "인공지능개론",
+          "rawTitle": "인공지능개론(Introduction to Artificial Intelligence)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001625",
+            "인공지능개론(Introduction to Artificial Intelligence)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001114",
+          "title": "컴파일러",
+          "rawTitle": "컴파일러(Compiler)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001114",
+            "컴파일러(Compiler)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001115",
+          "title": "컴퓨터그래픽스",
+          "rawTitle": "컴퓨터그래픽스(Computer graphics)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001115",
+            "컴퓨터그래픽스(Computer graphics)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001116",
+          "title": "컴퓨터네트워크",
+          "rawTitle": "컴퓨터네트워크(Computer Networks)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001116",
+            "컴퓨터네트워크(Computer Networks)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CB2001118",
+          "title": "머신러닝",
+          "rawTitle": "머신러닝(Machine Learning)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001118",
+            "머신러닝(Machine Learning)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001613",
+          "title": "블록체인",
+          "rawTitle": "블록체인(Blockchain)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001613",
+            "블록체인(Blockchain)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001129",
+          "title": "사물인터넷",
+          "rawTitle": "사물인터넷(Internet of Things)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001129",
+            "사물인터넷(Internet of Things)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001119",
+          "title": "소프트웨어시스템설계",
+          "rawTitle": "소프트웨어시스템설계(Software Systems Design)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001119",
+            "소프트웨어시스템설계(Software Systems Design)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2003048",
+          "title": "인공지능보안",
+          "rawTitle": "인공지능보안(AI Security)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2003048",
+            "인공지능보안(AI Security)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001121",
+          "title": "임베디드소프트웨어설계",
+          "rawTitle": "임베디드소프트웨어설계(Embedded Software Design)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001121",
+            "임베디드소프트웨어설계(Embedded Software Design)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001123",
+          "title": "집적회로및시스템설계",
+          "rawTitle": "집적회로및시스템설계(Integrated Circuits and System Design)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001123",
+            "집적회로및시스템설계(Integrated Circuits and System Design)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001117",
+          "title": "컴퓨터비전개론",
+          "rawTitle": "컴퓨터비전개론(Introduction to Computer Vision)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001117",
+            "컴퓨터비전개론(Introduction to Computer Vision)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001124",
+          "title": "컴퓨터응용설계및실험",
+          "rawTitle": "컴퓨터응용설계및실험(Applied Computer Design & Lab)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001124",
+            "컴퓨터응용설계및실험(Applied Computer Design & Lab)",
+            "3-2-2",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001612",
+          "title": "클라우드컴퓨팅",
+          "rawTitle": "클라우드컴퓨팅(Cloud Computing)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CB2001612",
+            "클라우드컴퓨팅(Cloud Computing)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CB2001127",
+          "title": "데이터마이닝",
+          "rawTitle": "데이터마이닝(Data Mining)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001127",
+            "데이터마이닝(Data Mining)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CB2001128",
+          "title": "멀티미디어처리",
+          "rawTitle": "멀티미디어처리(Multimedia Processing)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001128",
+            "멀티미디어처리(Multimedia Processing)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CB2003049",
+          "title": "양자컴퓨팅및정보의기초",
+          "rawTitle": "양자컴퓨팅및정보의기초(Introduction to Quantm Computing and Quantum Information)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2003049",
+            "양자컴퓨팅및정보의기초(Introduction to Quantm Computing and Quantum Information)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CB2003050",
+          "title": "모빌리티보안",
+          "rawTitle": "모빌리티보안(Mobility Security)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2003050",
+            "모빌리티보안(Mobility Security)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CB2001611",
+          "title": "지능형IoT플랫폼",
+          "rawTitle": "지능형IoT플랫폼(Intelligent IoT Platform)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CB2001611",
+            "지능형IoT플랫폼(Intelligent IoT Platform)",
+            "3-3-0",
+            "4-2"
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "code": "CB2002509",
+          "rawTitle": "컴퓨터알고리즘실무(Advanced Computer Algorithm Practice)",
+          "term": "3-여름도약"
+        },
+        {
+          "code": "CB2001120",
+          "rawTitle": "산학협력실무(Industry-Academy Cooperation Practice)",
+          "term": "전학년-1,2"
+        }
+      ]
+    },
+    {
+      "major": "ai",
+      "url": "https://cse.pusan.ac.kr/cse/14275/subview.do",
+      "rows": [
+        {
+          "code": "CA1501006",
+          "title": "이산수학",
+          "rawTitle": "이산수학(Discrete Mathematics)",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "전공",
+            "전공기초",
+            "CA1501006",
+            "이산수학(Discrete Mathematics)",
+            "3-3-0",
+            "1-1",
+            ""
+          ]
+        },
+        {
+          "code": "CA1501028",
+          "title": "컴퓨터및프로그래밍입문",
+          "rawTitle": "◎컴퓨터및프로그래밍입문(Introduction to Computers and Programming)",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA1501028",
+            "◎컴퓨터및프로그래밍입문(Introduction to Computers and Programming)",
+            "4-4-0",
+            "1-1"
+          ]
+        },
+        {
+          "code": "CA1501029",
+          "title": "확률통계",
+          "rawTitle": "◎확률통계(Probabilities and Statistics)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA1501029",
+            "◎확률통계(Probabilities and Statistics)",
+            "3-3-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CA1501030",
+          "title": "프로그래밍원리와실습",
+          "rawTitle": "프로그래밍원리와실습(Programming Principles and Practice)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA1501030",
+            "프로그래밍원리와실습(Programming Principles and Practice)",
+            "4-4-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CA2001141",
+          "title": "인터넷과웹기초",
+          "rawTitle": "인터넷과웹기초(Introduction to Internet and Web)",
+          "year": 1,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "전공필수",
+            "CA2001141",
+            "인터넷과웹기초(Introduction to Internet and Web)",
+            "3-3-0",
+            "1-1",
+            "※최소(복수)전공: 전공기초, 전공필수 과목 전부 이수 ※심화전공: 전공기초와 전공필수과목 전부, 전공선택 51학점 (전공기초 14학점, 전공필수 37학점, 전공선택 51학점) ※부전공: ◎과목을 포함하여 전공기초/전공필수 과목 21학점"
+          ]
+        },
+        {
+          "code": "CA2001142",
+          "title": "공학선형대수학",
+          "rawTitle": "공학선형대수학(Engineering Linear Algebra)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001142",
+            "공학선형대수학(Engineering Linear Algebra)",
+            "3-3-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CA2001144",
+          "title": "C++프로그래밍과실습",
+          "rawTitle": "C++프로그래밍과실습(C++ Programming and Practice)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001144",
+            "C++프로그래밍과실습(C++ Programming and Practice)",
+            "4-4-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CA2001145",
+          "title": "데이터과학입문",
+          "rawTitle": "데이터과학입문(Introduction to Data Science)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001145",
+            "데이터과학입문(Introduction to Data Science)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CA2001146",
+          "title": "인공지능수학",
+          "rawTitle": "인공지능수학(Mathematics for Artificial Intelligence)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001146",
+            "인공지능수학(Mathematics for Artificial Intelligence)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CA2001147",
+          "title": "자료구조",
+          "rawTitle": "자료구조(Data Structures)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001147",
+            "자료구조(Data Structures)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001627",
+          "title": "인공지능개론",
+          "rawTitle": "인공지능개론(Introduction to Artificial Intelligence)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001627",
+            "인공지능개론(Introduction to Artificial Intelligence)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001143",
+          "title": "AI프로그래밍",
+          "rawTitle": "◎AI프로그래밍(AI Programming)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001143",
+            "◎AI프로그래밍(AI Programming)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001150",
+          "title": "머신러닝",
+          "rawTitle": "머신러닝(Machine Learning)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001150",
+            "머신러닝(Machine Learning)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001149",
+          "title": "컴퓨터알고리즘",
+          "rawTitle": "컴퓨터알고리즘(Computer Algorithms)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001149",
+            "컴퓨터알고리즘(Computer Algorithms)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001151",
+          "title": "인공지능세미나특강",
+          "rawTitle": "인공지능세미나특강(Artificial Intelligence Seminar)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001151",
+            "인공지능세미나특강(Artificial Intelligence Seminar)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001152",
+          "title": "캡스톤디자인",
+          "rawTitle": "캡스톤디자인(Capstone Design)",
+          "year": 4,
+          "semesters": [
+            1,
+            2
+          ],
+          "cells": [
+            "CA2001152",
+            "캡스톤디자인(Capstone Design)",
+            "3-3-0",
+            "4-1,2"
+          ]
+        },
+        {
+          "code": "CA2001153",
+          "title": "어드벤처디자인",
+          "rawTitle": "어드벤처디자인(Adventure Design)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "전공선택",
+            "CA2001153",
+            "어드벤처디자인(Adventure Design)",
+            "2-0-4",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CA2001154",
+          "title": "전기전자공학개론",
+          "rawTitle": "전기전자공학개론(Introduction to Electric and Electronic Engineering)",
+          "year": 1,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001154",
+            "전기전자공학개론(Introduction to Electric and Electronic Engineering)",
+            "3-3-0",
+            "1-2"
+          ]
+        },
+        {
+          "code": "CA2001155",
+          "title": "논리회로및설계",
+          "rawTitle": "논리회로및설계(Logic Circuit Design)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001155",
+            "논리회로및설계(Logic Circuit Design)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CA2001156",
+          "title": "시스템소프트웨어",
+          "rawTitle": "시스템소프트웨어(System Software)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001156",
+            "시스템소프트웨어(System Software)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CA2001157",
+          "title": "유닉스기초",
+          "rawTitle": "유닉스기초(Introduction to Unix Programming)",
+          "year": 2,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001157",
+            "유닉스기초(Introduction to Unix Programming)",
+            "3-3-0",
+            "2-1"
+          ]
+        },
+        {
+          "code": "CA2001158",
+          "title": "논리회로설계및실험",
+          "rawTitle": "논리회로설계및실험(Logic Circuit design & Lab)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001158",
+            "논리회로설계및실험(Logic Circuit design & Lab)",
+            "2-0-4",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001159",
+          "title": "웹응용프로그래밍",
+          "rawTitle": "웹응용프로그래밍(Web Application Programming)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001159",
+            "웹응용프로그래밍(Web Application Programming)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001166",
+          "title": "컴퓨터구조",
+          "rawTitle": "컴퓨터구조(Computer Architecture)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001166",
+            "컴퓨터구조(Computer Architecture)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001160",
+          "title": "플랫폼기반프로그래밍",
+          "rawTitle": "플랫폼기반프로그래밍(Platform-based Programming)",
+          "year": 2,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001160",
+            "플랫폼기반프로그래밍(Platform-based Programming)",
+            "3-3-0",
+            "2-2"
+          ]
+        },
+        {
+          "code": "CA2001162",
+          "title": "데이터통신",
+          "rawTitle": "데이터통신(Data Communications)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001162",
+            "데이터통신(Data Communications)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001163",
+          "title": "실감미디어프로그래밍",
+          "rawTitle": "실감미디어프로그래밍(Immersive Media Programming)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001163",
+            "실감미디어프로그래밍(Immersive Media Programming)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001164",
+          "title": "운영체제",
+          "rawTitle": "운영체제(Operating Systems)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001164",
+            "운영체제(Operating Systems)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001165",
+          "title": "유닉스응용프로그래밍",
+          "rawTitle": "유닉스응용프로그래밍(Advanced UNIX Programming)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001165",
+            "유닉스응용프로그래밍(Advanced UNIX Programming)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001169",
+          "title": "임베디드시스템",
+          "rawTitle": "임베디드시스템(Embedded Systems)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001169",
+            "임베디드시스템(Embedded Systems)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001173",
+          "title": "컴퓨터비전개론",
+          "rawTitle": "컴퓨터비전개론(Introduction to Computer Vision)",
+          "year": 3,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001173",
+            "컴퓨터비전개론(Introduction to Computer Vision)",
+            "3-3-0",
+            "3-1"
+          ]
+        },
+        {
+          "code": "CA2001614",
+          "title": "그래프데이터분석",
+          "rawTitle": "그래프데이터분석(Data Analytics for Graphs)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001614",
+            "그래프데이터분석(Data Analytics for Graphs)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001178",
+          "title": "데이터마이닝",
+          "rawTitle": "데이터마이닝(Data Mining)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001178",
+            "데이터마이닝(Data Mining)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001167",
+          "title": "데이터베이스",
+          "rawTitle": "데이터베이스(Databases)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001167",
+            "데이터베이스(Databases)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001615",
+          "title": "딥러닝프로그래밍",
+          "rawTitle": "딥러닝프로그래밍(Programming for Deep Learning)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001615",
+            "딥러닝프로그래밍(Programming for Deep Learning)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001168",
+          "title": "소프트웨어공학",
+          "rawTitle": "소프트웨어공학(Software Engineering)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001168",
+            "소프트웨어공학(Software Engineering)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001616",
+          "title": "인공지능융합설계및실험",
+          "rawTitle": "인공지능융합설계및실험(Artificial Intelligence Design & Lab)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001616",
+            "인공지능융합설계및실험(Artificial Intelligence Design & Lab)",
+            "3-0-6",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001171",
+          "title": "컴퓨터그래픽스",
+          "rawTitle": "컴퓨터그래픽스(Computer graphics)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001171",
+            "컴퓨터그래픽스(Computer graphics)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001172",
+          "title": "컴퓨터네트워크",
+          "rawTitle": "컴퓨터네트워크(Computer Networks)",
+          "year": 3,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001172",
+            "컴퓨터네트워크(Computer Networks)",
+            "3-3-0",
+            "3-2"
+          ]
+        },
+        {
+          "code": "CA2001179",
+          "title": "가상현실개론",
+          "rawTitle": "가상현실개론(Introduction to Virtual Reality)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001179",
+            "가상현실개론(Introduction to Virtual Reality)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001617",
+          "title": "빅데이터분석설계및실험",
+          "rawTitle": "빅데이터분석설계및실험(Big Data Analysis Design & Lab)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001617",
+            "빅데이터분석설계및실험(Big Data Analysis Design & Lab)",
+            "3-0-6",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001618",
+          "title": "생성모델",
+          "rawTitle": "생성모델(Foundations of Generative AI)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001618",
+            "생성모델(Foundations of Generative AI)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001619",
+          "title": "시각컴퓨팅",
+          "rawTitle": "시각컴퓨팅(Visual Computing)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001619",
+            "시각컴퓨팅(Visual Computing)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001175",
+          "title": "임베디드소프트웨어설계",
+          "rawTitle": "임베디드소프트웨어설계(Embedded Software Design)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001175",
+            "임베디드소프트웨어설계(Embedded Software Design)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001174",
+          "title": "자연어처리",
+          "rawTitle": "자연어처리(Natural Language Processing)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001174",
+            "자연어처리(Natural Language Processing)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001621",
+          "title": "클라우드컴퓨팅",
+          "rawTitle": "클라우드컴퓨팅(Cloud Computing)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001621",
+            "클라우드컴퓨팅(Cloud Computing)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001177",
+          "title": "프로그래밍언어론",
+          "rawTitle": "프로그래밍언어론(Programming Language principles)",
+          "year": 4,
+          "semesters": [
+            1
+          ],
+          "cells": [
+            "CA2001177",
+            "프로그래밍언어론(Programming Language principles)",
+            "3-3-0",
+            "4-1"
+          ]
+        },
+        {
+          "code": "CA2001180",
+          "title": "강화학습개론",
+          "rawTitle": "강화학습개론(Introduction to Reinforcement Learning)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001180",
+            "강화학습개론(Introduction to Reinforcement Learning)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CA2001622",
+          "title": "멀티모달딥러닝",
+          "rawTitle": "멀티모달딥러닝(Multimodal Deep Learning)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001622",
+            "멀티모달딥러닝(Multimodal Deep Learning)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CA2001623",
+          "title": "인간컴퓨터상호작용",
+          "rawTitle": "인간컴퓨터상호작용(Human Computer Interaction)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001623",
+            "인간컴퓨터상호작용(Human Computer Interaction)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CA2001624",
+          "title": "정보검색및추천시스템",
+          "rawTitle": "정보검색및추천시스템(Information Retrieval and Recommendation Systems)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001624",
+            "정보검색및추천시스템(Information Retrieval and Recommendation Systems)",
+            "3-3-0",
+            "4-2"
+          ]
+        },
+        {
+          "code": "CA2001620",
+          "title": "지능형IoT플랫폼",
+          "rawTitle": "지능형IoT플랫폼(Intelligent IoT Platform)",
+          "year": 4,
+          "semesters": [
+            2
+          ],
+          "cells": [
+            "CA2001620",
+            "지능형IoT플랫폼(Intelligent IoT Platform)",
+            "3-3-0",
+            "4-2"
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "code": "CA2002525",
+          "rawTitle": "컴퓨터알고리즘실무(Advanced Computer Algorithm Practice)",
+          "term": "3-여름도약"
+        },
+        {
+          "code": "CA2001181",
+          "rawTitle": "산학협력실무(Industry-Academy Cooperation Practice)",
+          "term": "전학년-1,2"
+        }
+      ]
+    }
+  ],
+  "math": {
+    "url": "https://math.pusan.ac.kr/math/11214/subview.do",
+    "downloadUrl": "https://math.pusan.ac.kr/docViewer/math/125/117/fileDownload.do",
+    "format": "HWP",
+    "rows": [
+      {
+        "code": "MA1500619",
+        "title": "수학(I)",
+        "year": 1,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA1500848",
+        "title": "수학(I)실습",
+        "year": 1,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA1500644",
+        "title": "수학(II)",
+        "year": 1,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA1500852",
+        "title": "수학(II)실습",
+        "year": 1,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA1600095",
+        "title": "집합론",
+        "year": 1,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA1501142",
+        "title": "수학(III)",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA1501143",
+        "title": "수학(III)실습",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA1500914",
+        "title": "선형대수학(I)",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA1600409",
+        "title": "해석학(I)",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA1600410",
+        "title": "기하학개론",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200301",
+        "title": "미분방정식(I)",
+        "year": 1,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200302",
+        "title": "선형대수학(II)",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA3200378",
+        "title": "해석학(II)",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200305",
+        "title": "위상수학(I)",
+        "year": 3,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200304",
+        "title": "대수학(I)",
+        "year": 3,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200342",
+        "title": "복소변수함수론(I)",
+        "year": 3,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200322",
+        "title": "실변수함수론(I)",
+        "year": 3,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200319",
+        "title": "미분기하학(I)",
+        "year": 3,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA3500696",
+        "title": "기초수학",
+        "year": 1,
+        "semesters": [
+          1,
+          2
+        ]
+      },
+      {
+        "code": "MA1500336",
+        "title": "수학적프로그래밍",
+        "year": 1,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2400415",
+        "title": "확률과통계",
+        "year": 1,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA3200391",
+        "title": "미분방정식(I)실습",
+        "year": 1,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200310",
+        "title": "미분방정식(II)",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA3200380",
+        "title": "해석학(I)실습",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2300593",
+        "title": "보험수학입문",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2700497",
+        "title": "선형대수학(I)실습",
+        "year": 2,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200309",
+        "title": "정수론",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2300585",
+        "title": "정수론실습",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA3200383",
+        "title": "해석학(II)실습",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2700498",
+        "title": "선형대수학(II)실습",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2002061",
+        "title": "AI/DS를위한수학",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2002060",
+        "title": "수치해석",
+        "year": 2,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200358",
+        "title": "벡터해석",
+        "year": 3,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2001294",
+        "title": "수학캡스톤디자인",
+        "year": 3,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200330",
+        "title": "위상수학(II)",
+        "year": 3,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200321",
+        "title": "대수학(II)",
+        "year": 3,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200329",
+        "title": "복소변수함수론(II)",
+        "year": 3,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA3400462",
+        "title": "산업수학및실무",
+        "year": 3,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200325",
+        "title": "실변수함수론(II)",
+        "year": 4,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2400416",
+        "title": "위상수학특강",
+        "year": 4,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200313",
+        "title": "미분기하학(II)",
+        "year": 4,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2200360",
+        "title": "현대대수학",
+        "year": 4,
+        "semesters": [
+          1
+        ]
+      },
+      {
+        "code": "MA2002062",
+        "title": "수리모델론",
+        "year": 4,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200361",
+        "title": "편미분방정식",
+        "year": 4,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2200335",
+        "title": "복소해석학특강",
+        "year": 4,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA2100444",
+        "title": "조합론",
+        "year": 4,
+        "semesters": [
+          2
+        ]
+      },
+      {
+        "code": "MA3600181",
+        "title": "미분기하학특강",
+        "year": 4,
+        "semesters": [
+          2
+        ]
+      }
+    ],
+    "excluded": "General education and three mathematics education department elective recognition courses."
+  }
+}

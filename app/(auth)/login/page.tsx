@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowRight, ChevronLeft, LogIn, MailCheck, MessageCircle, Send, Sparkles } from 'lucide-react'
 import { isOAuthProviderEnabled } from '@/lib/auth/provider-availability'
-import { getPostLoginDestination } from '@/lib/auth/redirect'
+import { getPostLoginDestination, isSafeLocalRedirect } from '@/lib/auth/redirect'
 import { getPublicLoginErrorMessage } from '@/lib/auth/service-unavailable'
 import { createClient } from '@/lib/supabase'
 import {
@@ -41,6 +41,7 @@ function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const requestedRedirect = searchParams.get('redirect') ?? searchParams.get('next')
+  const hasReturnDestination = isSafeLocalRedirect(requestedRedirect)
   const isReauthentication = searchParams.get('reauth') === '1'
   const continueTo = getPostLoginDestination({
     requestedRedirect,
@@ -58,7 +59,7 @@ function LoginContent() {
   const [oauthProvider, setOAuthProvider] = useState<QuantumOAuthProvider | null>(null)
   const [error, setError] = useState<string | null>(publicAuthError)
   const [resendCooldown, setResendCooldown] = useState(0)
-  const [showAuth, setShowAuth] = useState(Boolean(publicAuthError) || isReauthentication)
+  const [showAuth, setShowAuth] = useState(Boolean(publicAuthError) || isReauthentication || hasReturnDestination)
   const [videoReady, setVideoReady] = useState(false)
   const [videoFailed, setVideoFailed] = useState(false)
   const codeRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -273,7 +274,8 @@ function LoginContent() {
           <div className="rounded-2xl border border-white/[0.45] bg-white/[0.82] px-3 py-2 shadow-sm backdrop-blur-xl">
             <BootingLogo size="md" subtitle="대학생 과팅" />
           </div>
-          {showAuth && !isReauthentication && (
+          {showAuth && hasReturnDestination && !isReauthentication ? <Link href={requestedRedirect} aria-label="보고 있던 화면으로 돌아가기" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.45] bg-white/75 text-boot-ink shadow-sm backdrop-blur-xl"><ChevronLeft size={19} strokeWidth={2.8} /></Link> : null}
+          {showAuth && !hasReturnDestination && !isReauthentication && (
             <button
               type="button"
               onClick={() => {
@@ -343,7 +345,7 @@ function LoginContent() {
                 <p className="mt-2 text-sm leading-6 text-boot-muted">
                   {isReauthentication
                     ? '사진·전화번호·점수·권한 변경 전, 본인 이메일 인증을 한 번 더 완료해 주세요.'
-                    : '로그인하면 기본정보 입력부터 매칭 준비까지 이어서 진행돼요.'}
+                    : hasReturnDestination ? '로그인하면 보고 있던 화면으로 이어져요. 필요한 기본정보는 먼저 확인해요.' : '로그인하면 기본정보 입력부터 매칭 준비까지 이어서 진행돼요.'}
                 </p>
               </div>
 

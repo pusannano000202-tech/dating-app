@@ -2,9 +2,11 @@
 
 import { ChevronLeft, ChevronRight, Clock3, HelpCircle, PauseCircle } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
 import DalmutiRulesGuide from '@/components/matching/DalmutiRulesGuide'
+import ActivityPromptDeck from './ActivityPromptDeck'
 import type { MeetupCategory } from '@/lib/community/contracts'
 import { getMeetupGuideTemplate } from '@/lib/meetups/guide-catalog'
 import { resolveMeetupGuideView, type ActiveMeetupGuideSceneId, type MeetupGuideActionKind, type MeetupLifecycleStatus } from '@/lib/meetups/guide-contract'
@@ -14,7 +16,8 @@ export type LiveMeetupGuideDto = {
   category: MeetupCategory
   activity_key: string | null
   lifecycle_status: MeetupLifecycleStatus
-  scheduled_at: string
+  scheduled_at: string | null
+  schedule_status?: 'confirmed' | 'schedule_pending'
   ends_at: string | null
   shared_step: ActiveMeetupGuideSceneId | null
   personal_acknowledged_step: ActiveMeetupGuideSceneId | null
@@ -55,6 +58,7 @@ export default function LiveActivityGuide({
       </section>
     )
   }
+  if (guide.schedule_status === 'schedule_pending' && (guide.lifecycle_status === 'open' || guide.lifecycle_status === 'full')) return <section className="rounded-[12px] border border-boot-hairline bg-white p-5"><h2 className="text-xl font-black">약속은 채팅에서 함께 정해요</h2><p className="mt-2 text-sm leading-6 text-boot-muted">참가자 채팅의 + 메뉴에서 날짜와 장소 후보를 투표로 모아요. 주최자가 약속을 확정하면 모임 진행 안내가 시작돼요.</p><button type="button" disabled={busy} onClick={()=>onAction('open_chat','prepare')} className="mt-4 min-h-11 rounded-[8px] bg-boot-primary px-4 text-sm font-black text-white">참가자 대화 열기</button></section>
   const scene = preview
     ? template.scenes[Math.min(previewIndex, template.scenes.length - 1)]
     : template.scenes.find((candidate) => candidate.id === actual.currentSceneId) ?? template.scenes[0]
@@ -72,7 +76,7 @@ export default function LiveActivityGuide({
         </button>
       </div>
 
-      <Image src={scene.artwork.src} alt={scene.artwork.alt} width={1280} height={720} className="aspect-[16/9] w-full object-cover" />
+      <Image src={scene.artwork.src} alt={scene.artwork.alt} width={1280} height={720} sizes="(min-width: 768px) 720px, 100vw" className="max-h-[360px] w-full bg-boot-soft object-contain" />
       <div className="p-4">
         <p className="text-xs font-black text-boot-primary">{preview ? `${previewIndex + 1} / ${template.scenes.length}` : '서버 진행 상태 기준'}</p>
         <h3 className="mt-1 text-xl font-black">{scene.title}</h3>
@@ -80,6 +84,15 @@ export default function LiveActivityGuide({
         {!preview ? <p className="mt-2 text-xs font-bold leading-5 text-boot-muted">안내를 넘겨 보는 것만으로 출석·결제·공용 게임·모임 완료 상태는 바뀌지 않아요.</p> : null}
 
         {template.usesDalmutiRules && scene.id === 'activity' ? <div className="mt-4"><DalmutiRulesGuide /></div> : null}
+        {['greet', 'start', 'activity'].includes(scene.id) ? <ActivityPromptDeck key={template.id} activityKey={guide.activity_key} category={guide.category}/> : null}
+        {['wrap', 'next'].includes(scene.id) ? <aside className="mt-4 rounded-2xl bg-boot-soft p-4">
+          <h4 className="font-black">좋았다면, 다음은 내 선택으로</h4>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <Link href="/meetups" className="flex min-h-11 items-center justify-center rounded-xl border border-boot-hairline bg-white px-3 text-sm font-bold">다른 활동 둘러보기</Link>
+            <Link href="/friends" className="flex min-h-11 items-center justify-center rounded-xl border border-boot-hairline bg-white px-3 text-sm font-bold">친구와 대화 이어가기</Link>
+          </div>
+          <p className="mt-3 text-xs leading-5 text-boot-muted">새 참가나 친구 연결이 자동으로 되지는 않아요. 친구는 요청과 수락으로 연결해요.</p>
+        </aside> : null}
 
         {preview ? (
           <div className="mt-4 grid grid-cols-2 gap-2">

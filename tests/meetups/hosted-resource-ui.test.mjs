@@ -6,6 +6,7 @@ import React from 'react'
 import ts from 'typescript'
 import * as mentoringContract from '../../lib/mentoring/hosted-contract.ts'
 import * as applicationView from '../../lib/meetups/application-view.ts'
+import * as messengerState from '../../lib/chat/social-messenger-state.ts'
 
 const require=createRequire(import.meta.url)
 const owner='97000000-0000-4000-8000-000000000001',other='97000000-0000-4000-8000-000000000002'
@@ -35,6 +36,8 @@ function harness({component=false}={}){
  const fetch=(url,options)=>new Promise((resolve,reject)=>requests.push({url,options,reply(body,status=200){resolve({ok:status>=200&&status<300,json:async()=>body})},fail(error=Error('network unavailable')){reject(error)}}))
  const dependencies={react:hooks,'react/jsx-runtime':require('react/jsx-runtime'),'next/link':{__esModule:true,default:'a'},'next/navigation':{useRouter:()=>({push:path=>routes.push(path)}),useSearchParams:()=>new URLSearchParams()},'lucide-react':require('lucide-react'),
   '@/components/content-history/useHistoryAccount':{useHistoryAccount:()=>account},'@/lib/mentoring/hosted-contract':mentoringContract,'@/lib/meetups/application-view':applicationView,'@/lib/chat/useSocialChatRead':{useSocialChatRead(){}},
+  '@/lib/chat/social-messenger-state':messengerState,'@/components/chat/SocialMessenger':{__esModule:true,default:'messenger',SocialChatComposer:'composer'},
+  '@/components/chat-polls/ActivityRoomPolls':{__esModule:true,default:'polls'},
   './HostedRoomCards':{HostedConnection:()=>null},'./HostedMentoringLobby':{MENTORING_ROLES:{mentor:'경험 나눔',mentee:'도움 구함'},MENTORING_TOPICS:{courses:'공부',career:'진로',campus:'학교생활'}},
   './MeetupApplications':{__esModule:true,default:()=>null},'./hosted-rooms.module.css':{__esModule:true,default:new Proxy({},{get:(_,key)=>String(key)})},
  }
@@ -47,10 +50,10 @@ function harness({component=false}={}){
  flush()
  return{requests,routes,settle,get value(){flush();return tree},setAccount(value){account=value;dirty=true;flush()},setUrl(value){url=value;dirty=true;flush()},setRoom(value){room=value;dirty=true;flush()},poll(){for(const fn of [...intervals.values()])fn()},focus(){for(const fn of listeners.window.get('focus')??[])fn()},dispose(){disposed=true;for(const s of slots)s?.cleanup?.();effects.clear();intervals.clear();timeouts.clear()}}
 }
-const nodes=tree=>!tree||typeof tree!=='object'?[]:Array.isArray(tree)?tree.flatMap(nodes):[tree,...nodes(tree.props?.children)]
-const text=tree=>typeof tree==='string'?tree:!tree||typeof tree!=='object'?'':(Array.isArray(tree)?tree:[tree.props?.children]).map(text).join(' ')
+const nodes=tree=>!tree||typeof tree!=='object'?[]:Array.isArray(tree)?tree.flatMap(nodes):[tree,...nodes([tree.props?.children,tree.props?.management,tree.props?.composer])]
+const text=tree=>typeof tree==='string'?tree:!tree||typeof tree!=='object'?'':(Array.isArray(tree)?tree:[tree.props?.children,tree.props?.management]).map(text).join(' ')
 const findButton=(tree,label)=>nodes(tree).find(n=>n.type==='button'&&text(n).includes(label))
-const input=(tree,label)=>nodes(tree).find(n=>n.type==='textarea'&&n.props['aria-label']===label)
+const input=(tree,label)=>{const composer=nodes(tree).find(n=>n.type==='composer'&&n.props.label===label);return composer?{props:{...composer.props,onChange:e=>composer.props.onChange(e.target.value)}}:nodes(tree).find(n=>n.type==='textarea'&&n.props['aria-label']===label)}
 
 test('restricted mentoring detail hides participant counts and chat but keeps report and leave controls',async()=>{
  const h=harness({component:true});try{
@@ -107,8 +110,8 @@ test('failed mutation that supersedes a background GET does not permanently disa
 test('changing room during post-send refresh cannot clear a new room draft',async()=>{
  const h=harness({component:true});try{
   h.requests[0].reply(detail());await h.settle();input(h.value,'멘토링 메시지').props.onChange({target:{value:'첫 방 메시지'}})
-  const composer=nodes(h.value).find(n=>n.type==='form'&&nodes(n).some(child=>child.type==='textarea'&&child.props['aria-label']==='멘토링 메시지'))
-  composer.props.onSubmit({preventDefault(){}});h.requests[1].reply(detail());await h.settle()
+  const composer=nodes(h.value).find(n=>n.type==='composer')
+  composer.props.onSend();h.requests[1].reply(detail());await h.settle()
   const refresh=h.requests[2];assert.ok(refresh,'Successful mutation starts an authoritative refresh')
   h.setRoom(roomB);h.requests[3].reply(detail(owner,roomB));await h.settle();input(h.value,'멘토링 메시지').props.onChange({target:{value:'새 방에서 쓰던 메시지'}})
   refresh.reply(detail());await h.settle();assert.equal(input(h.value,'멘토링 메시지').props.value,'새 방에서 쓰던 메시지','Old send completion must not mutate the new room composer')
@@ -166,5 +169,15 @@ test('changing account during a mutation starts a fresh GET without waiting for 
   h.requests[1].reply({success:true});assert.equal(await old,null);await h.settle()
   assert.equal(h.value.data.marker,'new account')
   h.poll();assert.equal(h.requests.length,4,'The previous mutation must not leave the current scope polling blocked')
+ }finally{h.dispose()}
+})
+test('hosted mentoring maps its exact session to native polls and preserves retry identity and a newer draft',async()=>{
+ const h=harness({component:true});try{
+  h.requests[0].reply(detail());await h.settle();assert.equal(h.value.props.tools.props.roomKind,'mentoring-rooms');assert.equal(h.value.props.tools.props.roomId,roomA)
+  input(h.value,'멘토링 메시지').props.onChange({target:{value:'A'}});h.value.props.composer.props.onSend();const key=JSON.parse(h.requests[1].options.body).args.client_id
+  h.requests[1].reply({error:'unavailable'},503);await h.settle();assert.equal(input(h.value,'멘토링 메시지').props.value,'A');assert.ok(h.value.props.error);assert.equal(h.value.props.readOnly,false,'failed fetch is not ended participation')
+  h.value.props.onRetry();h.requests[2].reply(detail());await h.settle();h.value.props.composer.props.onSend();assert.equal(JSON.parse(h.requests[3].options.body).args.client_id,key)
+  assert.equal(h.value.props.composer.props.disabled,false);input(h.value,'멘토링 메시지').props.onChange({target:{value:'B'}});h.requests[3].reply(detail());await h.settle();h.requests[4].reply(detail());await h.settle();assert.equal(input(h.value,'멘토링 메시지').props.value,'B')
+  h.setRoom(roomB);const closed=detail(owner,roomB);Object.assign(closed.data.room,{joined:false,is_host:false,status:'closed',mentor_count:0,member_count:0,members:[]});h.requests.at(-1).reply(closed);await h.settle();assert.equal(h.value.props.tools,null);assert.equal(h.value.props.composer.props.onCreatePoll,undefined)
  }finally{h.dispose()}
 })

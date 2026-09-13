@@ -1,6 +1,6 @@
 export const SOCIAL_CHAT_ROOM_KINDS = ['league_team', 'league_match', 'meetup', 'activity_room', 'study_room', 'mentoring'] as const
 export type SocialChatRoomKind = typeof SOCIAL_CHAT_ROOM_KINDS[number]
-export type SocialChatRoom = {kind: SocialChatRoomKind; id: string; title: string; affiliation: string; member_count: number; writable: boolean; updated_at: string; recruitment_mode?:'hosted'|'legacy'; sport?: 'lol' | 'futsal' | 'football'; challenge_id?: string; latest_message?: {id:string;body:string;created_at:string;is_me:boolean}|null; unread_count?:number}
+export type SocialChatRoom = {kind: SocialChatRoomKind; id: string; title: string; affiliation: string; member_count: number; writable: boolean; updated_at: string; activity_key?:string|null; category?:string|null; course_key?:string|null; recruitment_mode?:'hosted'|'legacy'; sport?: 'lol' | 'futsal' | 'football'; challenge_id?: string; latest_message?: {id:string;body:string;created_at:string;is_me:boolean}|null; unread_count?:number}
 export type SocialRoomsResponse = {owner_id: string; rooms: SocialChatRoom[]; has_more: boolean; next_cursor: string | null}
 export const isChatObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
 export const isChatUuid = (v: unknown): v is string => typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v)
@@ -20,6 +20,7 @@ export function parseSocialRoomsResponse(value: unknown, expectedOwner?: string)
  for (const room of value.rooms) {
   if (!isChatObject(room) || !isSocialChatRoomKind(room.kind) || !isChatUuid(room.id) || !isChatText(room.title, 200) || !isChatText(room.affiliation, 250) || !Number.isSafeInteger(room.member_count) || (room.member_count as number) < 1 || typeof room.writable !== 'boolean' || !isChatTimestamp(room.updated_at)) return null
   const leagueRoom = room.kind === 'league_team' || room.kind === 'league_match'
+  for(const field of ['activity_key','category','course_key'])if(room[field]!==undefined&&room[field]!==null&&(!isChatText(room[field],120)||!/^[-a-zA-Z0-9_:]+$/.test(String(room[field]))))return null
   if(room.recruitment_mode!==undefined&&(room.kind!=='mentoring'||!['hosted','legacy'].includes(String(room.recruitment_mode))))return null
   if(room.unread_count!==undefined&&(!Number.isSafeInteger(room.unread_count)||(room.unread_count as number)<0))return null
   if(room.latest_message!==undefined&&room.latest_message!==null){const m=room.latest_message;if(!isChatObject(m)||!isChatUuid(m.id)||!isChatText(m.body,160)||!isChatTimestamp(m.created_at)||typeof m.is_me!=='boolean')return null}

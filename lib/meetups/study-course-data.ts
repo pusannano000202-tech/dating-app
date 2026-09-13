@@ -1,4 +1,5 @@
 import type { StudyGuideKind } from './study-guide'
+import { EXPANDED_STUDY_COURSE_ROWS, EXPANDED_STUDY_CURRICULA } from './study-course-expansion-20260913'
 
 export type VerifiedStudyCurriculum = Readonly<{
   id: string
@@ -13,12 +14,13 @@ export type VerifiedStudyCurriculum = Readonly<{
 // Source-backed selections, not a claim of complete curricula or live offerings.
 // Codes are kept distinct even when two majors use the same course title.
 export const ADDITIONAL_STUDY_CURRICULA: readonly VerifiedStudyCurriculum[] = Object.freeze([
+  ...EXPANDED_STUDY_CURRICULA,
   Object.freeze({ id: 'pnu-statistics-2026', department: '통계학과', title: '부산대학교 통계학과 2026 교육과정', url: 'https://stat.pusan.ac.kr/bbs/stat/1874/970681/artclView.do', retrievedAt: '2026-09-12', curriculumYear: 2026, coverageNote: '2026 공식 표의 1~4학년 전공기초·필수·선택 32과목을 확인했어요. 통계학개론의 1·2학기 권장은 같은 과목으로 묶었어요. 실제 개설 분반·시간표·개인 적용 교육과정은 확인되지 않았어요.' }),
   Object.freeze({ id: 'pnu-tourism-convention-2026', department: '관광컨벤션학과', title: '부산대학교 관광컨벤션학과 2026 교육과정', url: 'https://convention.pusan.ac.kr/convention/16013/subview.do', retrievedAt: '2026-09-12', curriculumYear: 2026, coverageNote: '2026 공식 표의 1~4학년 전공기초·필수·선택 43과목을 확인했어요. 실제 개설 분반·시간표·개인 적용 교육과정은 확인되지 않았어요.' }),
   Object.freeze({ id: 'pnu-advanced-convergence-2026', department: '첨단융합학부', title: '부산대학교 첨단융합학부 2026 공통 교육과정', url: 'https://ste.pusan.ac.kr/ste/9577/subview.do', retrievedAt: '2026-09-12', curriculumYear: 2026, coverageNote: '2026 공식 공통 교육과정의 1학년 전공기초 11과목을 확인했어요. 2학년 이후 세부전공 전체에 공통 적용되는 목록이 아니며, 실제 개설·개인 적용 교육과정은 확인되지 않았어요.' }),
   Object.freeze({ id: 'pnu-future-energy-current', department: '미래에너지전공', title: '부산대학교 미래에너지전공 현행 교육과정 (연도 미표기)', url: 'https://ste.pusan.ac.kr/ste/9579/subview.do', retrievedAt: '2026-09-12', curriculumYear: null, coverageNote: '공식 현행 표의 2~4학년 정규학기 51과목이에요. 교육과정 연도 미표기 자료이며 여름 산학프로젝트는 제외했어요. 실제 개설·개인 적용 교육과정은 확인되지 않았어요.' }),
-  Object.freeze({ id: 'pnu-computer-2026', department: '컴퓨터공학전공', title: '부산대학교 정보컴퓨터공학부 2026 컴퓨터공학전공 교육과정', url: 'https://cse.pusan.ac.kr/bbs/cse/2605/978154/download.do', retrievedAt: '2026-09-10', coverageNote: '2026 교육과정에서 과목 코드·학기를 확인한 2학년 7과목이에요. 다른 학년과 실제 개설 분반은 아직 연결하지 않았어요.' }),
-  Object.freeze({ id: 'pnu-ai-2026', department: '인공지능전공', title: '부산대학교 정보컴퓨터공학부 2026 인공지능전공 교육과정', url: 'https://cse.pusan.ac.kr/bbs/cse/2605/978154/download.do', retrievedAt: '2026-09-10', coverageNote: '2026 교육과정에서 확인한 1·2학년 전공기초·전공필수 12과목이에요. 선택과목과 실제 개설 분반은 아직 연결하지 않았어요.' }),
+  Object.freeze({ id: 'pnu-computer-2026', department: '컴퓨터공학전공', title: '부산대학교 정보컴퓨터공학부 2026 컴퓨터공학전공 교육과정', url: 'https://cse.pusan.ac.kr/cse/14274/subview.do', retrievedAt: '2026-09-13', curriculumYear: 2026, coverageNote: '2026 공식 표의 1~4학년 정규학기 전공 56과목을 연결했어요. 여름도약·전학년 산학협력실무와 교양은 제외했어요. 실제 개설 분반·시간표·개인 적용 교육과정은 별도 확인이 필요해요.' }),
+  Object.freeze({ id: 'pnu-ai-2026', department: '인공지능전공', title: '부산대학교 정보컴퓨터공학부 2026 인공지능전공 교육과정', url: 'https://cse.pusan.ac.kr/cse/14275/subview.do', retrievedAt: '2026-09-13', curriculumYear: 2026, coverageNote: '2026 공식 표의 1~4학년 정규학기 전공 52과목을 연결했어요. 여름도약·전학년 산학협력실무와 교양은 제외했어요. 실제 개설 분반·시간표·개인 적용 교육과정은 별도 확인이 필요해요.' }),
   Object.freeze({ id: 'pnu-business-2026', department: '경영학과', title: '부산대학교 경영학과 2026 교육과정', url: 'https://his.pusan.ac.kr/bbs/biz/2557/977269/download.do', retrievedAt: '2026-09-10', coverageNote: '2026 교육과정에서 확인한 1~3학년 전공기초·전공필수 13과목이에요. 선택과목과 실제 개설 분반은 아직 연결하지 않았어요.' }),
 ])
 
@@ -179,4 +181,5 @@ export const ADDITIONAL_STUDY_COURSE_ROWS: readonly VerifiedCourseRow[] = Object
   ['pnu-future-energy-current', 'NY2002673', '유기반도체소자', 'major-general', 4, 2],
   ['pnu-future-energy-current', 'NY3600470', '이차전지화성평가공학', 'major-general', 4, 2],
   ['pnu-future-energy-current', 'NY3600575', '이차전지종합설계', 'major-general', 4, 2],
+  ...EXPANDED_STUDY_COURSE_ROWS,
 ] as const)

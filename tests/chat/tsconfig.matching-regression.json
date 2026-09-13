@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.matching-tests.json",
+  "compilerOptions": {"outDir": "../../.tmp/chat-matching-regression"},
+  "include": [
+    "../../lib/matching/friend-direct-chat.ts",
+    "../matching/match-chat-window.test.ts",
+    "../matching/friend-chat-preservation.test.ts",
+    "../matching/quantum-event-lifecycle.test.ts",
+    "../matching/quantum-event-lifecycle-migration.test.ts",
+    "../matching/quantum-event-lifecycle-ui.test.ts",
+    "../matching/integrated-continuation-migration.test.ts"
+  ]
+}

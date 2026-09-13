@@ -19,13 +19,13 @@ function CampusEatsCategoryChooser() {
         <section className="mt-6 rounded-2xl border border-[#eadbd4] bg-white p-5 sm:p-7" aria-labelledby="campus-eats-entry-heading">
           <p className="text-xs font-black text-[#B94B3F]">부산대 앞 · 방문 맛집 월드컵</p>
           <h1 id="campus-eats-entry-heading" className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">어떤 음식부터 골라볼까요?</h1>
-          <p className="mt-3 max-w-xl text-sm font-bold leading-6 text-[#77645b]">음식을 고른 뒤 먹어본 맛집끼리 비교해요. 이전 결과는 자동으로 열지 않아요.</p>
+          <p className="mt-3 max-w-xl text-sm font-bold leading-6 text-[#77645b]">음식을 고르면 내 순위를 먼저 볼 수 있어요. 참가하기를 눌러 먹어본 맛집끼리 비교해요. 이전 결과는 자동으로 열지 않아요.</p>
 
           <nav className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="방문 맛집 월드컵 음식 종류 선택">
             {PNU_CAMPUS_EATS_CATEGORIES.map((category) => (
               <Link
                 key={category.id}
-                href={`/community/campus-eats?mode=setup&category=${category.id}`}
+                href={`/community/campus-eats?mode=map&list=open&category=${category.id}`}
                 className="group flex min-h-11 flex-col rounded-xl border border-[#eadbd4] bg-[#fffdfb] p-3 text-left transition hover:border-[#B94B3F] hover:bg-[#fff5ef] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B94B3F]"
               >
                 <span className="flex items-center gap-2 text-[#B94B3F]">
@@ -33,7 +33,7 @@ function CampusEatsCategoryChooser() {
                   <span className="text-sm font-black text-[#292321]">{category.label}</span>
                 </span>
                 <span className="mt-2 flex items-center justify-between text-xs font-bold text-[#77645b]">
-                  {category.candidates.length}곳 비교하기 <ArrowRight size={14} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
+                  {category.candidates.length}곳 · 내 순위 보기 <ArrowRight size={14} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
             ))}

@@ -17,6 +17,8 @@ export async function activityRoomRpc(req: NextRequest, name: string, args: Reco
     const { data: { user }, error: authError } = await client.auth.getUser()
     if (authError && authError.status !== 400 && authError.status !== 401 && authError.status !== 403) return meetupJson({ error: 'community_unavailable' }, 503)
     if (!user) return meetupJson({ error: 'Unauthorized' }, 401)
+    const expectedAccount = req.headers.get('X-Expected-Account')
+    if (expectedAccount !== null && expectedAccount !== user.id) return meetupJson({ error: 'Unauthorized' }, 401)
     const { data, error } = await client.rpc(name, args)
     if (error) {
       const message = error.message.toLowerCase()

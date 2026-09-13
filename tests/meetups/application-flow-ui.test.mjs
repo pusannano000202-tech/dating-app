@@ -59,6 +59,12 @@ test('introduction advances to mandatory deposit, read-policy and explicit conse
     assert.ok(nodes(tree).some(node => node.type === 'h1' && node.props.tabIndex === -1))
   } finally { h.dispose() }
 })
+test('approved new amount is visible without inventing configured policy, and older different quotes cannot charge',()=>{
+ const h=harness({...props,newDepositAmountKrw:10000,quote:null,policy:null})
+ try{let tree=h.render();assert.match(text(tree),/10,000\s*원/);tree=enterDeposit(h);assert.match(text(tree),/10,000\s*원/);assert.equal(button(tree,'동의하고 결제·신청').props.disabled,true)}finally{h.dispose()}
+ const old=harness({...props,newDepositAmountKrw:10000,quote:{...quote,amountKrw:17000},onSubmit:()=>assert.fail('do not charge old quote')})
+ try{enterDeposit(old);const tree=consent(old);assert.match(text(tree),/17,000원/);assert.match(text(tree),/새 참가 신청 보증금은 10,000원/);assert.equal(button(tree,'동의하고 결제·신청').props.disabled,true)}finally{old.dispose()}
+})
 
 test('unknown amount and unavailable carryover never become free payment or a selectable method', () => {
   const h = harness({ ...props, quote: null })

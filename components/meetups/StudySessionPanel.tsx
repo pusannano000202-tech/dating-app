@@ -1,12 +1,15 @@
 'use client'
 
-import { useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import Image from 'next/image'
 import { BookOpen, CalendarDays, ChevronDown, MapPin, MessageCircle, Send, UsersRound } from 'lucide-react'
 import { getStudyCourse, getStudyCoursePhoto } from '@/lib/meetups/study-catalog'
 import { getStudyGuide } from '@/lib/meetups/study-guide'
 import { STUDY_VENUE_SOURCE, STUDY_VENUE_SUGGESTIONS } from '@/lib/meetups/study-venues'
 import { clearAcknowledgedDraft, formatStudyTime } from '@/lib/meetups/study-room-client-state'
+import SocialMessenger, {SocialChatComposer} from '@/components/chat/SocialMessenger'
+import ActivityRoomPolls from '@/components/chat-polls/ActivityRoomPolls'
+import {PendingChatSends} from '@/lib/chat/social-messenger-state'
 import { useSocialChatRead } from '@/lib/chat/useSocialChatRead'
 import type { StudyRoomAction, StudyRoomDetail } from '@/lib/meetups/study-room-contract'
 import s from './study-room.module.css'
@@ -15,9 +18,10 @@ export function displayStudyTime(value: string): string {
   return formatStudyTime(value)
 }
 
-export default function StudySessionPanel({ room, busy, onAction, onLeave, onOlderMessages, chatOnly = false, readOnly = false, readTrackingEnabled = false }: {
+export default function StudySessionPanel({ room, busy, onAction, onLeave, onOlderMessages, chatOnly = false, readOnly = false, readTrackingEnabled = false, error, onRetry, notice, managementExtra }: {
   room: StudyRoomDetail; busy: boolean;
   chatOnly?: boolean; readOnly?: boolean; readTrackingEnabled?: boolean;
+  error?:string; onRetry?:()=>void; notice?:ReactNode; managementExtra?:ReactNode;
   onAction: (action: StudyRoomAction) => Promise<boolean>;
   onLeave: (reason?: string) => Promise<void>;
   onOlderMessages: () => Promise<void>;
@@ -27,7 +31,8 @@ export default function StudySessionPanel({ room, busy, onAction, onLeave, onOld
   const [exit, setExit] = useState<'leave' | 'report' | null>(null)
   const [reason, setReason] = useState('')
   const [draft, setDraft] = useState('')
-  const pendingMessage = useRef<{ text: string; key: string } | null>(null)
+  const [pollRequest,setPollRequest]=useState(0)
+  const pendingMessage = useRef(new PendingChatSends())
   const chatReadRoot = useRef<HTMLDivElement>(null)
   useSocialChatRead('study_room', room.id, room.messages, { root: chatReadRoot, enabled: readTrackingEnabled })
   const [recap, setRecap] = useState('')
@@ -53,27 +58,15 @@ export default function StudySessionPanel({ room, busy, onAction, onLeave, onOld
     if (await onAction({ action: 'propose_schedule', session_number: selected, starts_at: startsAt.toISOString(), place_name: String(data.get('place') ?? '').trim(), place_note: String(data.get('note') ?? '').trim(), is_sponsored: data.get('sponsored') === 'on' })) { form.reset(); setPlaceDraft('') }
   }
 
-  async function sendMessage(event: FormEvent) {
-    event.preventDefault()
-    if (!draft.trim() || busy || readOnly) return
+  async function sendMessage() {
+    if (!draft.trim() || busy || readOnly || error) return
     const text = draft.trim()
-    if (!pendingMessage.current || pendingMessage.current.text !== text) pendingMessage.current = { text, key: crypto.randomUUID() }
-    if (await onAction({ action: 'message', message: text, idempotency_key: pendingMessage.current.key })) { setDraft(current => clearAcknowledgedDraft(current, text)); pendingMessage.current = null }
+    const key=pendingMessage.current.key(text,()=>crypto.randomUUID())
+    if (await onAction({ action: 'message', message: text, idempotency_key: key })) { setDraft(current => clearAcknowledgedDraft(current, text)); pendingMessage.current.acknowledge(text) }
   }
 
-  const conversation = <div className={s.inside}>
-        <p className={s.note}>현재 멤버는 입장 전 대화도 볼 수 있어요. 민감한 개인 정보는 남기지 않아요.</p>
-        {room.has_older_messages ? <button type="button" className={`${s.quiet} ${s.wide}`} disabled={busy} onClick={() => void onOlderMessages()}>이전 대화 더 보기</button> : null}
-        <div ref={chatReadRoot} className={s.chatList} aria-label="스터디 대화">
-          {room.messages.length === 0 ? <p className={s.muted}>이 방의 별명으로 먼저 인사해 볼까요?</p> : room.messages.map(message => <div className={`${s.message} ${message.is_me ? s.mine : ''}`} key={message.id} data-social-message-id={message.id}><small>{message.sender_alias} · {displayStudyTime(message.created_at)}</small><p>{message.message}</p></div>)}
-        </div>
-        <form className={s.composer} onSubmit={event => void sendMessage(event)}><textarea disabled={readOnly} aria-label="메시지" placeholder="메시지 입력" value={draft} onChange={event => setDraft(event.target.value)} maxLength={1000} rows={1} /><button className={s.primary} type="submit" aria-label="메시지 보내기" disabled={busy || readOnly || !draft.trim()}><Send size={18} /></button></form>
-      </div>
-  const Activities = chatOnly ? 'details' : 'div'
-  return <div className={s.workspace}>
-    {chatOnly ? <section className={s.card} aria-label="스터디 채팅">{conversation}</section> : null}
-    <Activities className={chatOnly ? s.disclosure : undefined}>
-    {chatOnly ? <summary>스터디 일정·활동 관리<ChevronDown size={17}/></summary> : null}
+  const management=<div className={s.workspace}>
+    {managementExtra}
     <header className={s.header}>
       <p className={s.eyebrow}>{room.course_name} · {room.room_number}번 방</p>
       <h1>{room.status === 'completed' ? '함께한 10회, 수고했어요' : `${room.current_session}회차를 준비하고 있어요`}</h1>
@@ -155,8 +148,6 @@ export default function StudySessionPanel({ room, busy, onAction, onLeave, onOld
       {current && session.status === 'confirmed' ? <><p className={s.note}>약속 시간이 지난 뒤 참여자들이 마무리를 확인하면 다음 회차로 넘어가요. 다음 회차 참여는 다시 선택해요.</p><button className={`${s.primary} ${s.wide}`} type="button" disabled={busy || session.completion_confirmed || !session.my_schedule_accepted || !session.starts_at || Date.parse(session.starts_at) > Date.now()} onClick={() => void onAction({ action: 'complete_session', session_number: selected })}>{session.completion_confirmed ? `마무리 확인했어요 · ${session.completed_count}/${session.attending_count}명` : '이번 회차 마무리 확인'}</button></> : null}
     </div></details> : null}
 
-    </Activities>
-    {!chatOnly ? <details className={s.disclosure}><summary><MessageCircle size={20}/>우리의 대화<ChevronDown size={17}/></summary>{conversation}</details> : null}
 
     <section className={s.exit}>
       <div className={s.exitButtons}><button type="button" onClick={() => setExit(exit === 'leave' ? null : 'leave')} aria-expanded={exit === 'leave'}>모임 나가기</button><button type="button" onClick={() => setExit(exit === 'report' ? null : 'report')} aria-expanded={exit === 'report'}>신고하고 나가기</button></div>
@@ -167,4 +158,11 @@ export default function StudySessionPanel({ room, busy, onAction, onLeave, onOld
       <p className={s.note}>신고 내용과 신고한 사람은 다른 참여자에게 보이지 않아요. 신고 저장에 문제가 생겨도 나갈 수 있어요.</p>
     </section>
   </div>
+  const conversation=<SocialMessenger scope={room.id} root={chatReadRoot}
+    messages={room.messages.map(message=>({id:message.id,alias:message.sender_alias,text:message.message,createdAt:message.created_at,isMe:message.is_me}))}
+    empty="이 방의 별명으로 먼저 인사해 볼까요?" readOnly={readOnly} management={chatOnly?management:undefined} error={error} onRetry={onRetry} notice={notice}
+    tools={readTrackingEnabled?<ActivityRoomPolls roomKind="study-rooms" roomId={room.id} composerRequest={pollRequest} readOnly={readOnly||room.status==='completed'||!!error}/>:null}
+    beforeMessages={room.has_older_messages?<button type="button" className={s.quiet} disabled={busy} onClick={()=>void onOlderMessages()}>이전 대화 더 보기</button>:null}
+    composer={<SocialChatComposer value={draft} onChange={setDraft} onSend={()=>void sendMessage()} busy={busy} disabled={readOnly||!!error} onCreatePoll={readTrackingEnabled&&room.status!=='completed'?()=>setPollRequest(value=>value+1):undefined} label="메시지"/>}/>
+  return chatOnly?conversation:<div className={s.workspace}>{management}<div style={{height:520}}>{conversation}</div></div>
 }

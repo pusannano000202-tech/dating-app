@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": "../..",
+    "paths": { "@/*": ["./*"] },
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "rootDir": "../..",
+    "outDir": "../../.tmp/daily-identity-tests",
+    "types": ["node"],
+    "noEmit": false
+  },
+  "include": [
+    "../../lib/daily-identity/**/*.ts",
+    "../../components/daily-identity/**/*.tsx",
+    "./*.test.ts"
+  ]
+}

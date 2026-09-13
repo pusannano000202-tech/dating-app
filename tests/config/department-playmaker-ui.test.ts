@@ -79,7 +79,8 @@ test('department team composer follows the approved playmaker scene without fake
   assert.match(component, /\/social-scenes\/department-clubhouse-gaming\.webp/)
   assert.match(component, /\/social-scenes\/home-playmaker-football\.webp/)
   assert.match(component, /category === 'gaming' \?/)
-  assert.match(component, /useState<'soccer' \| 'gaming'>\('gaming'\)/)
+  assert.match(component, /useState<'soccer' \| 'gaming'>\(browseCategory \?\? 'gaming'\)/)
+  assert.match(component, /useState\(!browseCategory\)/, 'discovery opens recruitment first; direct creation stays available')
   assert.match(component, /팀원 프로필이 아닌 활동 분위기 이미지/)
   assert.match(component, /팀을 먼저 만든 뒤 수락한 친구만 합류해요/)
   assert.match(component, /Math\.min\(capacity, 5\)/)
@@ -133,12 +134,22 @@ test('post-create recovery requires the created team to be present before claimi
 
 test('challenge parser accepts the empty list and one complete projected row', () => {
   const { parseDepartmentChallenges } = loadPresentationModule()
+  const normalizedChallenge = { ...validChallenge, fair_league: false, paired_challenge_id: null }
 
   assert.deepEqual(parseDepartmentChallenges([]), [])
-  assert.deepEqual(parseDepartmentChallenges([validChallenge]), [validChallenge])
+  assert.deepEqual(parseDepartmentChallenges([validChallenge]), [normalizedChallenge])
   assert.deepEqual(
     parseDepartmentChallenges([{ ...validChallenge, is_captain: false, teams: [] }]),
-    [{ ...validChallenge, is_captain: false, teams: [] }],
+    [{ ...normalizedChallenge, is_captain: false, teams: [] }],
+  )
+  const pairedChallengeId = '10000000-0000-4000-8000-000000000002'
+  assert.deepEqual(
+    parseDepartmentChallenges([{ ...validChallenge, fair_league: true, paired_challenge_id: pairedChallengeId }]),
+    [{ ...normalizedChallenge, fair_league: true, paired_challenge_id: pairedChallengeId }],
+  )
+  assert.deepEqual(
+    parseDepartmentChallenges([{ ...validChallenge, fair_league: 'true', paired_challenge_id: 'not-a-uuid' }]),
+    [normalizedChallenge],
   )
 })
 

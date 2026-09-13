@@ -1,0 +1,45 @@
+.discovery { width: 100%; max-width: 960px; margin: 0 auto; padding: 18px 0 24px; color: #292320; }
+.heading { margin: 0 0 17px; }
+.heading h2 { margin: 0; font-size: 23px; font-weight: 850; letter-spacing: -.04em; line-height: 1.35; }
+.heading p { margin: 7px 0 0; color: #807169; font-size: 13px; line-height: 1.6; }
+.modeCards { display: grid; gap: 12px; }
+.sceneCard { display: grid; grid-template-columns: minmax(0, .74fr) minmax(0, 1.26fr); width: 100%; padding: 0; overflow: hidden; border: 1px solid #e9ddd4; border-radius: 22px; background: #fff; color: #292320; text-align: left; transition: border-color .15s, box-shadow .15s; }
+.sceneCard:hover { border-color: #c99d8d; box-shadow: 0 5px 18px #6b3c2910; }
+.sceneCard:focus-visible, .primaryAction:focus-visible, .rules summary:focus-visible { outline: 3px solid #a74335; outline-offset: 4px; }
+.active { border-color: #b45241; box-shadow: 0 0 0 1px #b45241; }
+.photo { position: relative; display: block; min-height: 184px; overflow: hidden; background: #eaddd1; }
+.image { object-fit: cover; object-position: center; }
+.sceneCopy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; padding: 17px 16px 14px; }
+.category { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 0; color: #a74335; font-size: 11px; font-weight: 750; line-height: 1.5; }
+.title { display: block; margin-top: 7px; font-size: 20px; font-weight: 850; line-height: 1.35; letter-spacing: -.045em; overflow-wrap: anywhere; word-break: keep-all; }
+.description { display: block; margin: 7px 0 0; color: #807169; font-size: 12px; line-height: 1.65; word-break: keep-all; overflow-wrap: anywhere; }
+.timeCue { display: block; margin: 10px 0 0; font-size: 10px; font-weight: 650; line-height: 1.6; color: #75645c; }
+.cardAction { display: flex; width: 100%; min-height: 34px; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 9px; color: #a74335; font-size: 11px; font-weight: 750; line-height: 1.5; }
+.cardAction svg { flex-shrink: 0; }
+.selectionPanel { display: grid; gap: 16px; margin: 17px 0 0; padding: 20px; border: 1px solid #eadbd1; border-radius: 22px; background: #faf1e9; }
+.selectionTitle { margin: 7px 0 0; font-size: 19px; font-weight: 800; line-height: 1.4; letter-spacing: -.03em; }
+.facts { display: flex; flex-wrap: wrap; gap: 9px 16px; margin-top: 12px; font-size: 11px; line-height: 1.6; color: #78645a; }
+.facts span { display: flex; align-items: center; gap: 5px; }
+.primaryAction { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 10px; padding: 12px 18px; border-radius: 13px; background: #ae493a; color: #fff; font-size: 13px; font-weight: 750; line-height: 1.5; text-align: center; }
+.primaryAction:hover { background: #993e31; }
+.rules { min-width: 0; border-top: 1px solid #e7d7cb; color: #7c685c; font-size: 11px; line-height: 1.8; }
+.rules summary { min-height: 44px; padding: 12px 0 7px; cursor: pointer; }
+.rules p { margin: 0 0 2px; }
+.eventSection { margin-top: 20px; }
+.eventLabel { margin: 0 0 10px; color: #807169; font-size: 12px; font-weight: 700; }
+.eventCard { grid-template-columns: minmax(0, .74fr) minmax(0, 1.26fr); }
+.eventCard .photo { min-height: 215px; }
+.eventNote { margin: 8px 0 0; color: #98877b; font-size: 10px; line-height: 1.6; }
+.eventRules { margin-top: 8px; padding: 0 14px; border-top: 0; }
+@media (min-width: 760px) {
+  .modeCards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .heading h2 { font-size: 26px; }
+  .selectionPanel { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px 24px; padding: 22px; }
+  .primaryAction { min-width: 190px; }
+  .rules { grid-column: 1 / -1; }
+  .eventCard { max-width: 640px; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+  .eventCard .photo { min-height: 225px; }
+  .eventCard .sceneCopy { padding: 22px 24px 18px; }
+  .eventRules { max-width: 640px; }
+}
+@media (prefers-reduced-motion: reduce) { .sceneCard { transition: none; } }

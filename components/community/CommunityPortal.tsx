@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import s from '@/components/social/social-scenes.module.css'
 
 const entries = [
-  { id:'content', label:'콘텐츠', title:'우리 학교\n취향 찾기', detail:'맛집 · MBTI · 배달 · 장소', action:'취향 찾아보기', image:'/social-scenes/content.png', alt:'파스타와 음료가 놓인 테이블의 연출 사진', href:'/community/content' },
+  { id:'content', label:'콘텐츠', title:'우리 학교\n취향 찾기', detail:'맛집 · MBTI · 장소', action:'취향 찾아보기', image:'/social-scenes/content.png', alt:'파스타와 음료가 놓인 테이블의 연출 사진', href:'/community/content' },
   { id:'stories', label:'게시글', title:'오늘의 이야기\n나누기', detail:'공강 한 시간, 다들 뭐 해요?', action:'이야기 보러 가기', image:'/social-scenes/posts.png', alt:'카페에서 휴대전화로 소통하는 연출 사진', href:'/community/stories' },
   { id:'voice', label:'보이스', title:'같이 응원하고\n고민 나눠요', detail:'LCK · 야구 · 연애 · 취업', action:'목소리로 모이기', image:'/social-scenes/voice.png', alt:'경기를 보며 함께 응원하는 관중의 연출 사진', href:'/community/voice' },
 ] as const

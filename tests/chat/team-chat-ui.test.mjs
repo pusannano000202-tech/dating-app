@@ -86,7 +86,7 @@ test('an uncertain send retains draft and retry key; a newer draft survives an o
  let currentBody='가능한 시간 알려 주세요',currentPage=chat([]),fail=true,release
  const transport={send:async(body,key)=>{calls.push({body,key});if(fail)throw Error('connection lost');await new Promise(resolve=>{release=resolve});return{owner_id:owner,message:message(70,body)}}}
  const setBody=update=>{currentBody=typeof update==='function'?update(currentBody):update},setPage=update=>{currentPage=typeof update==='function'?update(currentPage):update}
- const make=()=>new Function('body','page','error','mutation','setBusy','generation','readController','reading','setLoading','pendingKeys','scope','sendController','window','transport','ownerId','parseLeagueTeamMessageResponse','alive','setBody','nearBottom','setPage','mergeLeagueTeamMessages','setError',compile(functionText(source,'send'))+';return send')(currentBody,currentPage,'',mutation,()=>{},generation,{current:null},{current:false},()=>{},pendingKeys,scope,{current:null},{setTimeout:()=>1,clearTimeout:()=>{}},transport,owner,contract.parseLeagueTeamMessageResponse,alive,setBody,{current:false},setPage,ui.mergeLeagueTeamMessages,()=>{})
+ const make=()=>new Function('body','page','error','mutation','setBusy','generation','readController','reading','setLoading','pendingKeys','scope','sendController','window','transport','ownerId','parseLeagueTeamMessageResponse','alive','setBody','clearSentDraft','setPage','mergeLeagueTeamMessages','setError',compile(functionText(source,'send'))+';return send')(currentBody,currentPage,'',mutation,()=>{},generation,{current:null},{current:false},()=>{},pendingKeys,scope,{current:null},{setTimeout:()=>1,clearTimeout:()=>{}},transport,owner,contract.parseLeagueTeamMessageResponse,alive,setBody,(current,sent)=>current.trim()===sent?'':current,setPage,ui.mergeLeagueTeamMessages,()=>{})
  await make()({preventDefault(){}});assert.equal(currentBody,'가능한 시간 알려 주세요');assert.equal(currentPage,null);assert.equal(pendingKeys.current.size,1)
  fail=false;currentPage=chat([]);const retry=make()({preventDefault(){}});currentBody='새로 작성 중';release();await retry
  assert.equal(calls[0].key,calls[1].key);assert.equal(currentBody,'새로 작성 중');assert.equal(currentPage.messages.length,1);assert.equal(pendingKeys.current.size,0)
@@ -95,7 +95,7 @@ test('an uncertain send retains draft and retry key; a newer draft survives an o
 test('a send resolved after its session scope was invalidated cannot expose old messages or erase current drafts',async()=>{
  const scope={current:0},updates=[],pendingKeys={current:new Map()},signalRef={current:null};let release
  const transport={send:async body=>{await new Promise(resolve=>{release=resolve});return{owner_id:owner,message:message(80,body)}}}
- const send=new Function('body','page','error','mutation','setBusy','generation','readController','reading','setLoading','pendingKeys','scope','sendController','window','transport','ownerId','parseLeagueTeamMessageResponse','alive','setBody','nearBottom','setPage','mergeLeagueTeamMessages','setError',compile(functionText(source,'send'))+';return send')('이전 계정 초안',chat([]),'',{current:false},()=>{},{current:0},{current:null},{current:false},()=>{},pendingKeys,scope,signalRef,{setTimeout:()=>1,clearTimeout:()=>{}},transport,owner,contract.parseLeagueTeamMessageResponse,{current:true},()=>updates.push('draft'),{current:false},()=>updates.push('messages'),ui.mergeLeagueTeamMessages,()=>updates.push('error'))
+ const send=new Function('body','page','error','mutation','setBusy','generation','readController','reading','setLoading','pendingKeys','scope','sendController','window','transport','ownerId','parseLeagueTeamMessageResponse','alive','setBody','clearSentDraft','setPage','mergeLeagueTeamMessages','setError',compile(functionText(source,'send'))+';return send')('이전 계정 초안',chat([]),'',{current:false},()=>{},{current:0},{current:null},{current:false},()=>{},pendingKeys,scope,signalRef,{setTimeout:()=>1,clearTimeout:()=>{}},transport,owner,contract.parseLeagueTeamMessageResponse,{current:true},()=>updates.push('draft'),(current,sent)=>current.trim()===sent?'':current,()=>updates.push('messages'),ui.mergeLeagueTeamMessages,()=>updates.push('error'))
  const pending=send({preventDefault(){}});scope.current++;release();await pending
  assert.deepEqual(updates,[]);assert.equal(pendingKeys.current.size,1)
 })
@@ -109,6 +109,6 @@ test('account or room changes remount private state and live reads are fenced by
  const right=ui.default(left.props);assert.equal(right.key,`${owner}:${team}`)
  assert.doesNotMatch(source,/localStorage|sessionStorage/)
  assert.match(source,/<ActivityRoomPolls roomKind="league-teams"/)
- assert.match(source,/<ChatComposerActions disabled=\{busy\|\|!page\?\.writable\|\|!!error\}/)
- assert.match(source,/학과 대항전 · 우리 팀/);assert.match(source,/href="\/chat"/);assert.match(source,/<time dateTime=\{message\.created_at\}/)
+ assert.match(source,/<SocialChatComposer value=\{body\}/);assert.match(source,/disabled=\{!page\?\.writable\|\|!!error\}/)
+ assert.match(source,/header=\{\{kind:'league_team'/);assert.match(source,/href="\/chat"/);assert.match(source,/createdAt:message\.created_at,isMe:message\.is_me/);assert.match(source,/<LeagueRecruitmentNotices teamId=\{teamId\} ownerId=\{ownerId\}/)
 })

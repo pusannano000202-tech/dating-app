@@ -4,14 +4,14 @@ import { ArrowRight, ChevronRight } from 'lucide-react'
 
 const discovery = [
   { href: '/community/voice', title: '목소리로 먼저 친해져요', label: '보이스 · 응원부터 고민까지', image: '/social-scenes/voice.png', alt: '함께 경기를 보며 응원하는 친구들의 예시 장면' },
-  { href: '/community/content', title: '내 취향, 우리 학교 순위', label: '맛집 · MBTI · 배달 · 장소', image: '/social-scenes/content.png', alt: '음식과 학교 주변 공간을 담은 취향 콘텐츠 이미지' },
+  { href: '/community/content', title: '내 취향, 우리 학교 순위', label: '맛집 · MBTI · 장소', image: '/social-scenes/content.png', alt: '음식과 학교 주변 공간을 담은 취향 콘텐츠 이미지' },
   { href: '/community/stories', title: '오늘의 이야기 나누기', label: '게시판 · 학교 친구들의 공감', image: '/social-scenes/posts.png', alt: '카페에서 오늘의 이야기를 기록하는 예시 장면' },
 ] as const
 
 export default function QuantumHomeRecommendations() {
   return <section aria-labelledby="quantum-home-recommendations">
     <h2 id="quantum-home-recommendations" className="mb-3 text-lg font-black tracking-tight">캠퍼스 플레이북</h2>
-    <Link href="/community/department" className="group block overflow-hidden rounded-xl border border-[#e8cfc4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b34c3e]">
+    <Link href="/meetups/league" className="group block overflow-hidden rounded-xl border border-[#e8cfc4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b34c3e]">
       <div className="relative aspect-[1.95/1] overflow-hidden bg-[#213427] sm:aspect-[2.45/1]">
         <Image src="/social-scenes/home-playmaker-football.webp" alt="캠퍼스 운동장에서 축구를 즐기는 대학생 친구들의 예시 장면" fill sizes="(min-width:1024px) 540px, 100vw" className="object-cover object-[62%_center]" priority />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/15 to-transparent" />

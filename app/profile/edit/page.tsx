@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import {
   AlertTriangle,
   Bell,
+  Bookmark,
+  Heart,
   Camera,
   ChevronLeft,
   ChevronRight,
@@ -18,6 +20,8 @@ import {
 } from 'lucide-react'
 
 import BootingLogo from '@/components/BootingLogo'
+import AccountPreferences from '@/components/i18n/AccountPreferences'
+import { DailyIdentityCard } from '@/components/daily-identity'
 import { createClient } from '@/lib/supabase'
 import type { Gender } from '@/lib/types'
 
@@ -71,6 +75,8 @@ type DepositSummaryState = {
 }
 
 const QUICK_ACTIONS = [
+  { href: '/profile/content-history', icon: Bookmark, label: '내 취향 기록', tone: 'bg-[#FFF0ED] text-[#C84C3E]' },
+  { href: '/community/mbti?view=manage', icon: Heart, label: 'MBTI 응답 관리', tone: 'bg-[#F7EEFF] text-[#76549B]' },
   { href: '/friends', icon: UsersRound, label: '친구 관리', tone: 'bg-boot-info-soft text-boot-info' },
   { href: '/chat', icon: MessageCircle, label: '채팅', tone: 'bg-[#EAF6F4] text-[#147A70]' },
   { href: '/notifications', icon: Bell, label: '알림', tone: 'bg-[#FFF5DE] text-[#A66B00]' },
@@ -217,6 +223,7 @@ export default function ProfileEditPage() {
           </div>
         </header>
 
+        <AccountPreferences />
         {loading ? <ProfileSkeleton /> : (
           <>
             <section className="mt-5 grid gap-4 border-y border-boot-hairline py-5 sm:grid-cols-[132px_minmax(0,1fr)]">
@@ -261,7 +268,8 @@ export default function ProfileEditPage() {
               />
             </section>
 
-            <section className="mt-3 grid grid-cols-4 gap-2">
+            <DailyIdentityCard className="mt-5" />
+            <section className="mt-3 grid grid-cols-3 gap-2">
               {QUICK_ACTIONS.map(({ href, icon: Icon, label, tone }) => (
                 <Link
                   key={href}

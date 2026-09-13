@@ -1,10 +1,19 @@
-export function integratedUiEnvironment(input, mode) {
+export function resolveIntegratedUiPort(args) {
+  if (args.length === 0) return '3010'
+  if (args.length === 2 && args[0] === '--port' && ['3004', '3010'].includes(args[1])) return args[1]
+  throw new Error('Choose --port 3004 or --port 3010')
+}
+
+export function integratedUiEnvironment(input, mode, port = '3010') {
   if (!['--offline-ui', '--live-local'].includes(mode)) throw new Error('Choose --offline-ui or --live-local')
+  resolveIntegratedUiPort(['--port', port])
+  const distDir = mode === '--offline-ui' ? '.next-integrated-qa' : '.next-integrated-live'
   const env = {
     ...input,
-    NEXT_PUBLIC_APP_ORIGIN: 'http://localhost:3010',
-    NEXT_DIST_DIR: mode === '--offline-ui' ? '.next-integrated-qa' : '.next-integrated-live',
+    NEXT_PUBLIC_APP_ORIGIN: `http://localhost:${port}`,
+    NEXT_DIST_DIR: port === '3010' ? distDir : `${distDir}-${port}`,
     QUANTUM_LOCAL_RUNTIME_MODE: mode === '--offline-ui' ? 'offline-ui' : 'live-local',
+    NEXT_PUBLIC_QUANTUM_LOCAL_RUNTIME_MODE: mode === '--offline-ui' ? 'offline-ui' : 'live-local',
     NEXT_PUBLIC_DEV_AUTH_BYPASS: 'false',
     NEXT_PUBLIC_COMMUNITY_ENABLED: 'true',
     TONIGHT_AUTOMATION_ENABLED: 'false',

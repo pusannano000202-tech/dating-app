@@ -11,10 +11,11 @@ export default function FriendChatPage() {
     <main className="min-h-screen booting-paper px-4 pb-24 pt-5 text-boot-ink">
       <div className="mx-auto w-full max-w-lg">
         <header className="mb-4 flex items-center gap-3">
-          <Link href={`/friends/${encodeURIComponent(id)}`} aria-label="친구 상세로 돌아가기" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-boot-hairline bg-white"><ArrowLeft size={20} /></Link>
+          <Link href="/chat?tab=friends" aria-label="친구 채팅 목록으로 돌아가기" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-boot-hairline bg-white"><ArrowLeft size={20} /></Link>
           <MessageCircle className="shrink-0 text-boot-primary" />
           <div className="min-w-0"><h1 className="truncate text-lg font-black">친구 대화</h1><p className="text-xs text-boot-muted">수락한 친구끼리만 보여요</p></div>
         </header>
+        <Link href={`/friends/${encodeURIComponent(id)}`} className="mb-3 inline-flex min-h-11 items-center text-sm font-bold text-boot-primary">친구 정보·관리 →</Link>
         <FriendChatRoom key={id} friendUserId={id} />
       </div>
     </main>

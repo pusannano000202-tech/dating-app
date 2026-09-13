@@ -12,6 +12,8 @@ import QuantumHomeParticipation from '@/components/home/QuantumHomeParticipation
 import QuantumHomeMyMeetups from '@/components/home/QuantumHomeMyMeetups'
 import QuantumHomePulse from '@/components/home/QuantumHomePulse'
 import QuantumHomeRecommendations from '@/components/home/QuantumHomeRecommendations'
+import { DailyIdentityCard } from '@/components/daily-identity'
+import RelationshipSummary from '@/components/relationship/RelationshipSummary'
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>
 
@@ -42,8 +44,10 @@ function HomeDashboard() {
 
         <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="space-y-3" aria-label="내가 참여한 약속">
+            <RelationshipSummary />
             <QuantumHomeMyMeetups />
             <QuantumHomeParticipation fallback={<QuantumHomeLead />} />
+            <DailyIdentityCard />
           </div>
           <div><QuantumHomeRecommendations />
             <details className="mt-5 border-t border-[#edddd4] pt-3">

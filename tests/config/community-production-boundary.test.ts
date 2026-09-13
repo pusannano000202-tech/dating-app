@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { isCommunityFeatureEnabled } from '../../lib/community-feature'
+import { getMeetupCapacityRecommendation } from '../../lib/community/catalog'
 
 const ROOT = process.cwd()
 
@@ -14,9 +15,21 @@ function readSource(path: string): string {
 test('public meetup actions use document navigation so auth redirects keep query parameters', () => {
   const meetups = readSource('components/meetups/MeetupHub.tsx')
 
-  assert.match(meetups, /<a[\s\S]*href="\/meetups\/create"/)
-  assert.match(meetups, /<a[\s\S]*href=\{category === 'all' \? '\/meetups\/create' : `\/meetups\/create\?category=\$\{category\}`\}/)
-  assert.match(meetups, /<Link href="\/community\/department"/)
+  assert.equal(meetups.match(/<a\s+href=\{createHref\}/g)?.length, 3, 'desktop, mobile and empty-state creation all use the same document navigation')
+  const createHrefSource = meetups.match(/const createParams = new URLSearchParams\(\)[\s\S]*?(?=\n  const returnParams)/)?.[0]
+  assert.ok(createHrefSource, 'the shared creation URL builder must remain available')
+  const createHref = new Function('category', 'compact', 'memberScope', 'genderFilter', `${createHrefSource}\nreturn createHref`) as (category: string, compact: boolean, memberScope: string, genderFilter: string) => string
+  assert.equal(createHref('all', false, 'school', 'any'), '/meetups/create')
+  assert.equal(createHref('study', false, 'school', 'any'), '/meetups/create?category=study')
+  assert.equal(createHref('all', true, 'department', 'any'), '/meetups/create?scope=department')
+  assert.equal(createHref('study', true, 'department', 'any'), '/meetups/create?category=study&scope=department')
+  for (const gender of ['all', 'male_only', 'female_only']) {
+    const href = new URL(createHref('study', true, 'department', gender), 'https://quantum.example')
+    assert.equal(href.pathname, '/meetups/create')
+    assert.deepEqual(Object.fromEntries(href.searchParams), { category: 'study', scope: 'department', gender_mode: gender })
+  }
+  assert.match(meetups, /<Link href="\/meetups\/league"/)
+  assert.match(readSource('app/meetups/league/page.tsx'), /export \{ default \} from '@\/app\/community\/department\/page'/)
   assert.match(meetups, /<Link href=\{`\/meetups\/\$\{meetup\.id\}`\}/)
 })
 
@@ -59,7 +72,10 @@ test('signed-in navigation keeps community and meetup destinations stable', () =
   assert.match(navigation, /prefetch/)
   assert.doesNotMatch(navigation, /isCommunityFeatureEnabled|previewTabs|coreTabs/)
   const boundary = readSource('components/community/CommunityComingSoon.tsx')
-  assert.match(boundary, /<a[\s\S]*href="\/match"/)
+  assert.match(boundary, /<a\s+href=\{isMeetups \? '\/meetups' : '\/community'\}/)
+  assert.match(boundary, /모임 다시 확인하기/)
+  assert.match(boundary, /커뮤니티 다시 확인하기/)
+  assert.doesNotMatch(boundary, /href="\/match"/)
   assert.doesNotMatch(boundary, /from 'next\/link'/)
   assert.match(envExample, /NEXT_PUBLIC_COMMUNITY_ENABLED=false/)
   assert.match(localEnvExample, /NEXT_PUBLIC_COMMUNITY_ENABLED=false/)
@@ -122,7 +138,11 @@ test('meetup catalog includes racket sports and activity capacity recommendation
   assert.match(catalog, /meetup-basketball\.webp/)
   assert.match(createForm, /getMeetupCapacityRecommendation/)
   assert.match(readSource('components/meetups/MeetupHub.tsx'), /MeetupIdeaCylinder/)
-  assert.match(createForm, /권장 인원/)
+  assert.deepEqual(['soccer', 'badminton', 'tennis', 'study'].map(category => getMeetupCapacityRecommendation(category as Parameters<typeof getMeetupCapacityRecommendation>[0])), [10, 4, 4, 5])
+  assert.match(createForm, /useState\(\(\) => getMeetupCapacityRecommendation\(initialCategory\)\)/)
+  assert.match(createForm, /setCapacity\(getMeetupCapacityRecommendation\(nextCategory\)\)/)
+  assert.match(createForm, /setCapacity\(getMeetupCapacityRecommendation\('study'\)\)/)
+  assert.match(createForm, /<legend>\{t\('모집 인원'\)\}<\/legend>[\s\S]*?<strong>\{capacity\}<\/strong>/)
   assert.match(catalog, /오늘 고점 뽑으러 가자/)
   assert.match(catalog, /금정산 같이 오르기/)
 })

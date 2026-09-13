@@ -21,6 +21,8 @@ import CampusEatsCategoryIcon from '@/components/campus-eats/CampusEatsCategoryI
 import CampusEatsBattleGuide from '@/components/campus-eats/CampusEatsBattleGuide'
 import NaverCampusMap, { type CampusEatsMapStatus } from '@/components/campus-eats/NaverCampusMap'
 import PlaceLinks from '@/components/places/PlaceLinks'
+import SaveContentRecord from '@/components/content-history/SaveContentRecord'
+import { visitResultSnapshot } from '@/lib/content-history/contract'
 import {
   applyBattleAction,
   createBracketSession,
@@ -260,7 +262,7 @@ export default function CampusEatsPilot() {
       setTournamentStarted(false)
       setTournamentId('not-started')
       setVisiblePair(getNextPair(initialSession))
-      const requiresBattleGuide = pendingDirectEntryRef.current.mode !== 'map'
+      const requiresBattleGuide = pendingDirectEntryRef.current.mode === 'battle'
         && !hasCompletedBattleGuide(selectedSchool.id)
       battleGuideNextViewRef.current = requestedView
       setView(requiresBattleGuide ? 'map' : requestedView)
@@ -303,7 +305,8 @@ export default function CampusEatsPilot() {
         restored.session,
         restored.tournamentStarted,
       )
-      const restoredRequiresBattleGuide = pendingDirectEntryRef.current.mode !== 'map'
+      const restoredRequiresBattleGuide = pendingDirectEntryRef.current.mode === 'battle'
+        && !restored.tournamentStarted
         && !hasCompletedBattleGuide(selectedSchool.id)
       battleGuideNextViewRef.current = restoredView
       setView(restoredRequiresBattleGuide ? 'map' : restoredView)
@@ -408,19 +411,7 @@ export default function CampusEatsPilot() {
   }
 
   function startBattle() {
-    const nextView: PilotView = tournamentStarted
-      ? session.status === 'active' ? 'battle' : 'result'
-      : 'setup'
-    const requiresBattleGuide =
-      !tournamentStarted
-      && !hasCompletedBattleGuide(selectedSchool.id)
-    if (requiresBattleGuide) {
-      battleGuideNextViewRef.current = nextView
-      setBattleGuideRequired(true)
-      setBattleGuideOpen(true)
-      return
-    }
-    setView(nextView)
+    setView('setup')
   }
 
   function completeBattleGuide() {
@@ -579,11 +570,11 @@ export default function CampusEatsPilot() {
       </p>}
       <header className="border-b border-[#ecdcd4] bg-[#fffdfb] px-4 py-3 sm:px-6">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-3">
-          <button type="button" onClick={() => setView('map')} className="flex min-h-10 items-center gap-2 text-left" aria-label="캠퍼스 맛집 지도">
+          <button type="button" onClick={() => setView('map')} className="flex min-h-10 items-center gap-2 text-left" aria-label="캠퍼스 맛집 내 순위">
             <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#c94d42] text-white"><UtensilsCrossed size={18} /></span>
             <span>
               <span className="block text-xs font-black text-[#c94d42]">CAMPUS EATS</span>
-              <span className="block text-sm font-black">{selectedSchool.name} 맛집 지도</span>
+              <span className="block text-sm font-black">{selectedSchool.name} 맛집 내 순위</span>
             </span>
           </button>
           <label className="flex items-center gap-2 text-xs font-black">
@@ -620,6 +611,7 @@ export default function CampusEatsPilot() {
           onToggleRanking={() => setRankingOpen((open) => !open)}
           onSelectCategory={selectCategory}
           onStart={startBattle}
+          onOpenSaved={() => setView(session.status === 'active' ? 'battle' : 'result')}
         />
       )}
       {view === 'setup' && (
@@ -651,6 +643,7 @@ export default function CampusEatsPilot() {
       )}
       {view === 'result' && (
         <ResultView
+          tournamentId={tournamentId}
           school={selectedSchool}
           category={selectedCategory}
           session={session}
@@ -686,7 +679,14 @@ export default function CampusEatsPilot() {
 function CandidateVisual({ candidate, priority = false }: { candidate: CampusEatsCandidate; priority?: boolean }) {
   return (
     <div className="relative h-full w-full overflow-hidden bg-[#f0e9e4]">
-      {candidate.imageSrc ? (
+      {candidate.imageKind === 'logo' ? (
+        <div className="flex h-full flex-col items-center justify-center gap-2 bg-[#f6ede8] px-3 py-3 text-center text-[#a54338]">
+          <CampusEatsCategoryIcon categoryId={candidate.categoryId} size={36} />
+          <strong className="text-sm">{candidate.name}</strong>
+          <span className="text-xs font-bold text-[#806f68]">음식 사진 미등록</span>
+          {candidate.imageSrc ? <Image src={candidate.imageSrc} alt={candidate.imageAlt} width={92} height={65} className="max-h-12 w-20 object-contain" /> : null}
+        </div>
+      ) : candidate.imageSrc ? (
         <Image src={candidate.imageSrc} alt={candidate.imageAlt} fill sizes="(max-width: 768px) 50vw, 420px" className="object-contain" priority={priority} />
       ) : (
         <div className="flex h-full flex-col items-center justify-center bg-[#f6ede8] px-4 text-center text-[#c94d42]">
@@ -717,7 +717,7 @@ function TournamentSetupView({ category, selectedVisitedCandidateIds, feedback, 
     <section className="px-3 pb-36 pt-4 sm:px-6 lg:py-8">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-5 flex items-center justify-between gap-3">
-          <button type="button" onClick={onBack} className="flex min-h-10 items-center gap-1 rounded-md px-2 text-sm font-black text-[#6f5d56] hover:bg-white"><ArrowLeft size={17} />맛집 지도</button>
+          <button type="button" onClick={onBack} className="flex min-h-10 items-center gap-1 rounded-md px-2 text-sm font-black text-[#6f5d56] hover:bg-white"><ArrowLeft size={17} />내 순위로 돌아가기</button>
           <button type="button" onClick={onOpenGuide} className="inline-flex min-h-10 items-center gap-1 rounded-md border border-[#e5d1c8] bg-white px-3 text-xs font-black text-[#6f5d56] hover:bg-[#fff0e9]"><BookOpen size={15} />진행 방법</button>
         </div>
 
@@ -785,14 +785,14 @@ function TournamentSetupView({ category, selectedVisitedCandidateIds, feedback, 
             </div>
             {feedback ? <p className="mt-3 rounded-md bg-[#fff1ed] px-3 py-2 text-xs font-black text-[#a63f36]" role="alert">{feedback}</p> : null}
             <button type="button" onClick={onStart} disabled={selectedCount < 2} className="mt-5 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-md bg-[#f3b95f] px-4 text-sm font-black text-[#211b1a] hover:bg-[#ffc96f] disabled:cursor-not-allowed disabled:bg-white/15 disabled:text-white/45">
-              <Play size={17} fill="currentColor" />{`${selectedCount}곳으로 ${category.label} 월드컵 시작`}
+              <Play size={17} fill="currentColor" />{`${category.label} 월드컵 시작`}
             </button>
           </aside>
         </div>
         <div aria-label="선택한 맛집으로 시작" className="fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-40 border-t border-[#e3cfc6] bg-[#fffaf7]/95 px-4 py-3 shadow-[0_-4px_20px_rgba(63,40,31,0.06)] backdrop-blur-sm lg:hidden">
           <div className="mx-auto flex max-w-3xl items-center gap-3">
             <div className="shrink-0" aria-live="polite"><p className="text-sm font-black text-[#211b1a]">{selectedCount}곳 선택</p><p className="mt-1 text-[11px] font-bold text-[#806f68]">{selectedCount < 2 ? '최소 2곳을 골라요' : `우승까지 ${selectedCount - 1}번 비교`}</p></div>
-            <button type="button" onClick={onStart} disabled={selectedCount < 2} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B94B3F] px-3 text-sm font-black text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B94B3F] disabled:cursor-not-allowed disabled:opacity-40"><Play size={16} aria-hidden="true" />{`${selectedCount}곳으로 ${category.label} 월드컵 시작`}</button>
+            <button type="button" onClick={onStart} disabled={selectedCount < 2} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B94B3F] px-3 text-sm font-black text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B94B3F] disabled:cursor-not-allowed disabled:opacity-40"><Play size={16} aria-hidden="true" />{`${category.label} 월드컵 시작`}</button>
           </div>
           {feedback && <p role="alert" className="mx-auto mt-2 max-w-3xl text-xs font-bold text-[#a63f36]">{feedback}</p>}
         </div>
@@ -841,6 +841,7 @@ function BattleView({ school, category, session, candidateA, candidateB, isResol
           {[candidateA, candidateB].map((candidate, index) => {
             const candidatePlace = toCampusEatsPublicPlace(candidate, { schoolName: school.name })
             const locationHref = candidatePlace.providerLinks.naver?.url ?? candidate.naverSearchUrl
+            const exactLocation = candidatePlace.providerLinks.naver?.kind === 'place'
             return (
               <article
                 key={candidate.id}
@@ -874,10 +875,12 @@ function BattleView({ school, category, session, candidateA, candidateB, isResol
                     target="_blank"
                     rel="noreferrer"
                     data-preserves-battle-state="true"
+                    aria-label={`${candidate.name} ${exactLocation ? '네이버 지도 위치 확인' : '네이버 지도 장소 검색'} (새 창)`}
                     className="mt-2 inline-flex min-h-10 w-full items-center justify-center gap-1 rounded-lg border border-[#d8c6be] bg-[#fffaf7] px-2 text-xs font-black text-[#315a57] hover:border-[#087f78] hover:bg-[#edf8f6]"
                   >
-                    <MapPinned size={14} aria-hidden="true" /><span>위치 확인</span>
+                    <MapPinned size={14} aria-hidden="true" /><span>{exactLocation ? '위치 확인' : '장소 검색'}</span>
                   </a>
+                  {!exactLocation && <p className="mt-1 text-[10px] leading-4 text-[#806f68]">정확한 장소 링크 미확인 · 상호와 주소로 검색해요.</p>}
                 </div>
               </article>
             )
@@ -892,7 +895,7 @@ function BattleView({ school, category, session, candidateA, candidateB, isResol
   )
 }
 
-function MapView({ school, category, selectedCandidateId, rankingOpen, categoryDataStatus, hydrated, session, personalRating, tournamentStarted, onSelectCandidate, onToggleRanking, onSelectCategory, onStart }: {
+function MapView({ school, category, selectedCandidateId, rankingOpen, categoryDataStatus, hydrated, session, personalRating, tournamentStarted, onSelectCandidate, onToggleRanking, onSelectCategory, onStart, onOpenSaved }: {
   school: CampusEatsSchool
   category: CampusEatsCategory
   selectedCandidateId: string | null
@@ -906,6 +909,7 @@ function MapView({ school, category, selectedCandidateId, rankingOpen, categoryD
   onToggleRanking: () => void
   onSelectCategory: (categoryId: CampusEatsCategoryId) => void
   onStart: () => void
+  onOpenSaved: () => void
 }) {
   const candidateIdKey = category.candidates.map((candidate) => candidate.id).join('|')
   const [mapCoverage, setMapCoverage] = useState<CampusEatsMapCoverage>(() => (
@@ -920,9 +924,7 @@ function MapView({ school, category, selectedCandidateId, rankingOpen, categoryD
   const selectedPlace = selectedCandidate
     ? toCampusEatsPublicPlace(selectedCandidate, { schoolName: school.name })
     : null
-  const startLabel = !tournamentStarted
-    ? `${category.label} 월드컵 시작`
-    : session.status === 'active'
+  const savedProgressLabel = session.status === 'active'
       ? `내 ${session.candidateIds.length}곳 대진 이어하기`
       : '내 월드컵 결과 보기'
   const rankedCandidates = useMemo(() => [...category.candidates].sort((candidateA, candidateB) => {
@@ -943,8 +945,8 @@ function MapView({ school, category, selectedCandidateId, rankingOpen, categoryD
               <CampusEatsCategoryIcon categoryId={category.id} />
               <p className="text-xs font-black">{school.name} 생활권 · {category.candidates.length}곳 주소 확인</p>
             </div>
-            <h1 className="mt-1 text-2xl font-black text-[#211b1a] sm:text-3xl">{school.name} 맛집 월드컵</h1>
-            <p className="mt-1 text-xs font-bold text-[#806f68]">먹어본 곳끼리 비교할수록 내 취향 순위가 정교해져요.</p>
+            <h1 className="mt-1 text-2xl font-black text-[#211b1a] sm:text-3xl">{category.label} 월드컵 · 내 순위</h1>
+            <p className="mt-1 text-xs font-bold text-[#806f68]">내 기기의 선택으로 만든 순위예요. 참가해서 먹어본 곳을 비교해요.</p>
           </div>
           <div className="min-w-0 lg:max-w-[760px]">
             <div className="flex max-w-full items-center gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:justify-end lg:overflow-visible">
@@ -957,8 +959,9 @@ function MapView({ school, category, selectedCandidateId, rankingOpen, categoryD
               ))}
             </div>
             <button type="button" onClick={onStart} disabled={!hydrated} className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#243f8f] px-4 text-sm font-black text-white hover:bg-[#1d3478] disabled:opacity-50 lg:ml-auto lg:w-auto lg:min-w-56">
-              <Play size={16} fill="currentColor" />{startLabel}
+              <Play size={16} fill="currentColor" />참가하기
             </button>
+            {tournamentStarted && <button type="button" onClick={onOpenSaved} className="mt-1 flex min-h-11 w-full items-center justify-center gap-2 px-3 text-xs font-bold text-[#665C58] lg:ml-auto lg:w-auto"><Trophy size={14} aria-hidden="true" />{savedProgressLabel}</button>}
           </div>
         </div>
       </div>
@@ -974,7 +977,7 @@ function MapView({ school, category, selectedCandidateId, rankingOpen, categoryD
             <div className="flex items-center justify-between border-b border-[#eee0d9] px-4 py-3">
               <div>
                 <p className="text-xs font-black text-[#c94d42]">내 취향 순위 · 이 기기에 저장</p>
-                <h2 className="mt-0.5 text-lg font-black">{category.label} 후보 {category.candidates.length}</h2>
+                <h2 className="mt-0.5 text-lg font-black">{personalRating.validComparisonCount ? `${category.label} 내 순위` : '아직 비교 전 · 후보 목록'}</h2>
               </div>
               <span className="rounded-md bg-[#eef1fb] px-2 py-1 text-[11px] font-black text-[#243f8f]">시작 점수 1500</span>
             </div>
@@ -1068,7 +1071,8 @@ function MapView({ school, category, selectedCandidateId, rankingOpen, categoryD
   )
 }
 
-function ResultView({ school, category, session, personalRating, onMap, onRestart }: { school: CampusEatsSchool; category: CampusEatsCategory; session: BracketSession; personalRating: PersonalRatingState; onMap: () => void; onRestart: () => void }) {
+function ResultView({ school, category, session, personalRating, onMap, onRestart, tournamentId }: { school: CampusEatsSchool; category: CampusEatsCategory; session: BracketSession; personalRating: PersonalRatingState; onMap: () => void; onRestart: () => void; tournamentId: string }) {
+  const resultSnapshot = visitResultSnapshot({ school: school.id, category: category.id, label: category.label, tournamentId, candidates: category.candidates, session })
   const winner = findCandidate(category, session.winnerId)
   const winnerPlace = winner
     ? toCampusEatsPublicPlace(winner, { schoolName: school.name })
@@ -1130,6 +1134,10 @@ function ResultView({ school, category, session, personalRating, onMap, onRestar
             ))}
           </ol>
           <p className="mt-3 text-[11px] font-bold text-[#8a756d]">이 기기에만 저장 · 누적 유효 비교 {personalRating.validComparisonCount}회</p>
+          {resultSnapshot && <SaveContentRecord snapshot={resultSnapshot} />}
+          <Link href="/community/relationship-advice?starter=cafe-or-walk" className="mt-3 flex min-h-12 items-center justify-between rounded-2xl border border-boot-hairline bg-white px-4 text-sm font-black">함께 가기 좋은 곳, 내 생각 나누기<ArrowLeft size={17} className="rotate-180"/></Link>
+          <p className="mt-2 text-xs leading-5 text-boot-muted">일반 이야기 초안을 열어요. 월드컵 기록은 자동으로 공개되지 않아요.</p>
+          <Link href="/community/content-history?type=visit" className="mt-3 min-h-11 py-3 text-center text-sm font-bold text-[#c94d42] underline">내 계정에 저장한 결과 보기</Link>
           <div className="mt-auto grid gap-3 pt-6 sm:grid-cols-2">
             <button type="button" onClick={onMap} className="flex h-12 items-center justify-center gap-2 rounded-md border border-[#243f8f] bg-white px-4 text-sm font-black text-[#243f8f] hover:bg-[#eef1fb]"><MapPinned size={17} />지도와 내 누적 순위</button>
             <button type="button" onClick={onRestart} className="flex h-12 items-center justify-center gap-2 rounded-md bg-[#243f8f] px-4 text-sm font-black text-white hover:bg-[#1d3478]"><RotateCcw size={17} />새 월드컵 만들기</button>

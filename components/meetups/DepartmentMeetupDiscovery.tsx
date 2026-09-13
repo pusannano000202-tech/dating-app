@@ -6,7 +6,9 @@ import { ArrowLeft, ArrowRight, CalendarDays, ChevronDown, Loader2, MapPin, Mess
 import { useEffect, useState } from 'react'
 import { featuredMeetupIdeas, getMeetupCategoryLabel } from '@/lib/community/catalog'
 import { MEETUP_GENDER_LABELS } from '@/lib/community/meetup-gender'
-import { parseDepartmentMeetups, presentDepartmentMeetups, type DepartmentMeetup } from './department-discovery'
+import { useHistoryAccount } from '@/components/content-history/useHistoryAccount'
+import { parseApplicationManagementView } from '@/lib/meetups/application-view'
+import { getDepartmentMeetupCardState, parseDepartmentMeetups, presentDepartmentMeetups, type DepartmentMeetup } from './department-discovery'
 import styles from './department-discovery.module.css'
 import MentoringExperience from './MentoringExperience'
 
@@ -24,6 +26,7 @@ export default function DepartmentMeetupDiscovery({ mode = 'home' }: { mode?: 'h
 }
 
 function DepartmentMeetupLegacyDiscovery({ mode }: { mode: 'home' | 'social' | 'mentoring' }) {
+  const account = useHistoryAccount()
   const [meetups, setMeetups] = useState<DepartmentMeetup[]>([])
   const [department, setDepartment] = useState('')
   const [loadState, setLoadState] = useState<LoadState>('loading')
@@ -72,7 +75,7 @@ function DepartmentMeetupLegacyDiscovery({ mode }: { mode: 'home' | 'social' | '
 
     void load()
     return () => { active = false; controller.abort(); window.clearTimeout(timeout) }
-  }, [reload])
+  }, [reload, account])
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30000)
@@ -87,6 +90,8 @@ function DepartmentMeetupLegacyDiscovery({ mode }: { mode: 'home' | 'social' | '
   const presentation = presentDepartmentMeetups(filteredMeetups, now)
   const visible = showAll ? presentation.available : presentation.recommended
   const needsAll = presentation.available.length > presentation.recommended.length
+  const createOrigin = mode === 'home' ? '/meetups/department' : `/meetups/department/${mode}`
+  const createHref = `/meetups/create?scope=department&from=${encodeURIComponent(createOrigin)}`
 
   return <main className={styles.page}>
     <div className={styles.shell}>
@@ -107,7 +112,7 @@ function DepartmentMeetupLegacyDiscovery({ mode }: { mode: 'home' | 'social' | '
         <span>{mode === 'mentoring' ? '질문 하나도, 경험 하나도 좋은 시작' : '카페 · 식사 · 보드게임, 가벼운 약속부터'}</span>
       </div>}
 
-      <Link href="/meetups#my-meetups" className={styles.continueLink}>
+      <Link href="/#my-meetups" className={styles.continueLink}>
         <MessageCircle size={19} /><span>내가 참여 중인 모임 이어가기<small>이미 잡은 약속과 대화는 여기서</small></span><ArrowRight size={17} />
       </Link>
 
@@ -130,7 +135,7 @@ function DepartmentMeetupLegacyDiscovery({ mode }: { mode: 'home' | 'social' | '
         {loadState === 'profile_required' || loadState === 'department_required' ? <div className={styles.status}><strong>{loadState === 'department_required' ? '어느 학과인지 알려주세요' : '기본정보를 먼저 확인해 주세요'}</strong><p>내 학과 정보가 있어야 같은 과 모임을 찾을 수 있어요.</p><Link className={styles.primary} href="/profile/edit">내 학과 확인하기<ArrowRight size={16} /></Link></div> : null}
         {loadState === 'error' || loadState === 'unavailable' ? <div className={styles.status} role="alert"><strong>모집 현황을 불러오지 못했어요</strong><p>잠시 후 다시 확인해 주세요.</p><button type="button" className={styles.secondary} onClick={() => setReload(value => value + 1)}>다시 불러오기<RefreshCw size={16} /></button></div> : null}
         {loadState === 'ready' ? <>
-          {presentation.joined.length > 0 ? <div className={styles.joinedList} aria-label="참여 중인 학과 모임">{presentation.joined.map(meetup => <Link key={meetup.id} href={`/meetups/${meetup.id}`} className={styles.joinedLink}><MessageCircle size={17} /><span><small>참여 중 · {MEETUP_GENDER_LABELS[meetup.gender_mode]}</small><strong>{meetup.title}</strong></span><ArrowRight size={16} /></Link>)}</div> : null}
+          {presentation.joined.length > 0 ? <div className={styles.joinedList} aria-label="내가 열었거나 참여 중인 학과 모임">{presentation.joined.map(meetup => <MeetupCard key={meetup.id} meetup={meetup} featured={false} now={now} account={account} />)}</div> : null}
           {filteredMeetups.length === 0 ? <div className={styles.status}><strong>{mode === 'mentoring' ? '불러온 모임에 멘토링 모집이 없어요' : '아직 열린 우리 과 모임이 없어요'}</strong><p>{mode === 'mentoring' ? '모집 제목의 멘토·멘티·선후배 키워드로 모았어요. 관심 있는 주제로 직접 모집해 보세요.' : '새 모집이 열리면 여기서 확인할 수 있어요. 학교 전체 모임도 함께 둘러볼 수 있어요.'}</p><Link href="/meetups/explore?intent=play" className={styles.primary}>학교 전체 모임 살펴보기<ArrowRight size={16} /></Link></div> : <>
             {presentation.recommended.length > 0 ? <p className={styles.sectionNote}>참여 가능한 모임을 가까운 일정순으로 먼저 보여드려요.</p> : presentation.available.length > 0 ? <p className={styles.sectionNote}>지금 바로 참여 가능한 빈자리는 없어요. 불러온 모임에서 정원과 참가 조건을 확인해 주세요.</p> : <p className={styles.sectionNote}>불러온 학과 모임에 모두 참여 중이에요.</p>}
             <div className={styles.meetupList} id="department-meetup-list">{visible.map((meetup, index) => <MeetupCard key={meetup.id} meetup={meetup} featured={index === 0 && !showAll} now={now} />)}</div>
@@ -140,24 +145,47 @@ function DepartmentMeetupLegacyDiscovery({ mode }: { mode: 'home' | 'social' | '
         </> : null}
       </section>
       </> : <p className={styles.homeNote}>친구 추가 없이, 원하는 활동에만 참여해요.<br />실제 참가 조건과 인원은 각 모집방에서 확인할 수 있어요.</p>}
-      <div className={styles.secondaryRoute}><div><strong>생각해 둔 활동이 있나요?</strong><p>내 학과 모집으로 시작하고, 내용은 자유롭게 정해요.</p></div><Link href="/meetups/create?scope=department">직접 모임 열기<ArrowRight size={15} /></Link></div>
+      <div className={styles.secondaryRoute}><div><strong>생각해 둔 활동이 있나요?</strong><p>내 학과 모집으로 시작하고, 내용은 자유롭게 정해요.</p></div><Link href={createHref}>직접 모임 열기<ArrowRight size={15} /></Link></div>
     </div>
   </main>
 }
 
-function MeetupCard({ meetup, featured, now }: { meetup: DepartmentMeetup; featured: boolean; now: number }) {
+function MeetupCard({ meetup, featured, now, account }: { meetup: DepartmentMeetup; featured: boolean; now: number; account?: string | null }) {
   const artwork = featuredMeetupIdeas.find(idea => idea.id === meetup.activity_key) ?? featuredMeetupIdeas.find(idea => idea.category === meetup.category)
-  const full = meetup.status === 'full' || meetup.member_count >= meetup.capacity
-  const begun = meetup.scheduled_at !== null && Date.parse(meetup.scheduled_at) <= now
-  const condition = meetup.gender_eligibility === 'gender_required' ? '프로필 성별 확인 필요' : meetup.gender_eligibility === 'gender_restricted' ? '참가 성별 조건 확인' : begun ? '시작 시간이 지났어요' : full ? '정원이 찼어요' : '모집 중'
-  return <Link href={`/meetups/${meetup.id}`} className={`${styles.meetupCard} ${featured ? styles.featured : ''}`}>
-    <div className={styles.meetupPhoto}><Image src={artwork?.imageSrc ?? '/images/meetups/meetup-cafe-friends-v1.webp'} alt={`${getMeetupCategoryLabel(meetup.category)} 활동의 분위기 예시`} fill sizes={featured ? '(max-width: 580px) 100vw, 310px' : '130px'} /></div>
+  const state = getDepartmentMeetupCardState(meetup, now)
+  const restriction = meetup.gender_eligibility === 'gender_required' ? '프로필 성별 확인 필요' : meetup.gender_eligibility === 'gender_restricted' ? '참가 성별 조건 확인' : null
+  return <article className={`${styles.meetupCard} ${featured ? styles.featured : ''}`}>
+    <Link href={`/meetups/${meetup.id}`} className={styles.meetupPhoto} aria-label={`${meetup.title} 상세 보기`}><Image src={artwork?.imageSrc ?? '/images/meetups/meetup-cafe-friends-v1.webp'} alt={`${getMeetupCategoryLabel(meetup.category)} 활동의 분위기 예시`} fill sizes={featured ? '(max-width: 580px) 100vw, 310px' : '130px'} /></Link>
     <div className={styles.meetupBody}>
-      <div className={styles.cardTags}><span>{getMeetupCategoryLabel(meetup.category)}</span><span>{MEETUP_GENDER_LABELS[meetup.gender_mode]}</span></div>
-      <h3>{meetup.title}</h3>
+      <div className={styles.cardTags}>{state.roleLabel ? <span>{meetup.is_host ? '내가 방장' : state.roleLabel}</span> : null}<span>{getMeetupCategoryLabel(meetup.category)}</span><span>{MEETUP_GENDER_LABELS[meetup.gender_mode]}</span></div>
+      <h3><Link href={`/meetups/${meetup.id}`}>{meetup.title}</Link></h3>
       <p className={styles.cardMeta}><CalendarDays size={14} />{meetup.scheduled_at ? new Intl.DateTimeFormat('ko-KR', { month: 'numeric', day: 'numeric', weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Seoul' }).format(new Date(meetup.scheduled_at)) : '채팅에서 함께 정하기'}</p>
       <p className={styles.cardMeta}><MapPin size={14} />{meetup.place_name?.trim() || '장소는 채팅에서 함께 정해요'}</p>
-      <div className={styles.cardBottom}><span><UsersRound size={15} />{meetup.member_count}/{meetup.capacity}명 · {condition}</span><span>모임 보기<ArrowRight size={15} /></span></div>
+      <div className={styles.cardBottom}><span><UsersRound size={15} />{meetup.member_count}/{meetup.capacity}명 · {state.statusLabel}</span>{state.remaining > 0 ? <span>{state.remaining}자리 남음</span> : null}</div>
+      {restriction ? <p className={styles.cardMeta}>{restriction}</p> : null}
+      <div className={styles.roomActions}>{state.applicationsHref ? <HostApplicationsLink meetupId={meetup.id} href={state.applicationsHref} account={account} /> : null}<Link href={state.primaryHref}>{state.primaryLabel}<ArrowRight size={14} /></Link></div>
     </div>
-  </Link>
+  </article>
+}
+
+/** Keep only the count from the existing private host response, never introductions. */
+function HostApplicationsLink({ meetupId, href, account }: { meetupId: string; href: string; account?: string | null }) {
+  const [summary, setSummary] = useState<{ account: string; count: number } | null>(null)
+  useEffect(() => {
+    setSummary(null)
+    if (!account || account === 'unavailable') return
+    const controller = new AbortController()
+    let active = true
+    const timeout = window.setTimeout(() => controller.abort(), 12000)
+    void fetch(`/api/meetups/${encodeURIComponent(meetupId)}/applications`, { cache: 'no-store', signal: controller.signal })
+      .then(async response => response.ok ? response.json() : null)
+      .then(payload => {
+        const parsed = parseApplicationManagementView(payload, account, meetupId)
+        if (active && parsed?.isHost) setSummary({ account, count: parsed.pendingCount })
+      }).catch(() => { /* Unknown application counts must not become a false zero. */ })
+      .finally(() => window.clearTimeout(timeout))
+    return () => { active = false; controller.abort(); window.clearTimeout(timeout) }
+  }, [account, meetupId])
+  const count = summary?.account === account ? summary?.count : undefined
+  return <Link href={href}>참가 신청 확인{count !== undefined ? ` · 대기 ${count}명` : ''}<ArrowRight size={14} /></Link>
 }

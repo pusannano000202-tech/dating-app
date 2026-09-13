@@ -62,6 +62,7 @@
 .cardBottom span{display:inline-flex;align-items:center;gap:4px}
 .cardBottom span:last-child{color:#b94b3f;font-weight:800}
 .cardBottom svg{flex-shrink:0}
+.roomActions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.roomActions a{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:44px;border:1px solid #e5cec1;border-radius:9px;background:#fffaf7;color:#9e4838;padding:8px 10px;font-size:11px;font-weight:800}.roomActions a:last-child{background:#b94b3f;border-color:#b94b3f;color:#fff}.joinedList .meetupCard{border-color:#d5dccc}.meetupPhoto{display:block}.meetupBody{min-width:0}.meetupBody h3 a{overflow-wrap:anywhere}
 .featured{grid-template-columns:1fr}
 .featured .meetupPhoto{aspect-ratio:1.85;min-height:0}
 .featured .meetupBody{padding:18px 19px}

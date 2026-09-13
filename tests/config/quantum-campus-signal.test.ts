@@ -45,11 +45,20 @@ test('home recommends direct active flows without duplicate match utility cards'
 
   const recommendations = readSource('components/home/QuantumHomeRecommendations.tsx')
   assert.match(recommendations, /\/community\/content/)
-  assert.match(recommendations, /맛집 · MBTI · 배달 · 장소/)
+  assert.match(recommendations, /맛집 · MBTI · 장소/)
   assert.match(recommendations, /우리 과 이름으로/)
   assert.match(recommendations, /home-playmaker-football.webp/)
   assert.doesNotMatch(recommendations, /mode=battle&category=donkatsu|부산대 돈까스 8강|바로 대결 시작/)
-  assert.match(recommendations, /href="\/community\/department"/)
+  assert.match(recommendations, /href="\/meetups\/league"/)
+  const league = readSource('app/meetups/league/page.tsx')
+  assert.match(league, /export \{ default \} from '@\/app\/community\/department\/page'/)
+  const department = readSource('app/community/department/page.tsx')
+  assert.match(department, /isCommunityFeatureEnabled/)
+  assert.match(department, /<DepartmentLeagueJourney/)
+  const journey = readSource('components/community/department/DepartmentLeagueJourney.tsx')
+  assert.match(journey, /demo=false/)
+  assert.match(journey, /const endpoint='\/api\/community\/department\/league\/journey'/)
+  assert.match(journey, /fetch\(`\$\{endpoint\}\?sport=\$\{sport\}`/)
 })
 
 test('first basic information entry uses the conversational shell', () => {

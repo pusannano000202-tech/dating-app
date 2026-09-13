@@ -26,7 +26,7 @@ function normalizeSocialRoomNames(value: unknown): unknown {
   if (!isChatObject(room) || room.kind !== 'activity_room') return room
   if (typeof room.activity_key !== 'string' || !Number.isSafeInteger(room.room_number) || (room.room_number as number) < 1) return null
   const title = getActivityRoomDefinition(room.activity_key)?.title ?? '활동 모임'
-  const {activity_key: _key, room_number: _number, ...publicRoom} = room
+  const {room_number: _number, ...publicRoom} = room
   return {...publicRoom, title: `${title} · ${room.room_number}번 방`, affiliation: title}
  })}
 }

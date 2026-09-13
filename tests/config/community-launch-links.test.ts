@@ -15,6 +15,7 @@ test('unreleased community destinations are labeled instead of advertising a bro
   assert.match(readFileSync('app/community/content/page.tsx', 'utf8'), /campusEatsEnabled=/)
   const explorer = readFileSync('components/community/CommunityExperienceExplorer.tsx', 'utf8')
   assert.match(readFileSync('components/social/PhotoSceneCarousel.tsx', 'utf8'), /공개 준비 중/)
-  assert.match(explorer, /disabled:.*visit.*delivery.*!campusEatsEnabled/)
+  assert.match(explorer, /disabled:.*visit.*!campusEatsEnabled/)
+  assert.doesNotMatch(readFileSync('lib/community/experience-explorer.ts', 'utf8'), /id: 'delivery'/)
   assert.match(readFileSync('components/community/CommunitySpotlight.tsx', 'utf8'), /campusEatsEnabled &&/)
 })

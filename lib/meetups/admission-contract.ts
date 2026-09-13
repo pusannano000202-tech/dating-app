@@ -2,7 +2,7 @@
 export const ADMISSION_ROOM_KINDS = ['custom_meetup', 'study', 'mentoring', 'department_league'] as const
 export type AdmissionRoomTarget = { kind: typeof ADMISSION_ROOM_KINDS[number]; id: string }
 export type AdmissionState = 'draft' | 'submitted' | 'accepted' | 'declined' | 'withdrawn' | 'expired'
-export type AdmissionPaymentState = 'unconfigured' | 'unpaid' | 'pending' | 'held' | 'refund_pending' | 'refunded' | 'failed' | 'reconciliation_required'
+export type AdmissionPaymentState = 'unconfigured' | 'unpaid' | 'pending' | 'held' | 'refund_due' | 'refund_pending' | 'refunded' | 'failed' | 'reconciliation_required'
 export type AdmissionPaymentMethod = 'new' | 'carryover'
 export type AdmissionDepositQuote = {
   id: string

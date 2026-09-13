@@ -13,6 +13,7 @@ import {
 import { parseQuantumMeetingMoment } from '@/lib/matching/quantum-profile-preferences'
 import { parseMySecretRole } from '@/lib/matching/quantum-secret-roles'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 
 const PRIVATE_NO_STORE_HEADERS = { 'Cache-Control': 'private, no-store, max-age=0' }
 
@@ -39,6 +40,8 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return jsonError('Unauthorized', 401)
+  const admissionFailure = await datingAdmissionFailure(supabase)
+  if (admissionFailure) return jsonError(admissionFailure.error, admissionFailure.status)
 
   const body = await readJson(request)
   const parsed = parseQuantumEventParticipationInput(body)
@@ -111,6 +114,7 @@ function mapFriendGroupError(error: { message?: string }): string | null {
 function mapEventApplicationError(error: { message?: string }): string | null {
   const message = error.message?.toLowerCase() ?? ''
   for (const code of [
+    'dating_participation_unavailable',
     'profile_preference_required',
     'application_closed',
     'event_not_recruiting',

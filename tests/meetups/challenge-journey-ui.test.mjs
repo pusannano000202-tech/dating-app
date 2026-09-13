@@ -6,7 +6,11 @@ import {LEAGUE_SPORTS,sportTiers} from '../../lib/meetups/challenge-journey.ts'
 const read=path=>readFile(new URL('../../'+path,import.meta.url),'utf8')
 test('focused league uses real full images with interactive occupant slots and every declared skill tier',async()=>{
  const source=await read('components/community/department/DepartmentLeagueJourney.tsx'),css=await read('components/community/department/department-league-journey.module.css')
- assert.match(source,/export function DepartmentLeagueJourney\(\{demo=false,initialSport,demoRanking='empty',demoFlow='league',initialInviteId,initialChallengeId\}/)
+ const tree=ts.createSourceFile('journey.tsx',source,ts.ScriptTarget.ES2022,true,ts.ScriptKind.TSX),journey=tree.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='DepartmentLeagueJourney')
+ assert.ok(journey?.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword))
+ assert.ok(ts.isObjectBindingPattern(journey.parameters[0].name))
+ const props=journey.parameters[0].name.elements.map(element=>element.name.getText(tree))
+ for(const name of ['demo','initialSport','initialChallengeId','initialTeamId','initialReview'])assert.ok(props.includes(name),name)
  assert.match(source,/<LeagueHonors rows=\{rows\} monthly=\{monthly\} onJoin=\{\(\)=>go\('recruitment'\)\}/)
  assert.match(source,/<Image src=\{definition\.image\}/);assert.match(source,/definition\.slots\.map\(slot=>/)
  assert.match(source,/onClick=\{readOnly\?undefined:\(\)=>onSelect\(slot\.key\)\}/);assert.match(source,/occupant\?\.alias/);assert.match(source,/occupant\?\.tier/)
@@ -47,11 +51,12 @@ test('opening an explicitly selected match or result never reuses another curren
  const source=await read('components/community/department/DepartmentLeagueJourney.tsx')
  const transition=source.split('\n').find(line=>line.trim().startsWith('function go('))
  const script=ts.transpileModule(transition,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText
- const ids=[],stages=[]
- const go=new Function('selected','setSelectedId','setNotice','setStage',script+';return go')({id:'old-own-team'},id=>ids.push(id),()=>{},stage=>stages.push(stage))
+ const ids=[],stages=[],routes=[]
+ const go=new Function('selected','setSelectedId','setNotice','setStage','demo','coordinationOnly','router',script+';return go')({id:'old-own-team'},id=>ids.push(id),()=>{},stage=>stages.push(stage),false,false,{push:url=>routes.push(url)})
  go('match','accepted-match');go('result','completed-match');go('report')
- assert.deepEqual(ids,['accepted-match','completed-match','old-own-team'])
- assert.deepEqual(stages,['match','result','report'])
+ assert.deepEqual(routes,['/chat/rooms/league_match/accepted-match'])
+ assert.deepEqual(ids,['completed-match','old-own-team'])
+ assert.deepEqual(stages,['result','report'])
  assert.match(source,/go\(c\.status==='completed'\?'result':'match',c\.id\)/)
- assert.match(source,/onPaired=\{id=>\{if\(id\)\{activeDetail\.current=id;setSelectedId\(id\);if\(!demo\)void load\(\)\}setNotice\(''\);setStage\('match'\)\}\}/)
+ assert.match(source,/onPaired=\{id=>\{if\(id\)\{activeDetail\.current=id;setSelectedId\(id\);if\(!demo\)void load\(\)\}setNotice\(''\);go\('match',id\)\}\}/)
 })

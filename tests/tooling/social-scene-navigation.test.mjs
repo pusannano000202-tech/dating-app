@@ -24,13 +24,12 @@ test('vertical gestures do not change selected content', async () => {
   assert.equal(sceneSwipe(20, 0), 0)
   assert.equal(sceneSwipe(60, 80), 0)
 })
-test('content adds places and uses a delivery scene rather than another cutlet photo', async () => {
+test('content keeps visit, MBTI and places while delivery is paused', async () => {
   const { outputText } = ts.transpileModule(readFileSync('lib/community/experience-explorer.ts', 'utf8'), { compilerOptions:{module:ts.ModuleKind.ESNext} })
   const { COMMUNITY_EXPERIENCES: rows } = await import('data:text/javascript;base64,' + Buffer.from(outputText).toString('base64'))
-  assert.deepEqual(rows.map(r=>r.id), ['visit','mbti','delivery','places'])
-  assert.match(rows.find(r=>r.id==='delivery').image, /delivery/)
+  assert.deepEqual(rows.map(r=>r.id), ['visit','mbti','places'])
   assert.equal(rows.find(r=>r.id==='places').href, '/community/places')
-  assert.equal(new Set(rows.map(r=>r.image)).size,4)
+  assert.equal(new Set(rows.map(r=>r.image)).size,3)
 })
 test('community gives the three axes equal editorial entry and preserves actual routes', () => {
   const source = readFileSync('app/community/page.tsx','utf8')

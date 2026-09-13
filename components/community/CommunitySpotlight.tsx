@@ -16,13 +16,13 @@ import {
 } from '@/lib/campus-eats/fixtures/pnu-categories'
 
 const CATEGORY_LINKS = [
-  { id: 'donkatsu', href: '/community/campus-eats?mode=setup&category=donkatsu' },
-  { id: 'pizza', href: '/community/campus-eats?mode=setup&category=pizza' },
-  { id: 'chicken', href: '/community/campus-eats?mode=setup&category=chicken' },
-  { id: 'coffee-main', href: '/community/campus-eats?mode=setup&category=coffee-main' },
-  { id: 'coffee-north', href: '/community/campus-eats?mode=setup&category=coffee-north' },
-  { id: 'gukbap', href: '/community/campus-eats?mode=setup&category=gukbap' },
-  { id: 'milmyeon', href: '/community/campus-eats?mode=setup&category=milmyeon' },
+  { id: 'donkatsu', href: '/community/campus-eats?mode=map&category=donkatsu&list=open' },
+  { id: 'pizza', href: '/community/campus-eats?mode=map&category=pizza&list=open' },
+  { id: 'chicken', href: '/community/campus-eats?mode=map&category=chicken&list=open' },
+  { id: 'coffee-main', href: '/community/campus-eats?mode=map&category=coffee-main&list=open' },
+  { id: 'coffee-north', href: '/community/campus-eats?mode=map&category=coffee-north&list=open' },
+  { id: 'gukbap', href: '/community/campus-eats?mode=map&category=gukbap&list=open' },
+  { id: 'milmyeon', href: '/community/campus-eats?mode=map&category=milmyeon&list=open' },
 ] satisfies ReadonlyArray<{ id: CampusEatsCategoryId; href: string }>
 
 const categoriesById = new Map(

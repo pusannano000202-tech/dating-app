@@ -1,8 +1,6 @@
-import DeliveryWorldcup from '@/components/campus-eats/DeliveryWorldcup'
-import { notFound } from 'next/navigation'
-import { isCampusEatsFeatureEnabled } from '@/lib/community-feature'
+import { redirect } from 'next/navigation'
 
 export default function DeliveryWorldcupPage() {
-  if (!isCampusEatsFeatureEnabled()) notFound()
-  return <DeliveryWorldcup />
+  // Paused by product decision. Retain legacy device records and implementation.
+  redirect('/community/content')
 }

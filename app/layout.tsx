@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import './globals.css'
 import SchoolThemeProvider from '@/components/theme/SchoolThemeProvider'
 import AppBottomNav from '@/components/navigation/AppBottomNav'
+import VoiceGlobalProvider from '@/components/voice/VoiceGlobalProvider'
 import QuantumLocaleProvider from '@/components/i18n/QuantumLocaleProvider'
 import NotificationsProvider from '@/components/notifications/NotificationsProvider'
 import { NotificationArrival } from '@/components/notifications/NotificationSurfaces'
@@ -35,11 +36,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SchoolThemeProvider />
         </Suspense>
         <QuantumLocaleProvider>
-        <NotificationsProvider>
-          {children}
+          <NotificationsProvider>
+          <VoiceGlobalProvider>{children}</VoiceGlobalProvider>
           <AppBottomNav />
           <NotificationArrival />
-        </NotificationsProvider>
+          </NotificationsProvider>
         </QuantumLocaleProvider>
       </body>
     </html>

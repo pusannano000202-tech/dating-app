@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {useHistoryAccount} from '@/components/content-history/useHistoryAccount'
-import {ChatAffiliationHeader} from '@/components/chat/ChatAffiliationHeader'
+import {SocialChatRoomContext} from '@/components/chat/SocialMessenger'
 import MeetupDetailExperience from '@/components/meetups/MeetupDetailExperience'
 import ActivityRoomChat from '@/components/meetups/ActivityRoomChat'
 import StudyRoomExperience from '@/components/meetups/StudyRoomExperience'
@@ -13,6 +13,7 @@ import LeagueMatchChat from '@/components/community/department/LeagueMatchChat'
 import DepartmentLeagueJourney from '@/components/community/department/DepartmentLeagueJourney'
 import {isChatUuid, parseSocialRoomsResponse, type SocialChatRoom, type SocialChatRoomKind} from '@/lib/chat/social-rooms-contract'
 import {socialRoomDetailHref} from '@/lib/chat/social-room-presentation'
+import {getSocialActivityPresentation} from '@/lib/social/activity-presentation'
 import s from './chat-belonging.module.css'
 
 type ExistingRoomKind = Exclude<SocialChatRoomKind, 'league_team'>
@@ -71,16 +72,20 @@ export default function SocialChatRoomPage({kind, id}: {kind: ExistingRoomKind; 
     {isChatUuid(account)&&isChatUuid(id)&&current?.error&&(kind==='study_room'||kind==='mentoring')?<><p>대화가 제한되어도 본인의 참여 정리·신고는 별도로 확인할 수 있어요.</p><Link href={kind==='study_room'?`/meetups/study?room=${id}`:`/meetups/mentoring-rooms/${id}`}>이 모임 참여 관리·나가기</Link>{kind==='mentoring'?<Link href={`/meetups/department/mentoring?session=${id}`}>이전 방식 멘토링 참여 관리</Link>:null}</>:null}
   </section></main>
 
-  const detailHref = socialRoomDetailHref(room)
-  return <main className={s.roomShell}>
-    <ChatAffiliationHeader kind={kind} title={room.title} affiliation={room.affiliation} memberCount={room.member_count} detailHref={detailHref}/>
-    <div className={s.roomContent} key={`${account}:${kind}:${id}`}>
-      {!room.writable ? <p role="status">현재 이 방은 읽기 전용이에요.</p> : null}
+  // Activity-room membership, guide and leave controls already live in this menu.
+  // Its legacy detail URL is another chat renderer, not a room information page.
+  const detailHref = kind==='activity_room'?null:socialRoomDetailHref(room)
+  const messengerLayout=true
+  return <main className={`${s.roomShell} ${messengerLayout?s.roomViewport:''}`}>
+    <SocialChatRoomContext.Provider value={{kind,title:room.title,categoryLabel:kind==='league_match'?undefined:getSocialActivityPresentation(room).categoryLabel,affiliation:room.affiliation,memberCount:room.member_count,detailHref}}>
+    <div className={`${s.roomContent} ${messengerLayout?s.roomViewportContent:''}`} key={`${account}:${kind}:${id}`}>
+      {!room.writable&&!messengerLayout ? <p role="status">현재 이 방은 읽기 전용이에요.</p> : null}
       {kind === 'meetup' ? <MeetupDetailExperience meetupId={id} chatOnly readOnly={!room.writable}/> : null}
       {kind === 'activity_room' ? <ActivityRoomChat roomId={id} embedded readOnly={!room.writable}/> : null}
       {kind === 'study_room' ? <StudyRoomExperience fixedRoomId={id} chatOnly readOnly={!room.writable}/> : null}
       {kind === 'mentoring' ? room.recruitment_mode==='hosted'?<HostedMentoringRoom id={id} chatOnly readOnly={!room.writable}/>:<MentoringExperience fixedSessionId={id} chatOnly readOnly={!room.writable}/> : null}
       {kind === 'league_match' ? <LeagueMatchChat challengeId={id} demo={false} onRefresh={refreshRoom} schedule={room.sport?<DepartmentLeagueJourney initialSport={room.sport} initialChallengeId={id} coordinationOnly/>:<Link href={detailHref ?? '/meetups/league'}>경기 정보에서 날짜·장소 확인</Link>}/> : null}
     </div>
+    </SocialChatRoomContext.Provider>
   </main>
 }

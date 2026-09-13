@@ -6,7 +6,7 @@ const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileM
 const read=file=>readFile(new URL('../../lib/meetups/'+file,import.meta.url),'utf8')
 const journeyUrl=moduleUrl(await read('challenge-journey.ts')),leagueUrl=moduleUrl(await read('challenge-league.ts'))
 const demoUrl=moduleUrl((await read('challenge-journey-demo.ts')).replaceAll("'./challenge-journey'",JSON.stringify(journeyUrl)).replaceAll("'./challenge-league'",JSON.stringify(leagueUrl)))
-const source=(await read('league-recruitment-demo.ts')).replaceAll("'./challenge-journey'",JSON.stringify(journeyUrl)).replaceAll("'./challenge-journey-demo'",JSON.stringify(demoUrl))
+const source=(await read('league-recruitment-demo.ts')).replaceAll("'./challenge-journey'",JSON.stringify(journeyUrl)).replaceAll("'./challenge-journey-demo'",JSON.stringify(demoUrl)).replaceAll("'./challenge-league'",JSON.stringify(leagueUrl))
 const demo=await import(moduleUrl(source)),{LEAGUE_SPORTS,selectJourneyChallenge}=await import(journeyUrl)
 const {advanceLeagueDemo}=await import(demoUrl)
 

@@ -1,0 +1,169 @@
+.participation {
+  margin-bottom: 16px;
+  padding: 8px 14px 10px;
+  border: 1px solid #ead8cd;
+  border-radius: 18px;
+  background: linear-gradient(115deg, #fcf0e8, #faf5f0);
+  color: #49382f;
+}
+
+.countHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.countHeading h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #785a4b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.countHeading h2 svg { flex-shrink: 0; }
+
+.countHeading button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -8px -6px -8px 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #785a4b;
+  cursor: pointer;
+}
+
+.countHeading button:hover:not(:disabled) { background: #f2e3d8; }
+
+.countGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 8px;
+  margin: 2px 0 6px;
+}
+
+.countGrid > div { min-width: 0; }
+
+.countGrid dt { font-size: 12px; line-height: 1.4; }
+
+.countGrid dd {
+  margin: 2px 0 0;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.045em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.countGrid small {
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.countTotal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3px 0 4px;
+}
+
+.countTotal dt { color: #806252; }
+.countTotal dd { color: #a44435; font-size: 40px; }
+.countTotal small { color: #8c5948; }
+
+.genderCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 7px 6px;
+  border: 1px solid #ecded4;
+  border-radius: 13px;
+  background: #fffdfa;
+  text-align: center;
+}
+
+.genderCard dt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #7b6558;
+}
+
+.genderCard dt svg { flex-shrink: 0; }
+.genderCard dd { width: 100%; color: #49382f; font-size: 27px; }
+.genderCard small { color: #7b6558; }
+
+.countMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 9px;
+  color: #7b6558;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.countMeta time { margin-left: auto; white-space: nowrap; }
+.otherCount { color: #755747; }
+.refreshMessage { flex-basis: 100%; }
+
+.countScope {
+  margin: 3px 0 0;
+  color: #7b6558;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.statusMessage { margin: 16px 0; color: #7b6558; font-size: 14px; line-height: 1.6; }
+.countError { padding: 6px 0 1px; font-size: 13px; line-height: 1.6; }
+.countError p { margin: 5px 0; overflow-wrap: anywhere; }
+
+.countError button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 8px 0 0;
+  border: 0;
+  background: transparent;
+  color: #9a3e33;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.countError details { font-size: 12px; color: #7b6558; }
+.countError summary { display: list-item; width: fit-content; padding: 10px 0; cursor: pointer; }
+.participation button:disabled { opacity: .6; cursor: not-allowed; }
+.participation button:focus-visible, .participation summary:focus-visible { outline: 3px solid #3576a0; outline-offset: 3px; }
+.refreshing { animation: refresh-spin 1s linear infinite; }
+
+@keyframes refresh-spin { to { transform: rotate(360deg); } }
+
+@media (min-width: 641px) {
+  .participation { margin-bottom: 20px; padding: 8px 18px 10px; border-radius: 20px; }
+  .countHeading h2 { font-size: 13px; }
+  .countGrid { gap: 12px; }
+  .countGrid dt { font-size: 13px; }
+  .countTotal dd { font-size: 44px; }
+  .genderCard { padding: 7px 10px; }
+  .genderCard dd { font-size: 29px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .refreshing { animation: none; } }

@@ -1,6 +1,7 @@
 import { RequestGuardError, requestGuardErrorResponse, requireRequestAccess } from '@/lib/auth/server-guards'
 import { hashTonightFriendInviteToken, normalizeTonightFriendInviteToken, tonightFriendInviteRpcErrorResponse } from '@/lib/server/tonight/friend-invites'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 import {
   TonightApiInputError,
   asIdempotencyKey,
@@ -34,6 +35,8 @@ export async function POST(request: Request, context: { params: Promise<{ token:
       throw new TonightApiInputError('invalid_field', 'ranked_activity_ids')
     }
     const supabase = createSupabaseRequestClient(request)
+    const admissionFailure = await datingAdmissionFailure(supabase)
+    if (admissionFailure) return privateJson({ error: admissionFailure.error }, admissionFailure.status)
     const { data, error } = await supabase.rpc('accept_tonight_friend_invite', {
       p_token_hash: hashTonightFriendInviteToken(token),
       p_ranked_activity_ids: rankedActivityIds,
@@ -49,4 +52,3 @@ export async function POST(request: Request, context: { params: Promise<{ token:
     return privateJson({ error: 'service_unavailable' }, 503)
   }
 }
-

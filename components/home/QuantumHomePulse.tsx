@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { ArrowRight, CalendarDays, CircleAlert, Flame, Heart, MapPin, UsersRound } from 'lucide-react'
+import { meetupDestination, postDestination } from '@/lib/community/journey-links'
 
 type MeetupRecord = {
   id: string
@@ -16,6 +17,7 @@ type MeetupRecord = {
 
 type CommunityPost = {
   id: string
+  category?: string
   title: string
   body: string
   like_count?: number
@@ -104,14 +106,14 @@ function LiveMeetupPanel({ state, meetups }: { state: LoadState, meetups: Meetup
       </div>
 
       {state === 'loading' ? <LoadingLine text="모집 중인 모임을 불러오고 있어요." /> : null}
-      {state === 'ready' && meetups.length === 0 ? <EmptyState text="아직 모집 중인 모임이 없어요." href="/meetups/create" action="모임 만들기" /> : null}
+      {state === 'ready' && meetups.length === 0 ? <EmptyState text="아직 모집 중인 모임이 없어요. 사진으로 활동을 고르고 함께할 방을 찾아보세요." href="/meetups" action="활동·방 둘러보기" /> : null}
       {state === 'auth_required' ? <EmptyState text="로그인하면 내 학교의 모임을 볼 수 있어요." href="/meetups" action="모임 보기" /> : null}
       {state === 'schema_unavailable' ? <EmptyState text="아직 실제 모임 목록을 열 수 없어요." href="/meetups" action="모임 둘러보기" /> : null}
       {state === 'error' ? <EmptyState text="모임을 불러오지 못했어요." href="/meetups" action="모임 보기" /> : null}
       {state === 'ready' && meetups.length > 0 ? (
         <div className="mt-3 divide-y divide-boot-hairline">
           {meetups.map((meetup) => (
-            <Link key={meetup.id} href="/meetups" className="block py-3 first:pt-0 last:pb-0">
+            <Link key={meetup.id} href={meetupDestination(meetup.id)} className="block py-3 first:pt-0 last:pb-0">
               <p className="break-words text-sm font-black">{meetup.title}</p>
               <div className="mt-2 grid gap-1 text-xs font-bold text-boot-muted">
                 <span className="flex items-center gap-1.5"><CalendarDays size={13} />{formatDate(meetup.scheduled_at)}</span>
@@ -147,7 +149,7 @@ function HotPostPanel({ state, posts }: { state: LoadState, posts: CommunityPost
       {state === 'ready' && posts.length > 0 ? (
         <div className="mt-3 divide-y divide-boot-hairline">
           {posts.map((post) => (
-            <Link key={post.id} href="/community/hot" className="block py-3 first:pt-0 last:pb-0">
+            <Link key={post.id} href={postDestination(post.category, post.id)} className="block py-3 first:pt-0 last:pb-0">
               <p className="break-words text-sm font-black">{post.title}</p>
               {post.body ? <p className="mt-1 line-clamp-2 break-words text-xs font-bold leading-5 text-boot-muted">{post.body}</p> : null}
               {typeof post.like_count === 'number' ? <p className="mt-2 flex items-center gap-1 text-xs font-black text-boot-coral"><Heart size={13} fill="currentColor" />좋아요 {post.like_count}</p> : null}

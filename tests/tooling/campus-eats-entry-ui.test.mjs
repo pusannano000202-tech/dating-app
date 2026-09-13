@@ -13,12 +13,21 @@ test('unselected Campus Eats entry offers all approved food categories before mo
   assert.match(entry, /category\.id/)
   assert.match(entry, /어떤 음식부터 골라볼까요\?/) 
   assert.match(entry, /이전 결과는 자동으로 열지 않아요/) 
-  assert.match(entry, /mode=setup/) 
+  assert.match(entry, /mode=map&list=open/)
   assert.match(entry, /CampusEatsCategoryIcon/) 
   assert.match(entry, /grid-cols-2/) 
   assert.match(entry, /sm:grid-cols-3/) 
   assert.match(entry, /min-h-11/) 
   assert.match(entry, /href="\/community"/)
+})
+
+test('ranking participation opens visit selection without resuming or replacing a saved tournament', () => {
+  const source = read('components/campus-eats/CampusEatsPilot.tsx')
+  const participate = source.match(/function startBattle\([\s\S]*?\n  }/)[0]
+  assert.match(participate, /setView\('setup'\)/)
+  assert.doesNotMatch(participate, /setSession|setTournamentStarted|setPersonalRating|setBattleGuideOpen/)
+  assert.match(source, /<Play[^\n]+참가하기/)
+  assert.match(source, /onOpenSaved=/)
 })
 
 test('Campus Eats route gates the pilot behind chooser mode or an explicit category', () => {

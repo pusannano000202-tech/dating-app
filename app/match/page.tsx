@@ -25,6 +25,7 @@ import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 import CampusSevenMatchEntry from '@/components/matching/campus-seven/CampusSevenMatchEntry'
 import QuantumMatchDiscovery from '@/components/matching/QuantumMatchDiscovery'
+import RelationshipSummary from '@/components/relationship/RelationshipSummary'
 import QuantumEventRoomInviteInbox from '@/components/matching/QuantumEventRoomInviteInbox'
 import {
   getMatchingFrontendLoadFailure,
@@ -482,20 +483,21 @@ export default function MatchesPage() {
   const activeGroupSize = groupCapacity === 2 ? 2 : 3
 
   return (
-    <main className="min-h-screen booting-paper px-4 pb-24 text-boot-ink sm:px-6">
-      <div className="mx-auto w-full max-w-6xl pt-5 sm:pt-7">
-        <header className="mx-auto mb-2 flex w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
+    <main className="min-h-screen bg-[#fffaf6] px-5 pb-24 text-boot-ink sm:px-7">
+      <div className="mx-auto w-full max-w-[960px] pt-5 sm:pt-7">
+        <header className="mb-5 flex w-full items-center gap-3">
           <Link href="/" className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body hover:border-boot-primary hover:text-boot-primary" aria-label="홈으로 돌아가기">
             <ChevronLeft size={18} />
           </Link>
           <div className="flex-1">
-            <p className="text-sm font-bold text-boot-muted">Quantum이 다음 단계를 정리했어요</p>
+            <p className="text-xs font-bold text-boot-muted">Quantum</p>
             <h1 className="text-[28px] font-black leading-tight">매칭</h1>
           </div>
           <NotificationBell />
         </header>
 
         <QuantumEventRoomInviteInbox />
+        <div className="mb-1 w-full"><RelationshipSummary /></div>
         <QuantumMatchDiscovery />
 
         <div className="mx-auto w-full max-w-2xl">

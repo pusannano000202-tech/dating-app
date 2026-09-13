@@ -34,7 +34,7 @@ test('home live-data empty states stay honest and keep a next action available',
 
   assert.match(pulse, /아직 모집 중인 모임이 없어요/)
   assert.match(pulse, /최근 7일 핫글이 아직 없어요/)
-  assert.match(pulse, /모임 만들기/)
+  assert.match(pulse, /활동·방 둘러보기/)
   assert.match(pulse, /커뮤니티 보기/)
   assert.doesNotMatch(pulse, /featuredMeetupIdeas|like_count \?\? [1-9]/)
 })

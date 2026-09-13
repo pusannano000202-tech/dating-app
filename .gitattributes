@@ -1,0 +1,3 @@
+# SQL migrations compare stored function definitions. Keep line endings stable
+# on Windows and Linux; this does not alter the migration SQL semantics.
+*.sql text eol=lf

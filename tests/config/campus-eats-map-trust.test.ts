@@ -86,7 +86,8 @@ test('each battle candidate and the champion expose location actions without rep
   const result = pilot.slice(pilot.indexOf('function ResultView'))
 
   assert.match(battle, /toCampusEatsPublicPlace\(candidate,\s*\{\s*schoolName:\s*school\.name\s*\}\)/)
-  assert.match(battle, />위치 확인</)
+  assert.match(battle, /exactLocation \? '위치 확인' : '장소 검색'/)
+  assert.match(battle, /정확한 장소 링크 미확인/)
   assert.match(battle, /target="_blank"/)
   assert.match(battle, /data-preserves-battle-state="true"/)
   assert.doesNotMatch(battle, /setView\(/)

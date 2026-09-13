@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { allowedCommonPushEndpoint, parseCommonPushSubscription, commonPushConfig, commonPushPayload, classifyCommonPushFailure, COMMON_PUSH_CONSENT_VERSION } from '../../lib/notifications/web-push-contract.ts'
+import { allowedCommonPushEndpoint, parseCommonPushSubscription, commonPushConfig, commonPushReadiness, commonPushPayload, classifyCommonPushFailure, COMMON_PUSH_CONSENT_VERSION } from '../../lib/notifications/web-push-contract.ts'
 
 const valid = { endpoint:'https://fcm.googleapis.com/fcm/send/test-token', keys:{p256dh:'B'+'a'.repeat(86),auth:'b'.repeat(22)},consentVersion:COMMON_PUSH_CONSENT_VERSION }
 test('subscriptions require explicit versioned consent and bounded strict keys',()=>{
@@ -22,6 +22,13 @@ test('lockscreen payload is generic and never includes user content or unsafe de
  const id='10000000-0000-4000-8000-000000000001'
  assert.deepEqual(commonPushPayload(id),{title:'Quantum',body:'새 알림이 도착했어요. 앱에서 확인해 주세요.',url:'/notifications',notificationId:id})
  assert.equal(JSON.stringify(commonPushPayload('https://evil.test/전화번호')).includes('evil'),false)
+})
+test('provider keys alone do not advertise dispatcher readiness or device delivery',()=>{
+ const env={QUANTUM_WEB_PUSH_ENABLED:'true',QUANTUM_WEB_PUSH_PUBLIC_KEY:valid.keys.p256dh,QUANTUM_WEB_PUSH_PRIVATE_KEY:'x'.repeat(43),QUANTUM_WEB_PUSH_SUBJECT:'mailto:operator@example.com'}
+ assert.equal(commonPushReadiness(env).available,false)
+ const ready=commonPushReadiness({...env,CRON_SECRET:'x'.repeat(32),SUPABASE_SERVICE_ROLE_KEY:'fixture-only'})
+ assert.equal(ready.available,true);assert.equal(ready.schedulerVerified,false);assert.equal(ready.phoneDeliveryVerified,false)
+ assert.ok(!JSON.stringify(ready).includes('fixture-only'))
 })
 test('expired endpoints are revoked and transport acceptance is distinct from phone delivery',()=>{
  assert.deepEqual(classifyCommonPushFailure({statusCode:410}),{code:'endpoint_expired',revoke:true,retry:false})

@@ -127,7 +127,7 @@ test('migration boundary reports workspace additions without claiming database a
 
 test('launcher reads source status and secrets but starts only the current workspace UI', () => {
   const source = readFileSync('scripts/qa/serve-community-voice-local.mjs', 'utf8')
-  assert.match(source, /process\.argv\.length !== 2/)
+  assert.match(source, /resolveIntegratedUiPort\(process\.argv\.slice\(2\)\)/)
   assert.match(source, /package\.json/)
   assert.match(source, /dist['"], 'supabase\.js/)
   assert.match(source, /process\.execPath/)
@@ -142,7 +142,7 @@ test('launcher reads source status and secrets but starts only the current works
   assert.match(source, /assertNoNextEnvironmentFiles/)
   assert.match(source, /validateIntegratedLocalAuthEnvironment\(authEnv\)/)
   assert.match(source, /createIntegratedRuntimeEnvironment\(status, secrets, smsTtl\)/)
-  assert.match(source, /\['scripts\/qa\/start-integrated-ui\.mjs', '--live-local'\]/)
+  assert.match(source, /\['scripts\/qa\/start-integrated-ui\.mjs', '--live-local', '--port', port\]/)
   assert.match(source, /stdio: 'inherit'/)
   assert.match(source, /localUiCanWriteLocalData: true/)
   assert.doesNotMatch(source, /sourceRuntimeReadOnly/)

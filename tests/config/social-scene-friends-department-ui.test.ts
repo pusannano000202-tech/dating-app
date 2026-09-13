@@ -1,13 +1,16 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import test from 'node:test'
+import { chatListHref, parseChatTab } from '../../lib/navigation/chat-navigation'
 
 const read = (path: string) => readFileSync(path, 'utf8')
 
 test('friends surface separates the directory from messages and keeps profile to direct-chat navigation', () => {
   const page = read('app/friends/page.tsx')
   const profile = read('app/friends/[id]/page.tsx')
-  const chatHub = read('app/chat/page.tsx')
+  const chatPage = read('app/chat/page.tsx')
+  const chatHub = read('components/chat/ChatHub.tsx')
+  const socialRooms = read('components/chat/SocialRoomsSection.tsx')
   const conversations = read('components/friends/ConversationList.tsx')
   const friendChat = read('components/friends/FriendChatRoom.tsx')
   assert.match(page, /친구\s*\(\d*\)?|>친구</)
@@ -18,12 +21,20 @@ test('friends surface separates the directory from messages and keeps profile to
   assert.ok(page.indexOf('<FriendDirectory') < page.indexOf('친구 추가·요청 관리'))
   assert.match(profile, /\/friends\/\$\{encodeURIComponent\(friendUserId\)\}\/chat/)
   assert.match(profile, /친구 1:1 채팅/)
-  assert.match(chatHub, /약속 대화/)
-  assert.match(chatHub, /친구 대화/)
+  assert.match(chatPage, /import ChatHub from '@\/components\/chat\/ChatHub'/)
+  assert.match(chatPage, /return <ChatHub \/>/)
+  assert.match(chatHub, /\['social','팀·모임'\],\['matching','매칭'\],\['friends','친구'\]/)
   assert.match(chatHub, /ConversationList/)
-  assert.match(chatHub, /\/api\/meetups/)
-  assert.match(chatHub, /최근 모집에서 찾은 참여 모임/)
-  assert.match(chatHub, /error \? null : loading/)
+  assert.match(chatHub, /<OwnedChatHub key=\{account\} ownerId=\{account\}/)
+  assert.match(chatHub, /router\.replace\(chatListHref\(value\),\{scroll:false\}\)/)
+  for (const tab of ['social', 'matching', 'friends'] as const) assert.equal(chatListHref(parseChatTab(tab)), `/chat?tab=${tab}`)
+  assert.equal(chatListHref(parseChatTab('/admin')), '/chat?tab=social')
+  assert.match(chatHub, /tab==='social'\?<SocialRoomsSection ownerId=\{ownerId\}/)
+  assert.match(socialRooms, /fetch\('\/api\/chat\/social-rooms'/)
+  assert.match(socialRooms, /parseSocialRoomsResponse\(await response\.json\(\),ownerId\)/)
+  assert.match(socialRooms, /setRooms\(\[\]\);setCursor\(null\);setStatus\('error'\)/)
+  assert.match(socialRooms, /status==='loading'[\s\S]*status==='error'[\s\S]*rooms\.length\?<SocialChatDirectory/)
+  assert.doesNotMatch(socialRooms, /fetch\('\/api\/meetups'/)
   assert.match(conversations, /!loading && !error/)
   assert.match(friendChat, /error \|\| access !== 'active'/)
   assert.match(friendChat, /친구 정보 확인 중/)

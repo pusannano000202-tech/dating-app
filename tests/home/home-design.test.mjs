@@ -11,7 +11,7 @@ test('own meetings precede discovery and retain actual auth boundary', () => {
 })
 test('selected playmaker photo and all discovery journeys are linked', () => {
   const source = read('components/home/QuantumHomeRecommendations.tsx')
-  for (const value of ['home-playmaker-football.webp', '/community/department', '/community/voice', '/community', '우리 과 이름으로']) assert.ok(source.includes(value), value)
+  for (const value of ['home-playmaker-football.webp', '/meetups/league', '/community/voice', '/community', '우리 과 이름으로']) assert.ok(source.includes(value), value)
   assert.doesNotMatch(source, /두 가지만 골랐어요/)
 })
 test('home matching and continuation use compact presentation without public future schedules', () => {

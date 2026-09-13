@@ -49,24 +49,26 @@ type CommunityBoardProps = {
     actionLabel: string
   }
   previewReviewableMeetups?: ReviewableMeetup[]
+  initialDraft?: { title: string; body: string } | null
 }
 
 export default function CommunityBoard({
   board,
   previewReviewableMeetups,
+  initialDraft,
 }: CommunityBoardProps) {
   const composer = getCommunityComposer(board.id)
   const [posts, setPosts] = useState<CommunityPost[]>([])
   const [loadState, setLoadState] = useState<LoadState>('loading')
   const [reviewableState, setReviewableState] = useState<ReviewableLoadState>('loading')
   const [reviewableMeetups, setReviewableMeetups] = useState<ReviewableMeetup[]>([])
-  const [title, setTitle] = useState('')
-  const [body, setBody] = useState('')
+  const [title, setTitle] = useState(initialDraft?.title ?? '')
+  const [body, setBody] = useState(initialDraft?.body ?? '')
   const [notice, setNotice] = useState('')
   const [selectedMeetupId, setSelectedMeetupId] = useState('')
   const [isReviewablePickerOpen, setIsReviewablePickerOpen] = useState(false)
   const [busyPost, setBusyPost] = useState(false)
-  const [showComposer, setShowComposer] = useState(false)
+  const [showComposer, setShowComposer] = useState(Boolean(initialDraft))
   const listboxId = useId()
 
   useEffect(() => {

@@ -12,23 +12,23 @@ async function model() {
   return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`)
 }
 
-test('four photo topics retain distinct copy, local photos and real destinations', async () => {
+test('three active photo topics retain distinct copy, local photos and real destinations', async () => {
   const { COMMUNITY_EXPERIENCES: topics } = await model()
-  assert.deepEqual(topics.map(t => t.id), ['visit', 'mbti', 'delivery', 'places'])
-  assert.deepEqual(topics.map(t => t.href), ['/community/campus-eats?mode=choose', '/community/mbti', '/community/campus-eats/delivery', '/community/places'])
-  for (const key of ['image', 'title', 'description', 'cta']) assert.equal(new Set(topics.map(t => t[key])).size, 4)
+  assert.deepEqual(topics.map(t => t.id), ['visit', 'mbti', 'places'])
+  assert.deepEqual(topics.map(t => t.href), ['/community/campus-eats?mode=choose', '/community/mbti', '/community/places'])
+  for (const key of ['image', 'title', 'description', 'cta']) assert.equal(new Set(topics.map(t => t[key])).size, 3)
   for (const topic of topics) assert.ok(existsSync(`public${topic.image}`), topic.image)
   assert.match(topics[1].notice, /자기보고.*과학적/)
   assert.match(topics[1].description, /자기보고.*과학적/)
   assert.doesNotMatch(topics[1].description, /INFP 두 번, INTP 한 번\./)
-  assert.match(topics[2].notice, /배달비.*확인/)
+  assert.match(topics[2].notice, /후보.*확인/)
   assert.ok(topics.every(t => /연출 이미지/.test(t.imageNote)))
 })
 
-test('previous and next wrap through all four topics without losing the selected index', async () => {
+test('previous and next wrap through active topics without losing the selected index', async () => {
   const { nextExperienceIndex: next } = await model()
-  assert.equal(next(0, -1), 3)
-  assert.equal(next(3, 1), 0)
+  assert.equal(next(0, -1), 2)
+  assert.equal(next(2, 1), 0)
   assert.equal(next(0, 1), 1)
   assert.equal(next(1, -1), 0)
 })
@@ -44,10 +44,10 @@ test('swipes require 44px and horizontal intent, leaving vertical scroll alone',
 
 test('keyboard moves and jumps with the same selection logic', async () => {
   const { experienceKeyboardIndex: key } = await model()
-  assert.equal(key('ArrowRight', 3), 0)
-  assert.equal(key('ArrowLeft', 0), 3)
+  assert.equal(key('ArrowRight', 2), 0)
+  assert.equal(key('ArrowLeft', 0), 2)
   assert.equal(key('Home', 2), 0)
-  assert.equal(key('End', 0), 3)
+  assert.equal(key('End', 0), 2)
   assert.equal(key('Tab', 1), null)
   assert.equal(key('Enter', 1), null)
 })
@@ -57,7 +57,7 @@ test('content destination exposes in-place selection with production feature gat
   assert.ok(page.includes('<CommunityExperienceExplorer'))
   assert.match(page, /isCommunityFeatureEnabled/)
   assert.match(page, /campusEatsEnabled=\{isCampusEatsFeatureEnabled\(\)\}/)
-  assert.match(readFileSync('components/community/CommunityExperienceExplorer.tsx','utf8'), /disabled:.*visit.*delivery.*!campusEatsEnabled/)
+  assert.match(readFileSync('components/community/CommunityExperienceExplorer.tsx','utf8'), /disabled:.*visit.*!campusEatsEnabled/)
 })
 
 test('photo controls preserve vertical scrolling, cancellation, focus and reduced motion', () => {

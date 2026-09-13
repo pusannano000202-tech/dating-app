@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import test from 'node:test'
+import { socialChatHref } from '../../lib/chat/social-room-presentation'
 
 const read = (path: string) => readFileSync(path, 'utf8')
 
@@ -41,7 +42,18 @@ test('meetup detail UI keeps host lifecycle separate from personal leave and off
   assert.match(experience, /\/join/)
   assert.match(experience, /개인 나가기/)
   assert.match(experience, /모임 전체 취소/)
-  assert.match(experience, /id="meetup-chat"/)
+  assert.match(experience, /meetup\.joined && !chatOnly[\s\S]*href=\{\(socialChatHref\(\{kind: 'meetup', id: meetup\.id\}\)/)
+  assert.match(experience, /action === 'open_chat'[\s\S]*router\.push\(\(socialChatHref\(\{kind: 'meetup', id: meetup\.id\}\)/)
+  const roomId = '11111111-1111-4111-8111-111111111111'
+  assert.equal(socialChatHref({ kind: 'meetup', id: roomId }), `/chat/rooms/meetup/${roomId}`)
+  assert.equal(socialChatHref({ kind: 'meetup', id: '../admin' }), null)
+  const chatPage = read('app/chat/rooms/[kind]/[id]/page.tsx')
+  const roomPage = read('components/chat/SocialChatRoomPage.tsx')
+  assert.match(chatPage, /isSocialChatRoomKind\(kind\)/)
+  assert.match(chatPage, /isChatUuid\(id\)/)
+  assert.match(chatPage, /<SocialChatRoomPage kind=\{kind\} id=\{id\.toLowerCase\(\)\}/)
+  assert.match(roomPage, /<MeetupDetailExperience meetupId=\{id\} chatOnly/)
+  assert.match(experience, /if\(chatOnly&&meetup\.joined\)return <SocialMessenger/)
   assert.match(guide, /늦었어요/)
   assert.match(guide, /도움 요청/)
   assert.match(guide, /잠깐 쉬기/)
@@ -54,8 +66,8 @@ test('meetup create and discovery preserve user-created rooms and expose school 
   const form = read('components/meetups/CreateMeetupForm.tsx')
   const hub = read('components/meetups/MeetupHub.tsx')
 
-  assert.match(route, /create_activity_meetup_v3/)
-  assert.match(route, /list_activity_meetups_v3/)
+  assert.match(route, /create_activity_meetup_v4/)
+  assert.match(route, /list_activity_meetups_v4/)
   assert.match(form, /scope_type/)
   assert.match(form, /activity_key/)
   assert.match(form, /학교 전체/)

@@ -47,10 +47,10 @@ export default function CommunityComingSoon({ kind }: CommunityComingSoonProps) 
             {/* A full document navigation keeps the disabled community boundary out of client prefetch. */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
-              href="/match"
+              href={isMeetups ? '/meetups' : '/community'}
               className="mt-4 flex h-12 items-center justify-center gap-2 rounded-[8px] bg-boot-ink px-4 text-sm font-black text-white"
             >
-              매칭으로 돌아가기
+              {isMeetups ? '모임 다시 확인하기' : '커뮤니티 다시 확인하기'}
               <ArrowRight aria-hidden="true" size={16} />
             </a>
           </div>

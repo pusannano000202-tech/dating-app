@@ -1,0 +1,9 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {clearSentDraft,chatScrollChange,isNearChatBottom,parseMeetupChat,PendingChatSends} from '../../lib/chat/social-messenger-state.ts'
+test('an acknowledged send cannot erase the next draft',()=>{assert.equal(clearSentDraft('다음 메시지','첫 메시지'),'다음 메시지');assert.equal(clearSentDraft(' 첫 메시지 ','첫 메시지'),'')})
+test('an uncertain retry reuses its key even after editing away and back',()=>{const pending=new PendingChatSends();let id=0;const create=()=>String(++id);assert.equal(pending.key('A',create),'1');assert.equal(pending.key('B',create),'2');assert.equal(pending.key('A',create),'1');pending.acknowledge('A');assert.equal(pending.key('A',create),'3')})
+test('older history preserves reading position; only appended messages raise the new cue',()=>{assert.equal(chatScrollChange(['b','c'],['a','b','c']),'prepend');assert.equal(chatScrollChange(['a','b'],['a','b','c']),'append');assert.equal(chatScrollChange([],['a']),'initial');assert.equal(chatScrollChange(['a'],['a']),'unchanged');assert.equal(isNearChatBottom(1000,100,400),false);assert.equal(isNearChatBottom(1000,550,400),true)})
+const item={id:'10000000-0000-4000-8000-000000000001',sender_alias:'같은 별명',message:'대화',created_at:'2026-09-13T00:00:00Z'}
+test('server identity only: same aliases never determine mine',()=>{assert.equal(parseMeetupChat({phase:'send',messages:[item]})?.messages[0].is_me,null);assert.equal(parseMeetupChat({phase:'send',messages:[{...item,is_me:true}]})?.messages[0].is_me,true);assert.equal(parseMeetupChat({phase:'send',messages:[{...item,is_me:false}]})?.messages[0].is_me,false)})
+test('malformed data is not an empty or read-only conversation',()=>{for(const value of [null,{phase:'send',messages:'broken'},{phase:'send',messages:[{...item,is_me:'true'}]},{phase:'send',messages:[item,item]}])assert.equal(parseMeetupChat(value),null)})

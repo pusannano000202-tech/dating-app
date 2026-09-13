@@ -21,11 +21,12 @@ test('live meetups precede the optional ideas area and have an honest empty stat
   assert.doesNotMatch(source, /member_count: Math.max/)
 })
 
-test('community entry distinguishes personal ranking, delivery and survey data', () => {
+test('community entry preserves personal ranking and survey data while delivery is paused', () => {
   const source = readFileSync('lib/community/experience-explorer.ts', 'utf8')
   assert.doesNotMatch(source, /1분 취향|전체 순위 보기|93곳|94장|한 곳만 고르면/)
   assert.match(source, /먹어본 곳 2곳/)
   assert.match(readFileSync('components/community/CommunitySpotlight.tsx', 'utf8'), /getCampusEatsSummary/)
   assert.match(source, /\/community\/mbti/)
-  assert.match(source, /\/community\/campus-eats\/delivery/)
+  assert.doesNotMatch(source, /\/community\/campus-eats\/delivery/)
+  assert.match(source, /\/community\/places/)
 })

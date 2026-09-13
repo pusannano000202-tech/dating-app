@@ -1,5 +1,6 @@
 .page{min-height:100dvh;background:#fffaf6;color:#292321;padding:8px 20px 112px;word-break:keep-all;overflow-wrap:anywhere}
 .shell{max-width:740px;margin:0 auto;width:100%}
+.programmes{border:1px solid #ead9d2;border-radius:20px;padding:24px;background:linear-gradient(140deg,#fff,#fff2e9);color:#a64d3c}.programmes h3{font-size:21px;color:#292321;letter-spacing:-.04em;margin:12px 0 6px}.programmes>p{font-size:13px;line-height:1.8;color:#82736b;margin-bottom:16px}.programmes button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:70px;text-align:left;background:#fff;border:1px solid #e8d6cd;border-radius:13px;padding:14px 16px;margin-top:10px}.programmes button:hover{border-color:#b64b3d;background:#fffaf6}.programmes strong,.programmes small{display:block}.programmes strong{font-size:16px;color:#403129}.programmes small{font-size:11px;font-weight:500;color:#8b7567;margin-top:4px}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .back{display:inline-flex;align-items:center;gap:7px;min-height:44px;font-size:13px;font-weight:700;color:#776960}
 .header{padding:6px 0 12px}.eyebrow{font-size:11px;line-height:1.6;font-weight:800;color:#b64b3d}

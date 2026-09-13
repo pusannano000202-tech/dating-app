@@ -1,0 +1,23 @@
+.section { min-width: 0; }
+.heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.heading h2 { margin: 0; font-size: 16px; font-weight: 800; line-height: 1.5; letter-spacing: -.03em; }
+.heading a { display: inline-flex; min-height: 40px; align-items: center; gap: 3px; color: #a74335; font-size: 11px; font-weight: 700; }
+.rooms { display: grid; gap: 11px; }
+.card { display: grid; grid-template-columns: minmax(0, .76fr) minmax(0, 1.24fr); overflow: hidden; border: 1px solid #e9dbd0; border-radius: 21px; background: #fff; color: #292320; transition: border-color .15s, box-shadow .15s; }
+.card:hover { border-color: #c99d8d; box-shadow: 0 5px 18px #6b3c2910; }
+.card:focus-visible, .toggle:focus-visible, .heading a:focus-visible { outline: 3px solid #a74335; outline-offset: 4px; }
+.photo { position: relative; min-height: 212px; background: #eaddd1; }
+.photo img { object-fit: cover; object-position: center; }
+.copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; padding: 16px 14px 12px; }
+.category { color: #a74335; font-size: 11px; font-weight: 750; line-height: 1.5; }
+.activity { display: block; margin-top: 4px; color: #897468; font-size: 10px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; }
+.title { display: block; margin-top: 7px; font-size: 17px; font-weight: 800; line-height: 1.4; letter-spacing: -.035em; overflow-wrap: anywhere; word-break: keep-all; }
+.members { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 9px; color: #746359; font-size: 10px; line-height: 1.7; }
+.members svg { flex-shrink: 0; }
+.detail { display: block; margin-top: 4px; color: #89786c; font-size: 10px; line-height: 1.65; word-break: keep-all; overflow-wrap: anywhere; }
+.action { display: flex; width: 100%; min-height: 38px; align-items: center; justify-content: space-between; gap: 5px; margin-top: auto; padding-top: 10px; color: #a74335; font-size: 11px; font-weight: 750; line-height: 1.5; }
+.action svg { flex-shrink: 0; }
+.toggle { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: center; margin-top: 4px; color: #a74335; font-size: 11px; font-weight: 700; }
+.note { margin-top: 10px; color: #89786c; font-size: 11px; line-height: 1.7; }
+.note button, .note a { min-height: 36px; color: #a74335; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } }

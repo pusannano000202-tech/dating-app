@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.matching-tests.json",
+  "compilerOptions": { "outDir": "../../.tmp/ux-cohesion-20260914/home-match-tests" },
+  "include": [
+    "../matching/quantum-event-discovery.test.ts",
+    "../matching/quantum-couple-double-date.test.ts",
+    "../matching/quantum-event-wheel-ui.test.ts",
+    "../matching/frontend-flow-polish.test.ts",
+    "../matching/group-queue-state.test.ts",
+    "../matching/match-chat-window.test.ts",
+    "../../lib/community/meetup-cylinder.ts",
+    "../../lib/matching/quantum-event-wheel.ts"
+  ]
+}

@@ -11,6 +11,8 @@ import type { MeetupCategory } from '@/lib/community/contracts'
 import { parseAdmissionDepositQuote, type AdmissionDepositQuote } from '@/lib/meetups/admission-contract'
 import MeetupApplicationFlow from './MeetupApplicationFlow'
 import MeetupAdmissionStatus from './MeetupAdmissionStatus'
+import {useAdmissionCheckout} from './useAdmissionCheckout'
+import {NEW_ADMISSION_DEPOSIT_KRW} from '@/lib/meetups/admission-deposit-policy'
 
 type Context = {
   accountKey: string
@@ -33,6 +35,7 @@ function NewMeetupApplication({ meetupId }: { meetupId: string }) {
   const generation = useRef(0)
   const request = useRef<AbortController | null>(null)
   const account = useRef<string | null | undefined>(undefined)
+  const checkout=useAdmissionCheckout({kind:'custom_meetup',id:meetupId},context?.accountKey??null)
   const load = useCallback(async () => {
     request.current?.abort()
     const controller = new AbortController(), ticket = ++generation.current
@@ -83,8 +86,8 @@ function NewMeetupApplication({ meetupId }: { meetupId: string }) {
   return <MeetupApplicationFlow
     room={context.room} accountKey={context.accountKey} quote={context.quote} policy={context.policy}
     meetup={{ title: item.title, activityLabel: getMeetupCategoryLabel(item.category), imageSrc: photo?.imageSrc ?? '/images/meetups/meetup-cafe-friends-v1.webp', imageAlt: photo?.imageAlt, summary: `${item.member_count} / ${item.capacity}명 · ${item.description}`, scheduleLabel: scheduled, locationLabel: item.place_name ?? '장소는 채팅에서 함께 정해요' }}
-    // Financial completion is deliberately not wired until owner decisions/refunds
-    // and provider verification exist. Never fall back to the old free join RPC.
+    newDepositAmountKrw={NEW_ADMISSION_DEPOSIT_KRW} onSubmit={checkout.submit} onRefreshStatus={checkout.refresh} onResumeCheckout={checkout.resume} application={checkout.application}
+    onOpenChat={result=>{if(result.chatHref===`/chat/rooms/meetup/${meetupId}`)router.push(result.chatHref)}}
     onCancel={() => router.push(backHref)}
   />
 }

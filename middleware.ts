@@ -8,7 +8,7 @@ import {
   isDevAuthBypassEnabled,
   shouldIssueDevAuthCookie,
 } from './lib/dev-auth'
-import { getRequestedRoute } from './lib/auth/redirect'
+import { getPostLoginDestination, getRequestedRoute } from './lib/auth/redirect'
 import { checkAccountAccess, hasConflictingApiActors, requiresAccountAccessCheck } from './lib/auth/account-access'
 import { createSupabaseRequestClient } from './lib/supabase-request'
 import {
@@ -201,7 +201,8 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname === '/login' && user && !isReauthentication) {
-    return preserveResponseCookies(NextResponse.redirect(new URL('/auth/continue', appOrigin)), response)
+    const destination = getPostLoginDestination({ requestedRedirect: request.nextUrl.searchParams.get('redirect') ?? request.nextUrl.searchParams.get('next') })
+    return preserveResponseCookies(NextResponse.redirect(new URL(destination, appOrigin)), response)
   }
 
   return response

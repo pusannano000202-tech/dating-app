@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "lib": ["ES2022", "DOM"], "module": "commonjs", "moduleResolution": "node",
+    "strict": true, "esModuleInterop": true, "skipLibCheck": true, "rootDir": "../..",
+    "outDir": "../../.tmp/meetup-study-tests", "types": ["node"], "noEmit": false
+  },
+  "include": ["study-*.test.ts", "../profile/pnu-departments.test.ts", "../../lib/meetups/study-catalog.ts", "../../lib/meetups/study-guide.ts"]
+}

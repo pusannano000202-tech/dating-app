@@ -1,5 +1,18 @@
 export const CHAT_POLL_PURPOSES = ['schedule', 'place', 'role', 'general'] as const
 export const CHAT_POLL_SELECTION_MODES = ['single', 'multiple'] as const
+export const CHAT_POLL_ROOM_KINDS = {
+  meetups: 'meetup',
+  friends: 'friend',
+  'department-challenges': 'department_challenge',
+  'league-teams': 'league_team',
+  'study-rooms': 'study_room',
+  'mentoring-rooms': 'mentoring',
+} as const
+
+export function resolveChatPollRoomKind(value: string) {
+  return Object.hasOwn(CHAT_POLL_ROOM_KINDS, value)
+    ? CHAT_POLL_ROOM_KINDS[value as keyof typeof CHAT_POLL_ROOM_KINDS] : null
+}
 
 export type ChatPollPurpose = typeof CHAT_POLL_PURPOSES[number]
 export type ChatPollSelectionMode = typeof CHAT_POLL_SELECTION_MODES[number]

@@ -1,6 +1,7 @@
 import { RequestGuardError, requestGuardErrorResponse, requireRequestAccess } from '@/lib/auth/server-guards'
 import { getTonightFeatureState } from '@/lib/matching/tonight-ranked/runtime'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 import {
   TonightApiInputError,
   asIdempotencyKey,
@@ -39,6 +40,8 @@ export async function POST(request: Request) {
     }
     const idempotencyKey = asIdempotencyKey(body.idempotency_key)
     const supabase = createSupabaseRequestClient(request)
+    const admissionFailure = await datingAdmissionFailure(supabase)
+    if (admissionFailure) return privateJson({ error: admissionFailure.error }, admissionFailure.status)
     const { data, error } = await supabase.rpc('submit_tonight_solo_application', {
       p_round_id: roundId,
       p_ranked_activity_ids: rankedActivityIds,

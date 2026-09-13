@@ -9,7 +9,8 @@ import { socialChatHref } from '@/lib/chat/social-room-presentation'
 
 import PlaceLinks from '@/components/places/PlaceLinks'
 import ActivityRoomPolls from '@/components/chat-polls/ActivityRoomPolls'
-import ChatComposerActions from '@/components/chat-polls/ChatComposerActions'
+import SocialMessenger, {SocialChatComposer} from '@/components/chat/SocialMessenger'
+import {clearSentDraft,isMeetupSendAcknowledged,parseMeetupChat,PendingChatSends,type MeetupChatState} from '@/lib/chat/social-messenger-state'
 import { getMeetupCategoryLabel } from '@/lib/community/catalog'
 import type { MeetupCategory } from '@/lib/community/contracts'
 import { MEETUP_GENDER_LABELS, type MeetupGenderMode } from '@/lib/community/meetup-gender'
@@ -17,6 +18,7 @@ import { projectLegacyMeetupPlace } from '@/lib/community/meetup-place'
 import type { ActiveMeetupGuideSceneId, MeetupGuideActionKind } from '@/lib/meetups/guide-contract'
 import LiveActivityGuide, { type LiveMeetupGuideDto } from './LiveActivityGuide'
 import MeetupApplications from './MeetupApplications'
+import MeetupCreatedNotice from './MeetupCreatedNotice'
 
 type MeetupDetail = {
   id: string
@@ -42,12 +44,7 @@ type MeetupDetail = {
   events: Array<{ action: string; created_at: string; resulting_revision: number }>
 }
 
-type MeetupChat = {
-  phase: 'send' | 'read_only' | 'hidden'
-  messages: Array<{ id: string; sender_alias: string; message: string; created_at: string }>
-}
-
-export default function MeetupDetailExperience({ meetupId, chatOnly = false, readOnly = false }: { meetupId: string; chatOnly?: boolean; readOnly?: boolean }) {
+export default function MeetupDetailExperience({ meetupId, chatOnly = false, readOnly = false, created = false }: { meetupId: string; chatOnly?: boolean; readOnly?: boolean; created?: boolean }) {
   const router = useRouter()
   const mounted = useRef(true)
   const generation = useRef(0)
@@ -55,18 +52,36 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
   const scheduleRevision = useRef<number | null>(null)
   const invalidateRead = useCallback(() => {++generation.current; readController.current?.abort()}, [])
   const [meetup, setMeetup] = useState<MeetupDetail | null>(null)
-  const [chat, setChat] = useState<MeetupChat | null>(null)
+  const [chat, setChat] = useState<MeetupChatState | null>(null)
+  const [chatError,setChatError]=useState(''),[chatLoading,setChatLoading]=useState(true),[sending,setSending]=useState(false),[sendError,setSendError]=useState('')
+  const chatController=useRef<AbortController|null>(null),chatGeneration=useRef(0),sendController=useRef<AbortController|null>(null),sendBusy=useRef(false),pendingSends=useRef(new PendingChatSends()),currentRoom=useRef(meetupId)
+  const sendScope=useRef(0)
+  currentRoom.current=meetupId
   const [guide, setGuide] = useState<LiveMeetupGuideDto | null>(null)
   const [message, setMessage] = useState('')
   const [pollComposerRequest, setPollComposerRequest] = useState(0)
   const [notice, setNotice] = useState('')
+  const [loginRequired, setLoginRequired] = useState(false)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [scheduleStart, setScheduleStart] = useState('')
   const [scheduleEnd, setScheduleEnd] = useState('')
   const [schedulePlace, setSchedulePlace] = useState('')
   const chatReadRoot=useRef<HTMLDivElement>(null)
-  useSocialChatRead('meetup',meetupId,chat?.messages??[],{root:chatReadRoot,enabled:chatOnly&&!!meetup?.joined&&!!chat})
+  useSocialChatRead('meetup',meetupId,chat?.messages??[],{root:chatReadRoot,enabled:chatOnly&&meetup?.id===meetupId&&meetup.joined&&!!chat&&!chatError})
+
+  const loadChat=useCallback(async()=>{
+    chatController.current?.abort();const controller=new AbortController(),ticket=++chatGeneration.current;chatController.current=controller
+    const timeout=setTimeout(()=>controller.abort(),12000);setChatLoading(true)
+    try{
+      const response=await fetch(`/api/meetups/${encodeURIComponent(meetupId)}/chat`,{cache:'no-store',signal:controller.signal}),payload=await response.json().catch(()=>null)
+      if(!mounted.current||ticket!==chatGeneration.current||currentRoom.current!==meetupId)return
+      const parsed=response.ok?parseMeetupChat(payload?.chat):null
+      if(!parsed)throw new Error('chat_unavailable')
+      setChat(parsed);setChatError('')
+    }catch{if(mounted.current&&ticket===chatGeneration.current&&currentRoom.current===meetupId){setChat(null);setChatError('대화를 불러오지 못했어요. 다시 연결하면 작성한 내용으로 이어갈 수 있어요.')}}
+    finally{clearTimeout(timeout);if(mounted.current&&ticket===chatGeneration.current){setChatLoading(false);chatController.current=null}}
+  },[meetupId])
 
   const load = useCallback(async (quiet = false) => {
     readController.current?.abort()
@@ -78,6 +93,7 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
       const response = await fetch(`/api/meetups/${encodeURIComponent(meetupId)}`, { cache: 'no-store', signal: controller.signal })
       const payload = await response.json().catch(() => null) as { meetup?: MeetupDetail; error?: string } | null
       if (!mounted.current || ticket !== generation.current) return
+      setLoginRequired(response.status === 401)
       if (!response.ok || !payload?.meetup || payload.meetup.id !== meetupId) throw new Error(payload?.error ?? 'load_failed')
       const detail = payload.meetup
       setMeetup(detail)
@@ -88,19 +104,19 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
         setSchedulePlace(detail.place_name ?? '')
       }
       if (!detail.joined) {
+        ++chatGeneration.current;chatController.current?.abort()
         setChat(null)
+        setChatLoading(false);setChatError('')
         setGuide(null)
         return
       }
-      const [chatResponse, guideResponse] = await Promise.all([
-        fetch(`/api/meetups/${encodeURIComponent(meetupId)}/chat`, { cache: 'no-store', signal: controller.signal }),
-        fetch(`/api/meetups/${encodeURIComponent(meetupId)}/guide`, { cache: 'no-store', signal: controller.signal }),
+      const [, guideResponse] = await Promise.all([
+        loadChat(),
+        fetch(`/api/meetups/${encodeURIComponent(meetupId)}/guide`, { cache: 'no-store', signal: controller.signal }).catch(()=>null),
       ])
-      const chatPayload = await chatResponse.json().catch(() => null) as { chat?: MeetupChat } | null
-      const guidePayload = await guideResponse.json().catch(() => null) as { guide?: LiveMeetupGuideDto } | null
+      const guidePayload = await guideResponse?.json().catch(() => null) as { guide?: LiveMeetupGuideDto } | null
       if (!mounted.current || ticket !== generation.current) return
-      setChat(chatResponse.ok && chatPayload?.chat ? chatPayload.chat : null)
-      setGuide(guideResponse.ok && guidePayload?.guide ? guidePayload.guide : null)
+      setGuide(guideResponse?.ok && guidePayload?.guide ? guidePayload.guide : null)
     } catch (error) {
       if (!mounted.current || ticket !== generation.current) return
       setMeetup(null); setChat(null); setGuide(null)
@@ -111,15 +127,16 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
       clearTimeout(timeout)
       if (mounted.current && ticket === generation.current) { setLoading(false); readController.current = null }
     }
-  }, [meetupId])
+  }, [meetupId,loadChat])
 
   useEffect(() => {
     mounted.current = true
+    setMeetup(null);setChat(null);setGuide(null);setMessage('');setChatError('');setSendError('');setSending(false);sendBusy.current=false;pendingSends.current.clear()
     void load()
     const refresh = () => { if (document.visibilityState === 'visible' && !readController.current) void load(true) }
     const timer = window.setInterval(refresh, 5000)
     window.addEventListener('focus', refresh)
-    return () => {mounted.current = false; invalidateRead(); window.clearInterval(timer); window.removeEventListener('focus', refresh)}
+    return () => {mounted.current = false;++sendScope.current; invalidateRead();++chatGeneration.current;chatController.current?.abort();sendController.current?.abort(); window.clearInterval(timer); window.removeEventListener('focus', refresh)}
   }, [load, invalidateRead])
 
   const place = useMemo(() => meetup?.place_name ? projectLegacyMeetupPlace({ meetupId: meetup.id, placeName: meetup.place_name, category: meetup.category }) : null, [meetup])
@@ -177,16 +194,25 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
   }
 
   async function sendMessage() {
-    if (!meetup || !message.trim() || readOnly) return
-    const sent = await request(`/api/meetups/${encodeURIComponent(meetup.id)}/chat`, jsonPost({ message: message.trim(), idempotency_key: crypto.randomUUID() }))
-    if (sent) setMessage('')
+    const text=message.trim()
+    if (!meetup || !text || readOnly || sendBusy.current || chat?.phase!=='send'||chatError) return
+    sendBusy.current=true;setSending(true);setSendError('')
+    const key=pendingSends.current.key(text,()=>crypto.randomUUID()),controller=new AbortController(),scope=sendScope.current;sendController.current=controller
+    const timeout=setTimeout(()=>controller.abort(),12000)
+    try{
+      const response=await fetch(`/api/meetups/${encodeURIComponent(meetup.id)}/chat`,{...jsonPost({message:text,idempotency_key:key}),signal:controller.signal})
+      const payload=await response.json().catch(()=>null)
+      if(!mounted.current||currentRoom.current!==meetupId||scope!==sendScope.current)return
+      if(!response.ok||!isMeetupSendAcknowledged(payload,text))throw new Error('send_unconfirmed')
+      pendingSends.current.acknowledge(text);setMessage(current=>clearSentDraft(current,text));void loadChat()
+    }catch{if(mounted.current&&currentRoom.current===meetupId&&scope===sendScope.current)setSendError('전송 결과를 확인하지 못했어요. 같은 내용을 다시 보내면 동일한 전송으로 확인해요.')}
+    finally{clearTimeout(timeout);if(mounted.current&&currentRoom.current===meetupId&&scope===sendScope.current){sendBusy.current=false;setSending(false)}}
   }
 
   async function guideAction(action: MeetupGuideActionKind | 'advance_shared', sceneId: ActiveMeetupGuideSceneId) {
     if (!meetup || !guide) return
     if (action === 'open_chat') {
-      if (!chatOnly) { router.push((socialChatHref({kind: 'meetup', id: meetup.id}) ?? '/chat')); return }
-      document.getElementById('meetup-chat')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      router.push((socialChatHref({kind: 'meetup', id: meetup.id}) ?? '/chat'))
       return
     }
     if (action === 'open_map') {
@@ -205,21 +231,12 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
     await request(`/api/meetups/${encodeURIComponent(meetup.id)}/help`, jsonPost({ action, note: '', idempotency_key: crypto.randomUUID() }))
   }
 
-  if (loading && !meetup) return <main className="min-h-screen bg-boot-canvas p-8 text-center"><Loader2 className="mx-auto animate-spin text-boot-primary" /><p className="mt-3 text-sm font-bold text-boot-muted">모임을 불러오는 중이에요.</p></main>
-  if (!meetup) return <main className="min-h-screen bg-boot-canvas px-4 py-8"><div className="mx-auto max-w-xl rounded-[12px] border border-boot-hairline bg-white p-6 text-center"><p className="font-black">{notice || '모임을 찾지 못했어요.'}</p><button type="button" onClick={() => void load()} className="mt-4 min-h-11 rounded-[8px] bg-boot-primary px-4 text-sm font-black text-white"><RotateCw className="mr-1 inline" size={16} />다시 확인</button></div></main>
+  if ((loading && !meetup)||meetup&&meetup.id!==meetupId) return <main className="min-h-screen bg-boot-canvas p-8 text-center"><Loader2 className="mx-auto animate-spin text-boot-primary" /><p className="mt-3 text-sm font-bold text-boot-muted">모임을 불러오는 중이에요.</p></main>
+  if (!meetup) return <main className="min-h-screen bg-boot-canvas px-4 py-8"><div className="mx-auto max-w-xl rounded-[20px] border border-boot-hairline bg-white p-6 text-center"><p className="font-black">{loginRequired ? '로그인하고 이 모임을 확인해요' : notice || '모임을 찾지 못했어요.'}</p>{loginRequired ? <><p className="mt-3 text-sm leading-6 text-boot-muted">처음이라면 같은 화면에서 가입할 수 있어요. 완료하면 이 모임으로 돌아와요.</p><Link href={`/login?redirect=${encodeURIComponent(`/meetups/${encodeURIComponent(meetupId)}`)}`} className="mt-5 flex min-h-12 items-center justify-center rounded-xl bg-boot-primary px-4 text-sm font-black text-white">로그인·가입하고 모임 보기</Link><Link href="/meetups" className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-boot-muted"><ArrowLeft size={16}/>모임 목록으로</Link></> : <button type="button" onClick={() => void load()} className="mt-4 min-h-11 rounded-[8px] bg-boot-primary px-4 text-sm font-black text-white"><RotateCw className="mr-1 inline" size={16} />다시 확인</button>}</div></main>
 
   const active = meetup.status === 'open' || meetup.status === 'full'
-  const conversation = meetup.joined ? <section id="meetup-chat" className="scroll-mt-4 rounded-[12px] border border-boot-hairline bg-white p-5"><div className="flex items-center gap-2"><MessageCircle size={18} className="text-boot-primary" /><h2 className="font-black">참가자 대화</h2></div><p className="mt-1 text-xs font-bold leading-5 text-boot-muted">참가 중에는 별칭으로 대화하고, 나가기·취소·종료 뒤에는 새 메시지를 보낼 수 없어요. 연락처 공유는 차단돼요.</p><div ref={chatReadRoot} className="mt-4 max-h-72 space-y-2 overflow-y-auto">{chat?.messages.length ? chat.messages.map((item) => <p key={item.id} data-social-message-id={item.id} className="rounded-[8px] bg-boot-soft px-3 py-2 text-sm"><b className="mr-2 text-boot-primary">{item.sender_alias}</b>{item.message}</p>) : <p className="text-sm font-bold text-boot-muted">아직 메시지가 없어요.</p>}</div>{active && !readOnly ? <ActivityRoomPolls roomId={meetup.id} roomKind="meetups" composerRequest={pollComposerRequest} /> : null}{chat?.phase === 'send' && !readOnly ? <div className="mt-4 flex items-end gap-2"><ChatComposerActions onCreatePoll={() => setPollComposerRequest(value => value + 1)} disabled={busy} /><input aria-label="참가자 대화 메시지" maxLength={1000} value={message} onChange={(event) => setMessage(event.target.value)} className={`${inputClass} min-w-0 flex-1`} /><button type="button" disabled={busy || !message.trim()} onClick={() => void sendMessage()} className={`${primaryButton} px-4`}>전송</button></div> : <p className="mt-3 text-xs font-black text-boot-muted">현재 대화는 읽기 전용이에요.</p>}</section> : null
-  const Container = chatOnly ? 'section' : 'main'
-  const Activities = chatOnly ? 'details' : 'div'
-  return (
-    <Container className={chatOnly ? 'text-boot-ink' : 'min-h-screen bg-boot-canvas px-4 pb-28 pt-5 text-boot-ink'}>
-      <div className="mx-auto w-full max-w-3xl space-y-5">
-        {chatOnly && meetup.joined ? <MeetupApplications meetupId={meetupId} noticesOnly/> : null}
-        {chatOnly ? conversation : <Link href="/meetups" className="inline-flex min-h-11 items-center gap-2 text-sm font-black text-boot-primary"><ArrowLeft size={17} />모임 목록</Link>}
-        {meetup.is_host && !chatOnly ? <Link href={`/meetups/${meetup.id}/applications`} className="flex min-h-12 items-center justify-between rounded-2xl border border-[#dbe3d4] bg-[#eff3e8] px-5 py-4 font-bold text-[#3d5e43]"><span>함께할 사람 · 참가 신청 확인</span><UsersRound size={20}/></Link> : null}
-        <Activities className="space-y-5">
-        {chatOnly ? <summary className="cursor-pointer rounded-[8px] border border-boot-hairline bg-white p-4 font-black">모임·일정·참가자 관리</summary> : null}
+  const management = (closeChatManagement?:()=>void) => <div className="space-y-5">
+    {meetup.is_host?<Link href={`/meetups/${meetup.id}/applications`} className="flex min-h-12 items-center justify-between rounded-2xl border border-[#dbe3d4] bg-[#eff3e8] px-5 py-4 font-bold text-[#3d5e43]"><span>함께할 사람 · 참가 신청 확인</span><UsersRound size={20}/></Link>:null}
         <section className="rounded-[12px] border border-boot-hairline bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-black text-boot-primary">{getMeetupCategoryLabel(meetup.category)} · {meetup.scope_type === 'department' ? `${meetup.department_label ?? '학과'} 전용` : '학교 전체'}</p><h1 className="mt-1 text-2xl font-black">{meetup.title}</h1></div><span className="rounded-[6px] bg-boot-soft px-2 py-1 text-xs font-black text-boot-primary">{statusLabel(meetup.status)}</span></div>
           {meetup.description ? <p className="mt-3 text-sm font-bold leading-6 text-boot-muted">{meetup.description}</p> : null}
@@ -237,16 +254,26 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
 
         {meetup.is_host && active ? <section className="rounded-[12px] border border-boot-hairline bg-white p-5"><h2 className="font-black">주최자 일정 관리</h2><p className="mt-1 text-xs font-bold text-boot-muted">일정 변경은 참가자 상세의 변경 기록에 남고 최신 revision으로만 저장돼요.</p><div className="mt-4 grid gap-3 sm:grid-cols-2"><input aria-label="새 시작 시간" type="datetime-local" value={scheduleStart} onChange={(event) => setScheduleStart(event.target.value)} className={inputClass} /><input aria-label="새 종료 시간" type="datetime-local" value={scheduleEnd} onChange={(event) => setScheduleEnd(event.target.value)} className={inputClass} /><input aria-label="새 장소" value={schedulePlace} onChange={(event) => setSchedulePlace(event.target.value)} className={`${inputClass} sm:col-span-2`} /></div><div className="mt-3 grid gap-2 sm:grid-cols-3"><button type="button" disabled={busy} onClick={() => void updateSchedule()} className={primaryButton}>{meetup.schedule_status==='schedule_pending'?'함께 정한 일정 확정':'일정 변경 저장'}</button><button type="button" disabled={busy||meetup.schedule_status==='schedule_pending'} onClick={() => void completeMeetup()} className={secondaryButton}>모임 전체 종료</button><button type="button" disabled={busy} onClick={() => void cancelMeetup()} className="min-h-11 rounded-[8px] border border-boot-coral/30 bg-white px-3 text-sm font-black text-boot-coral">모임 전체 취소</button></div></section> : null}
 
-        {meetup.joined && guide ? <LiveActivityGuide guide={guide} busy={busy} onAction={(action, sceneId) => { void guideAction(action, sceneId) }} /> : null}
+        {meetup.joined && guide ? <LiveActivityGuide guide={guide} busy={busy} onAction={(action, sceneId) => { if(action==='open_chat'&&chatOnly&&closeChatManagement){closeChatManagement();return} void guideAction(action, sceneId) }} /> : null}
 
 
         {meetup.joined ? <section className="rounded-[12px] border border-boot-hairline bg-white p-5"><div className="flex items-center gap-2"><ShieldCheck size={18} className="text-[#147A70]" /><h2 className="font-black">참가자</h2></div><p className="mt-1 text-xs font-bold text-boot-muted">이 방 안에서 필요한 최소 별칭만 보여요. 참여만으로 친구 관계가 생기지 않아요.</p><ul className="mt-3 flex flex-wrap gap-2">{meetup.members.map((member) => <li key={`${member.role}-${member.alias}`} className="rounded-full bg-boot-soft px-3 py-2 text-xs font-black text-boot-primary">{member.alias}{member.role === 'host' ? ' · 주최자' : ''}</li>)}</ul></section> : null}
 
-        </Activities>
-        {notice ? <p role="status" className="rounded-[8px] bg-white px-4 py-3 text-sm font-black text-boot-coral">{notice}</p> : null}
-      </div>
-    </Container>
-  )
+
+    {notice ? <p role="status" className="rounded-[8px] bg-white px-4 py-3 text-sm font-black text-boot-coral">{notice}</p> : null}
+  </div>
+  if(chatOnly&&meetup.joined)return <SocialMessenger scope={meetupId} root={chatReadRoot}
+    messages={(chat?.messages??[]).map(item=>({id:item.id,alias:item.sender_alias,text:item.message,createdAt:item.created_at,isMe:item.is_me}))}
+    loading={chatLoading} error={chatError||sendError} onRetry={()=>void loadChat()} readOnly={readOnly||(!active)||chat?.phase==='read_only'}
+    notice={<MeetupApplications meetupId={meetupId} noticesOnly/>} management={management}
+    tools={active&&!readOnly?<ActivityRoomPolls roomId={meetup.id} roomKind="meetups" composerRequest={pollComposerRequest}/>:null}
+    composer={<SocialChatComposer value={message} onChange={setMessage} onSend={()=>void sendMessage()} busy={sending} disabled={busy||readOnly||chat?.phase!=='send'||!!chatError} onCreatePoll={active&&!readOnly?()=>setPollComposerRequest(value=>value+1):undefined} label="참가자 대화 메시지"/>}/>
+  return <main className="min-h-screen bg-boot-canvas px-4 pb-28 pt-5 text-boot-ink"><div className="mx-auto w-full max-w-3xl space-y-5">
+    <Link href="/meetups" className="inline-flex min-h-11 items-center gap-2 text-sm font-black text-boot-primary"><ArrowLeft size={17}/>모임 목록</Link>
+    <MeetupCreatedNotice meetup={meetup} created={created}/>
+    {management()}
+  </div></main>
+
 }
 
 const inputClass = 'min-h-11 rounded-[8px] border border-boot-hairline bg-white px-3 text-sm font-bold outline-none focus:border-boot-primary'

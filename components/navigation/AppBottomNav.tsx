@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, MessageCircle, MessageCircleMore, UserRound, UsersRound, Zap } from 'lucide-react'
 
-const hiddenExactRoutes = new Set(['/login', '/dev/preview'])
+const hiddenExactRoutes = new Set(['/login', '/dev/preview', '/meetups/dev-notifications', '/meetups/dev-flow', '/meetups/dev-chat'])
 
 const tabs = [
   { href: '/', label: '홈', Icon: Home },
@@ -22,12 +22,16 @@ function shouldHide(pathname: string): boolean {
   if (hiddenExactRoutes.has(pathname)) return true
   if (pathname.startsWith('/admin')) return true
   if (pathname.startsWith('/match/events/')) return true
+  // In a conversation the bottom edge belongs to the composer. Back returns
+  // to the chat tab; discovery and room detail pages keep their normal tabs.
+  if (pathname.startsWith('/chat/rooms/') || pathname.startsWith('/chat/league-team/') || pathname.startsWith('/meetups/rooms/')) return true
   return false
 }
 
-export default function AppBottomNav() {
+export default function AppBottomNav({previewPathname}:{previewPathname?:string} = {}) {
   const { t } = useQuantumLocale()
-  const pathname = usePathname() || '/'
+  const currentPathname = usePathname() || '/'
+  const pathname = previewPathname ?? currentPathname
   const { unread } = useNotifications()
 
   if (shouldHide(pathname)) return null

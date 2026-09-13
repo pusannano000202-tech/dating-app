@@ -133,6 +133,12 @@ test('home read returns own current scheduled and automatic rooms only, without 
     const migration = names.find(n => n.endsWith('_home_my_meetups_read.sql'))
     assert.ok(migration, 'own-home read migration must exist')
     await f.db.exec(await readFile(new URL('../../supabase/migrations/' + migration, import.meta.url), 'utf8'))
+    // Exercise the current home replacement with the real automatic-room access
+    // guards too, not only the old home RPC or an empty automatic-room fixture.
+    await f.db.exec("alter table public.activity_meetups add column schedule_status text not null default 'confirmed'; alter table public.activity_meetup_members add column joined_at timestamptz not null default now()")
+    const pendingMigration=await readFile(new URL('../../supabase/migrations/20260911141856_meetup_pending_schedule.sql',import.meta.url),'utf8')
+    const homeReplacement=pendingMigration.slice(pendingMigration.indexOf('create or replace function public.get_my_home_meetups()'))
+    await f.db.exec(homeReplacement.slice(0,homeReplacement.indexOf('end $$;')+7))
     const value = await f.rpc('get_my_home_meetups')
     assert.equal(value.items.length,2)
     assert.equal(value.has_more,false)

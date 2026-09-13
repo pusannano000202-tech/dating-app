@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { getPostLoginDestination } from '@/lib/auth/redirect'
-import { getOAuthCallbackErrorMessage } from '@/lib/auth/oauth-login'
+import { getOAuthRetryUrl } from '@/lib/auth/oauth-login'
 import { getPublicAppOrigin, getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 
 type CookieMutation = { name: string; value: string; options?: CookieOptions }
@@ -34,16 +34,14 @@ export async function GET(request: NextRequest) {
   if (!appOrigin) return unavailable()
 
   if (providerError) {
-    const loginUrl = new URL('/login', appOrigin)
-    loginUrl.searchParams.set('auth_error', getOAuthCallbackErrorMessage(providerError))
+    const loginUrl = getOAuthRetryUrl(appOrigin, next, providerError)
     return applyCookieMutations(NextResponse.redirect(loginUrl), [])
   }
 
   if (configIssue) return unavailable()
 
   if (!code) {
-    const loginUrl = new URL('/login', appOrigin)
-    loginUrl.searchParams.set('auth_error', getOAuthCallbackErrorMessage())
+    const loginUrl = getOAuthRetryUrl(appOrigin, next)
     return applyCookieMutations(NextResponse.redirect(loginUrl), [])
   }
 
@@ -67,8 +65,7 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (error) {
-      const loginUrl = new URL('/login', appOrigin)
-      loginUrl.searchParams.set('auth_error', getOAuthCallbackErrorMessage())
+      const loginUrl = getOAuthRetryUrl(appOrigin, next)
       return applyCookieMutations(NextResponse.redirect(loginUrl), cookiesToSet)
     }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { guardDepositMutation } from '@/lib/payments/request-guard'
 
 export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -25,6 +26,8 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
 }
 
 export async function POST(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const blocked = guardDepositMutation(_req, false)
+  if (blocked) return blocked
   const params = await props.params;
   const supabase = createSupabaseRequestClient(_req)
   const { data: { user } } = await supabase.auth.getUser()

@@ -15,6 +15,13 @@ export function getOAuthCallbackUrl(origin: string, destination?: string | null)
   return callbackUrl.toString()
 }
 
+export function getOAuthRetryUrl(origin: string, destination?: string | null, errorCode?: string | null): string {
+  const loginUrl = new URL('/login', origin)
+  loginUrl.searchParams.set('auth_error', getOAuthCallbackErrorMessage(errorCode))
+  if (isSafeLocalRedirect(destination)) loginUrl.searchParams.set('redirect', destination)
+  return loginUrl.toString()
+}
+
 export function getOAuthLoginErrorMessage(
   provider: QuantumOAuthProvider,
   error: unknown

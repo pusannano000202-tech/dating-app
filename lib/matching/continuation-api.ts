@@ -17,6 +17,7 @@ export function mapContinuationRpcError(error: unknown): {
   error: ContinuationPublicError
 } {
   const message = errorMessage(error)
+  if (message.includes('dating_participation_unavailable')) return { status: 409, error: 'not_ready' }
   if (/not_authenticated|unauthenticated/.test(message)) return { status: 401, error: 'unauthenticated' }
   if (/attendee_required|service_role_required|forbidden/.test(message)) return { status: 403, error: 'forbidden' }
   if (/_not_found|not found/.test(message)) return { status: 404, error: 'not_found' }

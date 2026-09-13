@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Flame, MessageCircle, ThumbsDown, ThumbsUp } from 'lucide-react'
 
 import { communityCategoryCatalog, getCommunityCategory } from '@/lib/community/catalog'
@@ -12,19 +12,31 @@ type HotState = 'loading' | 'ready' | 'auth_required' | 'schema_unavailable' | '
 export default function HotCommunityBoard() {
   const [posts, setPosts] = useState<CommunityPost[]>([])
   const [state, setState] = useState<HotState>('loading')
+  const pending = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    fetch('/api/community/posts?feed=hot', { cache: 'no-store' })
-      .then(async (response) => {
+  const load = useCallback(async () => {
+    pending.current?.abort()
+    const controller = new AbortController()
+    pending.current = controller
+    setState('loading')
+    const timeout = setTimeout(() => controller.abort(), 12000)
+    try {
+        const response = await fetch('/api/community/posts?feed=hot', { cache: 'no-store', signal: controller.signal })
         const payload = await response.json().catch(() => ({})) as { posts?: CommunityPost[]; availability?: HotState }
+        if (pending.current !== controller) return
         if (!response.ok) setState(response.status === 401 ? 'auth_required' : 'error')
         else {
           setPosts(payload.posts ?? [])
           setState(payload.availability ?? 'ready')
         }
-      })
-      .catch(() => setState('error'))
+    } catch { if (pending.current === controller) setState('error') }
+    finally { clearTimeout(timeout); if (pending.current === controller) pending.current = null }
   }, [])
+
+  useEffect(() => {
+    void load()
+    return () => { pending.current?.abort(); pending.current = null }
+  }, [load])
 
   return (
     <main className="min-h-screen bg-boot-canvas pb-28 text-boot-ink">
@@ -39,10 +51,12 @@ export default function HotCommunityBoard() {
           {communityCategoryCatalog.map((entry) => <Link key={entry.id} href={entry.href} className="flex min-h-10 shrink-0 items-center rounded-lg border border-boot-hairline bg-white px-3 text-xs font-black text-boot-muted">{entry.title}</Link>)}
         </nav>
 
-        {state === 'loading' ? <p className="py-8 text-sm font-bold text-boot-muted">핫 게시글을 모으고 있어요.</p> : null}
+        {state === 'loading' ? <p role="status" className="py-8 text-sm font-bold text-boot-muted">핫 게시글을 모으고 있어요.</p> : null}
         {state === 'auth_required' ? <Notice text="로그인하면 같은 학교의 핫 게시글을 볼 수 있어요." /> : null}
-        {state === 'schema_unavailable' ? <Notice text="좋아요 저장소 연결 전이에요. DB 연결 뒤 최근 7일 핫 게시판이 열려요." /> : null}
+        {state === 'auth_required' ? <Link href="/login?redirect=%2Fcommunity%2Fhot" className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-boot-ink px-4 text-sm font-bold text-white">로그인하고 이어 보기</Link> : null}
+        {state === 'schema_unavailable' ? <Notice text="핫 게시판 연결을 확인하지 못했어요. 잠시 후 다시 시도해 주세요." /> : null}
         {state === 'error' ? <Notice text="핫 게시글을 불러오지 못했어요." /> : null}
+        {state === 'error' || state === 'schema_unavailable' ? <button type="button" onClick={() => void load()} className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-boot-hairline bg-white px-4 text-sm font-bold text-boot-ink">다시 시도</button> : null}
         {state === 'ready' && posts.length === 0 ? <Notice text="최근 7일 동안 아직 반응을 받은 글이 없어요." /> : null}
         {state === 'ready' && posts.length ? (
           <div className="divide-y divide-boot-hairline border-y border-boot-hairline bg-white">

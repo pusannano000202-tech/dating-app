@@ -64,7 +64,7 @@ test('login maps public errors without echoing provider or environment details',
 })
 
 test('calendar is presented as part of the matching tab', () => {
-  const nav = read('components/navigation/AppBottomNav.tsx')
+  const nav = read('lib/navigation/app-tabs.ts')
 
   assert.match(nav, /href === '\/match'[\s\S]*pathname === '\/calendar'/)
 })

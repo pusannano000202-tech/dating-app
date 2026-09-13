@@ -20,10 +20,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24.14.1"
 
       - name: Test migration verifier
         run: npm run test:tooling
@@ -75,7 +75,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24.14.1"
           cache: "npm"
 
       - name: Install dependencies
@@ -97,6 +97,27 @@ jobs:
 
       - name: JavaScript tooling and SQL regression tests
         run: npm run test:tooling:js
+
+      - name: Deposit authorization and isolated ledger regressions
+        run: npm run test:deposit-security
+
+      - name: Shared-room navigation and messenger regressions
+        run: npm run test:ui-cohesion
+
+      - name: Reject known high-severity dependency advisories
+        run: npm audit --audit-level=high
+
+      - name: Reject committed secrets
+        run: npm run check:secrets
+
+      - name: Production build without live service credentials
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-publishable-key
+          TONIGHT_CARD_PAYMENTS_ENABLED: "false"
+          NEXT_PUBLIC_DEV_AUTH_BYPASS: "false"
 
       - name: ESLint
         run: npm run lint

@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getRoleDestination, isSafeLocalRedirect } from '@/lib/auth/redirect'
+import { resolveSharedMeetupOnboarding } from '@/lib/auth/shared-meetup-return'
 import { RequestGuardError, requireServerAccess, type AccessGuardClient } from '@/lib/auth/server-guards'
 import { getPublicAppOrigin, getSupabaseConfigIssue, getSupabasePublicKey, getSupabaseUrl } from '@/lib/utils'
 
@@ -54,7 +55,10 @@ export async function GET(request: NextRequest) {
       },
     )
     const { access } = await requireServerAccess(supabase as unknown as AccessGuardClient)
-    const destination = getRoleDestination(access.accessRole, requestedRedirect)
+    const roleDestination = getRoleDestination(access.accessRole, requestedRedirect)
+    const destination = access.accessRole === 'user'
+      ? await resolveSharedMeetupOnboarding(supabase, roleDestination)
+      : roleDestination
     return applyCookieMutations(
       NextResponse.redirect(new URL(destination, appOrigin)),
       cookiesToSet,

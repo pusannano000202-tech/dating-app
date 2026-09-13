@@ -4,7 +4,11 @@ import { ArrowLeft, CalendarDays, Check, ChevronDown, Gamepad2, Loader2, LockKey
 import Image from 'next/image'
 import Link from 'next/link'
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import ActivityRoomPolls from '@/components/chat-polls/ActivityRoomPolls'
+import ChatComposerActions from '@/components/chat-polls/ChatComposerActions'
+import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
 import { parseDepartmentChallengeInviteState, type DepartmentChallengeInviteState } from '@/lib/community/challenges'
+import { filterDiscoveryChallenges } from '@/lib/meetups/challenge-discovery'
 import {
   buildDepartmentRosterSlots,
   parseDepartmentChallenges,
@@ -13,6 +17,8 @@ import {
   type DepartmentChallengeTeam as ChallengeTeam,
 } from './department-challenge-presentation'
 import styles from './department-challenge.module.css'
+import DepartmentLeaguePanel from './DepartmentLeaguePanel'
+import DepartmentLeagueReport from './DepartmentLeagueReport'
 
 type MutationPayload = { error?: string; challenge?: unknown } | null
 type MutationResult = {
@@ -26,18 +32,19 @@ type Mutate = (
   method?: string,
 ) => Promise<MutationResult>
 
-export default function DepartmentChallengeExperience() {
+export default function DepartmentChallengeExperience({ browseCategory }: { browseCategory?: 'soccer' | 'gaming' } = {}) {
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
-  const [category, setCategory] = useState<'soccer' | 'gaming'>('gaming')
+  const [category, setCategory] = useState<'soccer' | 'gaming'>(browseCategory ?? 'gaming')
   const [title, setTitle] = useState('')
   const [rules, setRules] = useState('')
   const [capacity, setCapacity] = useState(5)
-  const [createOpen, setCreateOpen] = useState(true)
+  const [createOpen, setCreateOpen] = useState(!browseCategory)
   const [createHint, setCreateHint] = useState('')
+  const [leagueRefresh, setLeagueRefresh] = useState(0)
   const [createdChallengeId, setCreatedChallengeId] = useState<string | null>(null)
   const [createdRefreshPending, setCreatedRefreshPending] = useState(false)
   const createIdempotencyKeyRef = useRef<string | null>(null)
@@ -78,6 +85,7 @@ export default function DepartmentChallengeExperience() {
       const payload = await response.json().catch(() => null) as MutationPayload
       if (!response.ok) throw new Error(payload?.error ?? 'request_failed')
       const refreshedChallenges = await load()
+      setLeagueRefresh(value => value + 1)
       return { saved: true, challenges: refreshedChallenges, payload }
     } catch (error) {
       setNotice(challengeError(error))
@@ -132,6 +140,7 @@ export default function DepartmentChallengeExperience() {
 
   function chooseCategory(nextCategory: 'soccer' | 'gaming') {
     setCategory(nextCategory)
+    if (nextCategory === 'gaming') setCapacity(5)
     resetCreateIntent()
   }
 
@@ -150,13 +159,37 @@ export default function DepartmentChallengeExperience() {
     height: 535,
   }
 
+  const visibleChallenges = filterDiscoveryChallenges(challenges, browseCategory ? category : undefined)
+  const challengeList = <section className={styles.challengeList} aria-labelledby="challenge-list-title">
+    <div className="flex items-center gap-2"><Trophy className="text-boot-primary" size={20} /><h2 id="challenge-list-title" className="text-xl font-black">{browseCategory ? `${category === 'soccer' ? '축구' : '게임'} 팀 모집` : '진행 중인 모집'}</h2></div>
+    {browseCategory ? <p className="mt-2 text-xs leading-6 text-boot-muted">최근 불러온 최대 50개 기준이에요. 팀의 진행 상태와 참가 가능 여부를 확인해 주세요.</p> : null}
+    {notice ? <p role="status" className="mt-3 rounded-[8px] bg-white px-4 py-3 text-sm font-black text-boot-coral">{notice}</p> : null}
+    {loading ? <div className="py-10 text-center" role="status" aria-label="모집 목록 확인 중"><Loader2 className="mx-auto animate-spin text-boot-primary" /></div>
+      : loadError ? <div role="alert" className="mt-4 rounded-[12px] border border-boot-coral/25 bg-white p-5 text-sm font-bold text-boot-coral">학과 대항 모집을 불러오지 못했어요.<button type="button" onClick={() => void load()} className="ml-2 min-h-11 underline">다시 시도</button></div>
+        : visibleChallenges.length ? <div className="mt-4 grid gap-4">{visibleChallenges.map((challenge) => <ChallengeCard key={challenge.id} challenge={challenge} busy={busy} mutate={mutate} startInviteOpen={challenge.id === createdChallengeId} />)}</div>
+          : <p className="mt-4 rounded-[12px] border border-dashed border-boot-hairline bg-white p-6 text-center text-sm font-bold text-boot-muted">{browseCategory ? `불러온 모집 중 ${category === 'soccer' ? '축구' : '게임'} 대항을 찾지 못했어요.` : '아직 학과 대항 모집이 없어요.'}</p>}
+  </section>
+
   return (
     <main className={styles.page}>
       <div className={styles.shell}>
         <header className={styles.topBar}>
-          <Link href="/meetups" aria-label="일반 모임으로 돌아가기" className={styles.backButton}><ArrowLeft aria-hidden="true" size={23} /></Link>
-          <span>우리 팀 만들기</span>
+          <Link href={browseCategory ? '/meetups/challenges' : '/meetups'} aria-label={browseCategory ? '학과 대항 종목 고르기' : '일반 모임으로 돌아가기'} className={styles.backButton}><ArrowLeft aria-hidden="true" size={23} /></Link>
+          <span>{browseCategory ? '함께 뛸 우리 과 팀 찾기' : '우리 팀 만들기'}</span>
         </header>
+
+        <DepartmentLeaguePanel category={category} onChanged={() => { void load() }} refreshKey={leagueRefresh} />
+
+        {browseCategory ? <>
+          <div className="mb-6">
+            <h1 className="text-3xl font-black tracking-tight">혼자 와도, 우리 팀으로.</h1>
+            <p className="mt-3 text-sm leading-7 text-boot-muted">우리 과 팀의 빈자리를 확인해요.<br />참가 요청 후 주장이 수락하면 함께할 수 있어요.</p>
+            <nav aria-label="학과 대항 모집 종목" className="mt-4 flex gap-2">
+              {(['gaming', 'soccer'] as const).map(sport => <Link key={sport} href={`/community/department?category=${sport}`} aria-current={category === sport ? 'page' : undefined} className={`inline-flex min-h-11 items-center rounded-full border px-5 text-sm font-bold ${category === sport ? 'border-boot-primary bg-boot-primary text-white' : 'border-boot-hairline bg-white text-boot-muted'}`}>{sport === 'gaming' ? '게임 팀' : '축구 팀'}</Link>)}
+            </nav>
+          </div>
+          {challengeList}
+        </> : null}
 
         {createOpen ? <form onSubmit={(event) => { void create(event) }} className={styles.composer}>
           <div className={styles.heroTitle}>
@@ -185,8 +218,9 @@ export default function DepartmentChallengeExperience() {
               <input
                 aria-label="팀 정원"
                 type="number"
-                min={2}
-                max={20}
+                min={category === 'gaming' ? 5 : 2}
+                max={category === 'gaming' ? 5 : 20}
+                disabled={category === 'gaming'}
                 value={capacity}
                 onChange={(event) => {
                   const nextCapacity = Number(event.target.value)
@@ -243,21 +277,17 @@ export default function DepartmentChallengeExperience() {
             </button>
           </div>
           <p className={styles.identityNote}>학과는 가입 때 직접 입력한 정보이며 재학 인증 표시가 아니에요.</p>
-        </form> : <section className={styles.createdPanel}>
+        </form> : createdChallengeId ? <section className={styles.createdPanel}>
           <p>{createdRefreshPending ? '팀은 생성됐고, 친구 초대 목록만 다시 확인하면 돼요.' : '새 팀의 친구 초대 패널을 열었어요.'}</p>
           {createdRefreshPending
             ? <button type="button" onClick={() => void retryCreatedChallenge()}>목록 다시 불러오기</button>
             : <button type="button" onClick={() => { resetCreateIntent(); setCreateOpen(true) }}>우리 팀 만들기</button>}
+        </section> : <section className="mt-8 rounded-2xl border border-boot-hairline bg-white p-5">
+          <h2 className="font-bold">찾는 팀이 없다면?</h2><p className="mt-2 text-sm leading-6 text-boot-muted">우리 과 팀을 만들고 친구를 초대할 수도 있어요.</p>
+          <button type="button" onClick={() => setCreateOpen(true)} className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-boot-primary"><Plus size={17} />우리 팀 직접 만들기</button>
         </section>}
 
-        <section className={styles.challengeList} aria-labelledby="challenge-list-title">
-          <div className="flex items-center gap-2"><Trophy className="text-boot-primary" size={20} /><h2 id="challenge-list-title" className="text-xl font-black">진행 중인 모집</h2></div>
-          {notice ? <p role="status" className="mt-3 rounded-[8px] bg-white px-4 py-3 text-sm font-black text-boot-coral">{notice}</p> : null}
-          {loading ? <div className="py-10 text-center"><Loader2 className="mx-auto animate-spin text-boot-primary" /></div>
-            : loadError ? <div role="alert" className="mt-4 rounded-[12px] border border-boot-coral/25 bg-white p-5 text-sm font-bold text-boot-coral">학과 대항 모집을 불러오지 못했어요.<button type="button" onClick={() => void load()} className="ml-2 underline">다시 시도</button></div>
-              : challenges.length ? <div className="mt-4 grid gap-4">{challenges.map((challenge) => <ChallengeCard key={challenge.id} challenge={challenge} busy={busy} mutate={mutate} startInviteOpen={challenge.id === createdChallengeId} />)}</div>
-                : <p className="mt-4 rounded-[12px] border border-dashed border-boot-hairline bg-white p-6 text-center text-sm font-bold text-boot-muted">아직 학과 대항 모집이 없어요.</p>}
-        </section>
+        {!browseCategory ? challengeList : null}
       </div>
     </main>
   )
@@ -280,13 +310,18 @@ function PlannedRoster({ capacity, onPlannedSlotClick }: { capacity: number; onP
 }
 
 function ChallengeCard({ challenge, busy, mutate, startInviteOpen }: { challenge: Challenge; busy: boolean; mutate: Mutate; startInviteOpen: boolean }) {
+  const { t } = useQuantumLocale()
+  const rosterLocked = challenge.fair_league && challenge.status !== 'recruiting'
+  const [pollComposerRequest, setPollComposerRequest] = useState(0)
   const [startsAt, setStartsAt] = useState(challenge.scheduled_at ? toLocalInput(challenge.scheduled_at) : '')
   const [endsAt, setEndsAt] = useState(challenge.ends_at ? toLocalInput(challenge.ends_at) : '')
   const [place, setPlace] = useState(challenge.place_name ?? '')
   const [ownScore, setOwnScore] = useState(0)
   const [opponentScore, setOpponentScore] = useState(0)
+  const mayUsePolls = !['completed', 'cancelled'].includes(challenge.status)
+    && challenge.teams.some((team) => team.roster.some((entry) => entry.is_me && entry.status === 'accepted'))
   const mutation = (suffix: string, body: Record<string, unknown>, method?: string) => mutate(`/api/community/department/challenges/${encodeURIComponent(challenge.id)}${suffix}`, { ...body, expected_revision: challenge.revision, idempotency_key: crypto.randomUUID() }, method)
-  return <article className="rounded-[12px] border border-boot-hairline bg-white p-5"><div className="flex items-start justify-between gap-3"><div><p className="flex items-center gap-1 text-xs font-black text-boot-primary">{challenge.category === 'soccer' ? <Trophy size={15} /> : <Gamepad2 size={15} />}{challenge.category === 'soccer' ? '축구' : '게임'}</p><h3 className="mt-1 text-xl font-black">{challenge.title}</h3></div><span className="rounded-[6px] bg-boot-soft px-2 py-1 text-xs font-black text-boot-primary">{challengeStatus(challenge.status)}</span></div>{challenge.rules ? <p className="mt-3 text-sm font-bold leading-6 text-boot-muted">{challenge.rules}</p> : null}{challenge.scheduled_at ? <div className="mt-3 flex flex-wrap gap-4 text-xs font-bold text-boot-muted"><span className="flex gap-1"><CalendarDays size={15} />{formatDate(challenge.scheduled_at)}</span><span className="flex gap-1"><MapPin size={15} />{challenge.place_name}</span></div> : null}<div className="mt-4 grid gap-3 sm:grid-cols-2">{challenge.teams.map((team) => <section key={team.id} className="rounded-[8px] bg-boot-soft p-3"><div className="flex justify-between gap-2"><h4 className="font-black">{team.department_label}</h4><span className="text-xs font-black text-boot-primary">{team.accepted_count}/{team.capacity}명</span></div><RosterSlots team={team} />{team.may_request_roster && !team.roster.some((entry) => entry.is_me && ['requested', 'accepted'].includes(entry.status)) ? <button type="button" disabled={busy} onClick={() => void mutation('/roster', { team_id: team.id })} className={smallButton}>팀 참가 요청</button> : null}{!team.is_captain && team.roster.some((entry) => entry.is_me && ['requested', 'accepted'].includes(entry.status)) ? <button type="button" disabled={busy} onClick={() => void mutation('/roster', { team_id: team.id }, 'DELETE')} className={smallButton}>팀에서 나가기</button> : null}{team.is_captain ? team.roster.filter((entry) => entry.status === 'requested').map((entry) => <button key={entry.id} type="button" disabled={busy} onClick={() => void mutation(`/roster/${encodeURIComponent(entry.id)}/accept`, {})} className={smallButton}>{entry.alias} 수락</button>) : null}</section>)}</div><ChallengeInvitePanel challenge={challenge} busy={busy} mutate={mutate} startOpen={startInviteOpen} />{challenge.can_accept_opponent ? <button type="button" disabled={busy} onClick={() => void mutation('/opponent', {})} className={`${primaryButton} mt-4`}>상대 학과로 수락</button> : null}{challenge.is_captain && !['completed', 'cancelled'].includes(challenge.status) ? <div className="mt-4 border-t border-boot-hairline pt-4"><h4 className="text-sm font-black">양쪽 일정 확인</h4><div className="mt-2 grid gap-2 sm:grid-cols-3"><input aria-label="대항 시작 시간" type="datetime-local" value={startsAt} onChange={(event) => setStartsAt(event.target.value)} className={inputClass} /><input aria-label="대항 종료 시간" value={endsAt} type="datetime-local" onChange={(event) => setEndsAt(event.target.value)} className={inputClass} /><input aria-label="대항 장소" value={place} onChange={(event) => setPlace(event.target.value)} className={inputClass} /></div><button type="button" disabled={busy || !startsAt || !endsAt || !place.trim()} onClick={() => void mutation('/schedule', { scheduled_at: new Date(startsAt).toISOString(), ends_at: new Date(endsAt).toISOString(), place_name: place })} className={`${smallButton} mt-2`}>이 일정 확인</button></div> : null}{challenge.is_captain && ['scheduled', 'result_pending'].includes(challenge.status) ? <div className="mt-4 border-t border-boot-hairline pt-4"><h4 className="text-sm font-black">양쪽 주장이 같은 결과를 확인해야 공개돼요</h4><div className="mt-2 flex items-center gap-2"><input aria-label="우리 팀 점수" type="number" min={0} max={999} value={ownScore} onChange={(event) => setOwnScore(Number(event.target.value))} className={scoreInput} /><span className="font-black">:</span><input aria-label="상대 팀 점수" type="number" min={0} max={999} value={opponentScore} onChange={(event) => setOpponentScore(Number(event.target.value))} className={scoreInput} /><button type="button" disabled={busy} onClick={() => void mutation('/result', { own_score: ownScore, opponent_score: opponentScore })} className={smallButton}>결과 확인</button></div></div> : null}{challenge.result ? <p className="mt-4 rounded-[8px] bg-[#EAF6F4] px-3 py-2 text-center text-lg font-black text-[#147A70]">확정 결과 {challenge.result.first_score} : {challenge.result.second_score}</p> : null}{challenge.is_captain && !['completed', 'cancelled'].includes(challenge.status) ? <button type="button" disabled={busy} onClick={() => { const reason = window.prompt('취소 이유를 입력해 주세요.')?.trim(); if (reason) void mutation('/cancel', { reason }) }} className="mt-4 min-h-11 rounded-[8px] border border-boot-coral/30 px-3 text-sm font-black text-boot-coral">대항 모집 취소</button> : null}<p className="mt-4 flex gap-2 text-xs font-bold leading-5 text-boot-muted"><ShieldCheck size={16} className="shrink-0 text-[#147A70]" />참가 요청과 주장 수락을 서버에서 따로 기록하며, 한 사용자는 같은 대항의 두 팀에 들어갈 수 없어요.</p></article>
+  return <article className="rounded-[12px] border border-boot-hairline bg-white p-5"><div className="flex items-start justify-between gap-3"><div><p className="flex items-center gap-1 text-xs font-black text-boot-primary">{challenge.category === 'soccer' ? <Trophy size={15} /> : <Gamepad2 size={15} />}{challenge.category === 'soccer' ? '축구' : '게임'}</p><h3 className="mt-1 text-xl font-black">{challenge.title}</h3></div><span className="rounded-[6px] bg-boot-soft px-2 py-1 text-xs font-black text-boot-primary">{challengeStatus(challenge.status)}</span></div>{challenge.rules ? <p className="mt-3 text-sm font-bold leading-6 text-boot-muted">{challenge.rules}</p> : null}{challenge.scheduled_at ? <div className="mt-3 flex flex-wrap gap-4 text-xs font-bold text-boot-muted"><span className="flex gap-1"><CalendarDays size={15} />{formatDate(challenge.scheduled_at)}</span><span className="flex gap-1"><MapPin size={15} />{challenge.place_name}</span></div> : null}<div className="mt-4 grid gap-3 sm:grid-cols-2">{challenge.teams.map((team) => <section key={team.id} className="rounded-[8px] bg-boot-soft p-3"><div className="flex justify-between gap-2"><h4 className="font-black">{team.department_label}</h4><span className="text-xs font-black text-boot-primary">{team.accepted_count}/{team.capacity}명</span></div><RosterSlots team={team} />{!rosterLocked && team.may_request_roster && !team.roster.some((entry) => entry.is_me && ['requested', 'accepted'].includes(entry.status)) ? <button type="button" disabled={busy} onClick={() => void mutation('/roster', { team_id: team.id })} className={smallButton}>팀 참가 요청</button> : null}{!team.is_captain && team.roster.some((entry) => entry.is_me && ['requested', 'accepted'].includes(entry.status)) ? <button type="button" disabled={busy} onClick={() => void mutation('/roster', { team_id: team.id }, 'DELETE')} className={smallButton}>팀에서 나가기</button> : null}{team.is_captain && !rosterLocked ? team.roster.filter((entry) => entry.status === 'requested').map((entry) => <button key={entry.id} type="button" disabled={busy} onClick={() => void mutation(`/roster/${encodeURIComponent(entry.id)}/accept`, {})} className={smallButton}>{entry.alias} 수락</button>) : null}</section>)}</div>{mayUsePolls ? <section className="mt-4 rounded-[8px] border border-boot-hairline bg-boot-soft p-3"><div className="flex items-center justify-between gap-3"><p className="text-sm font-black">팀 토론 투표</p><ChatComposerActions onCreatePoll={() => setPollComposerRequest(value => value + 1)} disabled={busy} /></div><ActivityRoomPolls roomId={challenge.id} roomKind="department-challenges" composerRequest={pollComposerRequest} /></section> : null}{rosterLocked ? <p className="mt-4 text-sm font-bold leading-6 text-boot-muted">{t('challenge.rosterLocked')}</p> : <ChallengeInvitePanel challenge={challenge} busy={busy} mutate={mutate} startOpen={startInviteOpen} />}{challenge.can_accept_opponent && !challenge.fair_league ? <button type="button" disabled={busy} onClick={() => void mutation('/opponent', {})} className={`${primaryButton} mt-4`}>상대 학과로 수락</button> : null}{challenge.is_captain && !['completed', 'cancelled'].includes(challenge.status) ? <div className="mt-4 border-t border-boot-hairline pt-4"><h4 className="text-sm font-black">양쪽 일정 확인</h4><div className="mt-2 grid gap-2 sm:grid-cols-3"><input aria-label="대항 시작 시간" type="datetime-local" value={startsAt} onChange={(event) => setStartsAt(event.target.value)} className={inputClass} /><input aria-label="대항 종료 시간" value={endsAt} type="datetime-local" onChange={(event) => setEndsAt(event.target.value)} className={inputClass} /><input aria-label="대항 장소" value={place} onChange={(event) => setPlace(event.target.value)} className={inputClass} /></div><button type="button" disabled={busy || !startsAt || !endsAt || !place.trim()} onClick={() => void mutation('/schedule', { scheduled_at: new Date(startsAt).toISOString(), ends_at: new Date(endsAt).toISOString(), place_name: place })} className={`${smallButton} mt-2`}>이 일정 확인</button></div> : null}{challenge.is_captain && ['scheduled', 'result_pending'].includes(challenge.status) ? <div className="mt-4 border-t border-boot-hairline pt-4"><h4 className="text-sm font-black">양쪽 주장이 같은 결과를 확인해야 공개돼요</h4><div className="mt-2 flex items-center gap-2"><input aria-label="우리 팀 점수" type="number" min={0} max={999} value={ownScore} onChange={(event) => setOwnScore(Number(event.target.value))} className={scoreInput} /><span className="font-black">:</span><input aria-label="상대 팀 점수" type="number" min={0} max={999} value={opponentScore} onChange={(event) => setOpponentScore(Number(event.target.value))} className={scoreInput} /><button type="button" disabled={busy} onClick={() => void mutation('/result', { own_score: ownScore, opponent_score: opponentScore })} className={smallButton}>결과 확인</button></div></div> : null}{challenge.result ? <p className="mt-4 rounded-[8px] bg-[#EAF6F4] px-3 py-2 text-center text-lg font-black text-[#147A70]">확정 결과 {challenge.result.first_score} : {challenge.result.second_score}</p> : null}{challenge.is_captain && !['completed', 'cancelled'].includes(challenge.status) ? <button type="button" disabled={busy} onClick={() => { const reason = window.prompt('취소 이유를 입력해 주세요.')?.trim(); if (reason) void mutation('/cancel', { reason }) }} className="mt-4 min-h-11 rounded-[8px] border border-boot-coral/30 px-3 text-sm font-black text-boot-coral">대항 모집 취소</button> : null}<p className="mt-4 flex gap-2 text-xs font-bold leading-5 text-boot-muted"><ShieldCheck size={16} className="shrink-0 text-[#147A70]" />참가 요청과 주장 수락을 서버에서 따로 기록하며, 한 사용자는 같은 대항의 두 팀에 들어갈 수 없어요.</p>{['scheduled', 'result_pending', 'completed'].includes(challenge.status) && challenge.teams.some(team => team.roster.some(entry => entry.is_me)) ? <DepartmentLeagueReport challengeId={challenge.id} /> : null}</article>
 }
 
 function RosterSlots({ team }: { team: ChallengeTeam }) {

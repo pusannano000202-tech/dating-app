@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import ContinuationFeeCheckout from '@/components/matching/ContinuationFeeCheckout'
+import RelationshipCompletionPrompt from '@/components/relationship/RelationshipCompletionPrompt'
 import { resolveMutationAttempt, type MutationAttempt } from '@/lib/matching/continuation-journey-client'
 
 type AfterState = { occurrence_id: string; series_id: string; transition_id: string; program_day: number; final_program_day: boolean; friend_targets: Array<{ target_user_id: string; alias: string }> }
@@ -135,6 +136,7 @@ export default function FiveMeetingPostFlow({ occurrenceId }: { occurrenceId: st
         </div>
       ) : null}
 
+      {loadState === 'ready' ? <RelationshipCompletionPrompt/> : null}
       {notice ? <p role="status" className="mt-4 text-xs font-bold leading-5 text-boot-muted">{notice}</p> : null}
     </section>
   )

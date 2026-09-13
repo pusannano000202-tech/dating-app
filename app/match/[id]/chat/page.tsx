@@ -185,10 +185,10 @@ export default function MatchChatPage() {
   }
 
   return (
-    <main className="min-h-screen px-5 pb-10">
+    <main className="min-h-screen px-5 pb-28">
       <div className="mx-auto max-w-md pt-6">
         <header className="mb-4 flex items-center gap-3">
-          <Link href={`/match/${encodeURIComponent(matchId)}`} className="p-2 glass rounded-xl">
+          <Link href="/chat?tab=matching" aria-label="매칭 채팅 목록으로 돌아가기" className="flex h-11 w-11 items-center justify-center glass rounded-xl">
             <ArrowLeft size={18} />
           </Link>
           <div className="min-w-0 flex-1">
@@ -198,6 +198,7 @@ export default function MatchChatPage() {
           <MessageCircleMore size={20} className="text-boot-primary" />
         </header>
 
+        <Link href={`/match/${encodeURIComponent(matchId)}`} className="mb-3 inline-flex min-h-11 items-center text-sm font-bold text-boot-primary">매칭 약속·참여 정보 →</Link>
         {error && <p className="mb-3 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-700">{error}</p>}
 
         <section className="glass-card rounded-3xl p-4 min-h-[60vh] flex flex-col gap-3">

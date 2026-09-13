@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getMatchSetupStatus, type MatchSetupProfile } from '@/lib/matching/match-setup-status'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { datingAdmissionFailure } from '@/lib/relationship/contract'
 
 interface MatchSetupProfileRow extends MatchSetupProfile { user_id: string }
 
@@ -31,6 +32,8 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await readJson(req)
+  const admissionFailure = await datingAdmissionFailure(supabase)
+  if (admissionFailure) return NextResponse.json({ error: admissionFailure.error }, { status: admissionFailure.status, headers: { 'Cache-Control': 'private, no-store' } })
   const groupId = typeof body.group_id === 'string' ? body.group_id : ''
   if (!groupId) {
     return NextResponse.json({ error: 'group_id_required' }, { status: 400 })
@@ -154,6 +157,7 @@ function getEnterMatchPoolRpcFailure(message: string | undefined): { error: stri
   }
 
   if (
+    message === 'dating_participation_unavailable' ||
     message === 'not_group_leader' ||
     message === 'group_membership_invalid' ||
     message === 'already_in_queue' ||

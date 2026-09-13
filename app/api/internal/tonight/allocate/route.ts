@@ -1,4 +1,5 @@
 import { isAuthorizedInternalRequest } from '@/lib/auth/internal-request'
+import { retryDatingAdmissionOnce } from '@/lib/relationship/allocator-retry'
 import {
   buildTonightPublishAssignments,
   parseTonightAllocatorRpcPayload,
@@ -69,7 +70,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      const parsed = parseTonightAllocatorRpcPayload(allocatorInput.data)
+      let parsed = parseTonightAllocatorRpcPayload(allocatorInput.data)
       if (parsed.round.id !== round.id || parsed.round.serviceDate !== round.serviceDate) {
         failedRoundCount += 1
         logAllocationMetric({
@@ -82,8 +83,8 @@ export async function GET(request: Request) {
         continue
       }
 
-      const allocation = allocateTonightTeams(parsed.allocationInput, parsed.capacities)
-      const publish = buildTonightPublishAssignments(parsed, allocation)
+      let allocation = allocateTonightTeams(parsed.allocationInput, parsed.capacities)
+      let publish = buildTonightPublishAssignments(parsed, allocation)
       if (publish.status === 'allocator_failed') {
         failedRoundCount += 1
         logAllocationMetric({
@@ -140,11 +141,30 @@ export async function GET(request: Request) {
 
       // Empty assignments are deliberately published too: the database atomically
       // waitlists every submitted application instead of leaving an open round.
-      const result = await service.rpc('service_publish_tonight_allocation', {
+      const firstResult = await service.rpc('service_publish_tonight_allocation', {
         p_round_id: parsed.round.id,
         p_expected_revision: parsed.round.revision,
         p_team_assignments: publish.assignments,
         p_idempotency_key: `tonight-allocation-${MARKET_CODE}-${round.serviceDate}`,
+      })
+      const result = await retryDatingAdmissionOnce(firstResult, async () => {
+        // A relationship change between input and publish rolls back the entire
+        // first RPC. Refresh/filter and recompute once, without cancelling any
+        // existing confirmed team or splitting companion bundles.
+        const refreshed = await service.rpc('service_get_tonight_allocator_input', { p_round_id: round.id })
+        if (refreshed.error) return firstResult
+        const nextParsed = parseTonightAllocatorRpcPayload(refreshed.data)
+        if (nextParsed.round.id !== round.id || nextParsed.round.serviceDate !== round.serviceDate) return firstResult
+        const nextAllocation = allocateTonightTeams(nextParsed.allocationInput, nextParsed.capacities)
+        const nextPublish = buildTonightPublishAssignments(nextParsed, nextAllocation)
+        if (nextPublish.status === 'allocator_failed' || nextPublish.status === 'allocation_unproven') return firstResult
+        parsed = nextParsed; allocation = nextAllocation; publish = nextPublish
+        return service.rpc('service_publish_tonight_allocation', {
+          p_round_id: parsed.round.id,
+          p_expected_revision: parsed.round.revision,
+          p_team_assignments: nextPublish.assignments,
+          p_idempotency_key: `tonight-allocation-${MARKET_CODE}-${round.serviceDate}`,
+        })
       })
       if (result.error) {
         failedRoundCount += 1

@@ -127,6 +127,7 @@ export default function PushNotificationSettings({ownerId}:{ownerId:string}){
  return <section className={styles.card} aria-labelledby="push-settings-heading">
   <div className={styles.heading}><span className={styles.icon}><BellRing size={21}/></span><div><p className={styles.eyebrow}>놓치지 않는 소식</p><h3 id="push-settings-heading">휴대폰에서도 알려드릴까요?</h3></div>{state==='on'&&<span className={styles.badge}>등록됨</span>}</div>
   <p className={styles.description}>{description[state]}</p>
+  <p className={styles.description}>앱 안의 빨간 배지는 알림함에 새 소식이 있다는 뜻이에요. 이 기기 등록이나 실제 휴대폰 수신 확인과는 별개예요.</p>
   <p className={styles.privacy}><ShieldCheck size={15}/> 잠금화면에는 이름·채팅 내용·보증금 금액을 표시하지 않아요.</p>
   {(state==='off'||state==='on'||state==='error'&&config.current)&&<button type="button" disabled={busy} onClick={()=>void act()} className={state==='on'?styles.secondary:styles.primary}>{busy?'설정 중…':state==='on'?'이 기기 알림 끄기':'이 기기에 알림 켜기'}</button>}
   {feedback&&<p className={styles.feedback} role="status">{feedback}</p>}

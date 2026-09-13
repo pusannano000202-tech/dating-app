@@ -37,17 +37,29 @@ test('worry matching requires a visible talker or listener choice', async () => 
 })
 
 test('session next uses atomic advice requeue and audio input is not the waiting pulse', async () => {
-  const [source, styles] = await Promise.all([
+  const [source, provider, styles] = await Promise.all([
     read('components/voice/VoiceSessionView.tsx'),
+    read('components/voice/VoiceGlobalProvider.tsx'),
     read('components/voice/voice.module.css'),
   ])
   assert.match(source, /session\.adviceRole/)
-  assert.match(source, /\/api\/voice\/advice\/next/)
-  assert.match(source, /localParticipant\.audioLevel/)
+  assert.match(provider, /\/api\/voice\/advice\/next/)
+  assert.match(provider, /localParticipant\.audioLevel/)
   assert.match(source, /s\.inputMeter/)
   assert.match(source, /s\.waitingPulse/)
   assert.match(source, /session\.adviceRole/)
   assert.match(styles, /\.inputMeter/)
   assert.match(styles, /\.waitingPulse/)
   assert.match(styles, /prefers-reduced-motion:\s*reduce/)
+})
+
+test('active sessions mount optional conversation cards after core call controls', async () => {
+  const source = await read('components/voice/VoiceSessionView.tsx')
+  assert.match(source, /VoiceConversationPrompts/)
+  assert.match(source, /session\?\.state === 'active' && room/)
+  assert.match(source, /key=\{`\$\{session\.id\}:\$\{room\.topic\}:\$\{room\.scope\}:\$\{session\.adviceRole/)
+  assert.match(source, /topic=\{room\.topic\}/)
+  assert.match(source, /scope=\{room\.scope\}/)
+  assert.match(source, /adviceRole=\{session\.adviceRole\}/)
+  assert.ok(source.indexOf('className={s.controls}') < source.indexOf('<VoiceConversationPrompts'))
 })

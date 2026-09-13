@@ -27,6 +27,7 @@ export type CampusEatsCandidate = {
   coordinateStatus: CampusEatsCoordinateStatus
   imageSrc: string | null
   imageAlt: string
+  imageKind?: 'logo'
   imageSourceUrl: string
   sourceSha256: string
   naverSearchUrl: string
@@ -54,6 +55,13 @@ type GeneratedRestaurant = {
 }
 
 const restaurants = generatedFixture.restaurants as GeneratedRestaurant[]
+
+// Visual audit 2026-09-11: classify the exact original, leaving the generated
+// source manifest intact. A replacement source must be reviewed independently.
+function isVerifiedLogo(restaurant: GeneratedRestaurant): boolean {
+  return restaurant.canonicalStoreId === 'pnu:store:001'
+    && restaurant.sourceSha256 === '389126967a473bd6defc8ee286a9cc1cb588ffcad9518d97ff8d4e13dea58261'
+}
 
 const CATEGORY_META: Readonly<Record<CampusEatsCategoryId, Omit<CampusEatsCategory, 'id' | 'candidates'>>> = {
   donkatsu: {
@@ -112,7 +120,8 @@ function candidatesFor(categoryId: CampusEatsCategoryId): CampusEatsCandidate[] 
       verifyStatus: '상호·주소·원본 해시 확인 · 영업은 방문 전 재확인',
       coordinateStatus: 'search_verified',
       imageSrc: restaurant.imageSrc,
-      imageAlt: restaurant.imageAlt,
+      imageAlt: isVerifiedLogo(restaurant) ? `${restaurant.name} 가게 로고 · 음식 사진 아님` : restaurant.imageAlt,
+      ...(isVerifiedLogo(restaurant) ? { imageKind: 'logo' as const } : {}),
       imageSourceUrl: restaurant.imageSourceUrl,
       sourceSha256: restaurant.sourceSha256,
       naverSearchUrl: buildNaverSearchUrl(restaurant.name, restaurant.roadAddress),
