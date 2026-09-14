@@ -195,9 +195,14 @@ def query_code_mask(text: str) -> str:
                 else:
                     index += 1
         elif text[index] == "'":
+            escaped = index > 0 and text[index - 1] in 'eE' and (
+                index < 2 or not re.match(r'[\w$]', text[index - 2])
+            )
             index += 1
             while index < len(text):
-                if text.startswith("''", index):
+                if escaped and text[index] == '\\':
+                    index = min(index + 2, len(text))
+                elif text.startswith("''", index):
                     index += 2
                 elif text[index] == "'":
                     index += 1
@@ -211,6 +216,79 @@ def query_code_mask(text: str) -> str:
             if result[cursor] not in '\r\n':
                 result[cursor] = ' '
     return ''.join(result)
+
+
+def unclosed_dollar_quote(text: str) -> str | None:
+    """Check SQL literals and explicitly SQL/PLpgSQL executable bodies.
+
+    Counting ``$$`` mistakes the boundary in ``$fn$$ddl$`` for an unnamed
+    delimiter. Only the exact opening tag closes a dollar-quoted string.
+    Other tags inside an ordinary literal are text, but DO/function bodies
+    contain executable SQL whose own literals must also be balanced.
+    """
+    delimiter_pattern = re.compile(r'(?<![\w$])\$(?:[^\W\d]\w*)?\$')
+    index = 0
+    statement_start = 0
+    while index < len(text):
+        if text.startswith('--', index):
+            end = text.find('\n', index)
+            index = len(text) if end < 0 else end
+        elif text.startswith('/*', index):
+            nesting = 1
+            index += 2
+            while index < len(text) and nesting:
+                if text.startswith('/*', index):
+                    nesting += 1
+                    index += 2
+                elif text.startswith('*/', index):
+                    nesting -= 1
+                    index += 2
+                else:
+                    index += 1
+        elif text[index] in ("'", '"'):
+            quote = text[index]
+            escaped = quote == "'" and index > 0 and text[index - 1] in 'eE' and (
+                index < 2 or not re.match(r'[\w$]', text[index - 2])
+            )
+            index += 1
+            while index < len(text):
+                if escaped and text[index] == '\\':
+                    index += 2
+                elif text.startswith(quote * 2, index):
+                    index += 2
+                elif text[index] == quote:
+                    index += 1
+                    break
+                else:
+                    index += 1
+        elif match := delimiter_pattern.match(text, index):
+            delimiter = match.group()
+            end = text.find(delimiter, match.end())
+            if end < 0:
+                return delimiter
+            prefix = query_code_mask(text[statement_start:index])
+            is_do_body = re.fullmatch(r'\s*DO(?:\s+LANGUAGE\s+[\w"]+)?\s*', prefix, re.IGNORECASE)
+            is_function_body = re.match(
+                r'\s*CREATE\s+(?:OR\s+REPLACE\s+)?(?:FUNCTION|PROCEDURE)\b',
+                prefix, re.IGNORECASE,
+            ) and re.search(r'\bAS\s*$', prefix, re.IGNORECASE)
+            if is_do_body or is_function_body:
+                # LANGUAGE can precede or follow AS/body. This is a scoped
+                # lexical check, not validation of every procedural language.
+                suffix = query_code_mask(text[end + len(delimiter):]).split(';', 1)[0]
+                language = re.search(r'\bLANGUAGE\s+"?(\w+)"?', prefix + suffix, re.IGNORECASE)
+                is_sql_body = (
+                    language.group(1).lower() in ('sql', 'plpgsql')
+                    if language else bool(is_do_body)
+                )
+                if is_sql_body and (unclosed := unclosed_dollar_quote(text[match.end():end])):
+                    return unclosed
+            index = end + len(delimiter)
+        else:
+            if text[index] == ';':
+                statement_start = index + 1
+            index += 1
+    return None
 
 
 def query_reference_context(code: str):
@@ -237,7 +315,7 @@ def query_reference_context(code: str):
             cursor += alias.end()
             if cursor in closes:  # Optional CTE column names.
                 cursor = closes[cursor] + 1
-            declaration = re.match(r'\s*AS\s+(?:(?:NOT\s+)?MATERIALIZED\s*)?\(', code[cursor:], re.IGNORECASE)
+            declaration = re.match(r'\s*AS\b\s*(?:(?:NOT\s+)?MATERIALIZED\s*)?\(', code[cursor:], re.IGNORECASE)
             if not declaration:
                 break
             opening = cursor + declaration.end() - 1
@@ -381,7 +459,7 @@ def parse_file(path: Path) -> FileReport:
         report.refs.append(Reference(iname, 'index', path.name, line, f'DROP INDEX {iname}'))
 
     # REFERENCES <table>(col)
-    for m in re.finditer(r"REFERENCES\s+([\w.\"]+)", stripped, re.IGNORECASE):
+    for m in re.finditer(r"\bREFERENCES\s+([\w.\"]+)", query_code, re.IGNORECASE):
         name = schema_qualify(normalize_name(m.group(1)))
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'table', path.name, line, 'FK REFERENCES'))
@@ -475,10 +553,9 @@ def parse_file(path: Path) -> FileReport:
         line = stripped.count('\n', 0, m.start()) + 1
         report.refs.append(Reference(name, 'table', path.name, line, 'COMMENT COLUMN'))
 
-    # $$ balanced check
-    dollar_count = text.count('$$')
-    if dollar_count % 2 != 0:
-        report.issues.append(f'unbalanced $$ delimiters: {dollar_count} occurrences')
+    # Match SQL dollar strings lexically, including named tags and comments.
+    if delimiter := unclosed_dollar_quote(text):
+        report.issues.append(f'unbalanced {delimiter} delimiters: missing closing delimiter')
 
     return report
 

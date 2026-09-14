@@ -57,6 +57,9 @@ export default function AdminDashboardPage() {
         <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-boot-primary">Admin Review</p>
         <h1 className="text-2xl font-black mb-1 text-boot-ink">운영자 대시보드</h1>
         <p className="text-xs text-boot-muted mb-6">매칭 품질 통제 · 외모 점수 보정</p>
+        <Link href="/admin/super-admin/meetup-refunds" className="mb-5 flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-[#E3D9CB] bg-[#FBF8F2] px-5 py-3 text-sm font-bold text-[#A45539]">
+          <span>모임 보증금 반환 검토<span className="mt-1 block text-xs font-medium text-[#796453]">최고 관리자 · 본인 반환 신청 확인 및 승인</span></span><span aria-hidden="true">→</span>
+        </Link>
 
         {error && (
           <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">

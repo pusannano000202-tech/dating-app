@@ -359,6 +359,9 @@ export default function ProfileEditPage() {
               <p className={`mt-3 text-sm font-black ${depositSummaryTone(depositSummary)}`}>
                 {depositSummaryLabel(depositSummary)}
               </p>
+              <Link href="/profile/deposits" className="mt-4 flex min-h-12 items-center justify-between rounded-xl border border-[#E3D9CB] bg-[#FBF8F2] px-4 text-sm font-bold text-[#A45539]">
+                <span>내 모임 보증금 · 반환 내역</span><ChevronRight size={17}/>
+              </Link>
             </section>
 
             <section className="flex items-start gap-3 border-y border-[#CBE3DD] bg-[#EAF6F4] px-4 py-4">

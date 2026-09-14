@@ -7,7 +7,7 @@ import { PGlite } from '@electric-sql/pglite'
 
 // Embedded Postgres with explicit Auth/storage/voice fixtures. This is not live
 // Supabase RLS, Storage object deletion, Auth provider, cron, or legal approval proof.
-async function setup({ preG9Sql = '' } = {}) {
+async function setup({ preG9Sql = '', admissionFinance = false } = {}) {
   const db = new PGlite()
   try {
     await db.exec(`
@@ -133,6 +133,40 @@ async function setup({ preG9Sql = '' } = {}) {
     `)
     if (preG9Sql) await db.exec(preG9Sql)
     await db.exec(await readFile(new URL('../../docs/implementation/community-voice/g9-schema.sql', import.meta.url), 'utf8'))
+    if (admissionFinance) {
+      // Minimal FK/state fixtures; full real admission migrations are exercised
+      // separately by admission-deletion-finance.test.mjs.
+      await db.exec(`
+        create table quantum_private.meetup_admission_checkout_orders(
+          order_id text primary key,intent_id uuid not null unique,
+          user_id uuid references public.users(id) on delete set null,
+          state text not null,expires_at timestamptz default now(),payment_key text
+        );
+        create table quantum_private.activity_meetup_admission_deposits(
+          id uuid primary key,intent_id uuid not null unique,
+          user_id uuid references public.users(id) on delete set null,state text not null
+        );
+        create table quantum_private.activity_meetup_admission_refund_outbox(
+          deposit_id uuid primary key references quantum_private.activity_meetup_admission_deposits(id),state text not null
+        );
+      `)
+      // Use the deployed-source definitions rather than relying on draft parity.
+      const integrated = await readFile(new URL('../../supabase/migrations/20260906181225_community_social_integrated.sql', import.meta.url), 'utf8')
+      for (const name of [
+        'quantum_private.account_has_legal_retention_candidates',
+        'quantum_private.enqueue_retention_cleanup_jobs',
+        'public.request_account_deletion_for_service',
+        'public.approve_account_legal_retention_for_service',
+        'public.claim_retention_cleanup_jobs_for_service',
+        'public.confirm_account_auth_delete_ready_for_service',
+      ]) {
+        const tail = integrated.slice(integrated.indexOf(`create or replace function ${name}(`))
+        await db.exec(tail.slice(0, tail.indexOf('$$;') + 3))
+      }
+      if (process.env.ACCOUNT_ADMISSION_BASELINE !== '1') {
+        await db.exec(await readFile(new URL('../../supabase/migrations/20260914032828_account_admission_erasure_guard.sql', import.meta.url), 'utf8'))
+      }
+    }
   } catch (error) {
     await db.close()
     throw error
@@ -160,6 +194,88 @@ async function setup({ preG9Sql = '' } = {}) {
   }
   return { db, users, service, authenticated, jsonOnly }
 }
+
+test('admission checkout history requires legal review and unresolved payment survives auth erasure', async () => {
+  const f = await setup({admissionFinance: true})
+  try {
+    const user = f.users[0], intent = randomUUID()
+    await f.service()
+    await f.db.query("insert into quantum_private.meetup_admission_checkout_orders(order_id,intent_id,user_id,state) values('checkout',$1,$2,'prepared')", [intent, user])
+    const request = (await f.db.query('select public.request_account_deletion_for_service($1,$2) value', [user, randomUUID()])).rows[0].value
+    assert.equal((await f.db.query('select legal_retention_ready from quantum_private.account_deletion_requests where id=$1', [request.request_id])).rows[0].legal_retention_ready, false)
+    assert.equal((await f.db.query('select quantum_private.account_deletion_blocks_access($1) value', [user])).rows[0].value, true)
+    await f.db.query("select public.approve_account_legal_retention_for_service($1,null,'retention_preserved',$2)", [request.request_id, 'a'.repeat(64)])
+    const worker = randomUUID()
+    await f.db.query('select * from public.claim_retention_cleanup_jobs_for_service($1,25)', [worker])
+    for (const state of ['prepared', 'confirming', 'reconciliation_required']) {
+      await f.db.query('update quantum_private.meetup_admission_checkout_orders set state=$1,expires_at=now()-interval \'1 day\' where user_id=$2', [state, user])
+      assert.equal((await f.db.query('select public.confirm_account_auth_delete_ready_for_service($1,$2,$3) value', [request.request_id, user, worker])).rows[0].value, false, state)
+      await assert.rejects(f.db.query('delete from auth.users where id=$1', [user]), /account_financial_retention_pending/)
+      assert.equal((await f.db.query('select user_id from quantum_private.meetup_admission_checkout_orders')).rows[0].user_id, user)
+    }
+    // Only an explicit verified abort is terminal; elapsed time alone never is.
+    await f.db.query("update quantum_private.meetup_admission_checkout_orders set state='aborted' where user_id=$1", [user])
+    assert.equal((await f.db.query('select public.confirm_account_auth_delete_ready_for_service($1,$2,$3) value', [request.request_id, user, worker])).rows[0].value, true)
+    await f.db.query('delete from auth.users where id=$1', [user])
+    assert.equal((await f.db.query('select user_id from quantum_private.meetup_admission_checkout_orders')).rows[0].user_id, null)
+  } finally { await f.db.close() }
+})
+
+test('actual deletion catches finance arriving after readiness and rechecks old automatic legal approval', async () => {
+  const f = await setup({admissionFinance: true})
+  try {
+    const user = f.users[0], intent = randomUUID(), deposit = randomUUID(), worker = randomUUID()
+    await f.service()
+    const request = (await f.db.query('select public.request_account_deletion_for_service($1,$2) value', [user, randomUUID()])).rows[0].value
+    await f.db.query('select * from public.claim_retention_cleanup_jobs_for_service($1,25)', [worker])
+    const ready = async () => (await f.db.query('select public.confirm_account_auth_delete_ready_for_service($1,$2,$3) value', [request.request_id, user, worker])).rows[0].value
+    assert.equal(await ready(), true)
+    // Simulates a service confirmation committed between the RPC and Auth call.
+    await f.db.query("insert into quantum_private.activity_meetup_admission_deposits values($1,$2,$3,'held')", [deposit, intent, user])
+    await assert.rejects(f.db.query('delete from auth.users where id=$1', [user]), /account_financial_retention_pending/)
+    assert.equal(await ready(), false)
+    await f.db.query("select public.approve_account_legal_retention_for_service($1,null,'retention_preserved',$2)", [request.request_id, 'b'.repeat(64)])
+    await f.db.query("update quantum_private.activity_meetup_admission_deposits set state='refund_due' where id=$1", [deposit])
+    await f.db.query("insert into quantum_private.activity_meetup_admission_refund_outbox values($1,'pending')", [deposit])
+    assert.equal(await ready(), false)
+    await f.db.query("update quantum_private.activity_meetup_admission_deposits set state='refunded' where id=$1", [deposit])
+    for (const state of ['pending', 'processing', 'failed']) {
+      await f.db.query('update quantum_private.activity_meetup_admission_refund_outbox set state=$1 where deposit_id=$2', [state, deposit])
+      assert.equal(await ready(), false, state)
+    }
+    await f.db.query("update quantum_private.activity_meetup_admission_refund_outbox set state='completed' where deposit_id=$1", [deposit])
+    assert.equal(await ready(), true)
+    await f.db.query('delete from auth.users where id=$1', [user])
+    assert.equal((await f.db.query('select user_id,state from quantum_private.activity_meetup_admission_deposits')).rows[0].user_id, null)
+    assert.equal((await f.db.query('select state from quantum_private.activity_meetup_admission_refund_outbox')).rows[0].state, 'completed')
+  } finally { await f.db.close() }
+})
+
+test('closed admission history needs explicit review on stale requests; finance helpers remain private', async () => {
+  const f = await setup({admissionFinance: true})
+  try {
+    await f.service()
+    const user = f.users[0], worker = randomUUID()
+    const request = (await f.db.query('select public.request_account_deletion_for_service($1,$2) value', [user, randomUUID()])).rows[0].value
+    await f.db.query('select * from public.claim_retention_cleanup_jobs_for_service($1,25)', [worker])
+    await f.db.query("insert into quantum_private.meetup_admission_checkout_orders(order_id,intent_id,user_id,state) values('aborted',$1,$2,'aborted')", [randomUUID(), user])
+    assert.equal((await f.db.query('select public.confirm_account_auth_delete_ready_for_service($1,$2,$3) value', [request.request_id, user, worker])).rows[0].value, false)
+    await assert.rejects(f.db.query('delete from auth.users where id=$1', [user]), /account_financial_retention_pending/)
+    for (const role of ['anon', 'authenticated', 'service_role']) {
+      for (const name of ['account_has_unresolved_meetup_payments(uuid)', 'account_admission_finance_owner_lock()', 'guard_account_admission_erasure()']) {
+        assert.equal((await f.db.query('select has_function_privilege($1,$2,\'EXECUTE\') allowed', [role, `quantum_private.${name}`])).rows[0].allowed, false)
+      }
+    }
+    await f.db.query("select public.approve_account_legal_retention_for_service($1,null,'retention_preserved',$2)", [request.request_id, 'c'.repeat(64)])
+    await f.db.query('delete from auth.users where id=$1', [user])
+    // Users without money can still complete their ordinary deletion path.
+    const peerRequest = (await f.db.query('select public.request_account_deletion_for_service($1,$2) value', [f.users[1], randomUUID()])).rows[0].value
+    const peerWorker = randomUUID()
+    await f.db.query('select * from public.claim_retention_cleanup_jobs_for_service($1,25)', [peerWorker])
+    assert.equal((await f.db.query('select public.confirm_account_auth_delete_ready_for_service($1,$2,$3) value', [peerRequest.request_id, f.users[1], peerWorker])).rows[0].value, true)
+    await f.db.query('delete from auth.users where id=$1', [f.users[1]])
+  } finally { await f.db.close() }
+})
 
 test('G9 draft executes and account request replay revokes friend and voice access', async () => {
   const f = await setup()

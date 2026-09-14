@@ -83,6 +83,8 @@ export async function processRetentionWork(
       } else {
         const ready = await dependencies.confirmAuthDeletionReady(item)
         if (!ready) throw new Error('account_not_ready')
+        // Readiness and Auth deletion are separate transactions. The target-row
+        // database guard may still reject a newly arrived financial obligation.
         await dependencies.deleteAuthUser(item)
       }
       await dependencies.completeJob(item)
@@ -103,7 +105,9 @@ export function retentionRetryDelaySeconds(attempt: number): number {
 
 function retentionErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : 'unknown_error'
-  if (message === 'account_not_ready') return message
+  if (message === 'account_not_ready' || message === 'account_financial_retention_pending') {
+    return 'account_not_ready'
+  }
   if (/provider/i.test(message)) return 'provider_failed'
   if (/storage/i.test(message)) return 'storage_failed'
   return 'cleanup_failed'

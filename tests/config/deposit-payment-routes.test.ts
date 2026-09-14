@@ -858,8 +858,8 @@ test('Toss general payment webhook re-queries and finalizes DONE through the own
   assert.match(webhookRoute, /p_match_id: deposit\.match_id/)
   assert.match(webhookRoute, /p_group_id: deposit\.group_id/)
   assert.match(webhookRoute, /p_user_id: deposit\.user_id/)
-  assert.match(webhookRoute, /partial_cancellation_requires_reconciliation/)
-  assert.match(webhookRoute, /sumSuccessfulCancelAmount/)
+  assert.match(webhookRoute, /\.rpc\('reconcile_toss_deposit_cancellation'/)
+  assert.match(webhookRoute, /p_payment: payment/)
   assert.doesNotMatch(webhookRoute, /if \(status === 'DONE'\) return 'paid'/)
   assert.doesNotMatch(webhookRoute, /status:\s*nextStatus/)
   assert.doesNotMatch(webhookRoute, /\.update\(\{\s*status:\s*'paid'/)
@@ -1030,24 +1030,16 @@ test('deposit confirmation re-reads the exact deposit and leaves uncertain settl
   )
 })
 
-test('partial cancellation webhook recovers the matching pending refund request through its finalizer', () => {
+test('full and partial cancellation webhooks use one atomic verified-evidence ledger boundary', () => {
   const webhookRoute = readSource('app/api/payments/deposit/webhook/route.ts')
-
-  assert.match(webhookRoute, /deposit_refund_requests/)
-  assert.match(webhookRoute, /verifyTossPartialRefundEvidence/)
-  assert.match(webhookRoute, /buildTossRefundRequestKey/)
-  assert.match(webhookRoute, /\.rpc\('finalize_refund_request'/)
-  assert.match(webhookRoute, /p_refund_request_id: refundRequest\.id/)
-  assert.match(webhookRoute, /p_settlement_version: refundRequest\.settlement_version/)
-  assert.match(webhookRoute, /p_settlement_key: evidence\.transactionKey/)
-  assert.match(webhookRoute, /p_provider_request_key: requestKey/)
-  assert.match(webhookRoute, /refundRequest\.status === 'processed'/)
-  assert.match(webhookRoute, /refundRequest\.settlement_key === evidence\.transactionKey/)
-  assert.match(webhookRoute, /refundRequest\.provider_request_key === requestKey/)
-  assert.doesNotMatch(
-    webhookRoute,
-    /if \(reconcileAction === 'partial_cancellation'\) \{\s*throw new WebhookReconcileError/,
-  )
+  assert.match(webhookRoute, /reconcileAction === 'partial_cancellation' \|\| reconcileAction === 'finalize_refund'/)
+  assert.match(webhookRoute, /\.rpc\('reconcile_toss_deposit_cancellation'/)
+  for (const field of ['id', 'match_id', 'group_id', 'user_id']) {
+    assert.ok(webhookRoute.includes(`deposit.${field}`))
+  }
+  assert.match(webhookRoute, /p_payment: payment/)
+  assert.doesNotMatch(webhookRoute, /\.update\(/)
+  assert.doesNotMatch(webhookRoute, /\.rpc\('finalize_refund_request'/)
 })
 
 test('refund route verifies current Toss state before issuing a new cancellation', () => {

@@ -17,6 +17,124 @@ UNKNOWN_TABLE_ISSUE = (
 
 
 class VerifyMigrationsCliTests(unittest.TestCase):
+    def test_compact_cte_declarations_keep_their_query_scope(self) -> None:
+        for declaration in ('AS(', 'AS (', 'AS\n(', 'AS NOT MATERIALIZED('):
+            with self.subTest(declaration=declaration):
+                sql = (
+                    f'WITH recent {declaration}SELECT 1 AS id),'
+                    'page AS(SELECT * FROM recent),'
+                    'visible AS(SELECT * FROM page) '
+                    'SELECT * FROM visible JOIN page ON TRUE;'
+                )
+                result = self.run_verifier('--strict', sql=sql)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                outside = self.run_verifier('--strict', sql=sql + 'SELECT * FROM page;')
+                self.assertEqual(outside.returncode, 1)
+                self.assertIn('"public.page" in FROM', outside.stdout)
+
+        missing = self.run_verifier(
+            '--strict',
+            sql='WITH page AS(SELECT * FROM missing) SELECT * FROM public.page;',
+        )
+        self.assertEqual(missing.returncode, 1)
+        self.assertIn('"public.missing" in FROM', missing.stdout)
+        self.assertIn('"public.page" in FROM', missing.stdout)
+
+    def test_references_keyword_does_not_match_preferences_or_literals(self) -> None:
+        sql = (
+            'CREATE TABLE public.preferences(id integer PRIMARY KEY); '
+            'CREATE TABLE public.items(id integer REFERENCES public.preferences(id)); '
+            'SELECT * FROM public.preferences pref; '
+            "COMMENT ON TABLE public.preferences IS 'User preferences only. REFERENCES absent(id).'; "
+            '/* REFERENCES also_absent(id) */'
+        )
+        result = self.run_verifier('--strict', sql=sql)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        missing = self.run_verifier(
+            '--strict',
+            sql=sql + 'ALTER TABLE public.items ADD COLUMN parent integer REFERENCES missing(id);',
+        )
+        self.assertEqual(missing.returncode, 1)
+        self.assertIn('"public.missing" in FK REFERENCES', missing.stdout)
+
+    def test_escape_string_mask_keeps_later_fk_visible(self) -> None:
+        for literal in (r"E'can\'t'", r"e'can\'t'", r"E'backslash\\'", r"'backslash\'"):
+            with self.subTest(literal=literal):
+                result = self.run_verifier(
+                    '--strict',
+                    sql=(
+                        f'SELECT {literal};\n'
+                        'CREATE TABLE public.child (parent_id integer REFERENCES public.missing(id));'
+                    ),
+                )
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn('L2: references unknown table/view "public.missing" in FK REFERENCES', result.stdout)
+
+    def test_escape_string_contents_do_not_create_false_fk_references(self) -> None:
+        result = self.run_verifier(
+            '--strict',
+            sql=r"SELECT E'can\'t REFERENCES public.not_a_table(id)'; SELECT 1;",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('Issues: 0', result.stdout)
+
+    def test_adjacent_tagged_dollar_quotes_are_not_an_unnamed_delimiter(self) -> None:
+        result = self.run_verifier(
+            '--strict',
+            sql=(
+                'DO $install$ BEGIN EXECUTE $ddl$'
+                'CREATE FUNCTION public.answer() RETURNS integer LANGUAGE plpgsql '
+                'AS $fn$begin return 42;end$fn$$ddl$; END $install$;'
+            ),
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_dollar_quotes_in_comments_and_other_literals_are_not_delimiters(self) -> None:
+        result = self.run_verifier(
+            '--strict',
+            sql=(
+                "SELECT '$$'; -- $comment$\n"
+                "/* $$ /* $nested$ */ */ SELECT '$missing$'; "
+                'SELECT 1 AS "$$"; '
+                "SELECT E'escaped \\' $$ stays in the string'; "
+                'SELECT 1 AS identifier$tag$; '
+                "SELECT $$It's a dollar-quoted literal$$; "
+                "SELECT $outer$an unmatched $inner$ is literal text$outer$;"
+            ),
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_missing_dollar_quote_closers_still_fail(self) -> None:
+        for delimiter in ('$$', '$fn$'):
+            with self.subTest(delimiter=delimiter):
+                result = self.run_verifier('--strict', sql=f'DO {delimiter} BEGIN NULL; END;')
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(f'unbalanced {delimiter} delimiters', result.stdout)
+
+        mismatched = self.run_verifier('--strict', sql='DO $first$ BEGIN NULL; END $other$;')
+        self.assertEqual(mismatched.returncode, 1)
+        self.assertIn('unbalanced $first$ delimiters', mismatched.stdout)
+
+    def test_sql_body_dollar_quote_closers_remain_checked(self) -> None:
+        for sql in (
+            'DO $outer$ BEGIN EXECUTE $$SELECT 1; END $outer$;',
+            'CREATE FUNCTION public.broken() RETURNS void LANGUAGE plpgsql '
+            'AS $outer$ BEGIN EXECUTE $$SELECT 1; END $outer$;',
+            'CREATE FUNCTION public.broken() RETURNS void '
+            'AS $outer$ BEGIN EXECUTE $$SELECT 1; END $outer$ LANGUAGE plpgsql;',
+        ):
+            with self.subTest(sql=sql):
+                result = self.run_verifier('--strict', sql=sql)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn('unbalanced $$ delimiters', result.stdout)
+
+    def test_sql_body_literals_may_contain_unmatched_other_dollar_tags(self) -> None:
+        result = self.run_verifier(
+            '--strict',
+            sql='DO $outer$ BEGIN PERFORM $literal$an unmatched $inner$ is text$literal$; END $outer$;',
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_trigger_update_event_is_not_a_table_but_real_updates_remain_checked(self) -> None:
         sql = (
             'CREATE TABLE public.items(id integer); '

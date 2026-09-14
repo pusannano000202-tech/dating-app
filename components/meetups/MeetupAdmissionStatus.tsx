@@ -60,7 +60,7 @@ export function ApplicationStatusCard({application:a,confirm=false,busy=false,on
   <h2>{accepted?'우리 모임 채팅으로 가요':pending?'방장에게 신청을 전했어요':'신청 결과를 확인해 주세요'}</h2>
   <p>{accepted?'입장 전 대화도 읽을 수 있어요. 먼저 정한 시간과 장소를 확인하고 인사해 주세요.':pending?'기존 모임 채팅방과 방장 알림함에 신청 소식을 전달했어요. 이 화면을 나가도 승인 소식은 알림함에 남아요.':a.admission==='declined'?'이번 신청은 수락되지 않았어요. 보증금 반환 상태는 아래에서 따로 확인하세요.':'신청이 취소됐어요. 보증금 반환 완료와는 다른 상태예요.'}</p>
   <div className={s.payment}><span>이 모임 보증금<br/><b>{a.amountKrw.toLocaleString('ko-KR')}원</b></span><strong>{a.payment==='held'?'예치 확인':a.payment==='refund_due'?'반환 처리 대기':'공급자 반환 확인'}</strong></div>
-  {a.payment==='refund_due'?<p>반환 처리가 필요한 상태예요. 실제 결제수단에 돌려받았다는 뜻은 아니에요.</p>:null}
+  {a.payment==='refund_due'?<p>반환 처리가 필요한 상태예요. 실제 결제수단에 돌려받았다는 뜻은 아니에요. <Link href="/profile/deposits" className="inline-flex min-h-11 items-center font-bold underline">내 보증금에서 반환 신청하기</Link></p>:null}
   {!pending&&!accepted&&onRestart?<button className={`${s.primary} mb-3 w-full`} onClick={onRestart}>다시 신청하기<ArrowRight size={17}/></button>:null}
   <div className={s.actions}>{accepted&&a.chatHref?onOpenChat?<button className={s.primary} onClick={onOpenChat}>모임 채팅으로<ArrowRight size={17}/></button>:<Link className={s.primary} href={a.chatHref}>모임 채팅으로<ArrowRight size={17}/></Link>:<button className={s.primary} disabled={busy} onClick={onRefresh}><RefreshCw size={16}/>신청 상태 확인</button>}<Link className={s.secondary} href="/notifications">알림함</Link></div>
   {accepted&&!a.chatHref?<p>현재 채팅 참여 권한을 확인할 수 없어요. 방에서 나갔거나 모임 상태가 바뀌었을 수 있어요.</p>:null}

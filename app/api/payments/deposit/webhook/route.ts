@@ -6,11 +6,9 @@ import {
   resolveDepositPaymentProvider,
 } from '@/lib/payments/deposit'
 import {
-  buildTossRefundRequestKey,
   getTossPayment,
   getTossPaymentByOrderId,
   TossPaymentError,
-  verifyTossPartialRefundEvidence,
   type TossPaymentObject,
 } from '@/lib/payments/toss'
 import { getSupabaseAdminKey } from '@/lib/supabase-admin'
@@ -46,17 +44,13 @@ interface WebhookDatabase {
         }
         Returns: Array<Record<string, unknown>>
       }
-      finalize_refund_request: {
+      reconcile_toss_deposit_cancellation: {
         Args: {
-          p_refund_request_id: string
-          p_settlement_version: number
-          p_provider: string
-          p_settlement_key: string
-          p_provider_request_key: string
-          p_provider_status: string
-          p_provider_payment_key: string
-          p_provider_order_id: string
-          p_settled_refund_amount: number
+          p_deposit_id: string
+          p_match_id: string
+          p_group_id: string
+          p_user_id: string
+          p_payment: TossPaymentObject
         }
         Returns: Array<Record<string, unknown>>
       }
@@ -78,21 +72,6 @@ interface DepositWebhookRow {
   refunded_amount: number | null
   retained_amount: number | null
   notes: string | null
-}
-
-interface RefundRequestWebhookRow {
-  id: string
-  deposit_id: string
-  status: 'pending' | 'processed' | 'cancelled'
-  requested_refund_amount: number
-  settlement_version: number
-  provider: string | null
-  provider_status: string | null
-  settlement_key: string | null
-  provider_request_key: string | null
-  provider_payment_key: string | null
-  provider_order_id: string | null
-  settled_refund_amount: number | null
 }
 
 export async function POST(req: NextRequest) {
@@ -136,8 +115,6 @@ export async function POST(req: NextRequest) {
         },
       }),
       payment,
-      eventType: event.eventType,
-      transmissionId: req.headers.get('tosspayments-webhook-transmission-id') ?? undefined,
     })
 
     return NextResponse.json({
@@ -218,8 +195,6 @@ async function verifyPaymentFromWebhook(event: TossWebhookEvent) {
 async function reconcileDepositFromPayment(params: {
   service: SupabaseClient<WebhookDatabase, 'public'>
   payment: TossPaymentObject
-  eventType: string
-  transmissionId?: string
 }) {
   const { payment, service } = params
 
@@ -264,8 +239,8 @@ async function reconcileDepositFromPayment(params: {
   if (payment.paymentKey !== deposit.toss_payment_key && deposit.toss_payment_key) {
     throw new WebhookReconcileError('payment_key_mismatch', 409, 'payment_verification_failed')
   }
-  if (reconcileAction === 'partial_cancellation') {
-    return reconcilePartialRefund({
+  if (reconcileAction === 'partial_cancellation' || reconcileAction === 'finalize_refund') {
+    return reconcileCancellation({
       service,
       payment,
       deposit,
@@ -307,153 +282,24 @@ async function reconcileDepositFromPayment(params: {
     }
   }
 
-  const refundedAmount = sumSuccessfulCancelAmount(payment.cancels)
-  if (refundedAmount !== deposit.amount) {
-    throw new WebhookReconcileError(
-      'partial_cancellation_requires_reconciliation',
-      409,
-      'payment_reconciliation_required',
-    )
-  }
-  if (
-    deposit.status === 'refunded'
-    && deposit.refunded_amount === deposit.amount
-    && deposit.retained_amount === 0
-    && hasProcessedWebhookTransmission(deposit.notes, params.transmissionId)
-  ) {
-    return {
-      status: 'ignored_duplicate_webhook',
-      httpStatus: 200,
-      deposit,
-    }
-  }
-
-  const { data: refundedDeposit, error: refundError } = await service
-    .from('deposits')
-    .update({
-      status: 'refunded',
-      toss_payment_key: payment.paymentKey,
-      refunded_at: getLatestSuccessfulCancelTime(payment.cancels) ?? new Date().toISOString(),
-      refunded_amount: deposit.amount,
-      retained_amount: 0,
-      notes: [
-        deposit.notes,
-        buildWebhookNote(params.eventType, payment.status, params.transmissionId),
-      ].filter(Boolean).join(' | '),
-    })
-    .eq('id', deposit.id)
-    .eq('match_id', deposit.match_id)
-    .eq('group_id', deposit.group_id)
-    .eq('user_id', deposit.user_id)
-    .eq('toss_order_id', deposit.toss_order_id)
-    .in('status', ['pending', 'paid', 'held', 'refunded'])
-    .select('id,match_id,group_id,user_id,status,toss_order_id,toss_payment_key,refunded_at,refunded_amount,retained_amount')
-    .maybeSingle()
-
-  if (refundError || !refundedDeposit) {
-    throw new WebhookReconcileError(
-      'payment_reconciliation_required',
-      502,
-      'payment_reconciliation_required',
-    )
-  }
-
-  return {
-    status: 'reconciled',
-    httpStatus: 200,
-    deposit: refundedDeposit,
-  }
+  throw new WebhookReconcileError('payment_reconciliation_required', 502)
 }
 
-async function reconcilePartialRefund(params: {
+async function reconcileCancellation(params: {
   service: SupabaseClient<WebhookDatabase, 'public'>
   payment: TossPaymentObject
   deposit: DepositWebhookRow
 }) {
   const { service, payment, deposit } = params
-  if (
-    !deposit.toss_payment_key
-    || deposit.toss_payment_key !== payment.paymentKey
-    || deposit.toss_order_id !== payment.orderId
-  ) {
-    throw new WebhookReconcileError(
-      'partial_cancellation_requires_reconciliation',
-      409,
-      'payment_reconciliation_required',
-    )
-  }
-
-  const { data: requestData, error: requestError } = await service
-    .from('deposit_refund_requests')
-    .select(
-      'id,deposit_id,status,requested_refund_amount,settlement_version,provider,provider_status,settlement_key,provider_request_key,provider_payment_key,provider_order_id,settled_refund_amount',
-    )
-    .eq('deposit_id', deposit.id)
-    .in('status', ['pending', 'processed'])
-    .maybeSingle()
-
-  if (requestError || !requestData) {
-    throw new WebhookReconcileError(
-      'partial_cancellation_requires_reconciliation',
-      409,
-      'payment_reconciliation_required',
-    )
-  }
-
-  const refundRequest = requestData as RefundRequestWebhookRow
-  const evidence = verifyTossPartialRefundEvidence(payment, {
-    requestedRefundAmount: refundRequest.requested_refund_amount,
-    depositAmount: deposit.amount,
-  })
-  if (!evidence.ok) {
-    throw new WebhookReconcileError(
-      'partial_cancellation_requires_reconciliation',
-      409,
-      'payment_reconciliation_required',
-    )
-  }
-
-  const requestKey = buildTossRefundRequestKey({
-    refundRequestId: refundRequest.id,
-    settlementVersion: refundRequest.settlement_version,
-    refundAmount: refundRequest.requested_refund_amount,
-  })
-
-  if (refundRequest.status === 'processed') {
-    if (
-      refundRequest.provider === 'toss'
-      && refundRequest.provider_status === payment.status
-      && refundRequest.settlement_key === evidence.transactionKey
-      && refundRequest.provider_request_key === requestKey
-      && refundRequest.provider_payment_key === payment.paymentKey
-      && refundRequest.provider_order_id === payment.orderId
-      && refundRequest.settled_refund_amount === refundRequest.requested_refund_amount
-    ) {
-      return {
-        status: 'ignored_duplicate_refund_webhook',
-        httpStatus: 200,
-        deposit,
-      }
-    }
-
-    throw new WebhookReconcileError(
-      'partial_cancellation_requires_reconciliation',
-      409,
-      'payment_reconciliation_required',
-    )
-  }
-
+  // Only the provider re-query enters this service-only atomic boundary. SQL
+  // rechecks identity, receipt arithmetic and both ledgers while holding locks.
   const finalized = await service
-    .rpc('finalize_refund_request', {
-      p_refund_request_id: refundRequest.id,
-      p_settlement_version: refundRequest.settlement_version,
-      p_provider: 'toss',
-      p_settlement_key: evidence.transactionKey,
-      p_provider_request_key: requestKey,
-      p_provider_status: payment.status,
-      p_provider_payment_key: payment.paymentKey,
-      p_provider_order_id: payment.orderId,
-      p_settled_refund_amount: refundRequest.requested_refund_amount,
+    .rpc('reconcile_toss_deposit_cancellation', {
+      p_deposit_id: deposit.id,
+      p_match_id: deposit.match_id,
+      p_group_id: deposit.group_id,
+      p_user_id: deposit.user_id,
+      p_payment: payment,
     })
     .maybeSingle()
 
@@ -466,7 +312,7 @@ async function reconcilePartialRefund(params: {
   }
 
   return {
-    status: 'reconciled_partial_refund',
+    status: String(finalized.data.reconciliation_status ?? 'reconciled'),
     httpStatus: 200,
     deposit: finalized.data,
   }
@@ -477,36 +323,6 @@ function mapTossPaymentStatusToReconcileAction(status: string) {
   if (status === 'CANCELED') return 'finalize_refund'
   if (status === 'PARTIAL_CANCELED') return 'partial_cancellation'
   return null
-}
-
-function buildWebhookNote(eventType: string, paymentStatus: string, transmissionId?: string) {
-  return [
-    `toss_webhook=${eventType}`,
-    `payment_status=${paymentStatus}`,
-    transmissionId ? `transmission_id=${transmissionId}` : null,
-  ].filter(Boolean).join(' ')
-}
-
-function hasProcessedWebhookTransmission(notes: string | null, transmissionId?: string) {
-  if (!notes || !transmissionId) return false
-
-  const transmissionToken = `transmission_id=${transmissionId}`
-  return notes
-    .split(' | ')
-    .some((note) => note.split(' ').includes(transmissionToken))
-}
-
-function sumSuccessfulCancelAmount(cancels: TossPaymentObject['cancels']) {
-  return (cancels ?? [])
-    .filter((cancel) => cancel.cancelStatus === 'DONE')
-    .reduce((sum, cancel) => sum + (cancel.cancelAmount ?? 0), 0)
-}
-
-function getLatestSuccessfulCancelTime(cancels: TossPaymentObject['cancels']) {
-  return [...(cancels ?? [])]
-    .reverse()
-    .find((cancel) => cancel.cancelStatus === 'DONE' && cancel.canceledAt)
-    ?.canceledAt ?? null
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -69,6 +69,30 @@ test('a failed closed readiness gate never invokes the auth provider', async () 
   assert.equal(deleted, false)
 })
 
+test('finance appearing after readiness is retried and readiness runs again before a later deletion', async () => {
+  const calls: string[] = []
+  let financePending = true
+  const deps: RetentionWorkerDependencies = {
+    removeStorageObject: async () => {},
+    confirmAuthDeletionReady: async () => { calls.push('ready'); return true },
+    deleteAuthUser: async () => {
+      calls.push('delete')
+      if (financePending) throw new Error('account_financial_retention_pending')
+    },
+    completeJob: async () => { calls.push('complete') },
+    retryJob: async (_job, code) => { calls.push(`retry:${code}`) },
+  }
+  const item = parseRetentionWorkItem({
+    kind: 'auth_user', job_id: JOB, user_id: USER, request_id: REQUEST,
+    bucket: null, storage_path: null, claim_token: TOKEN,
+  })!
+  assert.deepEqual(await processRetentionWork([item], deps), { processed: 1, completed: 0, retryScheduled: 1 })
+  assert.deepEqual(calls, ['ready', 'delete', 'retry:account_not_ready'])
+  financePending = false
+  assert.deepEqual(await processRetentionWork([item], deps), { processed: 1, completed: 1, retryScheduled: 0 })
+  assert.deepEqual(calls, ['ready', 'delete', 'retry:account_not_ready', 'ready', 'delete', 'complete'])
+})
+
 test('retry backoff is bounded', () => {
   assert.equal(retentionRetryDelaySeconds(1), 60)
   assert.equal(retentionRetryDelaySeconds(2), 120)
