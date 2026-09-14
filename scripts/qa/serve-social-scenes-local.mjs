@@ -4,6 +4,7 @@ import { createServer } from 'node:net'
 import { join } from 'node:path'
 
 import { preflightIntegratedLocalAuth } from './integrated-auth-preflight.mjs'
+import { assertSocialScenesSchemaReady, SOCIAL_SCENES_SCHEMA_PROBE_SQL } from './social-scenes-schema-preflight.mjs'
 import {
   createIntegratedRuntimeEnvironment,
   validateIntegratedLocalAuthEnvironment,
@@ -187,6 +188,18 @@ try {
 
   const dockerEnvironment = buildLocalDockerEnvironment(process.env)
   assertLocalDockerContext(dockerEnvironment)
+  // Check the actual local catalog before opening a candidate with missing RPCs.
+  // No migration, row contents, credentials or remote endpoint are involved.
+  const schemaPreflight = assertSocialScenesSchemaReady(execFileSync('docker', [
+    '--context', 'desktop-linux', 'exec', '-i',
+    `supabase_db_${COMMUNITY_VOICE_LOCAL.projectId}`,
+    'env', '-i', 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+    'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1', '-h', '/var/run/postgresql',
+    '-p', '5432', '-U', 'postgres', '-d', 'postgres',
+  ], {
+    input: SOCIAL_SCENES_SCHEMA_PROBE_SQL, encoding: 'utf8', timeout: 10_000,
+    windowsHide: true, shell: false, env: dockerEnvironment, stdio: ['pipe', 'pipe', 'pipe'],
+  }).trim())
   const supabaseCliScript = await resolveSupabaseCliScript(dockerEnvironment)
   const status = readLocalStatus(supabaseCliScript, dockerEnvironment)
   const authEnv = readLocalAuthEnvironment(dockerEnvironment)
@@ -248,6 +261,7 @@ try {
       databaseReadOnly: false,
       localUiCanWriteLocalData: true,
       authPreflight,
+      schemaPreflight,
       authBypass: false,
       privateKeysLogged: false,
       paymentProvider: 'mock',
@@ -259,7 +273,7 @@ try {
   )
   if (migrationBoundary.workspaceOnlyMigrations.length > 0) {
     console.warn(
-      `주의: ${migrationBoundary.workspaceOnlyMigrations.join(', ')}은 기존 로컬 스택 snapshot에 없습니다. 이 런처는 migration을 적용하지 않으며 새 기능 전체 완료를 증명하지 않습니다.`,
+      `기존 파일 snapshot과 ${migrationBoundary.workspaceOnlyMigrations.length}개 차이가 있습니다. 실제 DB의 필수 연결은 별도 조회로 확인했습니다. 이 런처는 migration을 적용하지 않으며 새 기능 전체 완료를 증명하지 않습니다.`,
     )
   }
   console.warn(
