@@ -19,11 +19,12 @@ test('Tonight user API returns the authorized aggregate and the client parses it
 
 test('Tonight user UI displays every exact registered-gender bucket', () => {
   const experience = source('components/tonight/UserTonightExperience.tsx')
-  assert.match(experience, /현재 신청 총/)
+  assert.match(experience, /이번 회차 신청 현황/)
+  assert.match(experience, /summary\?\.totalPeople/)
   assert.match(experience, /남성/)
   assert.match(experience, /여성/)
   assert.match(experience, /기타·미확인/)
-  assert.match(experience, /유효한 신청자 전체/)
+  assert.match(experience, /취소를 제외한 유효 신청 기준/)
 })
 
 test('weekly date cards distinguish applicant people from assigned people', () => {

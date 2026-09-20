@@ -3,3 +3,12 @@
 .teamRow .rosterTiers{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px}
 .teamRow .rosterTier{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:35px}
 .rosterTier small{font-size:8px;letter-spacing:.02em}
+.proposalSummary{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:15px 17px;background:#fff;border:1px solid #e1e6dc;border-radius:12px;font-size:12px}
+.proposalSummary>span{color:#6c796c}
+.proposalSummary strong{font-weight:700;color:#345a38}
+.lobby{color:#172326}
+.heading h2{letter-spacing:-.035em}
+.teamRow strong{overflow-wrap:anywhere}
+.teamRow .rosterTiers{gap:10px;margin-top:7px}
+.teamRow .rosterTier{min-width:32px}
+@media(max-width:390px){.teamRow{gap:8px;padding:15px}.teamPoints{min-width:66px}.teamRow .rosterTiers{gap:5px}.ownTeam{flex-wrap:wrap}}

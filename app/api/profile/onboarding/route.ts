@@ -34,6 +34,15 @@ export async function GET(request: NextRequest) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
+  // Optional request binding for resumable application screens. The authenticated
+  // identity, not the header, still determines every query below.
+  const expectedOwner = request.headers.get('X-Quantum-Owner')
+  if (expectedOwner !== null && expectedOwner !== user.id) {
+    return NextResponse.json({ error: 'account_changed' }, {
+      status: 409, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie, Authorization, X-Quantum-Owner' },
+    })
+  }
+
   const [profileResult, photoResult, appearanceResult, readinessResult] = await Promise.all([
     supabase
       .from('profiles')

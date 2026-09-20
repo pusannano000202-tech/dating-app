@@ -1,12 +1,12 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Loader2, MapPin, RotateCw, Users } from 'lucide-react'
+import { CalendarDays, Check, Clock3, Loader2, MapPin, RotateCw, Users } from 'lucide-react'
 import Image from 'next/image'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import ScheduledContinuationStartButton from '@/components/matching/ScheduledContinuationStartButton'
 import WeeklyPartyControls, { type WeeklyPartyApplication } from '@/components/matching/WeeklyPartyControls'
-import { resolveMutationAttempt, type MutationAttempt } from '@/lib/matching/continuation-journey-client'
 
 type WindowRow = {
   id: string
@@ -26,24 +26,24 @@ type WindowRow = {
 
 type Discovery = { server_now: string; week_key: string; windows: WindowRow[]; application: WeeklyPartyApplication | null }
 
-export default function WeeklyActivityExplorer() {
+export default function WeeklyActivityExplorer({ weekKey, calendarHref = '/match/calendar' }: { weekKey?: string; calendarHref?: string } = {}) {
   const [data, setData] = useState<Discovery | null>(null)
   const [selectedActivity, setSelectedActivity] = useState('')
   const [selectedWindows, setSelectedWindows] = useState<string[]>([])
   const [partyType, setPartyType] = useState<'solo' | 'friends'>('solo')
   const [partyGroupId, setPartyGroupId] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
   const [canReload, setCanReload] = useState(false)
-  const applyAttempt = useRef<MutationAttempt | null>(null)
+  const weekLabel = weekKey ? '선택한 주' : '이번 주'
 
   const load = useCallback(async () => {
     setNotice('')
     setCanReload(false)
     try {
-      const response = await fetch('/api/match/weekly-availability', { cache: 'no-store' })
+      const url = weekKey ? `/api/match/weekly-availability?week_key=${encodeURIComponent(weekKey)}` : '/api/match/weekly-availability'
+      const response = await fetch(url, { cache: 'no-store' })
       const payload = await response.json().catch(() => null)
-      if (!response.ok || !isDiscovery(payload)) throw new Error('load_failed')
+      if (!response.ok || !isDiscovery(payload, weekKey)) throw new Error('load_failed')
       setData(payload)
       if (payload.application) {
         setSelectedActivity(payload.application.activity_id)
@@ -53,10 +53,11 @@ export default function WeeklyActivityExplorer() {
         setSelectedActivity(payload.windows[0].activity_id)
       }
     } catch {
-      setNotice('이번 주 활동 시간을 불러오지 못했어요. 잠시 후 다시 확인해 주세요.')
+      setData(null)
+      setNotice(`${weekLabel} 활동 시간을 불러오지 못했어요. 잠시 후 다시 확인해 주세요.`)
       setCanReload(true)
     }
-  }, [])
+  }, [weekKey, weekLabel])
 
   useEffect(() => { void load() }, [load])
   const activities = useMemo(() => {
@@ -76,72 +77,24 @@ export default function WeeklyActivityExplorer() {
     || data?.application?.status === 'active'
     || data?.application?.status === 'assigned'
 
-  function chooseActivity(activityId: string) {
-    if (hasLiveApplication) return
-    setSelectedActivity(activityId)
-    setSelectedWindows([])
-  }
-
-  function moveActivity(direction: -1 | 1) {
-    if (hasLiveApplication || activities.length < 2) return
-    const nextIndex = (activityIndex + direction + activities.length) % activities.length
-    const nextActivity = activities[nextIndex]?.[0]
-    if (nextActivity) chooseActivity(nextActivity)
-  }
-
-  function toggleWindow(id: string) {
-    if (hasLiveApplication) return
-    setSelectedWindows((current) => current.includes(id) ? current.filter((value) => value !== id) : [...current, id])
-  }
-
-  async function apply() {
-    if (!data || !selectedActivity || selectedWindows.length === 0 || busy
-      || (partyType === 'friends' && !partyGroupId)) return
-    const candidateWindowIds = [...selectedWindows].sort()
-    const partyIdentity = partyType === 'friends' ? partyGroupId : 'solo'
-    applyAttempt.current = resolveMutationAttempt(
-      applyAttempt.current,
-      `weekly-apply:${data.week_key}:${selectedActivity}:${partyIdentity}:${candidateWindowIds.join(',')}`,
-    )
-    setBusy(true)
-    setNotice('')
-    setCanReload(false)
-    try {
-      const response = await fetch('/api/match/weekly-availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          activity_id: selectedActivity,
-          week_key: data.week_key,
-          candidate_window_ids: candidateWindowIds,
-          party_group_id: partyType === 'friends' ? partyGroupId : null,
-          idempotency_key: applyAttempt.current.key,
-        }),
-      })
-      const payload = await response.json().catch(() => null)
-      if (!response.ok || !isDiscovery(payload)) throw new Error('apply_failed')
-      setData(payload)
-      applyAttempt.current = null
-      setNotice(partyType === 'friends'
-        ? '친구들과 가능한 날짜를 한 번에 신청했어요. 전원 수락 뒤 한 일정만 확정됩니다.'
-        : '가능한 날짜를 한 번에 신청했어요. 확정되는 일정은 한 개뿐이에요.')
-    } catch {
-      setNotice('신청을 저장하지 못했어요. 마감이나 기존 일정을 확인해 주세요.')
-      setCanReload(true)
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  if (!data && !notice) return <PanelMessage icon={Loader2} message="이번 주 활동을 불러오는 중이에요." spin />
+  if (!data && !notice) return <PanelMessage icon={Loader2} message={`${weekLabel} 활동을 불러오는 중이에요.`} spin />
   if (!data) return <PanelMessage icon={RotateCw} message={notice} action={() => void load()} />
+  if (!hasLiveApplication) return (
+    <section className="mx-auto mt-5 w-full max-w-3xl rounded-3xl border border-boot-hairline bg-white p-5 sm:p-7">
+      <h2 className="text-lg font-black text-boot-ink">{data.application?.status === 'cancelled' ? '신청이 취소되었어요' : `${weekLabel} 진행 중인 신청이 없어요`}</h2>
+      <p className="mt-2 text-sm font-bold leading-6 text-boot-muted">새 신청은 이벤트 캘린더에서 날짜를 고르고, 참여 동의와 1인 보증금 1만원 확인 후 진행해요.</p>
+      {notice ? <p role="status" className="mt-3 text-sm text-boot-muted">{notice}</p> : null}
+      {canReload ? <button type="button" onClick={() => void load()} className="mt-3 min-h-11 rounded-xl bg-boot-soft px-4 text-xs font-black text-boot-primary">다시 불러오기</button> : null}
+      <Link href={calendarHref} className="mt-4 inline-flex min-h-12 items-center rounded-2xl bg-boot-primary px-5 text-sm font-black text-white">캘린더에서 일정·보증금 확인</Link>
+    </section>
+  )
 
   return (
     <section className="mx-auto mt-5 w-full max-w-3xl overflow-hidden rounded-3xl border border-boot-hairline bg-white shadow-[0_18px_42px_rgba(23,20,18,0.08)]">
       <header className="border-b border-boot-hairline px-5 py-5 sm:px-7">
-        <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">이번 주 만나기 · 한 신청 풀</p>
-        <h3 className="mt-2 text-2xl font-black text-boot-ink">활동을 보고, 가능한 날짜를 모두 골라요</h3>
-        <p className="mt-2 text-sm font-bold leading-6 text-boot-muted">둘러보기만으로 신청되지 않아요. 마지막 버튼을 눌러도 여러 날짜 중 한 일정만 확정됩니다.</p>
+        <p className="text-[11px] font-black tracking-[0.18em] text-boot-primary">{weekLabel} 만나기 · 한 신청 풀</p>
+        <h3 className="mt-2 text-2xl font-black text-boot-ink">신청한 일정과 참여 상태를 확인해요</h3>
+        <p className="mt-2 text-sm font-bold leading-6 text-boot-muted">기존 친구 동의·취소·배정 확인은 여기서 이어갈 수 있어요. 새 신청은 이벤트 캘린더에서 진행해 주세요.</p>
       </header>
 
       {activity ? (
@@ -159,9 +112,7 @@ export default function WeeklyActivityExplorer() {
             <h4 className="mt-1 text-2xl font-black">{activity.title}</h4>
             <p className="mt-2 max-w-xl text-sm font-bold leading-6 text-white/80">{activity.summary}</p>
             <div className="mt-4 flex items-center justify-between gap-3">
-              <button type="button" aria-label="이전 활동" onClick={() => moveActivity(-1)} disabled={hasLiveApplication || activities.length < 2} className="flex min-h-12 min-w-12 items-center justify-center rounded-full border border-white/35 bg-black/20 disabled:opacity-35"><ArrowLeft size={19} /></button>
               <div className="flex gap-1.5" aria-hidden="true">{activities.map(([id]) => <span key={id} className={`h-1.5 rounded-full ${id === selectedActivity ? 'w-7 bg-[#F3B95F]' : 'w-1.5 bg-white/55'}`} />)}</div>
-              <button type="button" aria-label="다음 활동" onClick={() => moveActivity(1)} disabled={hasLiveApplication || activities.length < 2} className="flex min-h-12 min-w-12 items-center justify-center rounded-full border border-white/35 bg-black/20 disabled:opacity-35"><ArrowRight size={19} /></button>
             </div>
           </div>
         </div>
@@ -207,7 +158,7 @@ export default function WeeklyActivityExplorer() {
           onPartyTypeChange={setPartyType}
           onPartyGroupChange={setPartyGroupId}
           onDiscovery={(payload) => {
-            if (!isDiscovery(payload)) return false
+            if (!isDiscovery(payload, data.week_key)) return false
             setData(payload)
             return true
           }}
@@ -219,7 +170,7 @@ export default function WeeklyActivityExplorer() {
 
         <div>
           <div className="flex items-end justify-between gap-3">
-            <div><p className="text-[11px] font-black text-boot-primary">2. 날짜 선택</p><h4 className="mt-1 text-lg font-black text-boot-ink">가능한 날짜를 복수로 선택</h4></div>
+            <div><p className="text-[11px] font-black text-boot-primary">신청 내역</p><h4 className="mt-1 text-lg font-black text-boot-ink">신청한 후보 일정</h4></div>
             <p className="text-xs font-black text-boot-primary">{selectedWindows.length}개 선택</p>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -227,7 +178,7 @@ export default function WeeklyActivityExplorer() {
               const selected = selectedWindows.includes(window.id)
               const confirmed = window.id === data.application?.assigned_window_id
               return (
-                <button key={window.id} type="button" aria-pressed={selected} onClick={() => toggleWindow(window.id)} disabled={hasLiveApplication}
+                <button key={window.id} type="button" aria-pressed={selected} disabled
                   className={`min-h-[132px] rounded-2xl border p-4 text-left transition ${confirmed ? 'border-[#147A70] bg-[#EAF7F5]' : selected ? 'border-boot-primary bg-boot-soft shadow-sm' : 'border-boot-hairline bg-white'} disabled:cursor-default`}>
                   <span className="flex items-start justify-between gap-3">
                     <span className="font-black text-boot-ink">{formatWindow(window.starts_at)}</span>
@@ -250,11 +201,6 @@ export default function WeeklyActivityExplorer() {
             {canReload ? <button type="button" onClick={() => void load()} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-xs font-black text-boot-primary shadow-sm">다시 불러오기</button> : null}
           </div>
         ) : null}
-        {!hasLiveApplication ? (
-          <button type="button" onClick={() => void apply()} disabled={busy || selectedWindows.length === 0 || (partyType === 'friends' && !partyGroupId)} className="min-h-14 w-full rounded-2xl bg-boot-primary px-4 text-base font-black text-white disabled:opacity-45">
-            {busy ? '저장하는 중…' : `선택한 ${selectedWindows.length}개 날짜로 한 번만 신청`}
-          </button>
-        ) : null}
       </div>
     </section>
   )
@@ -274,18 +220,19 @@ function activityImage(kind: string) {
   } as Record<string, string>)[kind] ?? '/images/match/quantum-scheduled-five.png'
 }
 
-function isDiscovery(value: unknown): value is Discovery {
+function isDiscovery(value: unknown, expectedWeek?: string): value is Discovery {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
   const row = value as Partial<Discovery>
-  if (typeof row.server_now !== 'string' || typeof row.week_key !== 'string' || !Array.isArray(row.windows)
-    || !row.windows.every(isWindowRow)) return false
+  if (typeof row.server_now !== 'string' || typeof row.week_key !== 'string'
+    || (expectedWeek !== undefined && row.week_key !== expectedWeek) || !Array.isArray(row.windows)
+    || !row.windows.every(window => isWindowRow(window) && window.week_key === row.week_key)) return false
   if (row.application === null) return true
   if (!row.application || typeof row.application !== 'object') return false
   const application = row.application as Partial<WeeklyPartyApplication>
   const party = application.party
   return typeof application.id === 'string'
     && typeof application.activity_id === 'string'
-    && typeof application.week_key === 'string'
+    && application.week_key === row.week_key
     && ['awaiting_consents', 'active', 'assigned', 'cancelled', 'expired'].includes(application.status ?? '')
     && typeof application.revision === 'number'
     && Array.isArray(application.candidate_window_ids)

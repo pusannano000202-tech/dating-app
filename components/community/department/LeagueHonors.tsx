@@ -5,6 +5,7 @@ import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
 import type { LeagueTableRow } from '@/lib/meetups/challenge-journey'
 import { groupLeagueHonors } from '@/lib/meetups/league-honors'
 import styles from './league-honors.module.css'
+import DepartmentMascot from './DepartmentMascot'
 
 const copy = {
   ko: {
@@ -60,6 +61,7 @@ export function LeagueHonors({ rows, monthly, onJoin }: LeagueHonorsProps) {
     <ul className={styles.names}>
       {members.map(row => (
         <li key={row.department}>
+          <DepartmentMascot department={row.department} size={members.length===1?92:40}/>
           <strong className={styles.department}>{row.department}</strong>
           {row.is_me ? <span className={styles.myDepartment}>{text.myDepartment}</span> : null}
           <span className={styles.meta}>{text.matches(row.played)}</span>
@@ -80,7 +82,7 @@ export function LeagueHonors({ rows, monthly, onJoin }: LeagueHonorsProps) {
             const Icon = group.rank === 1 ? Trophy : Medal
             const tied = group.rows.length > 1
             return (
-              <li key={group.rank} className={styles.group} data-rank={group.rank} value={group.rank}>
+              <li key={group.rank} className={styles.group} data-rank={group.rank} data-tied={tied} value={group.rank}>
                 <div className={styles.rankLine}>
                   <Icon className={styles.icon} aria-hidden="true" strokeWidth={1.7} />
                   <span>{tied ? text.tiedRank(group.rank) : text.rank(group.rank)}</span>

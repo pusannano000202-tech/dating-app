@@ -1,0 +1,24 @@
+.shell { width: 100%; max-width: 640px; padding: 16px; margin: 0 auto 16px; border: 1px solid #ead9d1; border-radius: 22px; background: #fffaf6; color: #3d2d29; }
+.header { display: flex; justify-content: space-between; gap: 8px; align-items: center; color: #a43e31; font-size: 12px; font-weight: 800; }
+.header small { color: #76655e; font-size: 10px; font-weight: 600; }
+.title { margin: 10px 0 14px; font-size: 21px; font-weight: 850; letter-spacing: -.04em; line-height: 1.4; word-break: keep-all; }
+.art { display: flex; gap: 6px; overflow: hidden; border-radius: 15px; background: #f1e4d8; }
+.art img { flex: 1; width: 0; min-width: 0; height: auto; max-height: 230px; object-fit: contain; }
+.fallback { padding: 22px; min-height: 100px; font-size: 13px; }
+.speech { position: relative; margin: 13px 1px 0; border: 1px solid #e6bca8; border-radius: 17px; background: white; padding: 12px 16px; text-align: center; }
+.speech::before { content: ''; position: absolute; top: -7px; left: 30%; width: 12px; height: 12px; border-top: 1px solid #e6bca8; border-left: 1px solid #e6bca8; background: white; transform: rotate(45deg); }
+.speech span { font-size: 9px; color: #a43e31; font-weight: 800; letter-spacing: .1em; }
+.speech p { margin: 4px 0 0; font-size: 17px; font-weight: 800; line-height: 1.6; word-break: keep-all; }
+.action { margin-top: 12px; font-size: 13px; line-height: 1.6; text-align: center; }
+.details { margin-top: 8px; color: #75655e; font-size: 12px; line-height: 1.7; }
+.details summary { cursor: pointer; min-height: 44px; display: list-item; padding: 12px 0; }
+.details summary:focus-visible { outline: 2px solid #b74635; outline-offset: 3px; }
+.recovery { width: 100%; max-width: 640px; margin: 0 auto 16px; padding: 22px; border: 1px solid #ead9d1; border-radius: 22px; background: #fffaf6; color: #3d2d29; }
+.recoveryLabel { color: #a43e31; font-size: 12px; font-weight: 800; }
+.recovery h2 { margin: 8px 0; font-size: 20px; line-height: 1.4; letter-spacing: -.035em; word-break: keep-all; }
+.recovery p { color: #75655e; font-size: 14px; line-height: 1.7; word-break: keep-all; }
+.recovery button { display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin: 16px 0 10px; padding: 10px 12px; border: 1px solid #d8b8a9; border-radius: 14px; background: white; color: #a43e31; font-size: 14px; font-weight: 750; }
+.recovery button:focus-visible { outline: 2px solid #b74635; outline-offset: 3px; }
+.recovery button:disabled { opacity: .6; cursor: wait; }
+.recovery small { display: block; color: #75655e; font-size: 11px; line-height: 1.7; }
+@media (max-width: 420px) { .art img { max-height: 205px; } }

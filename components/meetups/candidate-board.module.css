@@ -8,3 +8,68 @@
 .depositStep{max-width:530px;margin:12px auto 0}.depositBack{display:inline-flex;align-items:center;gap:5px;min-height:36px;font-size:12px;color:#657464}.depositProgress{display:flex;align-items:center;justify-content:center;gap:12px;font-size:12px;margin:0 0 16px;color:#647961}.depositProgress>span{display:flex;align-items:center;gap:4px}.depositProgress>i{width:44px;height:1px;background:#ccd8c7}.depositProgress>strong{color:var(--green)}.depositTitle{text-align:center}.depositIcon{display:grid;place-items:center;margin:0 auto 11px;width:52px;height:52px;border-radius:18px;background:#e6eddc;color:var(--green)}.depositTitle h1{font-size:25px;line-height:1.32;letter-spacing:-.9px}.depositTitle>p{font-size:12px;line-height:1.6;color:#6d756d;margin:8px 0 17px}.depositReceipt{background:white;border:1px solid #d5decf;border-radius:19px;padding:16px 19px;box-shadow:0 4px 18px #23371c05}.depositReceipt>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 0;font-size:12px}.depositReceipt>div>span{color:#757b72}.depositReceipt strong{font-size:13px;text-align:right;overflow-wrap:anywhere}.depositReceipt strong.depositAmount{color:var(--green);font-size:26px;letter-spacing:-1px}.depositReceipt>p{display:flex;align-items:center;gap:5px;border-top:1px dashed #dce3d6;margin-top:12px;padding-top:11px;font-size:10px;color:#82897c}.depositSteps{list-style:none;display:grid;gap:13px;margin:19px 0;padding:0 4px}.depositSteps>li{display:flex;align-items:flex-start;gap:11px}.depositSteps>li>span{display:grid;place-items:center;flex:0 0 23px;height:23px;border-radius:50%;background:#e5eddc;color:#567240;font-size:11px;font-weight:800}.depositSteps strong{font-size:13px}.depositSteps p{font-size:11px;color:#7b8276;line-height:1.6;margin-top:2px}.depositStep>.consent{margin:14px 0;font-size:11px}.depositUnavailable{border:1px solid #e4dbc5;border-radius:15px;background:#f6f0e4;padding:16px;font-size:13px;color:#766245}.depositUnavailable>p{font-size:12px;line-height:1.6;margin:7px 0}.depositStep>.small{text-align:center;font-size:10px}.depositStep>.textButton{margin:4px 0}.depositNotice{max-width:650px;margin:20px auto;padding:23px;border-radius:20px;border:1px solid #d1ddca;background:white;color:#163721}.depositNotice>small{font-size:11px;color:#75856c}.depositNotice>h2{font-size:23px;font-weight:800;margin:14px 0 9px;line-height:1.4}.depositNotice>p{font-size:14px;color:#6b7863;line-height:1.7;margin-bottom:19px}.depositNotice>.primary{margin-top:15px}
 @media(min-width:700px){.depositTitle h1{font-size:32px}.depositTitle>p{font-size:14px}.depositReceipt{padding:24px}.depositReceipt>div{font-size:14px}.depositSteps strong{font-size:15px}.depositSteps p{font-size:13px}.depositStep>.consent{font-size:13px}}
 .depositNotice{--green:#295d3c;width:calc(100% - 40px)}.depositNotice>span{display:flex;align-items:center;gap:7px;font-size:12px;color:#6a7c61}.depositNotice>.secondary{display:flex;align-items:center;justify-content:center;gap:10px}.depositNotice>small{display:block;line-height:1.65;margin-top:12px}
+
+.headerTitle{flex:1;min-width:0}.headerTitle>strong{font-size:21px;letter-spacing:-.8px}
+.leaguePage{--green:#315c3e;--ink:#152127;--muted:#6b706f;background:#faf9f6;padding:24px 20px 110px}
+.leaguePage .header{gap:12px;min-height:48px;align-items:center}
+.leaguePage .headerTitle>strong{display:block;font-size:26px;font-weight:850;letter-spacing:-1px;line-height:1.25}
+.leaguePage .headerTitle>p{margin:4px 0 0;font-size:13px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+.leaguePage .circle{width:36px;height:40px;flex-shrink:0;border:0;background:transparent}
+.leaguePage .bell{flex-shrink:0;color:var(--ink);border-radius:10px}
+.leaguePage .tabs{gap:8px;margin:20px 0 24px;border-color:#e4e5df}
+.leaguePage .tabs>*{min-height:44px;padding:12px 2px;font-size:14px;line-height:1.5;font-weight:650;color:#717471}
+.leaguePage .tabs>[aria-current]{font-weight:800;color:var(--green)}
+.leaguePage .intro{margin:0 0 15px}
+.leagueHeading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.leaguePage .leagueHeading h1{margin:0;font-size:21px;line-height:1.4;letter-spacing:-.7px;font-weight:850}
+.leagueCount{margin:0;font-size:12px;line-height:1.6;color:var(--muted);white-space:nowrap}
+.leagueCount>strong{font-weight:750;color:var(--ink)}
+.countScope{margin:5px 0 0;font-size:11px;line-height:1.55;color:var(--muted);overflow-wrap:anywhere}
+.leagueMine{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;border:1px solid #dce6d5;border-radius:12px;background:#eef4e8;padding:11px 12px;margin:0 0 11px}
+.myRegistration{display:flex;align-items:center;gap:11px;min-width:0;min-height:60px;text-align:left;border-radius:8px}
+.myRegistration>span:last-child{display:flex;flex-direction:column;gap:7px;min-width:0}
+.myRegistration strong{font-size:14px;line-height:1.4;color:#294934;letter-spacing:-.4px}
+.myRegistrationIcon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:50%;background:#d9e4d1;color:#527049}
+.leagueMine{border-radius:18px;padding:16px 14px;background:#f0f5e9;gap:12px}
+.myRegistration{gap:12px}.myRegistration>span:first-child{flex-shrink:0}
+.myRegistration strong{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.myRegistration strong>em{font-size:10px;line-height:1.4;font-style:normal;padding:3px 7px;border-radius:20px;background:#dce9d1;color:#335b3d}
+.membershipContext{grid-column:1/-1;margin:0;padding-top:10px;border-top:1px solid #dce6d4;color:#60735f;font-size:12px;line-height:1.6}
+.membershipContext>strong{color:#294b34;font-weight:800}
+.membershipContext>button{margin-left:8px;text-decoration:underline;min-height:32px;color:#315c3e}
+.leaguePage .cardTier{display:flex;align-items:center;gap:6px;min-height:24px}
+.cardTier>span:last-child{font-size:10px;color:#8a8e87}
+.leagueMine .positionTags{gap:4px}
+.leagueMine .positionTags>span{padding:2px 7px;border-color:#d4e2cd;background:#e5efdc;font-size:11px;font-weight:700;line-height:1.4}
+.leagueMineActions{display:flex;flex-direction:column;gap:5px}
+.leagueMineActions>button{min-height:32px;min-width:66px;padding:5px 8px;border:1px solid #d7dcd2;border-radius:6px;background:#ffffffba;color:#3b473e;font-size:11px;font-weight:650}
+.leagueMineActions>button:last-child{border-color:#e5c9bd;background:#fffaf6;color:#a34332}
+.receivedInvites{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:12px 15px;text-align:left;border:1px solid #e4e5de;border-radius:12px;background:#fff;color:var(--green)}
+.receivedInvites>span{flex:1;font-size:14px;font-weight:700}.receivedInvites strong{font-weight:800}
+.leaguePage .filters{gap:6px;margin:17px 0 13px;padding:2px 0 4px;scrollbar-width:thin}
+.leaguePage .filters button{min-width:43px;min-height:38px;padding:8px 10px;font-size:12px;font-weight:650;border-color:#dadcd4;background:#faf9f6;color:#404742}
+.leaguePage .filters [aria-pressed=true]{background:var(--green);color:white;border-color:var(--green)}
+.leaguePage .filterCount{margin:0 0 12px;line-height:1.6}
+.leaguePage .list{gap:10px}
+.leaguePage .candidate{min-height:101px;padding:13px 12px;gap:11px;border:1px solid #e2e5df;border-radius:13px;background:#fff}
+.leaguePage .emblem{flex-basis:48px;width:48px}.leaguePage .emblem>span>span{width:48px!important;height:48px!important}
+.leaguePage .cardBody{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;row-gap:3px;align-items:start}
+.leaguePage .cardBody>strong{grid-column:1;grid-row:1;font-size:14px;line-height:1.5;font-weight:800;letter-spacing:-.45px}
+.leaguePage .cardBody>small{grid-column:1;grid-row:2;font-size:11px;line-height:1.6;color:#68716b}
+.leaguePage .cardBody>.positionTags{grid-column:2;grid-row:1 / span 2;align-self:start;justify-content:flex-end;max-width:120px;gap:4px}
+.leaguePage .cardBody>.positionTags>span{border:0;background:#edf5e8;color:#3e7042;padding:3px 9px;font-size:10px;font-weight:700;line-height:1.5}
+.leaguePage .cardBody>.positionTags>span:nth-child(even){background:#e8f1f1;color:#427174}
+.leaguePage .quote{grid-column:1 / -1;margin-top:7px;font-size:12px;line-height:1.5;-webkit-line-clamp:1;color:#6b726e}
+.leaguePage .chevron{display:none}
+.leaguePage h1[tabindex="-1"]:focus{outline:none}
+.leaguePage .moreRow{margin:5px 0 8px}.leaguePage .moreRow button{min-height:40px}
+.leagueNotice{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:11px;background:#f0f1ed;color:#65716b;font-size:11px;line-height:1.6;margin:9px 0 0}
+.leagueNotice>svg{flex-shrink:0}
+.leaguePage .bottomAction{position:static;transform:none;width:100%;max-width:none;margin:16px 0 0;padding:0;background:transparent}
+.leaguePage:has(.bottomAction){padding-bottom:110px}
+.leaguePage .primary{border-radius:11px;font-size:14px;min-height:50px}
+.leaguePage .candidate:hover,.leaguePage .receivedInvites:hover{border-color:#afc1a5}
+.leaguePage .leagueMineActions>button:hover{filter:brightness(.97)}
+.leaguePage .demoLabel{height:auto;margin-top:7px;line-height:1.4}
+@media(min-width:700px){.headerTitle>strong{font-size:24px}.leaguePage{padding:30px 36px 110px}.leaguePage .headerTitle>strong{font-size:28px}.leaguePage .headerTitle>p{font-size:14px}.leaguePage .leagueHeading h1{font-size:24px}.leagueCount{font-size:13px}.countScope{font-size:12px}.leaguePage .tabs>*{font-size:15px}.leaguePage .filters button{font-size:13px;min-height:40px}.leaguePage .candidate{padding:16px;gap:15px;min-height:106px}.leaguePage .cardBody>strong{font-size:16px}.leaguePage .cardBody>small,.leaguePage .quote{font-size:12px}.leaguePage .cardBody>.positionTags{max-width:220px}.leaguePage .cardBody>.positionTags>span{font-size:11px}.myRegistration strong{font-size:15px}.leagueMineActions>button{font-size:12px;min-height:34px}.leagueNotice{font-size:12px}}
+@media(max-width:360px){.leaguePage{padding-left:15px;padding-right:15px}.leaguePage .headerTitle>strong{font-size:24px}.leagueHeading{gap:3px 8px}.leaguePage .leagueHeading h1{font-size:19px}.leagueCount{font-size:11px}.myRegistration{gap:8px}.myRegistrationIcon{width:34px;height:34px;flex-basis:34px}.myRegistration strong{font-size:12px}.leagueMine{padding:10px}.leagueMineActions>button{min-width:60px}.leaguePage .cardBody>.positionTags{grid-column:1 / -1;grid-row:3;justify-content:flex-start;max-width:none;margin-top:4px}.leaguePage .cardBody>.quote{grid-row:4}.leaguePage .filters{gap:4px}.leaguePage .filters button{padding:8px;min-width:40px}}

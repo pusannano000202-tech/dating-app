@@ -4,8 +4,9 @@ import test from 'node:test'
 
 test('matching discovery keeps both first-meeting modes without revealing future continuation days', () => {
   const source = readFileSync('components/matching/QuantumMatchDiscovery.tsx', 'utf8')
-  assert.match(source, /TonightRankedEntryCard/)
-  assert.match(source, /WeeklyActivityExplorer/)
+  assert.match(source, /href="\/tonight"/)
+  assert.match(source, /href=\{entry\.calendarHref\}/)
+  assert.match(source, /matchingEntryFor/)
   assert.doesNotMatch(source, /ContinuationJourneyGuide|ContinuationContentGuide|Day [1-5]|5일 코스/)
   const guide = readFileSync('components/matching/ContinuationJourneyGuide.tsx', 'utf8')
   assert.match(guide, /이어 만나는 5일 코스 알아보기/)

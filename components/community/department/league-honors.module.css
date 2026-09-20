@@ -7,6 +7,8 @@
   color: #29362b;
 }
 
+/* Podium cards retain true server ranks, including ties; no invented winners. */
+
 .header {
   display: flex;
   flex-wrap: wrap;
@@ -401,3 +403,21 @@
     font-size: 11px;
   }
 }
+
+.honors{padding:0;border:0;border-radius:0;background:transparent}
+.header h2{font-size:17px}.header p{font-size:11px}
+.groups{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:8px}
+.group{display:flex;flex-direction:column;align-items:center;gap:0;padding:12px 8px;border-radius:18px;min-height:215px;text-align:center;color:#173331}
+.group[data-rank='1']{order:2;background:#fff7e8;border-color:#efd8a7;color:#173331;min-height:240px}
+.group[data-rank='2']{order:1;background:#f2f3f3;border-color:#e0e4e3}
+.group[data-rank='3']{order:3;background:#faf2e7;border-color:#ecdbc4}
+.group[data-rank='1'] .points{color:#173331}.group[data-rank='1'] .meta{color:#65776b}
+.rankLine{flex-direction:row;align-items:center;justify-content:center;margin:0 0 7px;font-size:11px;gap:3px}
+.group[data-rank='1'] .rankLine{color:#a8751d}.group[data-rank='1'] .icon{color:#9b6a17;background:#fae5b2}
+.names{margin:0;gap:10px;width:100%}.names li{display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.45}
+.department{font-size:13px;line-height:1.45;letter-spacing:-.04em}.meta{font-size:10px;margin:0}.points{justify-content:center;max-width:none;margin:8px 0 0;gap:2px}
+.points strong{font-size:23px}.points span{font-size:10px}.footer{margin:15px 0 0;justify-content:space-between}
+.group[data-tied='true'] .names li{flex-direction:row;flex-wrap:wrap;justify-content:center}.group[data-tied='true']{height:auto}
+.tied{width:100%}.tied summary{padding:4px 0;font-size:11px;min-height:44px}.group[data-rank='1'] .tied summary{color:#886625}
+@media(min-width:761px){.group{min-height:250px}.group[data-rank='1']{min-height:280px}.department{font-size:16px}.points strong{font-size:28px}}
+@media(max-width:360px){.group{padding:10px 4px}.department{font-size:12px}.points strong{font-size:20px}}

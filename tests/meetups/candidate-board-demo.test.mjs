@@ -23,7 +23,7 @@ test('incoming invitation alone leaves candidacy public; accepting one hides it 
  for(const scope of scopes){const waiting=register(createDemoBoard(scope)),incoming=valid(demoIncoming(waiting));assert.equal(incoming.incoming.length,1);assert.equal(incoming.total_count,31);assert.equal(incoming.mine.status,'waiting');assert.deepEqual(demoIncoming(incoming),incoming);const invite=incoming.incoming[0],joining=valid(applyDemoAction(incoming,'accept',command(incoming,invite)));assert.equal(joining.mine.status,'joining');assert.equal(joining.total_count,30);assert.ok(!joining.candidates.some(c=>c.is_me));assert.equal(joining.result.status,'joining');assert.equal(joining.result.checkout_enabled,false);assert.equal(joining.incoming[0].status,'joining');assert.ok(joining.mine.next_href);assert.equal(joining.mine.joining_until,joining.incoming[0].joining_until);assert.deepEqual(joining.host_rooms,incoming.host_rooms);}
 })
 test('only an explicit joining rehearsal can become joined; release restores just this valid candidate',()=>{
- for(const scope of scopes){let board=register(createDemoBoard(scope));assert.deepEqual(demoJoined(board),board);board=demoIncoming(board);const joining=applyDemoAction(board,'accept',command(board,board.incoming[0]));const released=valid(applyDemoAction(joining,'release',command(joining,joining.incoming[0])));assert.equal(released.total_count,31);assert.equal(released.mine.status,'waiting');assert.equal(released.mine.next_href,null);assert.equal(released.incoming[0].status,'pending');const joined=valid(demoJoined(joining));assert.equal(joined.total_count,30);assert.equal(joined.mine.status,'joined');assert.ok(joined.mine.next_href.startsWith('/chat/'));assert.equal(joined.incoming[0].status,'joined');assert.equal(joined.result.checkout_enabled,false);assert.ok(!joined.candidates.some(c=>c.is_me));assert.deepEqual(demoJoined(joined),joined);assert.throws(()=>applyDemoAction(joined,'release',command(joined,joined.incoming[0])),/conflict/);}
+ for(const scope of scopes){let board=register(createDemoBoard(scope));assert.deepEqual(demoJoined(board),board);board=demoIncoming(board);const joining=applyDemoAction(board,'accept',command(board,board.incoming[0]));const released=valid(applyDemoAction(joining,'release',command(joining,joining.incoming[0])));assert.equal(released.total_count,31);assert.equal(released.mine.status,'waiting');assert.equal(released.mine.next_href,null);assert.equal(released.incoming[0].status,'pending');const joined=valid(demoJoined(joining));assert.equal(joined.total_count,scope.kind==='league'?31:30);assert.equal(joined.mine.status,scope.kind==='league'?'waiting':'joined');if(scope.kind!=='league')assert.ok(joined.mine.next_href.startsWith('/chat/'));assert.equal(joined.incoming[0].status,'joined');assert.equal(joined.result.checkout_enabled,false);assert.equal(joined.candidates.some(c=>c.is_me),scope.kind==='league');assert.deepEqual(demoJoined(joined),joined);assert.throws(()=>applyDemoAction(joined,'release',command(joined,joined.incoming[0])),/conflict/);}
 })
 test('declining an invite does not withdraw registration; cancellation invalidates incoming invitations',()=>{
  let board=demoIncoming(register(createDemoBoard(scopes[0])));board=valid(applyDemoAction(board,'decline',command(board,board.incoming[0])));assert.equal(board.mine.status,'waiting');assert.equal(board.total_count,31);assert.equal(board.incoming[0].status,'declined');board=demoIncoming(board);const previous=board.incoming.find(i=>i.status==='pending');assert.ok(previous);const cancelled=valid(applyDemoAction(board,'cancel',{expected_revision:board.mine.revision}));assert.equal(cancelled.total_count,30);assert.equal(cancelled.mine.status,'cancelled');assert.ok(!cancelled.candidates.some(c=>c.is_me));assert.ok(cancelled.incoming.every(i=>i.status!=='pending'&&i.status!=='joining'));assert.deepEqual(demoIncoming(cancelled),cancelled);assert.throws(()=>applyDemoAction(cancelled,'accept',command(cancelled,previous)),/conflict|unavailable/);assert.equal(valid(register(cancelled)).total_count,31)
@@ -64,7 +64,7 @@ test('cancelling preparation invalidates the selected invitation and cannot rest
  let board=demoIncoming(register(createDemoBoard(scopes[0])));board=applyDemoAction(board,'accept',command(board,board.incoming[0]));const cancelled=valid(applyDemoAction(board,'cancel',{expected_revision:board.mine.revision}));assert.equal(cancelled.mine.status,'cancelled');assert.equal(cancelled.total_count,30);assert.equal(cancelled.incoming[0].status,'unavailable');assert.throws(()=>applyDemoAction(cancelled,'release',command(cancelled,cancelled.incoming[0])),/conflict/);assert.deepEqual(demoJoined(cancelled),cancelled)
 })
 
-test('two demo teams can invite but joining one closes the other without double membership',()=>{
+test('two demo league teams can invite and joining one preserves the other invitation',()=>{
  const invited=valid(demoIncoming(register(createDemoBoard(scopes[0])),2))
  assert.equal(invited.incoming.length,2)
  assert.notEqual(invited.incoming[0].room_id,invited.incoming[1].room_id)
@@ -72,9 +72,9 @@ test('two demo teams can invite but joining one closes the other without double 
  const joining=applyDemoAction(invited,'accept',command(invited,a))
  assert.throws(()=>applyDemoAction(joining,'accept',command(joining,b)),/conflict/)
  const joined=valid(demoJoined(joining))
- assert.equal(joined.incoming[0].status,'joined');assert.equal(joined.incoming[1].status,'unavailable')
- assert.equal(joined.total_count,30);assert.ok(!joined.candidates.some(c=>c.is_me))
- assert.throws(()=>applyDemoAction(joined,'accept',command(joined,b)),/conflict/)
+ assert.equal(joined.incoming[0].status,'joined');assert.equal(joined.incoming[1].status,'pending')
+ assert.equal(joined.total_count,31);assert.ok(joined.candidates.some(c=>c.is_me))
+ assert.equal(applyDemoAction(joined,'accept',command(joined,b)).incoming[1].status,'joining')
 })
 
 test('repeating the two-team demo after a decline never duplicates the remaining team',()=>{

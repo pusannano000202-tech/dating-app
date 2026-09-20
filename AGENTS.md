@@ -4,6 +4,13 @@
 
 이 작업공간의 기본 운영은 **solo-owner + 격리 작업공간**이다. 최신 사용자의 명시적 결정과 승인 범위가 과거 문서·핸드오프·스냅샷보다 우선한다.
 
+### 협업 브랜치 기준 (2026-09-20)
+
+- 현재 인수인계는 `docs/handoff/active/COLLABORATION_BRANCH_2026-09-20.md`를 따른다. 이 브랜치는 GitHub 코드 공유용이며 출시 완료본이 아니다.
+- `quantum-model-router`와 `quauntum-work-union-progress`, 이에 종속된 모델 고정 배정·연합 절차는 폐기됐다. 과거 파일에 남아 있어도 호출하거나 복원하지 않는다.
+- 독립 검토는 필요할 때 Codex의 별도 맥락에서 수행한다. 다른 AI 서비스로 소스를 보내거나 모델 설정을 임의 변경하지 않는다.
+- 다른 작성자의 미커밋 작업·QA 자료를 섞거나 삭제하지 않는다. 공유 브랜치 업로드와 main 병합·원격 DB 변경·실결제·배포는 별개 승인 범위다.
+
 - 새 구현은 사용자가 지시하지 않으면 현재 더티 루트가 아닌 격리 작업공간에서 시작한다. 기존 더티 변경은 사용자 소유 자료로 보존하며 이동·삭제·되돌리거나 새 변경에 섞지 않는다.
 - 실행에 따라 달라지는 사실(작업공간 경로, branch/HEAD/upstream, worktree, staged·unstaged·untracked 상태, 원격 DB·배포·결제 상태)은 실행 직전에 다시 확인한다. 이전 보고의 SHA나 상태를 현재 근거로 재사용하지 않는다.
 - 변경 구현 승인은 `git add`, commit, push, migration 원격 적용, 실제 결제 승인·취소·환불, 배포 승인이 아니다. 각각은 사용자 명시적 승인이 있어야 한다.
@@ -18,8 +25,8 @@
 | Git·worktree·충돌 조정 | 모든 작업 항목 + `docs/engineering/COLLABORATION.md` |
 | 타입·DB·API·인증·결제 | 모든 작업 항목 + `docs/engineering/INTERFACE_CONTRACT.md`, 관련 migration/RLS/RPC 코드와 적용 상태. Git 조작이 있을 때만 협업 문서를 추가한다. |
 | 배포·릴리스·원격 점검 | 모든 작업 항목 + `docs/engineering/COLLABORATION.md`, `docs/coordination/QUANTUM_SOURCE_OF_TRUTH.md`; GitHub/Supabase/Vercel/EAS의 라이브 상태를 별도 확인 |
-| 작업 분업·별도 작업방의 부모·라우팅 해석자 | 모든 작업 항목 + `.agents/skills/quantum-model-router/SKILL.md`, `docs/coordination/MODEL_ROUTING_POLICY.md`; 대표실 Gate가 있을 때만 `quantum-executive-reporting`을 추가한다. |
-| 유효한 `resolved routing`을 받은 내부 자식 | 부모가 전달한 계약과 대상 파일만 확인한다. 요청·범위·위험이 바뀌지 않았다면 라우터 정책과 대표실 스킬을 다시 읽지 않는다. |
+| 작업 분업·별도 작업방의 부모 | 모든 작업 항목 + 대상 작업의 범위·소유 파일·검증 기준. 별도 사용자 작업방·승인 보고가 필요할 때만 보고 스킬을 추가한다. |
+| 범위가 정해진 내부 자식 | 부모가 전달한 계약과 대상 파일만 확인한다. 요청·범위·위험이 같다면 공통 문서를 반복해서 읽지 않는다. |
 
 ### 위험 표면과 보호 대상
 

@@ -21,6 +21,7 @@ export type TonightRoundView = Readonly<{
   marketCode: string
   serviceDate: string
   status: string
+  signupOpenAt?: string
   signupCloseAt: string
   capacityLockAt: string
   allocationPublishAt: string
@@ -86,10 +87,13 @@ export type UserTonightData = Readonly<{
   round: TonightRoundView
   activities: readonly [TonightActivityCard, TonightActivityCard, TonightActivityCard]
   applicationsOpen: boolean
-  participationSummary: ParticipationSummary
+  applicationsAvailable?: boolean
+  participationSummary: ParticipationSummary | null
+  roundStats?: { maleApplicationCount: number | null; femaleApplicationCount: number | null; teamCount: number | null } | null
   application: TonightApplicationView | null
   journey: TonightJourneyView | null
   arrivalHelpRequest: TonightArrivalHelpView | null
+  arrivalHelpAvailable?: boolean
 }>
 
 export type UserApplyInput = Readonly<{
@@ -100,7 +104,7 @@ export type UserApplyInput = Readonly<{
 }>
 
 export interface UserTonightAdapter {
-  load(): Promise<UserTonightData>
+  load(options?: { signal?: AbortSignal }): Promise<UserTonightData>
   apply(input: UserApplyInput): Promise<UserTonightData>
   beginDeposit(input: {
     applicationId: string

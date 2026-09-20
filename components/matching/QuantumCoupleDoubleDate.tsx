@@ -115,7 +115,7 @@ export default function QuantumCoupleDoubleDate({ devPreview = false }: Props) {
         <div className="flex items-start gap-3">
           <LockKeyhole className="mt-0.5 shrink-0 text-[#B96657]" size={20} />
           <div>
-            <h2 className="text-base font-black">상대 커플 프로필은 만남 종료 후 열려요</h2>
+            <h2 className="text-base font-black">새로운 인연도 서로의 동의부터</h2>
             <p className="mt-1 text-sm font-bold leading-6 text-boot-muted">상대 커플의 사진·이름·학과는 보여주지 않아요. 만남 후 계속 이야기하려면 친구 초대를 보내고 서로 수락해 주세요. 친구로 자동 추가되지 않아요.</p>
           </div>
         </div>
@@ -178,10 +178,10 @@ function CouplePartyStatus({ party, busy, devPreview, onAccept, onCancel }: { pa
 
         {completed ? (
           <div className="mt-5 rounded-lg bg-[#FFF0EB] p-4">
-            <p className="text-xs font-black text-[#A85F50]">친구 연결 완료</p>
-            <p className="mt-1 text-lg font-black">네 사람의 프로필이 열렸어요</p>
-            <p className="mt-2 text-sm font-bold leading-6 text-boot-muted">친구 목록에서 함께 만난 사람을 확인하고 앱 안에서 대화를 이어갈 수 있어요.</p>
-            <Link href="/friends" className="mt-4 flex min-h-12 items-center justify-center rounded-lg bg-[#C86F60] px-4 text-sm font-black text-white">새 친구 프로필 보기</Link>
+            <p className="text-xs font-black text-[#A85F50]">만남 종료</p>
+            <p className="mt-1 text-lg font-black">계속 이야기하고 싶다면</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-boot-muted">친구 초대를 보내고 서로 수락해 주세요. 만남이 끝났다고 친구가 자동으로 추가되거나 프로필이 공개되지는 않아요.</p>
+            <Link href="/friends" className="mt-4 flex min-h-12 items-center justify-center rounded-lg bg-[#C86F60] px-4 text-sm font-black text-white">친구 연결 확인</Link>
           </div>
         ) : matched ? (
           <div className="mt-5 rounded-lg bg-[#FFF6ED] p-4">
@@ -216,7 +216,7 @@ function mapError(error?: string) {
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return '토요일 오후 4:00'
+  if (!value || !Number.isFinite(Date.parse(value))) return '일정 확인 중'
   const date = new Date(value)
-  return `${date.getMonth() + 1}월 ${date.getDate()}일 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  return new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
 }

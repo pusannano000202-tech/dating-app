@@ -19,7 +19,7 @@ const paths = [
   { id: 'courses', title: '내 수업, 같이 풀어요', detail: '내 학과와 과목에 맞는 공부 모임', image: '/social-scenes/course-calculus.png' },
 ] as const
 
-export default function GuidedParticipationPreview({ scene, ranking='empty', sport='lol', flow='league' }: { scene: Scene; ranking?: LeagueRankingExample; sport?: LeagueSport; flow?: 'league'|'invites'|'recruitment' }) {
+export default function GuidedParticipationPreview({ scene, ranking='empty', sport='lol', flow='league',design=false }: { scene: Scene; ranking?: LeagueRankingExample; sport?: LeagueSport; flow?: 'league'|'invites'|'recruitment';design?:boolean }) {
   const [chatView,setChatView]=useState(false)
   return <div className={s.root}>
     <aside className={s.notice} aria-label="개발용 예시 안내">
@@ -27,7 +27,7 @@ export default function GuidedParticipationPreview({ scene, ranking='empty', spo
       <span><strong>예시 체험</strong> · 실제 참가·초대·전송·신고는 하지 않아요.</span>
     </aside>
     {scene === 'league' ? <>
-      {chatView ? null : flow !== 'league' ? <nav className={`${s.examples} ${s.inviteExamples}`} aria-label={flow==='recruitment'?'우리 과 모집 종목 선택':'지도 초대 종목 선택'}>
+      {chatView||design ? null : flow !== 'league' ? <nav className={`${s.examples} ${s.inviteExamples}`} aria-label={flow==='recruitment'?'우리 과 모집 종목 선택':'지도 초대 종목 선택'}>
         {([['lol','LoL'],['futsal','풋살 6명'],['football','축구 11명']] as const).map(([value,label])=><Link key={value} href={`/meetups/dev-flow?scene=league&flow=${flow}&sport=${value}`} aria-current={sport===value?'page':undefined}>{label}</Link>)}
         <Link href={`/meetups/dev-flow?scene=league&flow=${flow==='recruitment'?'invites':'recruitment'}&sport=${sport}`}>{flow==='recruitment'?'친구 초대 →':'우리 과 모집 →'}</Link>
       </nav> : <nav className={s.examples} aria-label="순위 예시 선택">
@@ -36,7 +36,7 @@ export default function GuidedParticipationPreview({ scene, ranking='empty', spo
         <Link href="/meetups/dev-flow?scene=league&flow=invites&sport=lol">팀 개설·친구 초대 체험</Link>
         <Link href="/meetups/dev-flow?scene=league&flow=recruitment&sport=lol">우리 과 팀 찾기·모집 소식</Link>
       </nav>}
-      <DepartmentLeagueJourney key={`${sport}-${flow}-${ranking}`} demo initialSport={sport} demoRanking={ranking} demoFlow={flow} onDemoChatViewChange={setChatView} />
+      <DepartmentLeagueJourney key={`${sport}-${flow}-${ranking}`} demo demoDesign={design} initialSport={sport} demoRanking={ranking} demoFlow={flow} onDemoChatViewChange={setChatView} />
     </>
       : scene === 'mentoring' ? <MentoringExperience demo />
       : scene === 'courses' ? <DepartmentCourseDiscovery demo />

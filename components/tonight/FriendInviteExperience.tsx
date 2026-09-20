@@ -150,7 +150,7 @@ export default function FriendInviteExperience({ token }: { token: string }) {
       setError(code === 'friend_invite_expired'
         ? '신청 마감이 지나 초대가 만료됐어요.'
         : code === 'profile_not_ready'
-          ? '사전 카드 작성을 마친 뒤 다시 수락해 주세요.'
+          ? '프로필·취향·사진 준비를 마친 뒤 받은 초대로 돌아와 다시 수락해 주세요.'
           : '초대를 수락하지 못했어요. 다른 사람이 먼저 사용했거나 동행 자리가 찼을 수 있어요.')
     } finally {
       setBusy(false)
@@ -243,9 +243,9 @@ export default function FriendInviteExperience({ token }: { token: string }) {
       {state === 'ready' && invite?.membership_ready && !invite.profile_ready && (
         <section className={`${PEACH_PANEL} p-6 text-center sm:p-8`}>
           <UserRoundCheck className="mx-auto h-10 w-10 text-[#b94b3f]" aria-hidden />
-          <h2 className="mt-4 text-xl font-black">사전 카드를 먼저 완성해 주세요</h2>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[#665c58]">완료 뒤 지금 초대 주소로 자동 복귀해요.</p>
-          <Link href={`/profile/match-card?redirect=${encodeURIComponent(SAFE_RESUME_PATH)}`} className="mt-5 inline-flex min-h-12 items-center justify-center rounded-2xl bg-[#b94b3f] px-5 py-3 text-sm font-black text-white">사전 카드 작성</Link>
+          <h2 className="mt-4 text-xl font-black">남은 참가 준비를 이어가 주세요</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-[#665c58]">기존 프로필·취향·사진 준비를 마친 뒤 ‘받은 초대로 돌아가기’에서 이어가요. 준비만으로 초대가 수락되지는 않아요.</p>
+          <Link href={`/tonight/prepare?returnTo=${encodeURIComponent(SAFE_RESUME_PATH)}`} className="mt-5 inline-flex min-h-12 items-center justify-center rounded-2xl bg-[#b94b3f] px-5 py-3 text-sm font-black text-white">참가 준비 이어가기</Link>
         </section>
       )}
 

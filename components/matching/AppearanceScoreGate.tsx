@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, LoaderCircle, ShieldCheck } from 'lucide-react'
@@ -32,30 +32,43 @@ export default function AppearanceScoreGate({
   eventTitle,
   eventMeta,
   initialPhotoIssueCode = null,
+  expectedOwner,
+  onPrepared,
 }: {
   eventTitle?: string
   eventMeta?: string
   initialPhotoIssueCode?: PhotoIssueCode | null
+  expectedOwner?: string
+  onPrepared?: () => void | Promise<void>
 }) {
   const router = useRouter()
   const [state, setState] = useState<GateState>(initialPhotoIssueCode ? 'photo_invalid' : 'idle')
   const [photoIssueCode, setPhotoIssueCode] = useState<PhotoIssueCode | null>(initialPhotoIssueCode)
+  const owner = useRef(expectedOwner)
+  owner.current = expectedOwner
+  const inFlight = useRef(false)
 
   async function prepareForMatching() {
-    if (state === 'loading') return
+    if (state === 'loading' || inFlight.current) return
+    inFlight.current = true
+    const requestOwner = expectedOwner
     setPhotoIssueCode(null)
     setState('loading')
 
     try {
       const response = await fetch('/api/score', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(requestOwner ? { 'X-Quantum-Owner': requestOwner } : {}) },
         body: JSON.stringify({ trigger: 'match_search' }),
       })
       const data = await readScoreResponse(response)
+      if (owner.current !== requestOwner) return
 
       if (response.ok && data?.self_appearance_score_persisted === true) {
-        router.refresh()
+        if (onPrepared) {
+          await onPrepared()
+          setState('idle')
+        } else router.refresh()
         return
       }
 
@@ -69,6 +82,8 @@ export default function AppearanceScoreGate({
       }
     } catch {
       setState('error')
+    } finally {
+      inFlight.current = false
     }
   }
 

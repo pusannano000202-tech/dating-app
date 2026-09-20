@@ -1,0 +1,31 @@
+.page { min-height: 100vh; overflow-x: clip; padding: 24px 16px 110px; background: #faf8f5; color: #292521; }
+.container { width: 100%; max-width: 1056px; margin-inline: auto; }
+.back { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-bottom: 14px; font-size: 13px; font-weight: 700; color: #78685e; }
+.heading { margin-bottom: 22px; }
+.eyebrow { color: #b44733; font-size: 12px; font-weight: 800; }
+.title { margin-top: 8px; font-size: clamp(28px, 5vw, 38px); line-height: 1.3; letter-spacing: -.05em; font-weight: 900; }
+.description { margin-top: 10px; color: #7b6c62; font-size: 14px; line-height: 1.7; }
+.participation { margin-bottom: 22px; border: 1px solid #e9e0d8; border-radius: 18px; padding: 15px 17px; background: #fffdfb; }
+.stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin-top: 13px; }
+.stats > div { display: flex; flex-direction: column; gap: 5px; align-items: center; padding-inline: 5px; }
+.stats > div + div { border-left: 1px solid #eee6de; }
+.stats dt { font-size: 11px; color: #867266; font-weight: 700; }
+.stats dd { font-size: clamp(16px, 3vw, 21px); font-weight: 850; letter-spacing: -.03em; color: #4b352c; }
+.statsNote { margin-top: 12px; font-size: 11px; line-height: 1.7; color: #8a7c72; }
+.previewLink { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; margin-top: 18px; border-top: 1px solid #ede4dc; padding-top: 12px; font-size: 12px; color: #9e4736; font-weight: 800; }
+.tabs { display: flex; gap: 5px; margin-top: 20px; border-bottom: 1px solid #e7ddd4; overflow-x: auto; }
+.tab { flex: 1; min-height: 48px; padding: 10px 12px; white-space: nowrap; border-bottom: 3px solid transparent; color: #817268; font-size: 13px; font-weight: 800; }
+.tab[aria-pressed='true'] { border-bottom-color: #b44733; color: #a84230; }
+.nextAction { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 17px; border: 1px solid #e8d7cc; border-radius: 18px; background: #f7ece4; }
+.nextAction p { color: #8c5c47; font-size: 11px; font-weight: 800; }
+.nextAction h2 { margin-top: 5px; font-size: 16px; font-weight: 850; line-height: 1.6; word-break: keep-all; }
+.nextDescription { display: block; margin-top: 7px; color: #806858; font-size: 12px; line-height: 1.7; }
+.focused section[id] { scroll-margin-top: 20px; }
+.nextAction button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; flex-shrink: 0; min-height: 44px; border-radius: 12px; padding: 9px 13px; background: #b44733; color: white; font-size: 12px; font-weight: 800; }
+.focused { width: 100%; max-width: 752px; margin: 22px auto 0; }
+.controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.controls details { flex: 1; min-width: 220px; }
+.controls summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-size: 12px; font-weight: 750; color: #7d6d63; }
+.page button:focus-visible, .page a:focus-visible, .page summary:focus-visible { outline: 2px solid #b44733; outline-offset: 3px; }
+@media (min-width: 768px) { .page { padding: 36px 24px 100px; } }
+@media (max-width: 420px) { .nextAction { align-items: stretch; flex-direction: column; gap: 10px; } .nextAction button { align-self: flex-start; } .tab { padding-inline: 9px; font-size: 12px; } }

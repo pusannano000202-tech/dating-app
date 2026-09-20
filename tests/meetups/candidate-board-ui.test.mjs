@@ -23,11 +23,11 @@ function fixture({mine=false,incoming=false,expanded=false}={}){
 /** Executes actual TS hooks/component/page source with deterministic hook scheduling.
  * Network, auth source, timers and browser events are simulated; not React DOM or
  * real-account proof. No files, credentials, push devices or remote state touched. */
-function harness({live=false,board=fixture(),initialInviteId,onAction=async()=>null}={}){
+function harness({live=false,liveMembership=false,board=fixture(),initialInviteId,onAction=async()=>null}={}){
  let index=0,dirty=true,tree,account=board.owner_id,currentScope=scope,timerId=0,disposed=false,more=0
  const slots=[],effects=new Map(),intervals=new Map(),timeouts=new Map(),requests=[]
  const listeners={window:new Map(),document:new Map()}
- let props={scope,board,busy:false,error:'',filter:'all',onFilter(){},onMore(){more++},onRefresh(){},onAction,initialInviteId}
+ let props={scope,board,busy:false,error:'',filter:'all',leagueMembership:{status:'none'},onFilter(){},onMore(){more++},onRefresh(){},onAction,initialInviteId}
  const hooks={...React,
   useState(initial){const i=index++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true}}]},
   useRef(initial){const i=index++;if(!slots[i])slots[i]={value:{current:initial}};return slots[i].value},
@@ -42,7 +42,11 @@ function harness({live=false,board=fixture(),initialInviteId,onAction=async()=>n
   '@/lib/meetups/candidate-board-contract':contract,'@/lib/meetups/candidate-board-view':view,'@/lib/meetups/challenge-journey':{LEAGUE_SPORTS:{}},'@/lib/meetups/study-catalog':{getStudyCourse(){return null},getStudyCoursePhoto(){return{src:'/fixture'}}},'@/components/community/department/LeagueTier':{LeagueTierBadge:'span',LeagueTierPicker:'select'},'@/components/content-history/useHistoryAccount':{useHistoryAccount:()=>account},'./candidate-board.module.css':{__esModule:true,default:new Proxy({},{get:(_,key)=>String(key)})},
  }
  const evaluate=path=>{const m={exports:{}};new Function('require','module','exports','fetch','window','document','setInterval','clearInterval','setTimeout','clearTimeout',source(path))(name=>{assert.ok(Object.hasOwn(deps,name),name);return deps[name]},m,m.exports,fetch,window,document,setInterval,clearInterval,setTimeout,clearTimeout);return m.exports}
+ deps['@/components/community/department/DepartmentMascot']={__esModule:true,default:'department-mascot'}
+ deps['@/components/community/department/LeagueMyTeams']={__esModule:true,default:'my-teams'}
  deps['./useHostedResource']=evaluate('components/meetups/useHostedResource.ts')
+ if(liveMembership){deps['@/lib/meetups/challenge-journey']=evaluate('lib/meetups/challenge-journey.ts');deps['@/lib/meetups/league-navigation']=evaluate('lib/meetups/league-navigation.ts');deps['@/lib/chat/social-rooms-contract']=evaluate('lib/chat/social-rooms-contract.ts')}
+ deps['./useCandidateLeagueMembership']=liveMembership?evaluate('components/meetups/useCandidateLeagueMembership.ts'):{useCandidateLeagueMembership:()=>({membership:{status:'none'},retry(){}})}
  deps['./candidate-board-contract']=contract
  deps['@/lib/meetups/candidate-deposit-contract']=evaluate('lib/meetups/candidate-deposit-contract.ts')
  deps['./CandidateDepositStep']=evaluate('components/meetups/CandidateDepositStep.tsx')
@@ -153,17 +157,17 @@ test('sign-in recovery preserves the selected invitation from the notification l
  }finally{h.dispose()}
 })
 
-test('joined person sees its own team name and automatic closure, including ended invite history',()=>{
+test('joined league person remains discoverable and sees the second team invitation plus joined history',()=>{
  let board=fixture({mine:true,incoming:true}),first=board.incoming[0]
  board.incoming.push({...first,id:other,room_id:other,room_title:'다른 팀 · 예시'})
  board=applyDemoAction(board,'accept',{invite_id:first.id,expected_revision:first.revision})
  board=demoJoined(board)
  const h=harness({board});try{
-  assert.ok(text(h.tree).includes(`${first.room_title}에 합류했어요`))
-  assert.ok(text(h.tree).includes('다른 팀의 초대는 자동으로 종료됐어요'))
+  assert.ok(cards(h.tree).includes(board.mine.id))
+  assert.ok(text(h.tree).includes('팀에 합류해도 대기는 유지돼요'))
   const header=component(h.tree,'Header');header.props.onInbox()
   assert.ok(text(h.tree).includes('지난 초대'))
-  assert.ok(text(h.tree).includes('종료 · 더 이상 수락할 수 없어요'))
+  assert.ok(text(h.tree).includes('다른 팀 · 예시'));assert.ok(text(h.tree).includes(first.room_title))
   assert.ok(!text(h.tree).includes('아직 받은 초대가 없어요'))
  }finally{h.dispose()}
 })
@@ -222,10 +226,83 @@ test('refund copy requires a separate request and never treats withdrawal as com
   }
  }finally{h.dispose()}
  const c=harness({board:fixture({mine:true})});try{
-  button(c.tree,'대기 취소').props.onClick()
+  button(c.tree,'대기 중단').props.onClick()
   assert.ok(text(c.tree).includes('보증금 반환 신청'))
   assert.ok(text(c.tree).includes('자동 반환되지 않아요'))
   assert.equal(button(c.tree,'보증금 반환 신청'),undefined,'No fake request button before refund integration')
   assert.ok(button(c.tree,'대기 등록 취소하기'))
  }finally{c.dispose()}
+})
+
+const membershipId=n=>`97000000-0000-4000-8000-${String(n).padStart(12,'0')}`
+function membershipRooms({sport='lol',member=true,completed=false,owner=fixture().owner_id,hasMore=false,missingMetadata=false}={}){
+ const base={title:'우리 학과 팀',affiliation:'기계공학부',member_count:1,writable:!completed,updated_at:'2026-09-01T10:00:00Z'}
+ const rooms=hasMore?Array.from({length:50},(_,i)=>({...base,kind:'study_room',id:membershipId(500+i)})):member?[{...base,kind:'league_team',id:membershipId(200),...(!missingMetadata?{sport,challenge_id:membershipId(100)}:{})}]:[]
+ return{owner_id:owner,rooms,has_more:hasMore,next_cursor:hasMore?`study_room:${membershipId(549)}`:null}
+}
+
+test('membership reads actor-owned social rooms rather than privacy-filtered public journey and preserves exact team/challenge',async()=>{
+ const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+  assert.equal(h.requests.length,1)
+  h.requests[0].reply({data:board});await h.settle();assert.equal(h.tree.props.leagueMembership.status,'loading')
+  const lookup=h.requests[1];assert.equal(lookup.url,'/api/chat/social-rooms');assert.equal(lookup.options.cache,'no-store');assert.equal(lookup.options.method,undefined)
+  lookup.reply(membershipRooms());await h.settle()
+  assert.equal(h.tree.props.leagueMembership.status,'member')
+  const query=new URL(h.tree.props.leagueMembership.teams[0].href,'https://local').searchParams
+  assert.equal(query.get('sport'),'lol');assert.equal(query.get('view'),'roster');assert.equal(query.get('challenge'),membershipId(100));assert.equal(query.get('team'),membershipId(200))
+ }finally{h.dispose()}
+})
+test('membership absence needs a complete actor-owned room list; completed teams are excluded',async()=>{
+ for(const options of [{member:false},{completed:true}]){
+  const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+   h.requests[0].reply({data:board});await h.settle();h.requests[1].reply(membershipRooms(options));await h.settle();assert.equal(h.tree.props.leagueMembership.status,'none')
+  }finally{h.dispose()}
+ }
+})
+test('failed, malformed, foreign-owner and metadata-incomplete directory stays unavailable',async()=>{
+ for(const result of ['network',{},membershipRooms({owner:other}),membershipRooms({missingMetadata:true})]){
+  const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+   h.requests[0].reply({data:board});await h.settle();if(result==='network')h.requests[1].fail();else h.requests[1].reply(result);await h.settle()
+   assert.equal(h.tree.props.leagueMembership.status,'unavailable')
+   assert.equal(h.requests.length,2)
+   h.tree.props.onMembershipRetry();await h.settle();assert.equal(h.tree.props.leagueMembership.status,'loading')
+   h.requests.at(-1).reply(membershipRooms({member:false}));await h.settle();assert.equal(h.tree.props.leagueMembership.status,'none')
+  }finally{h.dispose()}
+ }
+})
+test('membership lookup ignores a late previous-account response and never exposes its own-team link',async()=>{
+ const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+  h.requests[0].reply({data:board});await h.settle();const old=h.requests[1]
+  h.setAccount(other);assert.equal(old.options.signal.aborted,true);assert.equal(h.tree.props.board,undefined)
+  const nextBoard=h.requests.findLast(request=>request.url.startsWith('/api/meetups/candidates?'));nextBoard.reply({data:{...board,owner_id:other}});await h.settle()
+  assert.equal(h.tree.props.leagueMembership.status,'loading');const current=h.requests.at(-1)
+  old.reply(membershipRooms());await h.settle();assert.equal(h.tree.props.leagueMembership.status,'loading')
+  current.reply(membershipRooms({member:false,owner:other}));await h.settle();assert.equal(h.tree.props.leagueMembership.status,'none')
+ }finally{h.dispose()}
+})
+test('sport changes cancel old membership lookup and only the new sport may provide a return destination',async()=>{
+ const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+  h.requests[0].reply({data:board});await h.settle();const old=h.requests[1]
+  h.setScope({kind:'league',key:'futsal'});assert.equal(old.options.signal.aborted,true)
+  h.requests.findLast(request=>request.url.startsWith('/api/meetups/candidates?')).reply({data:{...createDemoBoard({kind:'league',key:'futsal'}),owner_id:board.owner_id}});await h.settle()
+  const current=h.requests.at(-1);assert.equal(current.url,'/api/chat/social-rooms')
+  current.reply(membershipRooms({sport:'futsal'}));await h.settle();old.reply(membershipRooms());await h.settle()
+  assert.equal(h.tree.props.leagueMembership.status,'member');assert.equal(new URL(h.tree.props.leagueMembership.teams[0].href,'https://local').searchParams.get('sport'),'futsal')
+ }finally{h.dispose()}
+})
+test('non-league boards do not issue a league membership request',async()=>{
+ const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+  h.setScope({kind:'study',key:'pnu:AN1600527'})
+  h.requests.at(-1).reply({data:{...createDemoBoard({kind:'study',key:'pnu:AN1600527'}),owner_id:board.owner_id}});await h.settle()
+  assert.equal(h.tree.props.leagueMembership.status,'none');assert.equal(h.requests.some(request=>request.url.includes('/chat/social-rooms')||request.url.includes('/league/journey')),false)
+ }finally{h.dispose()}
+})
+
+test('a partial directory does not expose a misleading count until every page is verified',async()=>{
+ const board=fixture(),h=harness({live:true,liveMembership:true,board});try{
+  const rooms=membershipRooms({hasMore:true});rooms.rooms[0]=membershipRooms().rooms[0]
+  h.requests[0].reply({data:board});await h.settle();h.requests[1].reply(rooms);await h.settle()
+  assert.equal(h.tree.props.leagueMembership.status,'loading');assert.equal(h.requests.length,3);h.requests[2].reply(membershipRooms({member:false}));await h.settle();assert.equal(h.tree.props.leagueMembership.status,'member')
+  assert.equal(new URL(h.tree.props.leagueMembership.teams[0].href,'https://local').searchParams.get('team'),membershipId(200))
+ }finally{h.dispose()}
 })

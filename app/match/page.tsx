@@ -25,7 +25,6 @@ import DarkTeamProgressCard from '@/components/matching/DarkTeamProgressCard'
 import LockedOpponentCard from '@/components/matching/LockedOpponentCard'
 import CampusSevenMatchEntry from '@/components/matching/campus-seven/CampusSevenMatchEntry'
 import QuantumMatchDiscovery from '@/components/matching/QuantumMatchDiscovery'
-import RelationshipSummary from '@/components/relationship/RelationshipSummary'
 import QuantumEventRoomInviteInbox from '@/components/matching/QuantumEventRoomInviteInbox'
 import {
   getMatchingFrontendLoadFailure,
@@ -163,6 +162,13 @@ export default function MatchesPage() {
     setLoading(true)
     setError(null)
     setLoadFailure(null)
+
+    // Do not block modern discovery on the retired group-pool dashboard APIs.
+    // Legacy implementation remains available when its explicit feature is on.
+    if (!LEGACY_MATCH_ENTRY_VISIBLE && !isDevPreviewClientSession()) {
+      setLoading(false)
+      return
+    }
 
     const isDevPreview = isDevPreviewClientSession()
     setDevPreviewActive(isDevPreview)
@@ -485,19 +491,15 @@ export default function MatchesPage() {
   return (
     <main className="min-h-screen bg-[#fffaf6] px-5 pb-24 text-boot-ink sm:px-7">
       <div className="mx-auto w-full max-w-[960px] pt-5 sm:pt-7">
-        <header className="mb-5 flex w-full items-center gap-3">
-          <Link href="/" className="flex h-11 w-11 items-center justify-center rounded-md border border-boot-hairline bg-white text-boot-body hover:border-boot-primary hover:text-boot-primary" aria-label="홈으로 돌아가기">
-            <ChevronLeft size={18} />
-          </Link>
+        <header className="mb-3 flex w-full items-start gap-3 pt-2">
           <div className="flex-1">
-            <p className="text-xs font-bold text-boot-muted">Quantum</p>
-            <h1 className="text-[28px] font-black leading-tight">매칭</h1>
+            <Link href="/" className="inline-flex min-h-11 items-center text-sm font-extrabold text-boot-primary">Quantum</Link>
+            <h1 className="mt-3 text-[36px] font-black leading-tight tracking-tight">매칭</h1>
           </div>
           <NotificationBell />
         </header>
 
         <QuantumEventRoomInviteInbox />
-        <div className="mb-1 w-full"><RelationshipSummary /></div>
         <QuantumMatchDiscovery />
 
         <div className="mx-auto w-full max-w-2xl">

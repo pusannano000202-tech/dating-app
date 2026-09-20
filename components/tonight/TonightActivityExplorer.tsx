@@ -2,9 +2,10 @@
 
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, Clock3, ImageOff, Users } from 'lucide-react'
-import { type RefObject, useEffect, useRef, useState } from 'react'
+import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'
 
 import type { TonightActivityCard } from './types'
+import styles from './tonight-journey.module.css'
 
 export default function TonightActivityExplorer({
   activities,
@@ -12,14 +13,22 @@ export default function TonightActivityExplorer({
   onActiveIndexChange,
   onContinue,
   headingRef,
+  summary,
+  dateLabel,
+  onPreview,
   disabled = false,
+  disabledReason = '신청 상태 확인이 필요해요',
 }: {
   activities: readonly [TonightActivityCard, TonightActivityCard, TonightActivityCard]
   activeIndex: number
   onActiveIndexChange: (index: number) => void
   onContinue: () => void
   headingRef?: RefObject<HTMLHeadingElement | null>
+  summary?: ReactNode
+  dateLabel?: string
+  onPreview?: () => void
   disabled?: boolean
+  disabledReason?: string
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const cardRefs = useRef<Array<HTMLElement | null>>([])
@@ -78,19 +87,21 @@ export default function TonightActivityExplorer({
   const activeActivity = activities[safeIndex]
 
   return (
-    <section aria-labelledby="tonight-explorer-title" className="pb-24 lg:pb-8">
+    <section aria-labelledby="tonight-explorer-title" className="pb-4">
       <div className="relative mb-5 pr-14">
         <div>
-          <p className="text-xs font-black tracking-[0.14em] text-[#b94b3f]">PNU TONIGHT</p>
-          <h1 ref={headingRef} id="tonight-explorer-title" tabIndex={-1} className="mt-1 text-[28px] font-black tracking-[-0.05em] text-[#292321] outline-none sm:text-4xl">오늘, 뭐 해볼까요?</h1>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[#665c58]">옆으로 넘겨 오늘의 세 활동을 둘러보세요.</p>
+          <p className="text-xs font-black tracking-[0.14em] text-[#b94b3f]">{dateLabel ?? 'PNU TONIGHT'}</p>
+          <h1 ref={headingRef} id="tonight-explorer-title" tabIndex={-1} className="mt-2 text-[30px] font-black tracking-[-0.05em] text-[#292321] outline-none sm:text-4xl">오늘밤 만나기</h1>
+          <p className="mt-2 text-sm font-semibold leading-6 text-[#665c58]">어떤 저녁을 함께 보낼까요?</p>
         </div>
         <p className="absolute right-0 top-0 text-sm font-black text-[#b94b3f]" aria-live="polite" aria-atomic="true">
           활동 {safeIndex + 1}/3<span className="sr-only"> · {activeActivity.title}</span>
         </p>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,752px)_352px] lg:gap-8">
+      {summary}
+
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-6">
         <div>
           <div
             ref={scrollRef}
@@ -116,9 +127,9 @@ export default function TonightActivityExplorer({
               data-title={activity.title}
               data-description={activity.description}
               data-duration={activity.durationMinutes}
-              className="w-[min(326px,calc(100vw-64px))] shrink-0 snap-start overflow-hidden rounded-[18px] border border-[#ead9d2] bg-white shadow-[0_4px_14px_rgba(67,39,30,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f] focus-visible:ring-offset-2 sm:w-[calc(100vw-112px)] lg:w-[640px]"
+              className="w-[calc(100%-24px)] shrink-0 snap-start overflow-hidden rounded-[22px] border border-[#ead9d2] bg-white shadow-[0_4px_14px_rgba(67,39,30,0.04)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f] focus-visible:ring-offset-2 lg:w-[calc(100%-32px)]"
             >
-              <div className="relative h-[220px] bg-[#f4e9e4] sm:h-[320px]">
+              <div className="relative h-[250px] bg-[#f4e9e4] sm:h-[320px]">
                 {imageFailed ? (
                   <div className="flex h-full flex-col items-center justify-center bg-[#f4e9e4] text-[#8b7e78]">
                     <ImageOff className="h-8 w-8" aria-hidden />
@@ -129,17 +140,18 @@ export default function TonightActivityExplorer({
                     src={activity.imageUrl}
                     alt={activity.imageAlt}
                     fill
-                    sizes="(min-width: 1024px) 640px, (min-width: 640px) calc(100vw - 112px), min(326px, calc(100vw - 64px))"
+                    sizes="(min-width: 1024px) 600px, calc(100vw - 56px)"
                     className="object-cover"
                     onError={() => setFailedImageIds((current) => new Set([...current, activity.id]))}
                   />
                 )}
-                {!imageFailed && <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />}
+                {!imageFailed && <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />}
                 <span className="absolute left-4 top-4 rounded-full bg-white/[0.92] px-3 py-1.5 text-xs font-black text-[#b94b3f] shadow-sm">오늘의 활동</span>
+                {!imageFailed && <h2 className="absolute bottom-5 left-5 right-5 text-[25px] font-black leading-tight tracking-[-0.04em] text-white">{activity.title}</h2>}
               </div>
-              <div className="p-3.5">
-                <h2 className="text-xl font-black tracking-[-0.04em] text-[#292321]">{activity.title}</h2>
-                <p className="mt-1 max-h-10 overflow-hidden text-sm font-semibold leading-5 text-[#665c58]">{activity.description}</p>
+              <div className="p-4">
+                {imageFailed && <h2 className="text-xl font-black tracking-[-0.04em] text-[#292321]">{activity.title}</h2>}
+                <p className="text-sm font-semibold leading-6 text-[#665c58]">{activity.description}</p>
                 <p className="mt-2 inline-flex items-center gap-2 text-sm font-black text-[#8b7e78]"><Clock3 className="h-4 w-4" aria-hidden />약 {activity.durationMinutes}분</p>
               </div>
             </article>
@@ -154,21 +166,23 @@ export default function TonightActivityExplorer({
           </div>
         </div>
 
-        <div className="mt-5 rounded-[18px] border border-[#ead9d2] bg-white p-4 shadow-[0_4px_14px_rgba(67,39,30,0.06)] lg:mt-0 lg:self-start">
+        <div className="mt-5 rounded-[22px] border border-[#ead9d2] bg-white p-5 lg:mt-0 lg:self-start">
         <div className="flex items-start gap-3">
           <Users className="mt-0.5 h-5 w-5 shrink-0 text-[#b94b3f]" aria-hidden />
           <div className="text-sm font-semibold leading-6 text-[#665c58]">
-            <p className="font-black text-[#292321]">한 신청 풀에서 팀을 만든 뒤, 팀의 순위 합산으로 활동을 정해요.</p>
+            <p className="font-black text-[#292321]">활동이 달라도, 신청은 한곳에서.</p>
+            <p className="mt-2 text-xs leading-5">한 신청 풀에서 팀을 만든 뒤, 팀의 순위 합산으로 활동을 정해요.</p>
           </div>
         </div>
         <button type="button" onClick={onContinue} disabled={disabled} className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-[18px] bg-[#b94b3f] px-5 text-base font-black text-white shadow-[0_8px_18px_rgba(185,75,63,0.18)] transition hover:bg-[#963d34] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f] focus-visible:ring-offset-2">
-          {disabled ? '오늘 신청이 마감됐어요' : '세 활동 순위 정하러 가기'}
+          {disabled ? disabledReason : '세 활동 순위 정하러 가기'}
           <ArrowRight className="h-5 w-5" aria-hidden />
         </button>
         <div className="mt-3 space-y-1 text-xs font-semibold leading-5 text-[#665c58]">
           <p>둘러보기만으로는 신청되지 않아요</p>
           <p>다음 단계에서 1·2·3순위와 동의를 확인해요</p>
         </div>
+        {onPreview && <button type="button" onClick={onPreview} className={styles.previewLink}>만나면 뭘 하나요? <ArrowRight size={16} aria-hidden /></button>}
       </div>
       </div>
     </section>

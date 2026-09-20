@@ -160,6 +160,7 @@ test('notification entry validates sport, challenge, team and selected review sl
   if(specifier.includes('CommunityComingSoon'))return{__esModule:true,default:'coming-soon'}
   if(specifier==='@/lib/community-feature')return{isCommunityFeatureEnabled:()=>true}
   if(specifier==='@/lib/meetups/challenge-journey')return load(path.join(root,'lib/meetups/challenge-journey.ts'))
+  if(specifier==='@/lib/meetups/league-navigation')return load(path.join(root,'lib/meetups/league-navigation.ts'))
   return require(specifier)
  },module,module.exports)
  const id='90000000-0000-4000-8000-000000000001',teamId='90000000-0000-4000-8000-000000000002',route=module.exports.default
@@ -175,7 +176,7 @@ test('notification entry validates sport, challenge, team and selected review sl
 
 test('an exact notification team never falls back to a different own team in the same challenge',()=>{
  const declarations=source.split('\n').filter(line=>/^ const (exactTeam|team|targetTeamMissing|ready)=/.test(line)).join('\n')
- const select=new Function('initialTeamId','initialChallengeId','selected','data','connection',compile(declarations)+';return {team,ready}')
+ const select=new Function('targetTeamId','initialChallengeId','selected','data','connection',compile(declarations)+';return {team,ready}')
  const other={...team,id:'other',is_mine:true},wanted={...team,id:'wanted',is_mine:false},selected={id:'challenge',teams:[other,wanted]}
  assert.equal(select('wanted','challenge',selected,{my_department:team.department},'ready').team.id,'wanted')
  assert.deepEqual(select('missing','challenge',selected,{my_department:team.department},'ready'),{team:null,ready:false})

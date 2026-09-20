@@ -24,6 +24,7 @@ const SCORE_LEASE_SECONDS = 90
 type ScoreFailureCode =
   | AppearanceScoreRequestFailureCode
   | 'invalid_request'
+  | 'account_changed'
   | 'ai_server_not_configured'
   | 'server_unavailable'
   | 'photo_read_failed'
@@ -72,6 +73,10 @@ export async function POST(req: NextRequest) {
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  // The optional header binds a resumed calendar screen to its original account.
+  // Auth still supplies the only identity used to read photos or create a score.
+  const expectedOwner = req.headers.get('X-Quantum-Owner')
+  if (expectedOwner !== null && expectedOwner !== user.id) return scoreFailure('account_changed', 409)
 
   let body: unknown
   try {

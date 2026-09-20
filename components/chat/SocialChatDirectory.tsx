@@ -6,6 +6,7 @@ import type {SocialChatRoom} from '@/lib/chat/social-rooms-contract'
 import {socialChatHref,socialChatTime,sortSocialChatRooms} from '@/lib/chat/social-room-presentation'
 import {getSocialActivityPresentation} from '@/lib/social/activity-presentation'
 import s from './chat-belonging.module.css'
+import DepartmentMascot from '@/components/community/department/DepartmentMascot'
 
 export default function SocialChatDirectory({rooms,onOpen}:{rooms:SocialChatRoom[];onOpen?:(room:SocialChatRoom)=>void}){
  return <div className={s.directory} aria-label="소속별 팀·모임 채팅">{sortSocialChatRooms(rooms).map(room=>{
@@ -13,7 +14,7 @@ export default function SocialChatDirectory({rooms,onOpen}:{rooms:SocialChatRoom
   const activity=getSocialActivityPresentation(room)
   const roomType=room.kind==='league_team'?'우리 팀':room.kind==='league_match'?'양 팀 조율':null
   const content=<>
-   <span className={s.roomPhoto}><Image src={activity.imageSrc} alt={activity.imageAlt} fill sizes="80px"/></span>
+   {room.kind==='league_team'?<DepartmentMascot department={room.affiliation} size={68}/>:<span className={s.roomPhoto}><Image src={activity.imageSrc} alt={activity.imageAlt} fill sizes="80px"/></span>}
    <span className={s.rowBody}>
     <span className={s.rowKind} data-kind={room.kind}>{activity.categoryLabel}{roomType?<span> · {roomType}</span>:null}</span>
     <strong>{room.title}</strong>

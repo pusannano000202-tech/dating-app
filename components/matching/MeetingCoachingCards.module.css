@@ -1,0 +1,54 @@
+.shell { max-width: 600px; margin-inline: auto; padding: 18px; border: 1px solid #e9dfd6; border-radius: 23px; background: #fffcf7; color: #342b25; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.header > div { min-width: 0; }
+.badge { display: block; color: #a54534; font-size: 11px; line-height: 1.4; font-weight: 800; overflow-wrap: anywhere; }
+.counter { flex-shrink: 0; color: #88786c; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.title { margin: 5px 0 0; font-size: clamp(20px, 3.8vw, 25px); line-height: 1.35; letter-spacing: -.04em; font-weight: 850; word-break: keep-all; }
+.cueRow { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 26px; margin-top: 5px; color: #776458; font-size: 11px; }
+.cueRow button { display: inline-flex; align-items: center; gap: 3px; padding: 6px 2px; border: 0; background: transparent; color: #a23d2b; font: inherit; font-weight: 800; cursor: pointer; }
+.card { margin-top: 13px; touch-action: pan-y pinch-zoom; }
+.scene { overflow: hidden; border: 1px solid #e2d1be; border-radius: 16px; background: #fff8ec; }
+.art { position: relative; display: flex; align-items: center; justify-content: center; height: 230px; background: #f2e1c7; }
+.art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 49%; user-select: none; }
+.illustrationLabel { position: absolute; right: 8px; bottom: 7px; padding: 3px 6px; border-radius: 5px; background: #fff9eceb; color: #62513f; font-size: 9px; line-height: 1.3; }
+.imageFallback { padding: 22px; color: #796650; font-size: 13px; line-height: 1.8; text-align: center; }
+.speech { position: relative; display: flex; align-items: center; justify-content: center; min-height: 72px; margin: 0; padding: 13px 20px; border-top: 1px solid #dbc5ad; background: #fffefb; color: #493324; font-size: 17px; font-weight: 700; line-height: 1.5; text-align: center; word-break: keep-all; animation: sceneSpeech .18s ease-out; }
+.speech::before { content: ''; position: absolute; top: -9px; left: 45%; width: 16px; height: 16px; transform: rotate(45deg); border-top: 1px solid #dbc5ad; border-left: 1px solid #dbc5ad; background: #fffefb; }
+.action { margin: 10px 1px 0; color: #725d4e; font-size: 14px; line-height: 1.55; text-align: center; word-break: keep-all; }
+.navigation { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; margin-top: 15px; }
+.navigation button { display: flex; justify-content: center; align-items: center; gap: 6px; min-height: 44px; padding: 10px 8px; border-radius: 11px; border: 1px solid #e0cdbc; background: #fffdf9; color: #795b47; font-size: 12px; font-weight: 800; cursor: pointer; }
+.navigation button:last-child { color: white; background: #ae4b36; border-color: #ae4b36; }
+.navigation button:disabled { opacity: .4; cursor: not-allowed; }
+.navigation button:focus-visible, .cueRow button:focus-visible, .safety summary:focus-visible { outline: 2px solid #ae4b36; outline-offset: 3px; }
+.progress { display: flex; gap: 4px; }
+.progress span { width: 4px; height: 4px; background: #ddccbd; border-radius: 99px; }
+.progress span[data-active='true'] { width: 10px; background: #b44d37; }
+.safety { margin-top: 11px; color: #7d6c5e; font-size: 11px; line-height: 1.6; }
+.safety summary { display: flex; align-items: center; justify-content: center; gap: 5px; width: fit-content; margin-inline: auto; padding: 4px; cursor: pointer; list-style: none; }
+.safety summary::-webkit-details-marker { display: none; }
+.safety summary svg { flex-shrink: 0; }
+.safety[open] summary svg:last-child { transform: rotate(180deg); }
+.safety p { margin: 9px 0 0; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@keyframes sceneSpeech { from { opacity: .5; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) {
+  .shell { padding: 14px; border-radius: 19px; }
+  .art { height: 210px; }
+  .title { font-size: 21px; }
+  .speech { min-height: 68px; padding: 11px 13px; font-size: 16px; }
+  .navigation { gap: 8px; margin-top: 12px; }
+  .navigation button { gap: 4px; padding-inline: 5px; font-size: 11px; }
+  .safety { margin-top: 8px; }
+  .safety summary { min-height: 44px; padding-inline: 12px; }
+  .cueRow button { min-height: 44px; }
+}
+@media (max-width: 360px) {
+  .shell { padding: 11px; }
+  .title { font-size: 19px; }
+  .art { height: 190px; }
+  .action { font-size: 13px; }
+  .progress { gap: 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .speech { animation: none; }
+}

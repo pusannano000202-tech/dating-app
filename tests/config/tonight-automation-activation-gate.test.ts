@@ -161,7 +161,8 @@ test('readiness phase and activation classifiers execute fail closed', () => {
 test('user current route requires environment, database, and round gates together', () => {
   const source = readFileSync('app/api/tonight/route.ts', 'utf8')
   assert.match(source, /rpc\('get_tonight_application_gate'\)/)
-  assert.match(source, /if \(gateError\) return tonightRpcErrorResponse\(gateError\)/)
+  assert.match(source, /applicationsAvailable = !gateError && typeof gateData === 'boolean'/)
+  assert.match(source, /databaseApplicationsOpen = applicationsAvailable && gateData === true/)
   assert.match(
     source,
     /applications_open:\s*feature\.applicationsOpen\s*&&\s*databaseApplicationsOpen\s*&&\s*isTonightRoundApplicationsOpen\(data\)/,

@@ -3,6 +3,7 @@ import test from 'node:test'
 import {readFile} from 'node:fs/promises'
 import ts from 'typescript'
 import {LEAGUE_SPORTS,isLeagueSport} from '../../lib/meetups/challenge-journey.ts'
+import {readLeagueLocation} from '../../lib/meetups/league-navigation.ts'
 const module = await import('../../lib/notifications/league-invite-presentation.ts').catch(() => ({}))
 const present = (...args) => module.leagueInviteNotificationPresentation(...args)
 const inviteId = '10000000-0000-4000-8000-000000000001'
@@ -57,6 +58,7 @@ test('legacy URLs render the map journey and validate incoming invite identifier
     '@/components/community/CommunityComingSoon': {default:'comingSoon'},
     '@/components/community/department/DepartmentLeagueJourney': {default:'mapJourney'},
     '@/lib/meetups/challenge-journey': {isLeagueSport},
+    '@/lib/meetups/league-navigation': {readLeagueLocation},
     '@/lib/community-feature': {isCommunityFeatureEnabled:()=>true},
   }
   const exports = {}

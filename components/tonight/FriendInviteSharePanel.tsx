@@ -53,6 +53,8 @@ export default function FriendInviteSharePanel({
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [readError, setReadError] = useState<string | null>(null)
+  const [readAttempt, setReadAttempt] = useState(0)
   const createKeysRef = useRef(new Map<string, string>())
   const cancelKeysRef = useRef(new Map<string, string>())
   const currentRoundIdRef = useRef(roundId)
@@ -71,13 +73,17 @@ export default function FriendInviteSharePanel({
 
   useEffect(() => {
     let active = true
+    const roundChanged = currentRoundIdRef.current !== roundId
     currentRoundIdRef.current = roundId
     setInvites([])
     setInitialInvitesLoaded(mode === 'rehearsal')
     setLoadedRoundId(mode === 'rehearsal' ? roundId : null)
-    setNotice(null)
-    setError(null)
-    cancelKeysRef.current.clear()
+    setReadError(null)
+    if (roundChanged) {
+      setNotice(null)
+      setError(null)
+      cancelKeysRef.current.clear()
+    }
     void load()
       .then((nextInvites) => {
         if (!active || currentRoundIdRef.current !== roundId) return
@@ -86,12 +92,14 @@ export default function FriendInviteSharePanel({
         setLoadedRoundId(roundId)
       })
       .catch((reason: unknown) => {
-        if (active) setError(reason instanceof Error ? reason.message : inviteError(null))
+        if (active && currentRoundIdRef.current === roundId) {
+          setReadError(reason instanceof Error ? reason.message : inviteError(null))
+        }
       })
     return () => {
       active = false
     }
-  }, [load, mode, roundId])
+  }, [load, mode, roundId, memberCount, readAttempt])
 
   const roundReady = initialInvitesLoaded && loadedRoundId === roundId
 
@@ -272,7 +280,7 @@ export default function FriendInviteSharePanel({
         className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#fee500] px-5 py-3 text-sm font-black text-[#241f17] disabled:cursor-not-allowed disabled:opacity-45"
       >
         <MessageCircle className="h-5 w-5" aria-hidden />
-        {!roundReady ? '기존 초대 확인 중…' : busy ? '초대 준비 중…' : '카카오톡으로 초대'}
+        {!roundReady ? readError ? '기존 초대를 확인해 주세요' : '기존 초대 확인 중…' : busy ? '초대 준비 중…' : '카카오톡으로 초대'}
       </button>
       <p className="mt-2 text-center text-xs font-bold text-[#8b7e78]">
         카카오 공유가 안 되면 휴대폰 공유창, 링크 복사 순서로 자동 전환돼요.
@@ -302,6 +310,15 @@ export default function FriendInviteSharePanel({
 
       {roundReady && notice && <p className="mt-4 rounded-2xl bg-emerald-50 p-3 text-sm font-bold text-emerald-800" role="status">{notice}</p>}
       {roundReady && error && <p className="mt-4 rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-800" role="alert">{error}</p>}
+      {readError && (
+        <div className="mt-4 rounded-2xl bg-rose-50 p-3 text-sm font-bold text-rose-800" role="alert">
+          <p>{readError}</p>
+          <button type="button" onClick={() => setReadAttempt((value) => value + 1)} disabled={busy}
+            className="mt-2 min-h-11 rounded-xl border border-rose-200 bg-white px-4 disabled:opacity-40">
+            기존 초대 다시 확인
+          </button>
+        </div>
+      )}
       {remainingSeats === 0 && (
         <p className="mt-4 inline-flex items-center gap-2 text-xs font-black text-[#8b7e78]"><Copy className="h-4 w-4" aria-hidden />동행 자리 2개가 모두 사용 중이거나 합류 완료됐어요.</p>
       )}

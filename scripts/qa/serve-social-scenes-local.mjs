@@ -20,8 +20,9 @@ import {
   resolveCommunityVoiceLocalRoots,
 } from './community-voice-local-runtime.mjs'
 
-if (process.argv.length !== 2)
-  throw new Error('Usage: node scripts/qa/serve-social-scenes-local.mjs')
+const tonightQa = process.argv.length === 3 && process.argv[2] === '--tonight-qa'
+if (process.argv.length !== 2 && !tonightQa)
+  throw new Error('Usage: node scripts/qa/serve-social-scenes-local.mjs [--tonight-qa]')
 
 const APP_PORT = 3013
 const APP_ORIGIN = 'http://localhost:3013'
@@ -220,6 +221,8 @@ try {
     QUANTUM_LOCAL_RUNTIME_MODE: 'live-local',
     NEXT_PUBLIC_COMMUNITY_ENABLED: 'true',
     CONTINUATION_LOCAL_PAYMENT_SIMULATOR_ENABLED: 'false',
+    // Explicit loopback QA intake only; DB gate remains authoritative.
+    TONIGHT_APPLICATIONS_OPEN: tonightQa ? 'true' : 'false',
     TONIGHT_AUTOMATION_ENABLED: 'false',
     TONIGHT_CARD_PAYMENTS_ENABLED: 'false',
   }
@@ -266,6 +269,7 @@ try {
       privateKeysLogged: false,
       paymentProvider: 'mock',
       realPayments: false,
+      tonightQaIntake: tonightQa,
       automationEnabled: false,
       mediaProviderConfigured: false,
       migrationBoundary,

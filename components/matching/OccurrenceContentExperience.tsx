@@ -1,7 +1,7 @@
 'use client'
 
 import { CheckCircle2, Loader2, MessageCircle, RotateCw } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { parseDay1PrivateGameRuntime } from '@/lib/matching/continuation-day1-day3-runtime'
 import { getContinuationDayDefinition } from '@/lib/matching/five-meeting-content'
@@ -11,6 +11,8 @@ import Day2ContinuationRuntime from './Day2ContinuationRuntime'
 import Day3BowlingRuntime from './Day3BowlingRuntime'
 import Day4ContinuationRuntime from './Day4ContinuationRuntime'
 import FiveMeetingPostFlow from './FiveMeetingPostFlow'
+import OccurrenceComicGuide from './OccurrenceComicGuide'
+import { useHistoryAccount } from '@/components/content-history/useHistoryAccount'
 
 type Content = {
   server_now: string
@@ -38,30 +40,69 @@ export default function OccurrenceContentExperience({ occurrenceId }: { occurren
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
+  const owner = useHistoryAccount()
+  const scope = `${owner ?? 'unknown'}:${occurrenceId}`
+  const scopeRef = useRef(scope)
+  scopeRef.current = scope
+  const requestSequence = useRef(0)
+  const [guideVerified, setGuideVerified] = useState<{ scope: string; at: number } | null>(null)
+  const [guideClock, setGuideClock] = useState(0)
+  const [guideRefreshing, setGuideRefreshing] = useState(false)
 
   const load = useCallback(async () => {
+    const sequence = ++requestSequence.current
+    setGuideRefreshing(true)
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 12_000)
     try {
       const [contentResponse, chatResponse] = await Promise.all([
-        fetch(`/api/match/occurrences/${encodeURIComponent(occurrenceId)}/content`, { cache: 'no-store' }),
-        fetch(`/api/match/occurrences/${encodeURIComponent(occurrenceId)}/chat`, { cache: 'no-store' }),
+        fetch(`/api/match/occurrences/${encodeURIComponent(occurrenceId)}/content`, { cache: 'no-store', signal: controller.signal }),
+        fetch(`/api/match/occurrences/${encodeURIComponent(occurrenceId)}/chat`, { cache: 'no-store', signal: controller.signal }),
       ])
       const contentPayload = await contentResponse.json().catch(() => null)
       const chatPayload = await chatResponse.json().catch(() => null)
-      if (!contentResponse.ok || !isContent(contentPayload)) throw new Error('load_failed')
+      if (scopeRef.current !== scope || sequence !== requestSequence.current) return
+      if (!contentResponse.ok || !isContent(contentPayload) || contentPayload.occurrence_id !== occurrenceId) throw new Error('load_failed')
       setContent(contentPayload)
+      setGuideVerified({ scope, at: Date.now() })
       if (chatResponse.ok && isChat(chatPayload)) setChat(chatPayload)
+      else setChat(null)
     } catch {
+      if (scopeRef.current !== scope || sequence !== requestSequence.current) return
+      setGuideVerified(null)
       setNotice('만남 진행 상태를 불러오지 못했어요.')
+    } finally {
+      window.clearTimeout(timeout)
+      if (scopeRef.current === scope && sequence === requestSequence.current) setGuideRefreshing(false)
     }
-  }, [occurrenceId])
+  }, [occurrenceId, scope])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    setContent(null); setChat(null); setGuideVerified(null); setBusy(false); setMessage(''); setNotice('')
+    void load()
+    return () => { requestSequence.current += 1 }
+  }, [load])
+  useEffect(() => {
+    const update = () => setGuideClock(Date.now())
+    const resume = () => { update(); if (document.visibilityState === 'visible') void load() }
+    update()
+    const timer = window.setInterval(update, 5_000)
+    window.addEventListener('focus', resume)
+    document.addEventListener('visibilitychange', resume)
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', resume); document.removeEventListener('visibilitychange', resume) }
+  }, [load])
   useEffect(() => {
     if (busy) return
     const timer = window.setInterval(() => { void load() }, 30_000)
     return () => window.clearInterval(timer)
   }, [busy, load])
   const definition = content ? getContinuationDayDefinition(content.program_day) : null
+  const guideSnapshot = content ? {
+    programDay: content.program_day, status: content.status, startsAt: content.starts_at,
+    endsAt: content.ends_at, serverNow: content.server_now, runtime: content.runtime, contentState: content.content_state,
+    verified: Boolean(owner && owner !== 'unavailable' && guideVerified?.scope === scope && content.occurrence_id === occurrenceId),
+    elapsedMs: guideVerified ? Math.max(guideClock, Date.now()) - guideVerified.at : Infinity,
+  } : null
 
   async function act(action: string, payload: Record<string, unknown> = {}, options: { quiet?: boolean } = {}) {
     if (!content || busy) return
@@ -73,14 +114,18 @@ export default function OccurrenceContentExperience({ occurrenceId }: { occurren
         body: JSON.stringify({ action, payload, expected_content_revision: content.content_revision, idempotency_key: crypto.randomUUID() }),
       })
       const next = await response.json().catch(() => null)
-      if (!response.ok || !isContent(next)) throw new Error('action_failed')
+      if (scopeRef.current !== scope) return
+      if (!response.ok || !isContent(next) || next.occurrence_id !== occurrenceId) throw new Error('action_failed')
       setContent(next)
+      setGuideVerified(null)
+      void load()
       if (!options.quiet) setNotice('진행 상태를 안전하게 저장했어요.')
     } catch {
+      if (scopeRef.current !== scope) return
       setNotice('입력값이 빠졌거나 상태가 바뀌었어요. 최신 상태를 확인해 주세요.')
       await load()
     } finally {
-      setBusy(false)
+      if (scopeRef.current === scope) setBusy(false)
     }
   }
 
@@ -93,13 +138,15 @@ export default function OccurrenceContentExperience({ occurrenceId }: { occurren
       const response = await fetch(`/api/match/occurrences/${encodeURIComponent(occurrenceId)}/chat`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: trimmed, idempotency_key: crypto.randomUUID() }),
       })
+      if (scopeRef.current !== scope) return
       if (!response.ok) throw new Error('send_failed')
       setMessage('')
       await load()
     } catch {
+      if (scopeRef.current !== scope) return
       setNotice('지금은 메시지를 보낼 수 없어요. 채팅 시간을 확인해 주세요.')
     } finally {
-      setBusy(false)
+      if (scopeRef.current === scope) setBusy(false)
     }
   }
 
@@ -110,6 +157,7 @@ export default function OccurrenceContentExperience({ occurrenceId }: { occurren
       <section className="overflow-hidden rounded-3xl border border-boot-hairline bg-white shadow-sm">
         <header className="bg-[#13211f] px-5 py-6 text-white"><p className="text-[11px] font-black tracking-[0.18em] text-[#F3B95F]">DAY {content.program_day} · 실제 {content.physical_meeting_no}번째</p><h1 className="mt-2 text-2xl font-black">{definition?.title ?? '함께하는 만남'}</h1><p className="mt-2 text-sm font-bold leading-6 text-white/75">{definition?.summary}</p></header>
         <div className="p-5">
+          {guideSnapshot ? <OccurrenceComicGuide snapshot={guideSnapshot} rosterSize={continuationGuideRosterSize(content)} refreshing={guideRefreshing} onRefresh={() => void load()} /> : null}
           <ContinuationContentGuide
             programDay={content.program_day}
             mode="occurrence"

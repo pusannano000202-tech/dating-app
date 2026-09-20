@@ -2,6 +2,8 @@ import { RequestGuardError, requestGuardErrorResponse, requireRequestAccess } fr
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
 import { getTonightFeatureState } from '@/lib/matching/tonight-ranked/runtime'
 import { privateJson, tonightRpcErrorResponse } from '@/lib/server/tonight/api-contract'
+import { projectTonightRoundStats } from '@/lib/matching/event-calendar-stats'
+import { readWithDeadline } from '@/lib/matching/tonight-ranked/read-with-deadline'
 
 export async function GET(request: Request) {
   try {
@@ -14,20 +16,38 @@ export async function GET(request: Request) {
     if (error) return tonightRpcErrorResponse(error)
     const roundId = getTonightRoundId(data)
     let participationSummary: unknown = null
-    if (roundId) {
-      const { data: summaryData, error: summaryError } = await supabase.rpc(
-        'get_my_tonight_participation_summary',
-        { p_round_id: roundId },
-      )
-      if (summaryError) return tonightRpcErrorResponse(summaryError)
-      participationSummary = summaryData
+    let teamStats: unknown = null
+    const readOptional = (
+      name: 'get_my_tonight_participation_summary' | 'get_my_current_tonight_team_count',
+      args: { p_round_id: string },
+    ) => readWithDeadline(async signal => await supabase.rpc(name, args).abortSignal(signal), request.signal, 2_000)
+    // Independent reads must not serially delay the caller's existing receipt.
+    // Transport rejection is an unavailable optional value, not an empty round.
+    const [summary, teams, gate] = await Promise.allSettled([
+      roundId ? readOptional('get_my_tonight_participation_summary', { p_round_id: roundId }) : Promise.resolve({ data: null, error: null }),
+      roundId ? readOptional('get_my_current_tonight_team_count', { p_round_id: roundId }) : Promise.resolve({ data: null, error: null }),
+      readWithDeadline(async signal => await supabase.rpc('get_tonight_application_gate').abortSignal(signal), request.signal, 2_000),
+    ])
+    request.signal.throwIfAborted()
+    for (const result of [summary, teams, gate]) {
+      const readError = result.status === 'fulfilled' ? result.value.error : result.reason
+      if (readError) {
+        const response = tonightRpcErrorResponse(readError)
+        // Explicit access denial must still stop private data delivery.
+        if (response.status < 500) return response
+      }
     }
-    const { data: gateData, error: gateError } = await supabase.rpc('get_tonight_application_gate')
-    if (gateError) return tonightRpcErrorResponse(gateError)
-    const databaseApplicationsOpen = gateData === true
+    if (summary.status === 'fulfilled' && !summary.value.error) participationSummary = summary.value.data
+    if (teams.status === 'fulfilled' && !teams.value.error) teamStats = teams.value.data
+    const gateData = gate.status === 'fulfilled' ? gate.value.data : null
+    const gateError = gate.status === 'fulfilled' ? gate.value.error : gate.reason
+    const applicationsAvailable = !gateError && typeof gateData === 'boolean'
+    const databaseApplicationsOpen = applicationsAvailable && gateData === true
     return privateJson({
       round: data ?? null,
       participation_summary: participationSummary,
+      round_stats: roundId ? projectTonightRoundStats(participationSummary, teamStats, roundId) : null,
+      applications_available: applicationsAvailable,
       applications_open: feature.applicationsOpen
         && databaseApplicationsOpen
         && isTonightRoundApplicationsOpen(data),

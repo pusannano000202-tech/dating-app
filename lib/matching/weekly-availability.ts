@@ -44,11 +44,13 @@ export type WeeklyPartyConsentInputResult =
 export function mapWeeklyAvailabilityRpcError(error: unknown):
   | { status: 400; error: 'invalid_request' }
   | { status: 409; error: 'not_ready' }
+  | { status: 409; error: 'calendar_payment_required' }
   | { status: 409; error: 'assignment_retry'; retryable: true }
   | null {
   const message = error && typeof error === 'object' && 'message' in error
     && typeof error.message === 'string' ? error.message.toLowerCase() : ''
   if (/duplicate_candidate_window/.test(message)) return { status: 400, error: 'invalid_request' }
+  if (/calendar_payment_(?:not_ready|conflict)/.test(message)) return { status: 409, error: 'calendar_payment_required' }
   if (/weekly_assignment_retry/.test(message)) {
     return { status: 409, error: 'assignment_retry', retryable: true }
   }

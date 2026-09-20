@@ -1,111 +1,60 @@
 'use client'
 
-import { ArrowRight, CalendarDays, Check, Clock3, MoonStar, Users } from 'lucide-react'
+import { ArrowRight, Heart, LoaderCircle, RefreshCw } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
-import QuantumCoupleDoubleDateSpotlight from '@/components/matching/QuantumCoupleDoubleDateSpotlight'
-import WeeklyActivityExplorer from '@/components/matching/WeeklyActivityExplorer'
-import type { QuantumEventMode } from '@/lib/matching/quantum-event-catalog'
-import s from './match-discovery.module.css'
-
-const modeOptions: ReadonlyArray<{
-  id: QuantumEventMode
-  label: string
-  detail: string
-  image: string
-  imageAlt: string
-  timeCue: string
-}> = [
-  {
-    id: 'tonight',
-    label: '오늘 만나기',
-    detail: '오늘 바로 가볍게 만나기',
-    image: '/images/match/quantum-tonight-five.webp',
-    imageAlt: '오늘 밤 함께 활동하는 대학생들의 분위기 예시',
-    timeCue: '오늘 18:30 · 20:30 · 23:00',
-  },
-  {
-    id: 'scheduled',
-    label: '이번 주 만나기',
-    detail: '원하는 날짜의 특별한 만남',
-    image: '/images/match/quantum-scheduled-five.png',
-    imageAlt: '날짜를 정해 함께 나들이하는 대학생들의 분위기 예시',
-    timeCue: '금 · 토 · 일',
-  },
-]
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useRelationshipState } from '@/components/relationship/useRelationshipState'
+import { matchingEntryFor } from '@/lib/matching/match-entry-policy'
+import s from './match-journey.module.css'
 
 export default function QuantumMatchDiscovery() {
-  const [mode, setMode] = useState<QuantumEventMode>('tonight')
+  const { state, unavailable, refresh, owner } = useRelationshipState()
+  const router = useRouter()
+  const entry = matchingEntryFor(state?.status ?? null)
+  const retry = () => {
+    if (!owner || owner === 'unavailable') window.location.reload()
+    else void refresh()
+  }
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('discovery') === 'scheduled') setMode('scheduled')
-  }, [])
-
+    if (new URLSearchParams(window.location.search).get('discovery') === 'scheduled') router.replace('/match/calendar')
+  }, [router])
   return (
-    <section aria-labelledby="quantum-match-discovery-title" className={s.discovery}>
-      <header className={s.heading}>
-        <h2 id="quantum-match-discovery-title">언제 만나볼까요?</h2>
-        <p>끌리는 활동과 일정을 먼저 둘러봐요.</p>
-      </header>
-
-      <div role="group" aria-label="오늘 또는 이번 주 만나기 선택" data-layout="mode-scene-switch" className={s.modeCards}>
-        {modeOptions.map((option) => {
-          const active = option.id === mode
-          const OptionIcon = option.id === 'tonight' ? MoonStar : CalendarDays
-          return (
-            <button
-              key={option.id}
-              type="button"
-              aria-pressed={active}
-              aria-controls="match-discovery-selection"
-              onClick={() => setMode(option.id)}
-              className={`${s.sceneCard} ${active ? s.active : ''}`}
-            >
-              <span className={s.photo}>
-                <Image src={option.image} alt={option.imageAlt} fill sizes="(min-width: 900px) 160px, 36vw" className={s.image} />
-              </span>
-              <span className={s.sceneCopy} data-layout="time-context-switch">
-                <span className={s.category}><OptionIcon size={14} aria-hidden="true" />{option.id === 'tonight' ? '오늘 밤' : '이번 주'}</span>
-                <span className={s.title}>{option.label}</span>
-                <span className={s.description}>{option.detail}</span>
-                <span className={s.timeCue}>{option.timeCue}</span>
-                <span className={s.cardAction}>
-                  {active ? '선택한 일정' : '활동 살펴보기'}
-                  {active ? <Check size={15} strokeWidth={2.5} aria-hidden="true" /> : <ArrowRight size={15} aria-hidden="true" />}
-                </span>
-              </span>
-            </button>
-          )
-        })}
+    <section aria-labelledby="matching-entry-title" className={s.entry}>
+      <div className={s.entryHeading}>
+        <h2 id="matching-entry-title">{entry.audience === 'couple' ? '우리 둘의 데이트, 더 새롭게' : '어떤 만남으로 시작할까요?'}</h2>
+        {entry.audience === 'couple' ? <p>내 연인과 함께, 새로운 커플을 만나요.</p> : null}
       </div>
-
-      <div id="match-discovery-selection">
-        {mode === 'tonight' ? <TonightRankedEntryCard /> : null}
-        {mode === 'scheduled' ? <WeeklyActivityExplorer /> : null}
+      {entry.audience === 'unknown' ? (
+        <div className={s.pendingEntry} aria-busy={!unavailable}>
+          <p role="status">{unavailable ? '내 설정을 불러오지 못했어요.' : '나에게 맞는 만남을 불러오고 있어요.'}</p>
+          {unavailable ? <button type="button" className={s.quietButton} onClick={retry}><RefreshCw size={16} aria-hidden="true" />다시 불러오기</button> : <LoaderCircle size={22} aria-hidden="true" />}
+          {unavailable ? <Link href="/match/calendar" className={s.quietButton}>행사 일정 둘러보기 <ArrowRight size={16} aria-hidden="true" /></Link> : null}
+        </div>
+      ) : <div className={`${s.entryCards} ${!entry.showTonight ? s.coupleEntry : ''}`}>
+        {entry.showTonight ? <EntryCard href="/tonight" title="오늘밤 만나기" detail="오늘의 활동과 모집 상태를 확인해요" image="/images/match/tonight-social-20260915.webp" alt="저녁 거리에서 웃으며 걷는 성인 대학생 다섯 명의 AI 생성 분위기 이미지" priority /> : null}
+        <EntryCard href={entry.calendarHref} title={entry.calendarTitle}
+          detail={entry.audience === 'couple' ? '날짜를 골라, 연인과 함께 신청해요' : '날짜마다 준비된 특별한 만남'}
+          image={entry.audience === 'couple' ? '/images/match/couple-play-20260915.webp' : '/images/match/calendar-play-20260915.webp'}
+          alt={entry.audience === 'couple' ? '보드게임을 즐기는 두 커플의 AI 생성 분위기 이미지' : '블록 게임을 즐기는 성인 대학생들의 AI 생성 분위기 이미지'} priority={!entry.showTonight} />
+      </div>}
+      {state && unavailable ? <p className={s.entryRefreshNotice} role="status">최근 확인한 설정을 표시하고 있어요. <button type="button" className={s.quietButton} onClick={retry}>다시 확인</button></p> : null}
+      <div className={s.entryFoot}>
+        <span>사진은 AI로 만든 활동 분위기 예시예요.</span>
+        <Link href="/profile/relationship"><Heart size={14} aria-hidden="true" /> 내 연애 상태 관리 <ArrowRight size={14} aria-hidden="true" /></Link>
       </div>
-      {mode === 'scheduled' ? <QuantumCoupleDoubleDateSpotlight /> : null}
     </section>
   )
 }
 
-function TonightRankedEntryCard() {
-  return (
-    <section className={s.selectionPanel} aria-labelledby="tonight-entry-title">
-      <div>
-        <p className={s.category}>오늘 밤 · 부산대 파일럿</p>
-        <h3 id="tonight-entry-title" className={s.selectionTitle}>오늘 할 활동부터 둘러봐요</h3>
-        <p className={s.description}>오늘의 세 활동을 보고, 다음 화면에서 1·2·3순위와 동의를 정해요.</p>
-        <div className={s.facts}>
-          <span><Clock3 size={14} aria-hidden="true" />18:30 마감</span>
-          <span><Users size={14} aria-hidden="true" />친구와 함께 가능</span>
-        </div>
-      </div>
-      <Link href="/tonight" className={s.primaryAction}>오늘 활동 둘러보기 <ArrowRight size={17} aria-hidden="true" /></Link>
-      <details className={s.rules}>
-        <summary>팀이 정해지는 방식</summary>
-        <p>한 신청 풀에서 Quantum이 기본 남 3·여 2 팀과 장소를 맞춰요. 팀을 만든 뒤 팀의 순위 합산으로 활동을 정합니다. 여성 친구 3명이 함께 신청한 경우에만 남성 3명과 6명 팀으로 편성합니다.</p>
-      </details>
-    </section>
-  )
+function EntryCard({ href, title, detail, image, alt, priority = false }: {
+  href: string; title: string; detail: string; image: string; alt: string; priority?: boolean
+}) {
+  return <Link href={href} className={s.entryCard}>
+    <Image src={image} alt={alt} fill priority={priority} sizes="(min-width: 960px) 440px, (min-width: 640px) 46vw, 100vw" className={s.coverImage} />
+    <span className={s.photoScrim} />
+    <span className={s.entryCopy}><strong>{title}</strong><span>{detail}</span></span>
+    <span className={s.entryArrow} aria-hidden="true"><ArrowRight size={22} /></span>
+  </Link>
 }

@@ -91,7 +91,7 @@ test('event cylinder uses real activity scenes and every photo asset exists', ()
   assert.doesNotMatch(discovery, /grid gap-3 sm:grid-cols-2/)
 })
 
-test('scene switch makes today and date planning unmistakable without nested badges', () => {
+test('separate image-card links distinguish Tonight from dated events without nested screens', () => {
   const discovery = fs.readFileSync(
     path.join(process.cwd(), 'components/matching/QuantumMatchDiscovery.tsx'),
     'utf8',
@@ -101,26 +101,21 @@ test('scene switch makes today and date planning unmistakable without nested bad
     'utf8',
   )
 
-  assert.match(discovery, /label: '오늘 만나기'/)
-  assert.match(discovery, /label: '이번 주 만나기'/)
-  assert.match(discovery, /오늘 바로 가볍게 만나기/)
-  assert.match(discovery, /원하는 날짜의 특별한 만남/)
-  assert.match(discovery, /mode-scene-switch/)
-  assert.match(discovery, /quantum-tonight-five\.webp/)
-  assert.match(discovery, /quantum-scheduled-five\.png/)
-  assert.match(discovery, /role="group"/)
-  assert.match(discovery, /aria-pressed=\{active\}/)
+  assert.match(discovery, /href="\/tonight" title="오늘밤 만나기"/)
+  assert.match(discovery, /href=\{entry\.calendarHref\} title=\{entry\.calendarTitle\}/)
+  assert.match(discovery, /오늘의 활동과 모집 상태를 확인해요/)
+  assert.match(discovery, /날짜마다 준비된 특별한 만남/)
+  assert.match(discovery, /tonight-social-20260915\.webp/)
+  assert.match(discovery, /calendar-play-20260915\.webp/)
+  assert.match(discovery, /couple-play-20260915\.webp/)
+  assert.match(discovery, /<Link href=\{href\} className=\{s\.entryCard\}/)
+  assert.match(discovery, /<Image src=\{image\} alt=\{alt\}/)
   assert.doesNotMatch(discovery, /role="tab(?:list)?"/)
   assert.doesNotMatch(discovery, /role="tabpanel"/)
-  assert.match(discovery, /MoonStar/)
-  assert.match(discovery, /CalendarDays/)
-  assert.match(discovery, /오늘 18:30/)
-  assert.match(discovery, /금 · 토 · 일/)
-  assert.match(discovery, /data-layout="time-context-switch"/)
+  assert.doesNotMatch(discovery, /오늘 18:30|금 · 토 · 일/)
   assert.doesNotMatch(discovery, /badge:/)
   assert.doesNotMatch(discovery, /aria-label="선택됨"/)
-  assert.match(discovery, /<WeeklyActivityExplorer\s*\/>/)
-  assert.doesNotMatch(discovery, /<QuantumEventWheel/)
+  assert.doesNotMatch(discovery, /<QuantumEventWheel|<WeeklyActivityExplorer/)
   assert.doesNotMatch(wheel, /TONIGHT WHEEL|NEXT WEEK WHEEL/)
 })
 

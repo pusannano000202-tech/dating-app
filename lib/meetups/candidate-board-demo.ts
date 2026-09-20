@@ -130,7 +130,7 @@ function unavailable(invite: CandidateInvite): void {
 export function createDemoBoard(scope: CandidateScope): CandidateBoard {
   if (!validScope(scope)) throw new Error('invalid_candidate_scope')
   return refresh({
-    owner_id: uuid(scope, 'owner', 1), scope: {...scope}, department_label: '기계공학과 · 예시',
+    owner_id: uuid(scope, 'owner', 1), scope: {...scope}, department_label: scope.kind==='league'?'건축학과':'기계공학과 · 예시',
     total_count: OTHER_COUNT, filtered_count: OTHER_COUNT, candidates: [], next_cursor: null,
     mine: null, incoming: [], outgoing: [], host_rooms: [fixtureRoom(scope)], result: null,
   }, PREVIEW_SIZE)
@@ -223,7 +223,7 @@ export function demoIncoming(board: CandidateBoard, count = 1): CandidateBoard {
   const slot = roles(next.scope).length ? slots(next.scope).find(position => compatible(next.scope, mine, position)) ?? null : null
   for (let index = 0; index < count && next.incoming.length < 100; index++) {
     const roomId = uuid(next.scope, 'room', index + 2)
-    if (next.incoming.some(invite => invite.room_id === roomId && (invite.status === 'pending' || invite.status === 'joining'))) continue
+    if (next.incoming.some(invite => invite.room_id === roomId && ['pending','joining','joined'].includes(invite.status))) continue
     next.incoming.push({
       id: uuid(next.scope, 'incoming', next.incoming.length + 1), candidate_id: mine.id, candidate_alias: mine.alias,
       room_id: roomId, room_title: index === 0 ? 'A팀 · 수요일 한 판' : 'B팀 · 주말 한 판',
@@ -241,9 +241,9 @@ export function demoJoined(board: CandidateBoard): CandidateBoard {
   const invite = next.incoming.find(row => row.status === 'joining' && row.candidate_id === next.mine!.id && row.next_href === next.mine!.next_href)
   if (!invite) return board
   const href = chatHref(next.scope, invite.room_id)
-  next.mine = {...next.mine!, status: 'joined', revision: next.mine!.revision + 1, joining_until: null, next_href: href}
+  next.mine = {...next.mine!, status: next.scope.kind==='league'?'waiting':'joined', revision: next.mine!.revision + 1, joining_until: null, next_href: next.scope.kind==='league'?null:href}
   Object.assign(invite, {status: 'joined', revision: invite.revision + 1, joining_until: null, next_href: href})
-  next.incoming.forEach(other => { if (other.id !== invite.id) unavailable(other) })
+  if(next.scope.kind!=='league')next.incoming.forEach(other => { if (other.id !== invite.id) unavailable(other) })
   updateResult(next, 'updated', href)
   return refresh(next, currentOtherCount(board))
 }

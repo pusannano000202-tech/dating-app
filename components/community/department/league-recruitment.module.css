@@ -90,3 +90,44 @@
 .formActions{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
 @media(max-width:650px){.directory{gap:12px}.directoryHeading{gap:8px}.directoryHeading>span{font-size:12px}.sportBanner{height:132px;border-radius:13px}.sportBanner>div{padding:17px 19px;gap:6px}.sportBanner strong{font-size:24px;max-width:270px}.sportBanner span{font-size:11px}.tabs button{font-size:14px;min-height:47px}.tools{gap:8px}.searchField{padding:0 10px;gap:7px}.searchField input{font-size:12px}.createButton{padding:9px 11px;font-size:12px;gap:4px}.directoryMeta{gap:9px;margin-top:-5px}.note{font-size:11px}.refresh{font-size:10px;gap:4px}.cards{grid-template-columns:1fr;gap:12px}.card{padding:17px;gap:13px}.teamIdentity{gap:9px}.teamSymbol{width:44px;height:44px;font-size:21px}.teamIdentity h3,.teamIdentity strong{font-size:19px;line-height:1.35}.teamIdentity p{font-size:11px}.count{font-size:11px;padding:5px 7px}.vacancy>strong{font-size:19px}.vacancy>p{font-size:13px;gap:4px 10px}.noticeHeadline{font-size:21px}.noticeFacts>p{font-size:12px}.heading h2{font-size:24px}.formPage{gap:16px}.formPage form,.summary{padding:18px}.formPage form{gap:20px}}
 @media(prefers-reduced-motion:reduce){.directory button,.formPage button{transition:none}}
+.directory{color:#172326}
+.directoryHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
+.directoryHeading h2{font-size:22px;font-weight:850;letter-spacing:-.04em;line-height:1.4}
+.directoryHeading>span{font-size:11px;color:#717a73;text-align:right}
+.directory .tabs{background:transparent;padding:0;border:0;gap:8px;justify-content:flex-start}
+.directory .tabs button{flex:none;border:1px solid #dfe4d9;border-radius:20px;padding:8px 13px;font-size:12px;min-height:40px;background:#fff}
+.directory .tabs button[aria-pressed=true]{background:#edf3e7;border-color:#c8d7bf;color:#365c3d}
+.directory .tabs button[aria-pressed=true]::after{content:none}
+.directory .card[data-featured=true] .teamSymbol{background:#edf1e7}
+.directory .tools{margin-top:14px}
+.directory .createButton{color:#315b3b;background:#edf3e7;border-color:#d7e2ce}
+.directory .card{padding:18px;border:1px solid #e0e6dc;border-radius:15px;background:#fff;box-shadow:none}
+.directory .card[data-featured=true]{background:#fff;border-color:#d9e4d1}
+.directory .teamIdentity{gap:11px;align-items:flex-start}
+.directory .teamSymbol{width:44px;height:44px;min-width:44px;display:grid;place-items:center;background:#edf1e7;color:#44664a;border-radius:12px}
+.directory .teamIdentity h3{font-size:18px;line-height:1.4;letter-spacing:-.035em;overflow-wrap:anywhere}
+.directory .teamIdentity p{font-size:11px;color:#788076;line-height:1.5}
+.directory .count{background:transparent;color:#405346;font-size:12px;white-space:nowrap}
+.directory .vacancy{margin:13px 0 0;padding:0;background:transparent;border:0}
+.directory .vacancy>strong{font-size:11px;color:#5d7656}
+.directory .vacancy p{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.directory .vacancy p span{border:0;border-radius:6px;background:#f0f5eb;color:#42613e;padding:5px 7px;font-size:11px;line-height:1.4}
+.directory .cardLink,.directory .card>.primary{min-height:40px;padding:10px 0 0;margin-top:10px;color:#315b3b;border:0;background:transparent;display:flex;justify-content:flex-end;gap:6px;font-size:13px}
+.candidateEntry{display:flex;align-items:center;gap:14px;border-top:1px solid #e1e6dc;padding:22px 0 5px;margin-top:18px;color:#496d48}
+.candidateEntry>div{display:grid;gap:8px}
+.candidateEntry small{color:#7d837b;font-size:12px}
+.candidateEntry a{font-size:14px;display:flex;align-items:center;gap:10px;font-weight:750}
+.directory .tools{margin-top:0}
+.directory .teamSymbol{background:transparent!important;border-radius:12px}
+.memberBadge{display:inline-flex;align-items:center;background:#eaf3e9;color:#315b3b;font-size:10px;font-weight:750;border-radius:20px;padding:3px 8px;margin-top:5px}
+.inlineNotice{display:grid;gap:6px;margin-top:0;color:#61706a;font-size:12px;line-height:1.65}
+.inlineNotice p{margin:0;overflow-wrap:anywhere}
+.inlineNotice>span{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.inlineNotice small{font-size:10px;background:#f2f3ee;padding:2px 6px;border-radius:5px}
+.directory .card{gap:10px}
+.directory .vacancy{margin:0;gap:3px}
+.directory .vacancy p{margin-top:2px}
+.teamFooter{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:0}
+.teamFooter>span{display:flex;align-items:center;gap:5px;color:#65766b;font-size:11px;line-height:1.5}
+.directory .teamFooter .cardLink{margin:0;padding:8px 0;min-height:44px;flex-shrink:0;font-size:12px}
+@media(max-width:600px){.directoryHeading h2{font-size:20px}.directoryHeading{margin-bottom:14px}.directory .card{padding:16px}.directory .teamIdentity h3{font-size:16px}.directory .count{font-size:11px}.directory .teamIdentity{flex-wrap:wrap}.directory .teamIdentity>div{flex:1;min-width:120px}.directory .searchField input{font-size:12px}}

@@ -2,14 +2,15 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const provider = await readFile(
+// Git may check out CRLF on Windows; source-shape assertions use canonical LF.
+const provider = (await readFile(
   new URL('../../components/voice/VoiceGlobalProvider.tsx', import.meta.url),
   'utf8',
-)
-const sessionView = await readFile(
+)).replace(/\r\n/g, '\n')
+const sessionView = (await readFile(
   new URL('../../components/voice/VoiceSessionView.tsx', import.meta.url),
   'utf8',
-)
+)).replace(/\r\n/g, '\n')
 
 function between(startMarker, endMarker) {
   const start = provider.indexOf(startMarker)

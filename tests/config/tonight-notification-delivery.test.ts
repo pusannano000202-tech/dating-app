@@ -94,7 +94,11 @@ test('Tonight participant and partner screens offer explicit push choice and vis
   const partner = readSource('components/tonight/PartnerTonightConsole.tsx')
 
   assert.match(user, /TonightNotificationControl/)
-  assert.match(user, /mode === 'live' && application/)
+  assert.match(user, /mode === 'live' && <TonightNotificationControl audience="participant"/)
+  const applicationBranch = user.indexOf('if (!application) {')
+  const notificationControl = user.indexOf('<TonightNotificationControl audience="participant"')
+  assert.ok(applicationBranch >= 0 && notificationControl > applicationBranch,
+    'participant notification control stays in the existing-application view')
   assert.match(user, /if \(!silent\) setLoadError/)
   assert.match(partner, /TonightNotificationControl/)
   assert.match(control, /알림 켜기/)

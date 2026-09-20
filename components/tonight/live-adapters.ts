@@ -1,6 +1,10 @@
 'use client'
 
+import { parseTonightRoundStats } from '@/lib/matching/event-calendar-stats'
+
 import { requestTossPaymentWindow } from '@/lib/payments/toss-browser'
+import { isExplicitMissingTonightRound, TonightAccessError, TonightRoundUnavailableError } from './tonight-journey-errors'
+import { readWithDeadline } from '@/lib/matching/tonight-ranked/read-with-deadline'
 import {
   PLACE_ADDRESS_EVIDENCE,
   PLACE_COORDINATE_EVIDENCE,
@@ -91,6 +95,7 @@ function idempotencyKey(prefix: string): string {
 }
 
 const ERROR_LABELS: Record<string, string> = {
+  unauthenticated: '로그인이 만료됐어요. 다시 로그인해 주세요.',
   not_authenticated: '로그인이 만료됐어요. 다시 로그인해 주세요.',
   forbidden: '이 작업을 수행할 권한이 없어요.',
   reauthentication_required: '민감한 정보를 보호하기 위해 다시 로그인해 주세요.',
@@ -120,7 +125,9 @@ async function requestJson(path: string, init?: RequestInit): Promise<UnknownRec
       const redirect = `${window.location.pathname}${window.location.search}`
       window.location.assign(`/login?reauth=1&redirect=${encodeURIComponent(redirect)}`)
     }
-    throw new Error(ERROR_LABELS[code] ?? '요청을 처리하지 못했어요.')
+    const message = ERROR_LABELS[code] ?? '요청을 처리하지 못했어요.'
+    if (response.status === 401 || response.status === 403) throw new TonightAccessError(message)
+    throw new Error(message)
   }
   return payload
 }
@@ -140,6 +147,7 @@ function mapRound(value: unknown): TonightRoundView {
     marketCode: str(row.market_code, 'PNU'),
     serviceDate: str(row.service_date),
     status: str(row.status),
+    signupOpenAt: str(row.signup_open_at),
     signupCloseAt: str(row.signup_close_at),
     capacityLockAt: str(row.capacity_lock_at, str(row.signup_close_at)),
     allocationPublishAt: str(row.allocation_publish_at),
@@ -333,33 +341,54 @@ function mapArrivalHelp(value: unknown, fallbackVenueName: string | null = null)
 }
 
 export function createLiveUserTonightAdapter(): UserTonightAdapter {
-  const load = async (): Promise<UserTonightData> => {
-    const response = await requestJson('/api/tonight')
+  const read = async (signal: AbortSignal): Promise<UserTonightData> => {
+    const response = await requestJson('/api/tonight', { signal })
+    if (isExplicitMissingTonightRound(response)) throw new TonightRoundUnavailableError()
     const root = asRecord(response.round)
-    if (!str(asRecord(root.round).id)) throw new Error('오늘 진행 중인 부산대 회차가 없어요.')
+    if (!str(asRecord(root.round).id)) throw new Error('오늘 회차 정보를 확인하지 못했어요.')
     const round = mapRound(root.round)
     const activities = asArray(root.activities).map(mapActivity)
     if (activities.length !== 3) throw new Error('오늘 활동 3개가 아직 준비되지 않았어요.')
     const application = mapApplication(root.application)
     const journeyResponse = application
-      ? await requestJson(`/api/tonight/journey?round_id=${encodeURIComponent(round.id)}`)
+      ? await requestJson(`/api/tonight/journey?round_id=${encodeURIComponent(round.id)}`, { signal })
       : null
     const journey = journeyResponse ? mapJourney(journeyResponse.journey, round.id) : null
-    const arrivalHelpResponse = journey?.teamId && journey.canRevealExactVenue
-      ? await requestJson(`/api/tonight/arrival-help?team_id=${encodeURIComponent(journey.teamId)}`)
-      : null
+    let arrivalHelpRequest: TonightArrivalHelpView | null = null
+    let arrivalHelpAvailable = true
+    if (journey?.teamId && journey.canRevealExactVenue) {
+      try {
+        const help = await readWithDeadline(
+          helpSignal => requestJson(`/api/tonight/arrival-help?team_id=${encodeURIComponent(journey.teamId!)}`, { signal: helpSignal }),
+          signal,
+          4_000,
+        )
+        arrivalHelpRequest = mapArrivalHelp(help.arrival_help, journey.place?.displayName ?? null)
+        arrivalHelpAvailable = help.arrival_help === null || arrivalHelpRequest?.teamId === journey.teamId
+        if (!arrivalHelpAvailable) arrivalHelpRequest = null
+      } catch (error) {
+        // Help-service failure is not loss of the already verified paid journey.
+        // A cancelled owner/read or access denial still discards all private data.
+        signal.throwIfAborted()
+        if (error instanceof TonightAccessError) throw error
+        arrivalHelpAvailable = false
+      }
+    }
     return {
       round,
       activities: activities as [TonightActivityCard, TonightActivityCard, TonightActivityCard],
       applicationsOpen: bool(response.applications_open),
-      participationSummary: parseParticipationSummary(response.participation_summary),
+      applicationsAvailable: response.applications_available !== false,
+      participationSummary: response.participation_summary === null ? null : parseParticipationSummary(response.participation_summary),
+      roundStats: parseTonightRoundStats(response.round_stats),
       application,
       journey,
-      arrivalHelpRequest: arrivalHelpResponse
-        ? mapArrivalHelp(arrivalHelpResponse.arrival_help, journey?.place?.displayName ?? null)
-        : null,
+      arrivalHelpRequest,
+      arrivalHelpAvailable,
     }
   }
+
+  const load = (options?: { signal?: AbortSignal }) => readWithDeadline(read, options?.signal)
 
   return {
     load,

@@ -1,8 +1,11 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import {
   AlertCircle,
+  ArrowLeft,
+  ArrowRight,
   Banknote,
   CalendarClock,
   Check,
@@ -16,6 +19,10 @@ import {
 
 import PlaceLinks from '@/components/places/PlaceLinks'
 import PlaceMap from '@/components/places/PlaceMap'
+import MeetingCoachingCards from '@/components/matching/MeetingCoachingCards'
+import { useCalendarReadiness } from '@/components/matching/CalendarReadinessGate'
+import TonightPreparationGate from './TonightPreparationGate'
+import { tonightPrimaryAction } from './tonight-primary-action'
 import {
   TONIGHT_DEPOSIT_POLICY_HASH,
   TONIGHT_DEPOSIT_POLICY_ITEMS,
@@ -52,6 +59,9 @@ import type { TonightUiMode, UserTonightAdapter, UserTonightData } from './types
 import TonightNotificationControl from './TonightNotificationControl'
 import FriendInviteSharePanel from './FriendInviteSharePanel'
 import TonightContinuationEntry from './TonightContinuationEntry'
+import { canShowTonightMeetingCoaching, formatTonightCount, isTonightSnapshotFresh, tonightServiceDateLabel, tonightRecruitmentState } from './tonight-journey-state'
+import { isTonightRoundUnavailable, TonightAccessError, tonightLoadFailureAction } from './tonight-journey-errors'
+import styles from './tonight-journey.module.css'
 
 type BusyAction = 'apply' | 'deposit' | 'arrival' | 'arrivalHelp' | 'report' | 'refund' | null
 
@@ -128,10 +138,10 @@ function Timeline({ data }: { data: UserTonightData }) {
   const steps = [
     { at: data.round.signupCloseAt, label: '신청 마감', detail: '활동 순위 제출' },
     { at: data.round.allocationPublishAt, label: '팀 편성', detail: '팀 인원·활동 안내' },
-    { at: data.round.depositDueAt, label: '보증금 마감', detail: '18:45까지 결제' },
+    { at: data.round.depositDueAt, label: '보증금 마감', detail: '배정 후 각자 결제' },
     { at: data.round.revealAt, label: '장소 공개', detail: '업장·팀 번호 확인' },
-    { at: data.round.arrivalAt, label: '도착 확인', detail: '19:20부터 체크인' },
-    { at: data.round.startsAt, label: '모임 시작', detail: '19:30 시작' },
+    { at: data.round.arrivalAt, label: '도착 확인', detail: '현장에서 체크인' },
+    { at: data.round.startsAt, label: '모임 시작', detail: '활동 안내 확인' },
   ]
 
   return (
@@ -154,6 +164,28 @@ function Timeline({ data }: { data: UserTonightData }) {
   )
 }
 
+function TonightParticipation({ data, mode, fresh, now }: { data: UserTonightData; mode: TonightUiMode; fresh: boolean; now: number }) {
+  const summary = data.participationSummary
+  const asOf = Date.parse(summary?.asOf ?? '')
+  const timely = mode === 'rehearsal' || fresh && Number.isFinite(asOf) && now - asOf < 75_000 && now - asOf >= -60_000
+  const sameRound = timely && summary?.scopeId === `tonight:${data.round.id}` && summary.basis === 'valid_applicants'
+  return (
+    <section className={styles.participation} aria-label="이번 회차 신청 현황">
+      <div className="flex items-center justify-between gap-3 text-xs font-bold text-[#75665c]">
+        <span>{mode === 'rehearsal' ? '체험용 회차 집계' : !timely ? '신청 인원 재확인 필요' : '이번 회차 신청 현황'}</span>
+        <span>총 {formatTonightCount(sameRound ? summary?.totalPeople : null, '명')}</span>
+      </div>
+      <dl className={styles.stats}>
+        <div><dt>남성 신청</dt><dd>{formatTonightCount(sameRound ? summary?.genderBreakdown.malePeople : null, '명')}</dd></div>
+        <div><dt>여성 신청</dt><dd>{formatTonightCount(sameRound ? summary?.genderBreakdown.femalePeople : null, '명')}</dd></div>
+        <div><dt>편성된 팀</dt><dd>{formatTonightCount(timely ? data.roundStats?.teamCount : null, '팀')}</dd></div>
+      </dl>
+      <p className={styles.statsNote}>기타·미확인 {formatTonightCount(sameRound ? summary?.genderBreakdown.otherOrUnspecifiedPeople : null, '명')} 포함 · 취소를 제외한 유효 신청 기준</p>
+      {mode === 'live' ? <p className={styles.statsNote}>{timely && summary ? `${formatKoreanTime(summary.asOf)} 조회 · 30초마다 갱신` : '최신 인원을 확인하지 못했어요. 다시 불러와 주세요.'}</p> : null}
+    </section>
+  )
+}
+
 export default function UserTonightExperience({
   mode,
   adapter,
@@ -166,13 +198,22 @@ export default function UserTonightExperience({
   isOwnerCurrent?: () => boolean
 }) {
   const [data, setData] = useState<UserTonightData | null>(null)
+  // Use the existing readiness contract; never replace an existing receipt with onboarding.
+  const readiness = useCalendarReadiness(mode === 'live', ownerScope ?? null)
+  const dataRef = useRef<UserTonightData | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [roundUnavailable, setRoundUnavailable] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState<BusyAction>(null)
   const [rankedIds, setRankedIds] = useState<readonly string[]>([])
-  const [explorerStage, setExplorerStage] = useState<'browse' | 'rank'>('browse')
+  const [explorerStage, setExplorerStage] = useState<'browse' | 'rank' | 'guide'>('browse')
+  const [activePanel, setActivePanel] = useState<'next' | 'place' | 'guide' | 'help'>('next')
+  const [clockNow, setClockNow] = useState(() => Date.now())
+  const [verifiedAt,setVerifiedAt] = useState<number|null>(null)
+  const [refreshFailed,setRefreshFailed] = useState(false)
+  const [refreshing,setRefreshing] = useState(false)
   const [activeActivityIndex, setActiveActivityIndex] = useState(0)
   const [restoreBrowseFocus, setRestoreBrowseFocus] = useState(false)
   const [matchingConsentAccepted, setMatchingConsentAccepted] = useState(false)
@@ -189,7 +230,22 @@ export default function UserTonightExperience({
     rankedIds: [],
   })
   const lifecycleGenerationRef = useRef(0)
+  const requestGenerationRef = useRef(0)
+  const requestPendingRef = useRef(false)
+  const readControllerRef = useRef<AbortController | null>(null)
+  const ownerGuardRef = useRef(isOwnerCurrent)
+  ownerGuardRef.current = isOwnerCurrent
+  const busyRef = useRef(busy)
+  busyRef.current = busy
   const draftKey = activityExplorerDraftKey(mode, ownerScope)
+  const acceptData = useCallback((next: UserTonightData) => {
+    if (ownerGuardRef.current?.() === false) return
+    dataRef.current = next
+    setData(next)
+    setLoadError(null)
+    setVerifiedAt(Date.now())
+    setRefreshFailed(false)
+  }, [])
 
   useEffect(() => {
     const generation = lifecycleGenerationRef.current + 1
@@ -200,11 +256,22 @@ export default function UserTonightExperience({
   }, [])
 
   const load = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true)
+    const lifecycle = lifecycleGenerationRef.current
+    const request = ++requestGenerationRef.current
+    const current = () => lifecycle === lifecycleGenerationRef.current && request === requestGenerationRef.current && ownerGuardRef.current?.() !== false
+    readControllerRef.current?.abort()
+    const readController = new AbortController()
+    readControllerRef.current = readController
+    requestPendingRef.current = true
+    setRefreshing(true)
+    if (!silent) setLoading(dataRef.current === null)
     if (!silent) setLoadError(null)
+    if (!silent) setRoundUnavailable(false)
     try {
-      const next = await adapter.load()
-      setData(next)
+      const next = await adapter.load({ signal: readController.signal })
+      if (!current()) return
+      acceptData(next)
+      setRoundUnavailable(false)
       if (next.application?.choices.length === 3) {
         const applicationRanks = next.application.choices
           .slice()
@@ -238,15 +305,41 @@ export default function UserTonightExperience({
         }
       }
     } catch (error) {
-      if (!silent) setLoadError(actionErrorMessage(error))
+      if (!current()) return
+      setRefreshFailed(true)
+      const failureAction = tonightLoadFailureAction(dataRef.current, error)
+      if (failureAction === 'unavailable') {
+        dataRef.current = null
+        setData(null)
+        setLoadError(null)
+        setRoundUnavailable(true)
+      } else {
+        setRoundUnavailable(false)
+        if (failureAction === 'error') { dataRef.current = null; setData(null) }
+        setLoadError(isTonightRoundUnavailable(error)
+          ? '최신 회차를 확인하지 못했어요. 마지막으로 확인한 내 신청을 표시하고 있어요.'
+          : actionErrorMessage(error))
+      }
     } finally {
-      if (!silent) setLoading(false)
+      if (readControllerRef.current === readController) readControllerRef.current = null
+      if (current()) {requestPendingRef.current=false;setRefreshing(false);setLoading(false)}
     }
-  }, [adapter, draftKey])
+  }, [adapter, draftKey, acceptData])
 
   useEffect(() => {
     void load()
-  }, [load])
+    if(mode !== 'live')return () => { requestGenerationRef.current += 1; readControllerRef.current?.abort() }
+    const refresh=()=>{if(document.visibilityState==='visible'&&!requestPendingRef.current&&!busyRef.current)void load(true)}
+    const timer=window.setInterval(refresh,30_000)
+    window.addEventListener('focus',refresh)
+    document.addEventListener('visibilitychange',refresh)
+    return()=>{requestGenerationRef.current+=1;readControllerRef.current?.abort();requestPendingRef.current=false;window.clearInterval(timer);window.removeEventListener('focus',refresh);document.removeEventListener('visibilitychange',refresh)}
+  }, [load,mode])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClockNow(Date.now()), 10_000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     if (!data || data.application || !draftKey || !isExactlyThreeUniqueActivityIds(rankedIds, data.activities)) return
@@ -272,12 +365,29 @@ export default function UserTonightExperience({
   const rankedActivities = useMemo(() => rankedIds, [rankedIds])
 
   const runAction = async (name: Exclude<BusyAction, null>, action: () => Promise<void>) => {
+    requestGenerationRef.current+=1
+    readControllerRef.current?.abort()
+    requestPendingRef.current=false
+    setRefreshing(false)
     setBusy(name)
     setActionError(null)
     setNotice(null)
     try {
       await action()
     } catch (error) {
+      if (error instanceof TonightAccessError) {
+        requestGenerationRef.current += 1
+        readControllerRef.current?.abort()
+        requestPendingRef.current = false
+        dataRef.current = null
+        setData(null)
+        setVerifiedAt(null)
+        setRefreshFailed(true)
+        setRefreshing(false)
+        setLoading(false)
+        setRoundUnavailable(false)
+        setLoadError(actionErrorMessage(error))
+      }
       setActionError(actionErrorMessage(error))
     } finally {
       setBusy(null)
@@ -293,6 +403,11 @@ export default function UserTonightExperience({
       && (isOwnerCurrent?.() ?? true)
     )
     void runAction('apply', async () => {
+      if (mode === 'live' && !await readiness.check()) {
+        if (isCurrentSubmission()) setActionError('남은 참가 준비를 확인해 주세요. 선택한 활동 순위는 유지했어요.')
+        return
+      }
+      if (!isCurrentSubmission()) return
       await guardFreshActivityExplorerAction(
         () => adapter.load(),
         isCurrentSubmission,
@@ -313,7 +428,7 @@ export default function UserTonightExperience({
               rankedIds: serverRankedIds,
             }
             clearActivityExplorerDraft(draftKey)
-            setData(latest)
+            acceptData(latest)
             setRankedIds(serverRankedIds)
             setMatchingConsentAccepted(false)
             setNotice('이미 신청이 접수되어 최신 신청 상태를 보여드려요.')
@@ -326,7 +441,7 @@ export default function UserTonightExperience({
               previousRankedIds: rankedActivities,
             })
             explorerStateRef.current = { fingerprint: reconciled.fingerprint, rankedIds: reconciled.rankedIds }
-            setData(latest)
+            acceptData(latest)
             setRankedIds(reconciled.rankedIds)
             setMatchingConsentAccepted(false)
             setActiveActivityIndex(0)
@@ -345,18 +460,39 @@ export default function UserTonightExperience({
           })
           if (!isCurrentSubmission()) return
           clearActivityExplorerDraft(draftKey)
-          setData(next)
-          setNotice('신청이 접수됐어요. 18:32에 팀 조합을 안내할게요.')
+          acceptData(next)
+          setNotice(`신청이 접수됐어요. ${formatKoreanTime(next.round.allocationPublishAt)}에 팀 조합을 안내할게요.`)
         },
       )
     })
   }
 
   if (loading) return <TonightPageShell eyebrow="PNU TONIGHT" title="오늘 밤, 같이 해볼래요?" description="부산대 인증자끼리 한 풀에서 만나고, 팀이 함께할 활동을 정해요."><LoadingPanel /></TonightPageShell>
-  if (loadError || !data) {
+  if (roundUnavailable) {
+    return (
+      <main className={styles.page}>
+        <div className={styles.container}>
+          <Link href="/match" className={styles.back}><ArrowLeft size={17} aria-hidden />매칭</Link>
+          <header className={styles.heading}><p className={styles.eyebrow}>PNU TONIGHT</p><h1 className={styles.title}>오늘밤 만나기</h1></header>
+          <section className="mx-auto max-w-[680px] rounded-[24px] border border-[#e9e0d8] bg-[#fffdfb] px-6 py-9 sm:p-10" role="status">
+            <CalendarClock className="h-9 w-9 text-[#b44733]" aria-hidden />
+            <h2 className="mt-5 text-2xl font-black leading-snug tracking-[-0.04em]">오늘 모집이 아직 열리지 않았어요</h2>
+            <p className="mt-3 text-sm font-semibold leading-7 text-[#7b6c62]">모집이 열리면 이곳에서 활동과 신청 현황을 확인할 수 있어요. 다른 날짜의 만남도 둘러보세요.</p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <Link href="/match/calendar" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#b44733] px-4 text-sm font-black text-white">이벤트 캘린더 보기<ArrowRight size={17} aria-hidden /></Link>
+              <Link href="/match" className="flex min-h-12 items-center justify-center rounded-xl border border-[#e9e0d8] px-4 text-sm font-black text-[#75665c]">매칭으로 돌아가기</Link>
+            </div>
+            <button type="button" onClick={() => void load()} className="mt-5 inline-flex min-h-11 items-center gap-2 text-xs font-bold text-[#8a7366]"><RefreshCw size={15} aria-hidden />모집 상태 다시 확인</button>
+          </section>
+        </div>
+      </main>
+    )
+  }
+  if (!data) {
     return (
       <TonightPageShell eyebrow="PNU TONIGHT" title="오늘 밤, 같이 해볼래요?" description="부산대 인증자만 참여하는 당일 5~6인 모임이에요.">
         <ErrorPanel message={loadError ?? '오늘 회차가 아직 준비되지 않았어요.'} onRetry={() => void load()} />
+        {mode === 'live' && <div className="mt-5"><TonightPreparationGate value={readiness.value} onRetry={readiness.check} /></div>}
       </TonightPageShell>
     )
   }
@@ -371,6 +507,13 @@ export default function UserTonightExperience({
 
   const application = data.application
   const journey = data.journey
+  const snapshotFresh = mode === 'rehearsal' || isTonightSnapshotFresh(verifiedAt, Math.max(clockNow, verifiedAt ?? 0), refreshFailed)
+  const canUseArrivalHelp = snapshotFresh && !refreshing && data.arrivalHelpAvailable !== false
+  const recruitment = tonightRecruitmentState(data, clockNow, snapshotFresh)
+  const recruitmentLabel = {
+    open: '지금 신청 가능', upcoming: '아직 신청 시작 전이에요', closed: '오늘 신청이 마감됐어요',
+    paused: '현재 새 신청을 받지 않아요', unavailable: '최신 신청 상태 확인이 필요해요',
+  }[recruitment]
   const financialState = {
     applicationStatus: application?.status ?? null,
     roundStatus: data.round.status,
@@ -378,8 +521,8 @@ export default function UserTonightExperience({
     depositStatus: application?.deposit?.status ?? null,
     refundStatus: application?.deposit?.refundStatus ?? null,
   }
-  const canDeposit = Boolean(journey?.teamId && canBeginTonightDeposit(financialState))
-  const canRefund = Boolean(journey?.teamId && canRequestTonightRefund(financialState))
+  const canDeposit = Boolean(snapshotFresh && journey?.teamId && canBeginTonightDeposit(financialState))
+  const canRefund = Boolean(snapshotFresh && journey?.teamId && canRequestTonightRefund(financialState))
   const financialNextAction = tonightFinancialNextAction(financialState)
   const terminalRound = ['completed', 'cancelled'].includes(data.round.status)
   const refundReadOnlyTitle = application?.deposit?.refundStatus
@@ -388,17 +531,28 @@ export default function UserTonightExperience({
     ? financialNextAction
     : '현재 단계의 환불은 운영자 검토로 처리돼요'
   const canArrive = Boolean(
-    journey?.teamId
+    snapshotFresh && journey?.teamId
       && journey.attendanceRevision !== null
       && journey.canMarkArrival,
   )
+  const coachingUnlocked = mode === 'live' && snapshotFresh && !refreshing && canShowTonightMeetingCoaching(data, clockNow)
+  const matchedActivities = data.activities.filter(activity => activity.title === journey?.activityTitle)
+  const matchedActivityKind = matchedActivities.length === 1 ? matchedActivities[0].kind : undefined
+  const primaryAction = tonightPrimaryAction(data, clockNow, snapshotFresh)
+  const selectPanel = (panel: typeof activePanel) => {
+    setActivePanel(panel)
+    setClockNow(Date.now())
+    if (panel === 'guide') void load(true)
+  }
 
   if (!application) {
-    const canProgress = canProgressTonightActivityExplorer(data)
+    const canProgress = recruitment === 'open' && canProgressTonightActivityExplorer(data)
     return (
-      <main className="min-h-screen overflow-x-hidden bg-[#fff9f6] pb-24 text-[#292321] lg:pb-10">
-        <div className="mx-auto w-full max-w-[1152px] px-4 py-5 sm:px-6 sm:py-8">
+      <main className={styles.page}>
+        <div className={styles.container}>
+          <Link href="/match" className={styles.back}><ArrowLeft size={17} aria-hidden />매칭</Link>
           {mode === 'rehearsal' && <RehearsalBanner />}
+          {loadError && <p className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950" role="status">{loadError} 이전 조회 결과를 표시하며, 신청은 최신 확인 뒤 이어갈 수 있어요.</p>}
           {actionError && (
             <div className="mb-4 flex items-start gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-900" role="alert">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
@@ -417,19 +571,28 @@ export default function UserTonightExperience({
               activities={data.activities}
               activeIndex={activeActivityIndex}
               onActiveIndexChange={setActiveActivityIndex}
-              onContinue={() => setExplorerStage('rank')}
+              onContinue={() => { setExplorerStage('rank'); if (mode === 'live') void readiness.check() }}
               headingRef={explorerHeadingRef}
               disabled={!canProgress || busy !== null}
+              disabledReason={busy ? '요청을 처리하고 있어요' : recruitmentLabel}
+              dateLabel={tonightServiceDateLabel(data.round.serviceDate)}
+              summary={<TonightParticipation data={data} mode={mode} fresh={snapshotFresh} now={Math.max(clockNow,verifiedAt??0)} />}
+              onPreview={() => setExplorerStage('guide')}
             />
+          ) : explorerStage === 'guide' ? (
+            <div className={styles.focused}>
+              <button type="button" className={styles.back} onClick={() => { setRestoreBrowseFocus(true); setExplorerStage('browse') }}><ArrowLeft size={17} aria-hidden />활동 다시 둘러보기</button>
+              <MeetingCoachingCards audience="singles" preview unlocked={false} activityKind={data.activities[activeActivityIndex]?.kind} />
+            </div>
           ) : (
             <form onSubmit={submitApplication} className="mx-auto max-w-[752px] space-y-5">
               <header className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black tracking-[0.14em] text-[#b94b3f]">PNU TONIGHT · 순위 확인</p>
+                  <p className="text-xs font-black tracking-[0.14em] text-[#b94b3f]">{tonightServiceDateLabel(data.round.serviceDate)} · 순위 확인</p>
                   <h1 ref={rankHeadingRef} tabIndex={-1} className="mt-1 text-[28px] font-black tracking-[-0.05em] outline-none sm:text-4xl">세 활동을 1·2·3순위로 정해 주세요</h1>
                   <p className="mt-2 text-sm font-semibold leading-6 text-[#665c58]">신청 전까지는 언제든 다시 둘러보고 순서를 바꿀 수 있어요.</p>
                 </div>
-                <StatusPill tone={canProgress ? 'good' : 'warn'}>{canProgress ? '지금 신청 가능' : '오늘 신청 마감'}</StatusPill>
+                <StatusPill tone={canProgress ? 'good' : 'warn'}>{recruitmentLabel}</StatusPill>
               </header>
               <button type="button" onClick={() => { setRestoreBrowseFocus(true); setExplorerStage('browse') }} className="min-h-11 rounded-2xl border border-[#ead9d2] bg-white px-4 text-sm font-black text-[#665c58] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b94b3f]">활동 다시 둘러보기</button>
               <section className={`${PEACH_PANEL} p-4 sm:p-6`}>
@@ -444,6 +607,8 @@ export default function UserTonightExperience({
                 />
               </section>
               <section className={`${PEACH_PANEL} p-5 sm:p-6`}>
+                {mode === 'live' && <div className="mb-4"><TonightPreparationGate value={readiness.value} onRetry={readiness.check} /></div>}
+                <p className="mb-3 text-xs font-semibold leading-5 text-[#8b7e78]">기본은 남 3명 · 여 2명이며, 여성 친구 3명이 함께 신청한 경우에만 남 3명 · 여 3명으로 편성돼요.</p>
                 <p className="mb-4 text-sm font-semibold leading-6 text-[#665c58]">신청 뒤 일회용 링크를 최대 2개 만들어 친구를 안전하게 초대할 수 있어요.</p>
                 <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-[#fff5f1] p-4 text-sm font-bold leading-6 text-[#4d4541]">
                   <input
@@ -459,7 +624,7 @@ export default function UserTonightExperience({
                     <span className="mt-1 block text-xs font-semibold text-[#8b7e78]">세 활동 모두 참여 가능하며 최종 활동은 팀 순위 합산으로 결정됩니다.</span>
                   </span>
                 </label>
-                <PrimaryButton type="submit" className="mt-5 sm:w-full" disabled={!canProgress || !matchingConsentAccepted || busy !== null}>
+                <PrimaryButton type="submit" className="mt-5 sm:w-full" disabled={!canProgress || !matchingConsentAccepted || busy !== null || readiness.value.status !== 'ready'}>
                   {busy === 'apply' ? '신청하는 중…' : '이 순서로 오늘밤 신청'}
                 </PrimaryButton>
               </section>
@@ -482,46 +647,29 @@ export default function UserTonightExperience({
   }
 
   return (
-    <TonightPageShell
-      eyebrow="PNU TONIGHT · 부산대 인증자 전용"
-      title={terminalRound ? '지난 회차 보증금 상태를 확인해요' : application ? '오늘 만남이 준비되고 있어요' : '오늘 밤, 무엇을 같이 해볼까요?'}
-      description={terminalRound
-        ? '처리가 끝날 때까지 지난 회차의 결제·환불 진행 상태를 이 화면에서 놓치지 않게 안내합니다.'
-        : application
-        ? '한 화면에서 팀 편성, 보증금, 장소 공개, 도착까지 다음 행동만 차례대로 안내할게요.'
-        : '사진을 눌러 하고 싶은 순서를 정해 주세요. 기본은 남 3명 · 여 2명이고, 여성 친구 3명이 함께 신청한 경우에만 남 3명 · 여 3명으로 편성돼요.'}
-    >
+    <main className={styles.page}>
+      <div className={styles.container}>
+      <Link href="/match" className={styles.back}><ArrowLeft size={17} aria-hidden />매칭</Link>
+      <header className={styles.heading}>
+        <p className={styles.eyebrow}>{tonightServiceDateLabel(data.round.serviceDate)} · 부산대 인증자 전용</p>
+        <h1 className={styles.title}>{terminalRound ? '지난 만남 확인하기' : coachingUnlocked ? '오늘의 만남, 함께해요' : '오늘밤 만나기'}</h1>
+        <p className={styles.description}>{terminalRound ? '지난 회차의 결제·환불 진행 상태를 끝까지 확인할 수 있어요.' : '한 팀에서 만날 사람들, 다음 할 일부터 함께 확인해요.'}</p>
+      </header>
       {mode === 'rehearsal' && <RehearsalBanner />}
-      <section className={`${PEACH_PANEL} mb-4 p-4 sm:p-5`} aria-labelledby="tonight-participation-title">
-        <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-[#b94b3f]" aria-hidden />
-          <h2 id="tonight-participation-title" className="font-black">
-            현재 신청 총 {data.participationSummary.totalPeople}명
-          </h2>
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <p className="rounded-xl bg-[#fff5f1] px-2 py-3 text-xs font-bold text-[#6f625d]">
-            남성 <strong className="mt-1 block text-lg text-[#292321]">{data.participationSummary.genderBreakdown.malePeople}명</strong>
-          </p>
-          <p className="rounded-xl bg-[#fff5f1] px-2 py-3 text-xs font-bold text-[#6f625d]">
-            여성 <strong className="mt-1 block text-lg text-[#292321]">{data.participationSummary.genderBreakdown.femalePeople}명</strong>
-          </p>
-          <p className="rounded-xl bg-[#fff5f1] px-2 py-3 text-xs font-bold text-[#6f625d]">
-            기타·미확인 <strong className="mt-1 block text-lg text-[#292321]">{data.participationSummary.genderBreakdown.otherOrUnspecifiedPeople}명</strong>
-          </p>
-        </div>
-        <p className="mt-3 text-xs font-semibold leading-5 text-[#8b7e78]">
-          유효한 신청자 전체 기준이며, 가입 시 등록한 성별 분류를 그대로 합산해요. 취소한 신청은 제외됩니다.
-        </p>
+      {loadError && <p className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950" role="status">{loadError} 신청·보증금은 마지막 조회 결과예요. 다시 불러온 뒤 다음 절차를 이어가 주세요.</p>}
+      <TonightParticipation data={data} mode={mode} fresh={snapshotFresh} now={Math.max(clockNow,verifiedAt??0)} />
+      <section className={styles.nextAction} aria-label="지금 해야 할 일">
+        <div><p>지금 해야 할 일</p><h2>{primaryAction.title}</h2><span className={styles.nextDescription}>{primaryAction.description}</span></div>
+        <button type="button" disabled={busy !== null || refreshing} onClick={() => {
+          if (primaryAction.refresh) { void load(); return }
+          selectPanel(primaryAction.panel)
+          requestAnimationFrame(() => document.getElementById(`tonight-panel-${primaryAction.panel}`)?.scrollIntoView({ block: 'start', behavior: 'auto' }))
+        }}>
+          {primaryAction.label}<ArrowRight size={16} aria-hidden />
+        </button>
       </section>
-      {mode === 'live' && application && (
-        <TonightNotificationControl audience="participant" onRefresh={() => load(true)} />
-      )}
-      <Timeline data={data} />
-      {mode === 'live' && data.round.status === 'completed' && journey?.teamId && (
-        <TonightContinuationEntry key={journey.teamId} teamId={journey.teamId} isOwnerCurrent={isOwnerCurrent} />
-      )}
-      <div className="mt-3 flex justify-end">
+      <div className={styles.controls}>
+        <details><summary>오늘 시간표 · 알림 설정</summary><Timeline data={data} />{mode === 'live' && <TonightNotificationControl audience="participant" onRefresh={() => load(true)} />}</details>
         <button type="button" onClick={() => void load()} disabled={loading || busy !== null} className="inline-flex min-h-10 items-center gap-2 rounded-xl px-3 text-xs font-black text-[#665c58] hover:bg-white disabled:opacity-40">
           <RefreshCw className="h-4 w-4" aria-hidden />
           다시 불러오기
@@ -541,22 +689,30 @@ export default function UserTonightExperience({
         </div>
       )}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(330px,0.9fr)]">
+      <nav className={styles.tabs} aria-label="내 오늘밤 보기">
+        {([['next', '내 신청'], ['place', '장소·도착'], ['guide', '진행 안내'], ['help', '도움·환불']] as const).map(([panel, label]) => <button key={panel} type="button" className={styles.tab} aria-pressed={activePanel === panel} aria-controls={`tonight-panel-${panel}`} onClick={() => selectPanel(panel)}>{label}</button>)}
+      </nav>
+      <div className={styles.focused}>
           <div className="space-y-5">
-            <section className={`${PEACH_PANEL} overflow-hidden`}>
+            <section id="tonight-panel-next" hidden={activePanel !== 'next'} className={`${PEACH_PANEL} overflow-hidden`} aria-label="내 신청">
               <div className="bg-[#292321] px-5 py-6 text-white sm:px-6">
-                <p className="text-xs font-black tracking-[0.12em] text-[#ffcbbb]">지금 해야 할 일</p>
+                <p className="text-xs font-black tracking-[0.12em] text-[#ffcbbb]">{tonightServiceDateLabel(data.round.serviceDate)} · 내 신청 내역</p>
                 <h2 className="mt-2 text-2xl font-black tracking-[-0.04em]">
-                  {journey?.canRevealExactVenue && !['completed', 'cancelled'].includes(data.round.status)
-                    ? '팀 번호와 장소를 확인해 주세요'
-                    : financialNextAction}
+                  {journey?.activityTitle ?? '함께할 팀을 기다리고 있어요'}
                 </h2>
                 <p className="mt-2 text-sm font-semibold leading-6 text-white/70">
-                  {journey?.activityTitle ? `활동 후보 · ${journey.activityTitle}` : '팀의 1순위 활동을 합산해 안내해요.'}
+                  {journey?.activityTitle ? '배정된 활동이에요. 확정 여부는 아래 참가 상태에서 확인해 주세요.' : '한 신청 풀에서 팀을 만든 뒤, 각자의 1·2·3순위를 합산해 활동을 정해요.'}
                 </p>
               </div>
 
               <div className="space-y-4 p-5 sm:p-6">
+                <details className="rounded-2xl border border-[#ead9d2] p-4">
+                  <summary className="min-h-8 cursor-pointer text-sm font-black">내가 제출한 활동 순위</summary>
+                  <ol className="mt-3 space-y-2 text-sm text-[#77645b]">
+                    {application.choices.slice().sort((a, b) => a.rank - b.rank).map(choice => <li key={choice.activityId} className="flex gap-3"><strong className="text-[#b44733]">{choice.rank}순위</strong><span>{data.activities.find(activity => activity.id === choice.activityId)?.title ?? '활동 정보 확인 필요'}</span></li>)}
+                  </ol>
+                  <p className="mt-3 text-xs leading-5 text-[#8a7c72]">접수한 순위를 확인하는 화면이에요. 새로운 신청이나 재투표가 아니에요.</p>
+                </details>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-2xl bg-[#fff5f1] p-4">
                     <p className="text-xs font-black text-[#8b7e78]">신청 상태</p>
@@ -610,7 +766,7 @@ export default function UserTonightExperience({
                           depositPolicyHash: TONIGHT_DEPOSIT_POLICY_HASH,
                         })
                         setNotice(mode === 'rehearsal' ? '체험 결제가 완료된 상태로 바뀌었어요.' : '결제창을 열었어요.')
-                        if (mode === 'rehearsal') setData(await adapter.load())
+                        if (mode === 'rehearsal') acceptData(await adapter.load())
                       })}
                     >
                       <Banknote className="h-4 w-4" aria-hidden />
@@ -621,22 +777,29 @@ export default function UserTonightExperience({
               </div>
             </section>
 
+            <div hidden={activePanel !== 'next'} className="space-y-5">
             {application.bundle && (
               <FriendInviteSharePanel
+                key={`${ownerScope ?? mode}:${data.round.id}:${application.bundle.id}`}
                 roundId={data.round.id}
                 memberCount={application.bundle.memberCount}
                 mode={mode}
-                disabled={!data.applicationsOpen || application.bundle.status !== 'forming'}
+                disabled={!snapshotFresh || !data.applicationsOpen || application.bundle.status !== 'forming'}
               />
             )}
 
-            <section className={`${PEACH_PANEL} p-5 sm:p-6`}>
+            {mode === 'live' && data.round.status === 'completed' && journey?.teamId && (
+              <TonightContinuationEntry key={journey.teamId} teamId={journey.teamId} isOwnerCurrent={isOwnerCurrent} />
+            )}
+            </div>
+
+            <section id="tonight-panel-place" hidden={activePanel !== 'place'} className={`${PEACH_PANEL} p-5 sm:p-6`} aria-label="장소와 도착 확인">
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#fce9e4] text-[#b94b3f]">
                   <ShieldCheck className="h-5 w-5" aria-hidden />
                 </div>
                 <div>
-                  <p className="font-black">{journey?.canRevealExactVenue ? '공개된 팀 번호·업장·주소는 같은 원장에서 읽어요' : '18:55 전에는 정확한 팀·업장·주소를 숨겨요'}</p>
+                  <p className="font-black">{journey?.canRevealExactVenue ? '우리 팀 번호와 만날 장소' : `${formatKoreanTime(data.round.revealAt)} 공개 예정 · 팀과 업장 확인 후 열려요`}</p>
                   <p className="mt-1 text-sm font-semibold leading-6 text-[#8b7e78]">
                     {journey?.canRevealExactVenue
                       ? '사용자·업장·운영자가 같은 고유 팀 번호와 장소를 확인해 현장 혼선을 막습니다.'
@@ -671,7 +834,7 @@ export default function UserTonightExperience({
                           teamId: journey.teamId!,
                           expectedRevision: journey.attendanceRevision!,
                         })
-                        setData(next)
+                        acceptData(next)
                         setNotice('도착 상태가 업장과 운영자에게 전달됐어요.')
                       })
                     }}
@@ -691,10 +854,10 @@ export default function UserTonightExperience({
                         <p className="font-black">현장에서 못 찾겠어요</p>
                         <p className="mt-1 text-sm font-semibold leading-5 text-[#8b7e78]">연락처를 공유하지 않고 팀 번호로 업장과 운영자에게 도움을 요청해요.</p>
                       </div>
-                      {!data.arrivalHelpRequest && (
+                      {!data.arrivalHelpRequest && data.arrivalHelpAvailable !== false && (
                         <button
                           type="button"
-                          disabled={busy !== null}
+                          disabled={busy !== null || !canUseArrivalHelp}
                           onClick={() => setShowArrivalHelp((current) => !current)}
                           className="min-h-11 shrink-0 rounded-2xl border border-[#d85c4d] px-4 text-sm font-black text-[#b94b3f] disabled:opacity-50"
                         >
@@ -703,19 +866,24 @@ export default function UserTonightExperience({
                       )}
                     </div>
 
-                    {data.arrivalHelpRequest ? (
+                    {data.arrivalHelpAvailable === false ? (
+                      <div className="mt-4 rounded-2xl bg-[#fff7f3] p-4" role="status">
+                        <p className="text-sm font-bold leading-6">도움 요청 내역을 확인하지 못했어요. 내 참가와 장소 정보는 그대로 확인할 수 있어요.</p>
+                        <button type="button" disabled={busy !== null || refreshing} onClick={() => void load(true)} className="mt-2 min-h-11 text-sm font-black text-[#b94b3f] disabled:opacity-50">도움 요청 내역 다시 확인</button>
+                      </div>
+                    ) : data.arrivalHelpRequest ? (
                       <div className="mt-4 rounded-2xl bg-[#fff7f3] p-4" aria-live="polite">
                         <p className="text-sm font-black text-[#b94b3f]">도움 요청 접수 · {journey.teamCode}</p>
                         <p className="mt-2 text-sm font-bold leading-6">{data.arrivalHelpRequest.nextAction}</p>
                         <button
                           type="button"
-                          disabled={busy !== null}
+                          disabled={busy !== null || !canUseArrivalHelp}
                           onClick={() => void runAction('arrivalHelp', async () => {
                             const next = await adapter.cancelArrivalHelp({
                               requestId: data.arrivalHelpRequest!.requestId,
                               expectedRevision: data.arrivalHelpRequest!.revision,
                             })
-                            setData(next)
+                            acceptData(next)
                             setShowArrivalHelp(false)
                             setNotice('도움 요청을 종료했어요.')
                           })}
@@ -734,10 +902,10 @@ export default function UserTonightExperience({
                           <button
                             key={category}
                             type="button"
-                            disabled={busy !== null}
+                            disabled={busy !== null || !canUseArrivalHelp}
                             onClick={() => void runAction('arrivalHelp', async () => {
                               const next = await adapter.requestArrivalHelp({ teamId: journey.teamId!, category })
-                              setData(next)
+                              acceptData(next)
                               setShowArrivalHelp(false)
                               setNotice('업장과 운영자에게 도움 요청을 보냈어요.')
                             })}
@@ -760,7 +928,14 @@ export default function UserTonightExperience({
             </section>
           </div>
 
-          <aside className="space-y-5">
+          <section id="tonight-panel-guide" hidden={activePanel !== 'guide'} aria-label="만남 진행 안내">
+            <div className="mb-4 rounded-2xl border border-[#ead9d2] bg-white p-4 text-sm leading-6 text-[#77645b]">
+              <p>{terminalRound ? '이번 만남이 종료됐어요. 아래 카드는 일반적인 대화 안내이며, 다음 만남의 진행 화면이 아니에요.' : '아래 카드는 대화에 참고하는 안내예요. 실제 배정·출석·보증금·다음 만남 선택은 기존 참가 절차에서 따로 진행해요.'}</p>
+              {mode === 'live' && data.round.status === 'completed' && journey?.teamId && <button type="button" className="mt-3 min-h-11 font-bold text-[#a84230]" onClick={() => selectPanel('next')}>기존 계속 만나기에서 선택하기 <ArrowRight className="inline" size={15} aria-hidden /></button>}
+            </div>
+            {activePanel === 'guide' && <MeetingCoachingCards audience="singles" preview={!coachingUnlocked} unlocked={coachingUnlocked} activityKind={matchedActivityKind} />}
+          </section>
+          <aside id="tonight-panel-help" hidden={activePanel !== 'help'} className="space-y-5" aria-label="도움과 환불">
             <section className={`${PEACH_PANEL} p-5`}>
               <h2 className="font-black">문제가 생겼나요?</h2>
               <p className="mt-1 text-sm font-semibold leading-5 text-[#8b7e78]">신고와 환불 요청은 서로 분리해 처리하고 진행 상태를 남겨요.</p>
@@ -851,6 +1026,7 @@ export default function UserTonightExperience({
             </section>
           </aside>
       </div>
-    </TonightPageShell>
+      </div>
+    </main>
   )
 }

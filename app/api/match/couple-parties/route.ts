@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
+import { calendarClient, calendarError, calendarJson } from '@/lib/matching/event-calendar-http'
 
 export async function GET(request: NextRequest) {
   const supabase = createSupabaseRequestClient(request)
@@ -25,23 +26,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = createSupabaseRequestClient(request)
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return jsonError('unauthorized', 401)
-
-  const body = await readJson(request)
-  const partnerUserId = isRecord(body) ? cleanUuid(body.partner_user_id) : null
-  if (!partnerUserId) return jsonError('invalid_partner', 400)
-
-  const { data, error } = await supabase.rpc('create_quantum_couple_party', {
-    p_partner_user_id: partnerUserId,
-  })
-  if (error) {
-    const code = translateError(error.message)
-    return jsonError(code, errorStatus(code))
-  }
-
-  return NextResponse.json({ party: data }, { status: 201, headers: privateResponseHeaders() })
+  try {
+    await calendarClient(request)
+    // create_quantum_couple_party had no chosen date/payment binding. Use the calendar endpoint.
+    return calendarJson({ error: 'calendar_date_required' }, 400)
+  } catch (error) { return calendarError(error) }
 }
 
 export async function DELETE(request: NextRequest) {
@@ -55,18 +44,6 @@ export async function DELETE(request: NextRequest) {
     return jsonError(code, errorStatus(code))
   }
   return NextResponse.json(data ?? { cancelled: false }, { headers: privateResponseHeaders() })
-}
-
-async function readJson(request: NextRequest): Promise<unknown> {
-  try { return await request.json() } catch { return null }
-}
-
-function cleanUuid(value: unknown): string | null {
-  if (typeof value !== 'string') return null
-  const normalized = value.trim()
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalized)
-    ? normalized
-    : null
 }
 
 function translateError(message = '') {
@@ -94,8 +71,4 @@ function jsonError(error: string, status: number) {
 
 function privateResponseHeaders() {
   return { 'Cache-Control': 'private, no-store', Vary: 'Cookie, Authorization' }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }

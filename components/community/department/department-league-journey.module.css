@@ -23,3 +23,64 @@
 .slot.requested{background:#fae4d9;color:#913d30;border:2px solid #c57a60}.slot.requested b{color:#8e4033}.slot.requested small{color:#8e5141}.rosterPage .pitchMap .requested .jersey{fill:#e89b7d;color:#ffdfca}.rosterPage .pitchMap .requested span{color:#fff2de;font-weight:800}.reviewPanel{scroll-margin-top:18px;min-width:0;outline:none}.reviewPanel:focus-visible{outline:2px solid #b9473c;outline-offset:5px;border-radius:10px}.headerInbox>a{display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:0;background:transparent;padding:8px}.headerInbox>a>span{display:none}.receivedInviteShortcut{display:flex;justify-content:flex-end;margin:0 0 8px}.receivedInviteShortcut button{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:5px 8px;font-size:12px;color:#765849}.receivedInviteShortcut button:focus-visible{outline:2px solid #b9473c;outline-offset:2px}
 .requestCount{position:absolute;top:-8px;right:-7px;border:1px solid #fff2e9;border-radius:8px;padding:3px 5px;background:#a83f33;color:#fff;font-size:9px;font-weight:800;font-style:normal;line-height:1.2;white-space:nowrap;text-shadow:none}
 .teamChatEntry{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;margin:0 0 18px;border:1px solid #e3d8cd;border-radius:15px;background:#fffdf8}.teamChatEntry>div{min-width:0;display:grid;gap:5px}.teamChatEntry strong{font-size:16px;font-weight:800;color:#574e40}.teamChatEntry span{font-size:12px;color:#7b7466;line-height:1.6}.teamChatEntry .primary{white-space:nowrap;flex-shrink:0;font-size:13px;min-height:44px;padding:10px 14px}@media(max-width:600px){.teamChatEntry{padding:14px;gap:10px}.teamChatEntry strong{font-size:14px}.teamChatEntry span{font-size:11px}.teamChatEntry .primary{font-size:12px;padding:9px 11px}}
+
+/* League discovery and a team's workspace are separate destinations, not form steps. */
+.page,.recruitmentPage{background:#faf9f6;color:#172326}
+.shell{max-width:1000px}
+.topbar,.recruitmentPage .topbar{min-height:64px;margin:0;gap:12px}
+.topbar>button{display:grid;place-items:center;flex-shrink:0;border:0;background:transparent;width:44px;height:44px}
+.topbar>span,.recruitmentPage .topbar>span{font-size:12px;letter-spacing:.06em;line-height:1.4;text-align:center}
+.headerInbox{display:flex;align-items:center;justify-content:flex-end;min-width:44px}
+.headerInbox>button{display:grid;place-items:center;min-width:44px;border-radius:10px}
+.discoveryHeading{margin:18px 0 22px}
+.discoveryHeading h1{font-size:30px;font-weight:850;letter-spacing:-.05em;line-height:1.25;margin:0 0 9px}
+.discoveryHeading p{font-size:13px;line-height:1.6;color:#697273;margin:0}
+.discoveryTabs,.teamTabs{display:flex;align-items:stretch;border-bottom:1px solid #e4e6df;gap:4px;margin-bottom:22px}
+.discoveryTabs>*{flex:1;text-align:center;display:flex;align-items:center;justify-content:center;min-height:50px;border-bottom:3px solid transparent;font-size:14px;color:#727775;font-weight:650}
+.discoveryTabs>[aria-current=page],.teamTabs>[aria-pressed=true]{color:#315b3b;border-bottom-color:#315b3b;font-weight:850}
+.myTeamShortcut{display:flex;align-items:center;gap:14px;padding:16px;background:#eef3e9;border:1px solid #dce5d4;border-radius:14px;text-align:left;width:100%;margin-bottom:5px;color:#315b3b}
+.myTeamShortcut>span{flex:1;min-width:0;display:grid;gap:5px}
+.myTeamShortcut small{font-size:11px;color:#64735d}
+.myTeamShortcut strong{font-size:17px;line-height:1.4;overflow-wrap:anywhere;color:#1d3029}
+.receivedInviteShortcut{display:flex;align-items:center;justify-content:flex-end;gap:7px;width:100%;min-height:44px;margin:0 0 14px;font-size:12px;color:#536758}
+.teamHeading{display:flex;align-items:center;gap:13px;margin:18px 0 20px;scroll-margin-top:16px;outline:none}
+.teamHeading:focus-visible{outline:3px solid #345a38;outline-offset:5px;border-radius:10px}
+.teamMark{width:54px;height:54px;flex-shrink:0;border-radius:16px;display:grid;place-items:center;background:#e9eee3;color:#426248}
+.teamHeadingCopy{flex:1;min-width:0}
+.teamHeadingCopy h1{font-size:23px;line-height:1.35;letter-spacing:-.04em;font-weight:850;overflow-wrap:anywhere;margin:0 0 6px}
+.teamHeadingCopy p{font-size:12px;color:#707876;line-height:1.55;margin:0}
+.teamHeadingState{flex-shrink:0;display:grid;justify-items:end;gap:8px}
+.teamHeadingState span{font-size:11px;line-height:1.4;padding:5px 9px;background:#eaf2e2;color:#3d6644;border-radius:20px;font-weight:750}
+.teamHeadingState strong{font-size:14px;font-variant-numeric:tabular-nums}
+.teamTabs button{min-height:46px;flex:1;font-size:14px;color:#717775;border-bottom:3px solid transparent}
+.teamTabs b{font-size:11px;padding:3px 6px;margin-left:3px;background:#e8ebe4;border-radius:12px;color:#23302a}
+.managePanel{display:grid;gap:14px;padding:20px;border:1px solid #dfe5d8;border-radius:16px;background:white;margin-bottom:20px}
+.managePanel>header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.managePanel h2{font-size:18px;font-weight:800}
+.rosterMain{display:grid;gap:14px;min-width:0}
+.rosterMain:empty{display:none}
+.mapOnly{display:block;max-width:600px;margin-inline:auto}
+.mapOnly .map{max-width:none}
+.sceneGrid:has(.reviewPanel){display:block;max-width:720px;margin-inline:auto}
+.teamNextActions{display:grid;gap:8px}
+.opponentPreview{display:flex;align-items:center;gap:10px;border-top:1px solid #e3e6de;padding:16px 0 8px;text-align:left;margin-top:3px;flex-wrap:wrap}
+.opponentPreview strong{font-size:13px;flex:1}
+.opponentPreview small{font-size:11px;color:#6e7770;max-width:180px;line-height:1.6}
+.mapCaption{font-size:11px;line-height:1.7;text-align:center;color:#6e7770;margin:0}
+.discoveryWithTeams{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.discoveryWithTeams>div{min-width:0}.discoveryWithTeams h1{font-size:27px}
+.table li>div>strong{min-width:0;overflow-wrap:anywhere;line-height:1.5}
+.table li>div{min-width:0;gap:10px}.table .rankNumber{min-width:18px;flex-shrink:0;font-size:12px}
+.teamSwitchLine{display:flex;justify-content:flex-end;margin:-8px 0 14px}
+@media(max-width:480px){.discoveryWithTeams h1{font-size:24px}.table li>div{gap:7px}.table li>div>strong{font-size:12px}.table li>strong{font-size:14px}.table li>span{font-size:10px}}
+.recruitmentPage .primary{background:#345a38}
+.recruitmentPage .chosenRole{background:#edf3e8;color:#345a38}
+.rosterPage .lolMap .available{background:#18332dd9;color:#fff;border:1px dashed #e0eacf}
+.rosterPage .lolMap .available .seatPlus{display:block}
+.rosterPage .lolMap .slot{border-radius:14px;padding:8px 4px}
+.rosterPage .lolMap .slot:has([data-league-tier]){padding-block:3px}
+.rosterPage .lolMap .slot span{font-size:11px}
+.recruitmentPage :is(button,a,input,select,textarea):focus-visible,.discoveryTabs :focus-visible{outline:3px solid #537b4e;outline-offset:3px}
+@media(min-width:761px){.discoveryHeading h1{font-size:36px}.discoveryTabs{max-width:650px}.myTeamShortcut{max-width:650px}.receivedInviteShortcut{max-width:650px}.teamHeading,.teamTabs{max-width:850px}}
+@media(max-width:760px){.page,.recruitmentPage{padding:0 20px 100px}.shell,.recruitmentPage .shell{max-width:560px}.discoveryHeading h1{font-size:27px}.teamHeadingCopy h1{font-size:19px}.teamMark{width:44px;height:44px;border-radius:13px}.teamHeading{gap:10px}.teamHeadingState span{font-size:10px;padding:5px 8px}.discoveryTabs>*{font-size:13px}.rosterPage .sceneGrid{gap:14px}.topbar>span,.recruitmentPage .topbar>span{font-size:11px}.rosterPage .lolMap .slot{width:65px}.opponentPreview small{max-width:145px}.footer{margin-top:24px}}
+@media(max-width:360px){.page,.recruitmentPage{padding-inline:14px}.teamHeadingState span{max-width:82px;text-align:center}.teamHeadingCopy h1{font-size:17px}.teamMark{width:38px;height:38px}.rosterPage .lolMap .slot{width:57px}.teamTabs button{font-size:12px}}

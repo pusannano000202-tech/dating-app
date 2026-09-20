@@ -3,6 +3,7 @@ import test from 'node:test'
 import {readFile} from 'node:fs/promises'
 import ts from 'typescript'
 import {isLeagueSport} from '../../lib/meetups/challenge-journey.ts'
+import {readLeagueLocation} from '../../lib/meetups/league-navigation.ts'
 
 async function loadPage(path,dependencies){
  const source=await readFile(new URL('../../'+path,import.meta.url),'utf8')
@@ -32,6 +33,7 @@ test('recruitment rehearsal is explicitly selectable without bypassing the devel
 })
 test('the normal team detail link validates the selected challenge independently of invitation presence',async()=>{
  const page=await loadPage('app/community/department/page.tsx',{
+  '@/lib/meetups/league-navigation':{readLeagueLocation},
   '@/components/community/CommunityComingSoon':{default:'comingSoon'},
   '@/components/community/department/DepartmentLeagueJourney':{default:'journey'},
   '@/lib/meetups/challenge-journey':{isLeagueSport},
@@ -50,6 +52,7 @@ test('the normal team detail link validates the selected challenge independently
 
 test('team discovery does not bypass the normal community feature gate',async()=>{
  const page=await loadPage('app/community/department/page.tsx',{
+  '@/lib/meetups/league-navigation':{readLeagueLocation},
   '@/components/community/CommunityComingSoon':{default:'comingSoon'},
   '@/components/community/department/DepartmentLeagueJourney':{default:'journey'},
   '@/lib/meetups/challenge-journey':{isLeagueSport},

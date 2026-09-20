@@ -15,13 +15,14 @@ test('event wheel exposes full mobile touch targets and stable portrait cards', 
   assert.match(source, /다음 활동/)
 })
 
-test('legacy wheel owns its participation state but discovery uses only the weekly application pool', () => {
+test('legacy wheel owns its participation state but discovery navigates into the dated calendar', () => {
   assert.match(source, /onParticipationStateChange/)
   assert.match(source, /if \(participation && !dismissedCancelledParticipation\)/)
   assert.match(source, /chooseAnother && participationStage === 'cancelled'/)
   assert.match(source, /QuantumParticipationCommandCenter/)
-  assert.match(discovery, /<WeeklyActivityExplorer\s*\/>/)
-  assert.doesNotMatch(discovery, /<QuantumEventWheel/)
+  assert.match(discovery, /href=\{entry\.calendarHref\}/)
+  assert.match(discovery, /router\.replace\('\/match\/calendar'\)/)
+  assert.doesNotMatch(discovery, /<QuantumEventWheel|<WeeklyActivityExplorer/)
   assert.doesNotMatch(discovery, /hasParticipation/)
   assert.doesNotMatch(discovery, /onParticipationStateChange/)
   assert.match(source, /if \(!participation \|\| saving\) return/)

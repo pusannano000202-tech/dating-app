@@ -68,12 +68,14 @@ test('Today Night entry, activity and notification copy never promises the retir
   const entryCopy = [
     read('components/home/QuantumHomeLead.tsx'),
     read('components/matching/QuantumMatchDiscovery.tsx'),
+    read('components/tonight/UserTonightExperience.tsx'),
+    read('components/tonight/TonightActivityExplorer.tsx'),
     read('app/notifications/page.tsx'),
     read('lib/matching/tonight-ranked/activity-catalog.ts'),
   ].join('\n')
 
-  assert.match(entryCopy, /기본 남 3·여 2|기본은 남 3·여 2/i)
-  assert.match(entryCopy, /여성 친구 3명[\s\S]*?남성 3명/i)
+  assert.match(entryCopy, /기본(?:은)? 남\s*3(?:명)?\s*·\s*여\s*2(?:명)?/i)
+  assert.match(entryCopy, /여성 친구 3명[\s\S]*?남(?:성)?\s*3명/i)
   assert.doesNotMatch(entryCopy, /남\s*2[^\n]{0,20}여\s*3|2남[^\n]{0,20}3녀/i)
   assert.doesNotMatch(entryCopy, /오늘밤 5명 팀|5\/5 결제|다섯 명과 장소/i)
 })

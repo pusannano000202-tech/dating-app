@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "codex/collab-app-20260920": false
+    }
+  },
   "crons": [
     {
       "path": "/api/internal/retention/process",
