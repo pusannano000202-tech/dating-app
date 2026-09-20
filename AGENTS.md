@@ -6,6 +6,7 @@
 
 ### 협업 브랜치 기준 (2026-09-20)
 
+- 최신 사용자 분업: `codex/성준-업장-퀀텀`은 성준의 업장/관리자 작업, `codex/유저-퀀텀`은 사용자 앱 작업이다. 두 브랜치의 공용 인수인계는 `docs/handoff/active/QUANTUM_USER_PARTNER_HANDOFF_2026-09-20.md`부터 읽는다. 브랜치 분리는 DB·실계정·권한·배포 분리를 뜻하지 않는다.
 - 현재 인수인계는 `docs/handoff/active/COLLABORATION_BRANCH_2026-09-20.md`를 따른다. 이 브랜치는 GitHub 코드 공유용이며 출시 완료본이 아니다.
 - `quantum-model-router`와 `quauntum-work-union-progress`, 이에 종속된 모델 고정 배정·연합 절차는 폐기됐다. 과거 파일에 남아 있어도 호출하거나 복원하지 않는다.
 - 독립 검토는 필요할 때 Codex의 별도 맥락에서 수행한다. 다른 AI 서비스로 소스를 보내거나 모델 설정을 임의 변경하지 않는다.

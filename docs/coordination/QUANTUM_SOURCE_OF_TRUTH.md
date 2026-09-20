@@ -16,9 +16,9 @@
 현재 작업공간·branch·HEAD·upstream·dirty·staged 상태와 원격 main은 작업 직전에 확인합니다.
 원격 DB·Vercel·모바일 스토어 상태는 해당 승인 범위의 작업에서 별도로 확인합니다.
 
-작업 분업은 [모델 라우팅 정책](MODEL_ROUTING_POLICY.md)과
-[라우터 스킬](../../.agents/skills/quantum-model-router/SKILL.md)을 따릅니다.
-별도 사용자 승인 Gate에만 [대표실 보고 스킬](../../.agents/skills/quantum-executive-reporting/SKILL.md)을 사용합니다.
+2026-09-20 사용자 지정 분업과 전달 자료는
+[사용자·업장 인수인계](../handoff/active/QUANTUM_USER_PARTNER_HANDOFF_2026-09-20.md)를 따릅니다.
+과거 모델 라우터와 연합 절차는 폐기됐으며 호출하거나 복원하지 않습니다.
 역사적인 2인 운영·매일 push 규칙은 [보관 기록](../archive/COLLABORATION_LEGACY_2PERSON.md)이며 현재 실행 지시가 아닙니다.
 
 ## 2. 이번 로컬 커밋 후보의 기준점

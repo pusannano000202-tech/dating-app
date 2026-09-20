@@ -2,7 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
     "deploymentEnabled": {
-      "codex/collab-app-20260920": false
+      "codex/collab-app-20260920": false,
+      "codex/성준-업장-퀀텀": false,
+      "codex/유저-퀀텀": false
     }
   },
   "crons": [
