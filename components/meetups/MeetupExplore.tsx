@@ -10,6 +10,8 @@ import s from './meetup-discovery.module.css'
 import CustomMeetupShelf from './CustomMeetupShelf'
 import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
 import LanguagePicker from '@/components/i18n/LanguagePicker'
+import { customMeetupBrowseHref } from '@/lib/meetups/create-flow'
+import { getMeetupCategoryLabel } from '@/lib/community/catalog'
 
 export default function MeetupExplore({ intent }: { intent: MeetupExploreIntent }) {
   const { t } = useQuantumLocale()
@@ -18,6 +20,8 @@ export default function MeetupExplore({ intent }: { intent: MeetupExploreIntent 
   const groups = getMeetupDiscoveryGroups(intent)
   const selected = groups.find(group => group.id === state.group)
   const activities = getMeetupDiscoveryActivities(intent, state.group, state.genderMode)
+  const categories = [...new Set(activities.map(activity => activity.category))]
+  const activityGroupsOnly = intent === 'play' && activities.some(activity => activity.kind === 'activity')
   const intentTitle = t(intent === 'play' ? 'meetup.play' : 'meetup.achieve')
   const groupTitle = (id:string,title:string) => intent==='play'?t('play.'+id):title
   const backHref = selected ? buildMeetupExploreHref({ ...state, group: null }) : '/meetups'
@@ -71,7 +75,11 @@ export default function MeetupExplore({ intent }: { intent: MeetupExploreIntent 
                 </Link>
               ))}
             </nav>
-            <CustomMeetupShelf categories={[...new Set(activities.map(activity=>activity.category))]} genderMode={state.genderMode} imageSrc={selected.imageSrc}/>
+            {activityGroupsOnly ? <details className={s.otherMeetups}>
+              <summary>{t('다른 모임 보기')}<ChevronDown size={15} aria-hidden="true" /></summary>
+              <p>{t('활동을 지정하지 않고 연 모임도 둘러보세요.')}</p>
+              <nav aria-label="분류별 다른 모임">{categories.map(category => <Link key={category} href={customMeetupBrowseHref(category, 'school', state.genderMode)}>{t(getMeetupCategoryLabel(category))}<ArrowRight size={14} aria-hidden="true" /></Link>)}</nav>
+            </details> : <CustomMeetupShelf categories={categories} genderMode={state.genderMode} imageSrc={selected.imageSrc} topicGroup={state.intent==='achieve'?selected.id:undefined} fromHref={buildMeetupExploreHref(state)}/>}
           </>
         )}
       </div>

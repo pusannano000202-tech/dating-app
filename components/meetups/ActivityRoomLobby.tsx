@@ -6,21 +6,25 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Loader2, MessageCircle, RefreshCw, UsersRound } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Loader2, MessageCircle, Plus, RefreshCw, UsersRound } from 'lucide-react'
 import { MEETUP_GENDER_LABELS, type MeetupGenderMode } from '@/lib/community/meetup-gender'
 import { activityRoomErrorMessage, getActivityRoomDefinition, isActivityRoomId, parseActivityRoomLobby, type ActivityRoomLobby as Lobby } from '@/lib/meetups/activity-room-contract'
 import styles from './activity-rooms.module.css'
 import { fetchActivityRoom } from '@/lib/meetups/activity-room-client'
 import { buildMeetupDiscoveryReturnHref } from '@/lib/meetups/discovery-navigation'
+import { buildContextualMeetupCreateHref } from '@/lib/meetups/create-context'
+import HostedActivityRooms from './HostedActivityRooms'
 
 export default function ActivityRoomLobby({ activityKey, genderMode }: { activityKey: string; genderMode: MeetupGenderMode }) {
   const router = useRouter()
   const definition = getActivityRoomDefinition(activityKey)!
+  const createHref = buildContextualMeetupCreateHref({ activityKey, genderMode })
   const endpoint = `/api/meetups/activities/${encodeURIComponent(activityKey)}/rooms?gender_mode=${genderMode}`
   const [lobby, setLobby] = useState<Lobby | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [busyRoom, setBusyRoom] = useState<string | null>(null)
+  const [refreshVersion, setRefreshVersion] = useState(0)
   const sequence = useRef(0)
   const inFlightJoin = useRef(false)
   const readInFlight = useRef(false)
@@ -78,28 +82,30 @@ export default function ActivityRoomLobby({ activityKey, genderMode }: { activit
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>학교 친구들과 · {MEETUP_GENDER_LABELS[genderMode]}</p>
           <h1>{definition.title}</h1>
-          <p>빈자리가 있는 방을 골라 들어오세요.<br />누가 나가면 그 방에서 다시 모집하고, 모든 방이 차면 다음 방이 열려요.</p>
-          <div className={styles.tags}><span><UsersRound size={15} />방마다 {definition.capacity}명</span><span><MessageCircle size={15} />참여 즉시 채팅</span></div>
+          <p>같은 활동을 하고 싶은 친구들의 방이에요.<br />마음에 드는 방을 고르거나, 내 모임을 열어보세요.</p>
         </div>
       </section>
       <section aria-labelledby="activity-room-list-title">
-        <div className={styles.sectionHeading}><div><h2 id="activity-room-list-title">함께할 모임방</h2><p aria-live="polite">{lobby ? `현재 ${lobby.room_count}개 방 · 모집 중 ${lobby.rooms.filter(room => room.status === 'recruiting').length}개` : error ? '방 현황 연결 대기' : '실제 방 현황을 확인하고 있어요'}</p></div>
-          <button className={styles.iconButton} onClick={() => void load(true)} disabled={loading || !!busyRoom} aria-label="방 목록 새로고침"><RefreshCw size={19} className={loading ? styles.spin : ''} /></button>
+        <div className={styles.sectionHeading}><div><h2 id="activity-room-list-title">함께할 모임방</h2><p>방마다 시간과 참여 방법을 확인해요.</p></div>
+          <button className={styles.iconButton} onClick={() => { void load(true); setRefreshVersion(value => value + 1) }} disabled={loading || !!busyRoom} aria-label="방 목록 새로고침"><RefreshCw size={19} className={loading ? styles.spin : ''} /></button>
         </div>
+        {createHref ? <div className={styles.createRoom}><Link href={createHref} className={styles.createRoomLink}><Plus size={18} aria-hidden="true" />모임방 만들기<ArrowRight size={17} aria-hidden="true" /></Link><p>이 활동으로 직접 여는 모임이에요.</p></div> : null}
+        <h3 className={styles.roomGroupTitle}>바로 함께할 방 <span>참여하면 채팅이 열려요</span></h3>
         {loading && !lobby && !error ? <div className={styles.status} role="status"><Loader2 size={22} className={styles.spin} />방을 확인하고 있어요</div> : null}
         {error ? <div className={styles.error} role="alert"><strong>{lobby ? '참여 상태를 확인해 주세요' : '방 현황을 확인하지 못했어요'}</strong><p>{activityRoomErrorMessage(error)}</p>
           {error === 'Unauthorized' ? <Link className={styles.primary} href={`/login?redirect=${encodeURIComponent('/meetups/activities/' + activityKey + '/rooms?gender_mode=' + genderMode)}`}>로그인하기</Link> : /profile_required|gender_required/.test(error) ? <Link className={styles.primary} href="/profile/edit">프로필 확인하기</Link> : <button onClick={() => void load(true)} className={styles.secondary} disabled={loading}>다시 확인</button>}
         </div> : null}
         {lobby ? <div className={styles.rooms}>{lobby.rooms.map(room => <article className={styles.room} key={room.id}>
           <div className={styles.roomTop}><span className={styles.roomNumber}>{room.room_number}번 방</span><span className={room.joined ? styles.mine : room.status === 'full' || !room.joinable ? styles.full : styles.open}>{room.joined ? '내가 참여한 방' : room.status === 'full' ? '정원 마감' : room.joinable ? '모집 중' : alreadyInRoom ? '다른 방 참여 중' : '참여 불가'}</span></div>
-          <div className={styles.occupancy}><div className={styles.seats} aria-hidden="true">{Array.from({ length: room.capacity }, (_, index) => <span className={index < room.member_count ? styles.seatFilled : styles.seat} key={index}><UsersRound size={18} /></span>)}</div><strong>{room.member_count}<small> / {room.capacity}명</small></strong></div>
+          <div className={styles.roomMeta}><span><UsersRound size={14} aria-hidden="true" />{room.member_count} / {room.capacity}명</span><span>함께 시간과 장소를 정해요</span></div>
           <p className={styles.roomNote}>{room.joined ? '시간과 장소는 방에서 함께 정해요.' : room.status === 'full' ? '모집이 완료됐어요. 다음 방에서 함께해요.' : !room.joinable ? alreadyInRoom ? '한 번에 한 방만 참여해요. 내 방에서 먼저 나와 주세요.' : '현재 참여 조건으로는 이 방에 들어갈 수 없어요.' : room.member_count === 0 ? '첫 친구를 기다리는 방이에요.' : `한 팀까지 ${room.capacity - room.member_count}명 남았어요.`}</p>
           {room.joined ? <Link href={(socialChatHref({kind: 'activity_room', id: room.id}) ?? '/chat')} className={styles.primary}>내 방 채팅으로 <ArrowRight size={18} /></Link> : <button className={styles.primary} disabled={!!busyRoom || !room.joinable || !!error} onClick={() => void join(room.id)}>{busyRoom === room.id ? '참여 확인 중…' : room.status === 'full' ? '모집 완료' : !room.joinable ? alreadyInRoom ? '이미 참여 중인 방이 있어요' : '참여할 수 없는 방' : '이 방에 참여하기'}<ArrowRight size={18} /></button>}
         </article>)}
           {lobby.rooms.length === 0 ? <div className={styles.status}>모집방을 아직 준비하지 못했어요. 새로고침으로 다시 확인해 주세요.</div> : null}
         </div> : null}
+        <HostedActivityRooms key={`${activityKey}-${genderMode}`} activityKey={activityKey} category={definition.category} genderMode={genderMode} refreshVersion={refreshVersion} />
       </section>
-      <aside className={styles.hint}><MessageCircle size={20} /><div><strong>기존 약속도 이어서 확인해요.</strong><p>참여하면 입장 전 대화도 읽을 수 있어요. 이미 정한 시간·장소를 확인하고, 오늘의 별명으로 인사해 주세요.</p></div></aside>
+      <details className={styles.roomHelp}><summary><MessageCircle size={16} aria-hidden="true" />방 참여 방법</summary><p>바로 함께할 방은 참여 즉시 채팅이 열려요. 친구가 직접 연 방은 상세에서 보증금과 참가 조건을 확인하고 신청해요. 방장이 수락하면 채팅에 참여해요.</p></details>
     </div>
   </main>
 }

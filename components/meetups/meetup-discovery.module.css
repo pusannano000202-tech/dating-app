@@ -37,10 +37,20 @@
 .genderChoices a[aria-current=true]{background:#b94b3f;border-color:#b94b3f;color:#fff}
 .conditions>p{padding:0 14px 13px;font-size:11px;line-height:1.7;color:#82736b}
 .availabilityNote{margin:0 2px 12px;font-size:11px;line-height:1.7;color:#82736b}
+.shelfHeading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.shelfActions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.createMeetup{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 15px;border-radius:12px;background:#b94b3f;color:white;font-size:13px;font-weight:800;white-space:nowrap}
 .activityRow{min-height:175px;grid-template-columns:minmax(0,40%) minmax(0,60%)}
 .activityRow .rowText h2{font-size:18px}
 .activityRow .rowPhoto{min-height:175px}
 .capacity{display:flex;align-items:center;gap:5px;margin-top:9px;font-size:11px;line-height:1.5;color:#77665c}
+.otherMeetups{margin-top:24px;border-top:1px solid #ead9d2;font-size:12px;color:#82736b}
+.otherMeetups summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;cursor:pointer;list-style:none;font-weight:700}
+.otherMeetups summary::-webkit-details-marker{display:none}
+.otherMeetups[open] summary svg{transform:rotate(180deg)}
+.otherMeetups>p{margin:0 0 6px;line-height:1.7}
+.otherMeetups nav{display:flex;flex-wrap:wrap;gap:4px 18px}
+.otherMeetups nav a{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:#b94b3f;font-weight:700}
 .page a:focus-visible,.page summary:focus-visible{outline:3px solid #b94b3f;outline-offset:-3px;border-radius:8px}
 @media(min-width:760px){.page{padding-top:32px}.portalHeader{padding-bottom:24px}.portalHeader h1,.exploreHeader h1{font-size:31px}.portalRows,.groupRows,.activityRows{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;border:0;overflow:visible;background:transparent}.photoRow{border:1px solid #ead9d2;border-radius:18px;overflow:hidden;min-height:178px}.photoRow:last-child{border-bottom:1px solid #ead9d2}.rowPhoto{min-height:178px}.rowText{padding:20px 18px}.rowText h2{font-size:22px}.rowText p{font-size:12px}.rowDetail{font-size:11px}.activityRow{min-height:200px}.activityRow .rowPhoto{min-height:200px}.activityRow .rowText h2{font-size:20px}.conditions{max-width:440px}}
 @media(max-width:359px){.page{padding:18px 12px 108px}.portalHeader h1,.exploreHeader h1{font-size:24px}.rowText{padding:14px 11px}.rowText h2{font-size:18px}.rowText p{font-size:11px}.rowDetail{font-size:10px}.photoRow{grid-template-columns:minmax(0,40%) minmax(0,60%)}.activityRow .rowText h2{font-size:17px}.rowAction{margin-top:9px}.genderChoices{gap:5px}.genderChoices a{padding-left:10px;padding-right:10px}}

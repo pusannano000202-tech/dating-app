@@ -29,6 +29,7 @@ async function deniedRoom(status) {
     '@/lib/chat/social-messenger-state': stateExports, '@/lib/community/catalog': {}, '@/lib/community/meetup-gender': {}, '@/lib/community/meetup-place': {},
     '@/components/places/PlaceLinks': {}, '@/components/chat-polls/ActivityRoomPolls': {}, '@/components/chat/SocialMessenger': {},
     './LiveActivityGuide': {}, './MeetupApplications': {}, './MeetupCreatedNotice': {},
+    '@/lib/meetups/create-context': { getMeetupDetailBackLink() { throw new Error('unloaded room must not derive a detail return link') } },
   }
   const exports = {}
   vm.runInNewContext(compile('components/meetups/MeetupDetailExperience.tsx'), {

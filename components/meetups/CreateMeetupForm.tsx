@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useQuantumLocale } from '@/components/i18n/QuantumLocaleProvider'
 import LanguagePicker from '@/components/i18n/LanguagePicker'
 import { useHistoryAccount } from '@/components/content-history/useHistoryAccount'
-import { createdMeetupHref, getMeetupCreateBackHref, parseMeetupKoreanDate, meetupKoreanDateInput } from '@/lib/meetups/create-flow'
+import { createdMeetupHref, parseMeetupKoreanDate, meetupKoreanDateInput } from '@/lib/meetups/create-flow'
+import { readMeetupCreateContext } from '@/lib/meetups/create-context'
 import { getStudyCourse, searchStudyCourses } from '@/lib/meetups/study-catalog'
 import { validateMeetupCreateV3Input } from '@/lib/meetups/contracts'
 import s from './create-meetup.module.css'
@@ -23,12 +24,11 @@ import {
   type MeetupDiscoveryGroupId,
   type StudyTopicGroupId,
 } from '@/lib/community/catalog'
-import { isMeetupCategory, type MeetupCategory } from '@/lib/community/contracts'
+import type { MeetupCategory } from '@/lib/community/contracts'
 import type { MeetupScope } from '@/lib/community/department-rooms'
 import {
   MEETUP_GENDER_LABELS,
   MEETUP_GENDER_MODES,
-  isMeetupGenderMode,
   type MeetupGenderMode,
 } from '@/lib/community/meetup-gender'
 import { resolveIdempotencyAttempt, type IdempotencyAttempt } from '@/lib/meetups/idempotency'
@@ -38,22 +38,20 @@ export default function CreateMeetupForm() {
   const router = useRouter()
   const account = useHistoryAccount()
   const { t } = useQuantumLocale()
-  const [step, setStep] = useState(0)
   const submitLock = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
   const searchParams = useSearchParams()
-  const requestedCategory = searchParams.get('category')
-  const requestedIdea = searchParams.get('idea')
+  const createContext = readMeetupCreateContext(searchParams)
+  const [step, setStep] = useState(createContext.startAtRecruitment ? 1 : 0)
   // Discovery links provide editable defaults, not authorization. The server
   // still resolves the authenticated member's department for department scope.
-  const initialScope: MeetupScope = searchParams.get('scope') === 'department' ? 'department' : 'school'
+  const initialScope: MeetupScope = createContext.scope
   const requestedTitle = (searchParams.get('title') ?? '').replace(/\s+/g, ' ').trim().slice(0, 60)
-  const initialIdea = featuredMeetupIdeas.find((idea) => idea.id === requestedIdea)
-  const initialCategory = initialIdea?.category
-    ?? (isMeetupCategory(requestedCategory) ? requestedCategory : 'running')
+  const initialIdea = createContext.idea
+  const initialCategory = createContext.category
   const initialGroup = meetupDiscoveryGroups.find((group) => group.categories.includes(initialCategory))?.id
     ?? 'exercise'
-  const initialStudyGroup = initialIdea?.topicGroup ?? 'major-foundation'
+  const initialStudyGroup = createContext.topicGroup ?? 'major-foundation'
   const initialStudyTopics = initialIdea?.topicGroup
     ? (studyTopicGroups.find((group) => group.id === initialIdea.topicGroup)?.topics ?? [])
       .filter((topic) => initialIdea.title.includes(topic))
@@ -70,16 +68,15 @@ export default function CreateMeetupForm() {
   const [scheduledAt, setScheduledAt] = useState('')
   const [endsAt, setEndsAt] = useState('')
   const [capacity, setCapacity] = useState(() => getMeetupCapacityRecommendation(initialCategory))
-  const requestedGender = searchParams.get('gender_mode')
-  const [genderMode, setGenderMode] = useState<MeetupGenderMode>(isMeetupGenderMode(requestedGender) ? requestedGender : 'all')
+  const [genderMode, setGenderMode] = useState<MeetupGenderMode>(createContext.genderMode)
   const [scheduleStatus, setScheduleStatus] = useState<'confirmed'|'schedule_pending'>('schedule_pending')
   const [scopeType, setScopeType] = useState<MeetupScope>(initialScope)
   const [departmentProfile, setDepartmentProfile] = useState<{ owner: string; label: string } | null>(null)
   const departmentLabel = departmentProfile && departmentProfile.owner === account ? departmentProfile.label : ''
-  const [studyMode, setStudyMode] = useState<'course' | 'free'>(initialIdea && initialIdea.topicGroup !== 'major-foundation' ? 'free' : 'course')
+  const [studyMode, setStudyMode] = useState<'course' | 'free'>(createContext.startAtRecruitment || (initialIdea && initialIdea.topicGroup !== 'major-foundation') ? 'free' : 'course')
   const [courseQuery, setCourseQuery] = useState('')
   const [selectedCourseId, setSelectedCourseId] = useState('')
-  const backHref = getMeetupCreateBackHref(initialScope, searchParams.get('from'))
+  const backHref = createContext.backHref
   const selectedCourse = getStudyCourse(selectedCourseId)
   const courseResults = searchStudyCourses(courseQuery, { department: departmentLabel }).slice(0, 8)
   const [submitting, setSubmitting] = useState(false)
@@ -224,9 +221,9 @@ export default function CreateMeetupForm() {
 
     const payload = await response.json().catch(() => ({})) as { error?: string }
     window.clearTimeout(timeout)
-    submitLock.current = false
-    setSubmitting(false)
     if (!response.ok) {
+      submitLock.current = false
+      setSubmitting(false)
       if (response.status === 401) {
         const token=crypto.randomUUID()
         let saved=false
@@ -239,17 +236,25 @@ export default function CreateMeetupForm() {
         return
       }
       setError(getCreateError(payload.error))
-      setSubmitting(false)
       return
     }
 
     const createdHref = createdMeetupHref(payload)
-    if (!createdHref) { setError('저장 결과를 확인하지 못했어요. 같은 내용으로 다시 확인하거나 내 모임에서 찾아 주세요.'); return }
-    router.push(createdHref)
-    router.refresh()
+    if (!createdHref) {
+      submitLock.current = false
+      setSubmitting(false)
+      setError('저장 결과를 확인하지 못했어요. 같은 내용으로 다시 확인하거나 내 모임에서 찾아 주세요.')
+      return
+    }
+    // Keep the confirmed submission locked until the detail route replaces it.
+    // A second refresh would add another pending router action to this transition.
+    router.replace(createdHref)
   }
 
   const photo = activePreset?.imageSrc ?? featuredMeetupIdeas.find(idea => idea.category === category)?.imageSrc ?? (category==='soccer'?'/social-scenes/home-playmaker-football.webp':category==='baseball'?'/social-scenes/baseball.png':'/images/meetups/meetup-cafe-friends-v1.webp')
+  const selectedActivityTitle = activePreset?.title ?? (category === 'study' && studyMode === 'free'
+    ? `${studyTopicGroups.find(group => group.id === studyTopicGroup)?.title ?? ''} 스터디`
+    : t(getMeetupCategoryLabel(category)))
   function nextStep() {
     if (!formRef.current?.reportValidity()) return
     if(step===2&&scheduleStatus==='confirmed'){
@@ -263,11 +268,11 @@ export default function CreateMeetupForm() {
   const choice = (selected:boolean) => 'min-h-12 rounded-[14px] border px-4 py-3 text-sm font-bold '+(selected?'border-boot-primary bg-boot-primary text-white':'border-boot-hairline bg-white text-boot-muted')
   const groupPhotos={exercise:'/images/meetups/meetup-badminton.webp',games:'/images/meetups/meetup-gaming.webp',study:'/images/meetups/meetup-study.webp',lifestyle:'/images/meetups/meetup-cafe-friends-v1.webp'}
   return <main className={s.page}><div className={s.shell}>
-    <div className={s.top}><Link href={backHref} className={s.back}><ArrowLeft size={18}/>{t(backHref.startsWith('/meetups/department') ? '우리 과 모임으로' : '모임 둘러보기로')}</Link><LanguagePicker compact /></div>
+    <div className={s.top}><Link href={backHref} className={s.back}><ArrowLeft size={18}/>{t(backHref.startsWith('/meetups/activities/') ? '활동 모임방으로' : backHref.startsWith('/meetups/department') ? '우리 과 모임으로' : '모임 둘러보기로')}</Link><LanguagePicker compact /></div>
     <header className={s.header}><small>CREATE A NEW MEETUP</small><h1>{t(scopeType === 'department' ? '우리 과 모임 만들기' : '새 모임 만들기')} <span className={s.stepCount}>{step + 1}/4</span></h1><p>{t(step===0?'새 방에서 함께할 활동을 골라주세요.':step===1?'누구와 함께할지 모집 조건을 정해요.':step===2?'약속을 지금 정하거나 모인 뒤 함께 정해요.':'공개할 모집 조건과 다음 참여 단계를 확인해 주세요.')}</p><div className={s.creationContext}><span>{scopeType === 'department' ? departmentLabel || '내 프로필의 학과' : '학교 전체'}</span><span>{t(getMeetupCategoryLabel(category))}{category === 'study' ? ` · ${studyMode === 'course' ? '전공 수업' : '자유 주제'}` : ''}</span></div></header>
     <ol className={s.progress}>{['활동','모집','약속','확인'].map((label,index)=><li key={label} aria-current={step===index?'step':undefined}>{index+1} · {t(label)}</li>)}</ol>
     <form ref={formRef} onSubmit={submit} className={s.form}>
-      {step!==0&&step!==3?<div className={s.selected}><Image src={photo} alt="" width={180} height={140}/><span><strong>{t(getMeetupCategoryLabel(category))}</strong><small>{t(scopeType==='department'?'내 학과':'학교 전체')}</small></span></div>:null}
+      {step!==0&&step!==3?<div className={s.selected}><Image src={photo} alt="" width={180} height={140}/><span><strong>{selectedActivityTitle}</strong><small>{t(scopeType==='department'?'내 학과':'학교 전체')}</small></span><button type="button" disabled={submitting} className={s.changeActivity} onClick={()=>{setError('');setStep(0)}}>{t('활동 바꾸기')}</button></div>:null}
       {step===0 ? <>
         {activePreset?<p className={s.note}>{activePreset.title} · {activePreset.description}</p>:null}
         <div className={s.photos} role="group" aria-label={t('어떤 종류의 모임인가요?')}>

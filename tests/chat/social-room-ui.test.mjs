@@ -186,6 +186,7 @@ test('meetup quiet polling updates chat while preserving the host schedule draft
   const module=await moduleAt('components/meetups/MeetupDetailExperience.tsx',{
     '@/components/chat/SocialMessenger':{default:'SocialMessenger',SocialChatComposer:'SocialChatComposer'},
     '@/lib/chat/social-messenger-state':await moduleAt('lib/chat/social-messenger-state.ts',{}),
+    '@/lib/meetups/create-context':{getMeetupDetailBackLink(){throw new Error('chat-only room must not derive a detail return link')}},
     './MeetupCreatedNotice':{default:'MeetupCreatedNotice'},
     '@/lib/chat/useSocialChatRead':{useSocialChatRead(){}},
     react:h.react,'next/link':{default:'a'},'next/navigation':{useRouter:()=>router},'lucide-react':new Proxy({}, {get:(_,name)=>String(name)}),

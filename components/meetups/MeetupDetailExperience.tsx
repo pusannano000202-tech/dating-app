@@ -19,6 +19,7 @@ import type { ActiveMeetupGuideSceneId, MeetupGuideActionKind } from '@/lib/meet
 import LiveActivityGuide, { type LiveMeetupGuideDto } from './LiveActivityGuide'
 import MeetupApplications from './MeetupApplications'
 import MeetupCreatedNotice from './MeetupCreatedNotice'
+import { getMeetupDetailBackLink } from '@/lib/meetups/create-context'
 
 type MeetupDetail = {
   id: string
@@ -268,8 +269,9 @@ export default function MeetupDetailExperience({ meetupId, chatOnly = false, rea
     notice={<MeetupApplications meetupId={meetupId} noticesOnly/>} management={management}
     tools={active&&!readOnly?<ActivityRoomPolls roomId={meetup.id} roomKind="meetups" composerRequest={pollComposerRequest}/>:null}
     composer={<SocialChatComposer value={message} onChange={setMessage} onSend={()=>void sendMessage()} busy={sending} disabled={busy||readOnly||chat?.phase!=='send'||!!chatError} onCreatePoll={active&&!readOnly?()=>setPollComposerRequest(value=>value+1):undefined} label="참가자 대화 메시지"/>}/>
+  const detailBack = chatOnly ? { href: '/meetups', label: '모임 목록' } : getMeetupDetailBackLink(meetup)
   return <main className="min-h-screen bg-boot-canvas px-4 pb-28 pt-5 text-boot-ink"><div className="mx-auto w-full max-w-3xl space-y-5">
-    <Link href="/meetups" className="inline-flex min-h-11 items-center gap-2 text-sm font-black text-boot-primary"><ArrowLeft size={17}/>모임 목록</Link>
+    <Link href={detailBack.href} className="inline-flex min-h-11 items-center gap-2 text-sm font-black text-boot-primary"><ArrowLeft size={17}/>{detailBack.label}</Link>
     <MeetupCreatedNotice meetup={meetup} created={created}/>
     {management()}
   </div></main>

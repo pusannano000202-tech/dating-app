@@ -20,6 +20,7 @@ function harness(){
  }
  const fetch=(url,options)=>new Promise(resolve=>requests.push({url,options,reply(body,status=200){resolve({ok:status===200,status,json:async()=>body})}}))
  const deps={react,'react/jsx-runtime':{jsx:(type,props)=>({type,props}),jsxs:(type,props)=>({type,props})},'next/link':{default:'link'},'next/image':{default:'image'},'lucide-react':{},'@/components/i18n/QuantumLocaleProvider':{useQuantumLocale:()=>({t:x=>x})},'@/lib/meetups/create-flow':pure('lib/meetups/create-flow.ts'),'@/lib/meetups/list-page':pure('lib/meetups/list-page.ts'),'@/lib/community/catalog':{featuredMeetupIdeas:[],getMeetupCategoryLabel:x=>x},'./meetup-discovery.module.css':{default:{}}}
+ deps['@/lib/meetups/create-context']={buildContextualMeetupCreateHref:({category,genderMode})=>'/meetups/create?'+new URLSearchParams({category,gender_mode:genderMode})}
  const exports={};new Function('exports','require','fetch','window',compile('components/meetups/CustomMeetupShelf.tsx'))(exports,name=>{assert.ok(Object.hasOwn(deps,name),name);return deps[name]},fetch,{setTimeout:()=>1,clearTimeout(){}})
  function flush(){for(let turns=0;dirty||effects.size;turns++){assert.ok(turns<30);if(dirty){index=0;dirty=false;output=exports.default(props)}const pending=[...effects];effects.clear();for(const[i,{fn,deps}]of pending){slots[i].cleanup?.();slots[i]={fn,deps,cleanup:fn()}}}}
  async function settle(){for(let i=0;i<20;i++){await Promise.resolve();flush()}}

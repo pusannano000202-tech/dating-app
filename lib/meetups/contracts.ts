@@ -11,6 +11,11 @@ export type MeetupCreateV3Input = MeetupCreateInput & {
 
 type ValidationResult<T> = { ok: true; value: T } | { ok: false; error: string }
 
+/** An explicit activity must be a catalog key, not a title/category guess. */
+export function isMeetupListActivity(activityKey: string, category: string | null): boolean {
+  return featuredMeetupIdeas.some((idea) => idea.id === activityKey && (category === null || idea.category === category))
+}
+
 export function validateMeetupCreateV3Input(input: unknown, now = new Date()): ValidationResult<MeetupCreateV3Input> {
   const base = validateMeetupCreateInput(input, now)
   if (!base.ok) return base

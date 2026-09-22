@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { isMeetupCategory, parseCommunityListLimit } from '@/lib/community/contracts'
 import { parseMeetupScope } from '@/lib/community/department-rooms'
 import { isMeetupGenderMode } from '@/lib/community/meetup-gender'
-import { validateMeetupCreateV3Input } from '@/lib/meetups/contracts'
+import { isMeetupListActivity, validateMeetupCreateV3Input } from '@/lib/meetups/contracts'
 import { isMeetupListCursor, presentMeetupPage } from '@/lib/meetups/list-page'
 import { meetupRpcErrorResponse } from '@/lib/meetups/http'
 import { createSupabaseRequestClient } from '@/lib/supabase-request'
@@ -26,6 +26,7 @@ async function listMeetups(req: NextRequest) {
   }
 
   const categoryParam = req.nextUrl.searchParams.get('category')
+  const activityKeyParam = req.nextUrl.searchParams.get('activity_key')
   const genderModeParam = req.nextUrl.searchParams.get('gender_mode')
   const scopeParam = req.nextUrl.searchParams.get('scope_type')
   const limit = parseCommunityListLimit(req.nextUrl.searchParams.get('limit'))
@@ -34,6 +35,9 @@ async function listMeetups(req: NextRequest) {
   if (categoryParam && !isMeetupCategory(categoryParam)) {
     return jsonError('invalid_category', 400)
   }
+  if (activityKeyParam !== null && !isMeetupListActivity(activityKeyParam, categoryParam || null)) {
+    return jsonError('invalid_activity_key', 400)
+  }
   if (genderModeParam !== null && !isMeetupGenderMode(genderModeParam)) {
     return jsonError('invalid_gender_mode', 400)
   }
@@ -41,13 +45,18 @@ async function listMeetups(req: NextRequest) {
     return jsonError('invalid_scope_type', 400)
   }
 
-  const { data, error } = await supabase.rpc('list_activity_meetups_v4', {
+  const listArgs = {
     p_category: categoryParam || null,
     p_limit: limit + 1,
     p_gender_mode: genderModeParam,
     p_scope_type: scopeParam,
     p_cursor: cursor,
-  })
+  }
+  // Filtering happens inside the RPC before keyset pagination. Never fall back
+  // to a broader, already-limited v4 page when a requested activity is unavailable.
+  const { data, error } = activityKeyParam === null
+    ? await supabase.rpc('list_activity_meetups_v4', listArgs)
+    : await supabase.rpc('list_activity_meetups_v5', { ...listArgs, p_activity_key: activityKeyParam })
 
   if (error) {
     return meetupRpcErrorResponse(error)
